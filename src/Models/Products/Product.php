@@ -2,12 +2,12 @@
 
 namespace AdminEshop\Models\Products;
 
-use Gogol\Admin\Models\Model as AdminModel;
+use Admin\Eloquent\AdminModel;
 use Illuminate\Support\Collection;
 use AdminEshop\Traits\ProductTrait;
 use AdminEshop\Models\Store\Manufacturer;
-use Gogol\Admin\Fields\Group;
-use Gogol\Admin\Helpers\File as AdminFile;
+use Admin\Fields\Group;
+use Admin\Helpers\File as AdminFile;
 use Basket;
 use Store;
 

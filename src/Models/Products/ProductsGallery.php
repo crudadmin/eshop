@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
-use Gogol\Admin\Models\Model as AdminModel;
+use Admin\Eloquent\AdminModel;
 
 class ProductsGallery extends AdminModel
 {

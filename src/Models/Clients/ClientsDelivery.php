@@ -2,8 +2,8 @@
 
 namespace AdminEshop\Models\Clients;
 
-use Gogol\Admin\Models\Model as AdminModel;
-use Gogol\Admin\Fields\Group;
+use Admin\Eloquent\AdminModel;
+use Admin\Fields\Group;
 
 class ClientsDelivery extends AdminModel
 {
@@ -32,14 +32,14 @@ class ClientsDelivery extends AdminModel
     public function fields($row)
     {
         return [
-            'Osobné údaje' => Group::half([
+            'Osobné údaje' => Group::fields([
                 'type' => 'name:Typ adresy|type:select|required',
                 'name' => 'name:Názov adresy|required',
                 'firstname' => 'name:Krstné meno|required',
                 'lastname' => 'name:Priezvisko|required',
                 'phone' => 'name:Tel. číslo|required|phone:CZ,SK',
                 'default' => 'name:Predvolené|default:0|type:checkbox',
-            ])->grid(4),
+            ]),
 
             'Adresa' => Group::half([
                 'street' => 'name:Ulice a č.p.|required',
@@ -50,9 +50,9 @@ class ClientsDelivery extends AdminModel
 
             'Firemné údaje' => Group::fields([
                 'company_name' => 'name:Názov firmy|component:companyField',
-                'company_id' => 'name:IČO|numeric|max:99999999',
-                'company_tax_id' => 'name:DIČ|dic',
-                'company_vat_id' => 'name:IČ DPH|dic',
+                'company_id' => 'name:IČO|numeric',
+                'tax_id' => 'name:DIČ|dic',
+                'vat_id' => 'name:IČ DPH|dic',
             ])->grid(4)->add('hidden'),
         ];
     }

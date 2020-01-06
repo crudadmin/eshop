@@ -2,8 +2,8 @@
 
 namespace AdminEshop\Models\Clients;
 
-use Gogol\Admin\Models\Model as AdminModel;
-use Gogol\Admin\Fields\Group;
+use Admin\Eloquent\AdminModel;
+use Admin\Fields\Group;
 
 class ClientsGroup extends AdminModel
 {
@@ -15,7 +15,7 @@ class ClientsGroup extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Skupiny';
+    protected $name = 'Skupiny klientov';
 
     protected $group = 'clients';
 

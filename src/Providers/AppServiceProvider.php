@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Admin::addModelPath('AdminEshop\Models', __dir__ . '/../Models/**');
+        Admin::registerAdminModels(__dir__ . '/../Models/**', 'AdminEshop\Models');
 
         //Boot providers after this provider boot
         $this->bootProviders([

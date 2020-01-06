@@ -2,8 +2,8 @@
 
 namespace AdminEshop\Models\Products;
 
-use Gogol\Admin\Models\Model as AdminModel;
-use Gogol\Admin\Fields\Group;
+use Admin\Eloquent\AdminModel;
+use Admin\Fields\Group;
 use \AdminEshop\Models\Store\AttributesItem;
 
 class ProductsVariantsAttribute extends AdminModel

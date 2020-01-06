@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Rules;
 
-use Gogol\Admin\Models\Model as AdminModel;
+use Admin\Eloquent\AdminModel;
 use Admin;
 use Ajax;
 

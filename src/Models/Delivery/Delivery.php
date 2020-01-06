@@ -2,8 +2,8 @@
 
 namespace AdminEshop\Models\Delivery;
 
-use Gogol\Admin\Models\Model as AdminModel;
-use Gogol\Admin\Fields\Group;
+use Admin\Eloquent\AdminModel;
+use Admin\Fields\Group;
 use Basket;
 
 class Delivery extends AdminModel

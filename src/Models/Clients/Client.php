@@ -2,9 +2,9 @@
 
 namespace AdminEshop\Models\Clients;
 
-use Gogol\Admin\Models\Authenticatable;
+use Admin\Eloquent\Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Gogol\Admin\Fields\Group;
+use Admin\Fields\Group;
 use Carbon\Carbon;
 use DB;
 
@@ -18,7 +18,7 @@ class Client extends Authenticatable
     /*
      * Template name
      */
-    protected $name = 'Seznam klientů';
+    protected $name = 'Zoznam klientov';
 
     protected $group = 'clients';
 
@@ -41,22 +41,19 @@ class Client extends Authenticatable
                 'lastname' => 'name:Priezvisko',
                 'phone' => 'name:Telefon|phone:CZ,SK',
                 'groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd',
-            ])->grid(4),
-            'Fakturační údaje' => Group::fields([
+            ]),
+            'Fakturačné údaje' => Group::half([
                 'street' => 'name:Ulice a č.p.',
                 'city' => 'name:Mesto',
                 'zipcode' => 'name:PSČ',
                 'country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id',
-            ])->grid(4),
-            'Firemní údaje' => Group::fields([
+            ]),
+            'Firemné údaje' => Group::half([
                 'company_name' => 'name:Názov firmy|required_with:is_company',
-                'company_id' => 'name:IČO|required_with:is_company|numeric|max:99999999',
-                'company_tax_id' => 'name:DIČ|required_with:is_company|dic',
-                'company_vat_id' => 'name:IČ DPH',
-            ])->grid(4)->add('hidden'),
-            'Ostatné údaje' => Group::fields([
-                'last_logged_at' => 'name:Posledné prihlásenie|type:datetime',
-            ])->grid(4),
+                'company_id' => 'name:IČO|required_with:is_company|numeric',
+                'tax_id' => 'name:DIČ|required_with:is_company|dic',
+                'vat_id' => 'name:IČ DPH',
+            ])->add('hidden'),
         ];
     }
 

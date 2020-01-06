@@ -2,8 +2,8 @@
 
 namespace AdminEshop\Models\Orders;
 
-use Gogol\Admin\Models\Model as AdminModel;
-use Gogol\Admin\Fields\Group;
+use Admin\Eloquent\AdminModel;
+use Admin\Fields\Group;
 use AdminEshop\Traits\ProductTrait;
 use AdminEshop\Models\Products\ProductsVariant;
 use Store;

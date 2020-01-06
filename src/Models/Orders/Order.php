@@ -2,9 +2,9 @@
 
 namespace AdminEshop\Models\Orders;
 
-use Gogol\Admin\Models\Model as AdminModel;
+use Admin\Eloquent\AdminModel;
 use Illuminate\Notifications\Notifiable;
-use Gogol\Admin\Fields\Group;
+use Admin\Fields\Group;
 use AdminEshop\Traits\OrderTrait;
 use Basket;
 
@@ -71,7 +71,7 @@ class Order extends AdminModel
             Group::fields([
                 'Firemní údaje' => Group::fields([
                     'company_name' => 'name:Názov firmy|required_with:is_company|hidden',
-                    'company_id' => 'name:IČ|required_with:is_company|numeric|max:999999999|hidden',
+                    'company_id' => 'name:IČ|required_with:is_company|numeric|hidden',
                     'company_tax_id' => 'name:DIČ|required_with:is_company|hidden',
                     'company_vat_id' => 'name:IČ DPH|hidden',
                 ]),
