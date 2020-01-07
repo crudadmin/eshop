@@ -7,7 +7,6 @@ use Admin\Fields\Group;
 use AdminEshop\Traits\ProductTrait;
 use AdminEshop\Models\Products\ProductsVariant;
 use Store;
-use Basket;
 
 class OrdersProduct extends AdminModel
 {
@@ -89,10 +88,7 @@ class OrdersProduct extends AdminModel
             ],
 
             //Add currency after columns
-            'columns.tax.add_after' => ' %',
-            'columns.total.add_after' => ' '.Basket::getCurrency(),
-            'columns.price.add_after' => ' '.Basket::getCurrency(),
-            'columns.price_tax.add_after' => ' '.Basket::getCurrency(),
+            'columns.price_tax.add_after' => ' '.Store::getCurrency(),
         ];
     }
 

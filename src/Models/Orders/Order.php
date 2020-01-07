@@ -6,7 +6,7 @@ use Admin\Eloquent\AdminModel;
 use Illuminate\Notifications\Notifiable;
 use Admin\Fields\Group;
 use AdminEshop\Traits\OrderTrait;
-use Basket;
+use Store;
 
 class Order extends AdminModel
 {
@@ -110,8 +110,8 @@ class Order extends AdminModel
             'title.update' => 'Objednávka č. :id - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',
-            'columns.price.add_after' => ' '.Basket::getCurrency(),
-            'columns.price_tax.add_after' => ' '.Basket::getCurrency(),
+            'columns.price.add_after' => ' '.Store::getCurrency(),
+            'columns.price_tax.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
             'columns.client_name' => [
                 'after' => 'id',

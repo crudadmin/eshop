@@ -15,7 +15,7 @@ class Country extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Krajina';
+    protected $name = 'Krajiny';
 
     /*
      * Template title
@@ -23,7 +23,7 @@ class Country extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'store.settings.general';
+    protected $group = 'store.settings';
 
     /*
      * Automatic form and database generation

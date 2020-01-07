@@ -11,10 +11,7 @@ use Store;
 
 class Basket
 {
-    public function getCurrency()
-    {
-        return '€';
-    }
+
 }
 
 ?>

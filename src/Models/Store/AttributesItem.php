@@ -29,6 +29,7 @@ class AttributesItem extends AdminModel
     protected $withoutParent = true;
     protected $publishable = false;
     protected $reversed = true;
+
     protected $sluggable = 'name';
 
     /*
@@ -50,5 +51,4 @@ class AttributesItem extends AdminModel
         'title.update' => ':name',
         'columns.id.hidden' => true,
     ];
-
 }

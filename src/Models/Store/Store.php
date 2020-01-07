@@ -15,7 +15,7 @@ class Store extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Obchod';
+    protected $name = 'Nastavenia';
 
     /*
      * Template title
@@ -23,7 +23,7 @@ class Store extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'store.settings.general';
+    protected $group = 'store.settings';
 
     protected $single = true;
 
@@ -39,6 +39,7 @@ class Store extends AdminModel
         return [
             'email' => 'name:Email obchodu|email',
             'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
+            'default_image' => 'name:Obrázok pri produktoch bez fotografie|image|required',
         ];
     }
 

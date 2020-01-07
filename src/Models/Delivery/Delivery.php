@@ -44,12 +44,8 @@ class Delivery extends AdminModel
             'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|canAdd',
             'price' => 'name:Zakladná cena bez DPH|type:decimal|required',
             'description' => 'name:Popis dopravy|type:editor|hidden',
-            Group::fields([
-                'code' => 'name:Kód dopravy',
-                'enabled' => 'name:Aktivovaná|type:checkbox|default:1|hidden',
-            ])->inline(),
 
-            'Omezení dopravy' => Group::tab([
+            'Obmedzenia' => Group::tab([
                 'payments' => 'name:Platobné metódy|belongsToMany:payments_methods,name|canAdd',
                 'countries' => 'name:Krajiny|belongsToMany:countries,name|canAdd',
                 'groups' => 'name:Uživatelské skupiny|belongsToMany:clients_groups,name|canAdd',

@@ -2,11 +2,18 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Eloquent\Concerns\HasProductAttributes;
+use AdminEshop\Eloquent\Concerns\HasProductImage;
+use AdminEshop\Eloquent\Concerns\HasWarehouse;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
 class ProductsVariant extends AdminModel
 {
+    use HasProductAttributes,
+        HasWarehouse,
+        HasProductImage;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -23,9 +30,8 @@ class ProductsVariant extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'store.products';
-
     protected $inTab = true;
+
     protected $withoutParent = true;
 
     protected $publishable = false;
@@ -42,33 +48,33 @@ class ProductsVariant extends AdminModel
     public function fields()
     {
         return [
-            'Nastavení varianty' => Group::tab([
-                'ean' => 'name:EAN varianty',
-                'code' => 'name:Kód varianty',
-                'slug' => 'name:Url|invisible|index',
-                'image' => 'name:Obrázok varianty|hidden|image',
+            'Nastavenie varianty' => Group::tab([
+                Group::fields([
+                    'name' => 'name:Názov varianty',
+                    'image' => 'name:Obrázok varianty|image',
+                ])->inline(),
+                Group::fields([
+                    'ean' => 'name:EAN varianty',
+                    'code' => 'name:Kód varianty',
+                ])->inline(),
             ])->grid(5)->icon('fa-pencil'),
-            Group::tab( ProductsVariantsAttribute::class ),
+            'Popis' => Group::tab([
+                'description' => 'name:Popis varianty|type:editor|hidden',
+            ])->icon('fa-file-text-o'),
+            'Cena' => Group::tab([
+                'Cena' => Group::fields([
+                    'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|required|canAdd|hidden',
+                    'price' => 'name:Cena bez DPH|type:decimal|default:0',
+                ])->width(8),
+                'Zľava' => Group::fields([
+                    'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
+                    'discount' => 'name:Výška zľavy|type:decimal|required_with:discount_operator|hidden',
+                ])->width(4),
+            ])->icon('fa-money'),
             'Sklad' => Group::tab([
                 'warehouse_quantity' => 'name:Počet na sklade|type:integer|default:0',
             ])->grid(7)->icon('fa-gear'),
-            'Cena' => Group::tab([
-                'Cena' => Group::full([
-                    Group::half([
-                        'price_operator' => 'name:Spôsob upravy ceny|type:select|default:default',
-                    ]),
-                    Group::half([
-                        'price_value' => 'name:Upraviť cenu o|component:ProductVariantPrice|type:decimal',
-                    ]),
-
-                    'price' => 'name:Základna cena bez DPH|invisible|type:decimal|default:0',
-                    'pricings' => 'name:Cenníky|component:productPrice|type:json|hidden',
-                ]),
-                'Sleva' => Group::full([
-                    'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
-                    'discount' => 'name:Výška zľavy|type:decimal|hidden',
-                ]),
-            ])->add('hidden')->icon('fa-money'),
+            Group::tab( ProductsVariantsAttribute::class ),
         ];
     }
 
@@ -86,6 +92,7 @@ class ProductsVariant extends AdminModel
             'before' => 'code',
         ],
         'buttons' => [
+            'insert' => 'Nová varianta',
             'update' => 'Uložiť variantu',
             'create' => 'Pridať variantu',
         ],

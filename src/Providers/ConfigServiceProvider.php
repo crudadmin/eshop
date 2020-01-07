@@ -29,7 +29,9 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        $this->mergeConfigFrom(
+            __DIR__.'/../Config/config.php', 'admineshop'
+        );
     }
 
     /*
@@ -38,14 +40,14 @@ class ConfigServiceProvider extends ServiceProvider
     private function mergeAdminConfigs($key = 'admin')
     {
         //test 2
-        $admineshop_config = require __DIR__.'/../Config/config.php';
+        $admineshop_config = require __DIR__.'/../Config/admin.php';
 
         $config = $this->app['config']->get($key, []);
 
         $this->app['config']->set($key, array_merge($admineshop_config, $config));
 
         //Merge selected properties with two dimensional array
-        foreach (['groups', 'models', 'author', 'passwords', 'gettext_source_paths'] as $property) {
+        foreach (['groups', 'models', 'components', 'author', 'passwords', 'gettext_source_paths'] as $property) {
             if ( ! array_key_exists($property, $admineshop_config) || ! array_key_exists($property, $config) )
                 continue;
 

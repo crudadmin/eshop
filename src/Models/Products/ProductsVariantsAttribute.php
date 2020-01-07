@@ -24,8 +24,6 @@ class ProductsVariantsAttribute extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'store.products';
-
     protected $inTab = true;
     protected $withoutParent = true;
 
@@ -44,7 +42,7 @@ class ProductsVariantsAttribute extends AdminModel
     {
         return [
             'attribute' => 'name:Atribút|belongsTo:attributes,name|canAdd|required',
-            'item' => 'name:Hodnota atribútu|belongsTo:attributes_items,name|component:AttributeItemValue|filterBy:attribute|canAdd|required',
+            'item' => 'name:Hodnota atribútu|belongsTo:attributes_items,:name:unit|filterBy:attribute|canAdd|required',
         ];
     }
 
@@ -53,19 +51,9 @@ class ProductsVariantsAttribute extends AdminModel
      */
     private function getVariantItemsOptions()
     {
-        $array = [];
-
-        $items = AttributesItem::select(['id', 'attribute_id', 'name'])->whereHas('attribute')->with('attribute:id,unit')->get();
-
-        foreach ($items as $item) {
-            $array_item = $item->toArray();
-            $array_item['name'] = $item->name.$item->attribute->unit;
-            unset($array_item['attribute']);
-
-            $array[$item->getKey()] = $array_item;
-        }
-
-        return $array;
+        return AttributesItem::select(['attributes_items.id', 'attributes_items.attribute_id', 'attributes_items.name', 'attributes.unit'])
+                ->leftJoin('attributes', 'attributes.id', '=', 'attributes_items.attribute_id')
+                ->get();
     }
 
     public function options()
@@ -73,18 +61,6 @@ class ProductsVariantsAttribute extends AdminModel
         return [
             'item' => $this->getVariantItemsOptions(),
         ];
-    }
-
-    public function onUpdate($row)
-    {
-        if ( $this->variant )
-            $row->variant->reloadSlug();
-    }
-
-    public function onCreate($row)
-    {
-        if ( $this->variant )
-            $row->variant->reloadSlug();
     }
 
     protected $settings = [
@@ -95,8 +71,13 @@ class ProductsVariantsAttribute extends AdminModel
         'grid.enabled' => false,
         'grid.default' => 'full',
         'buttons' => [
+            'insert' => 'Nový atribút',
             'update' => 'Uložiť atribút',
-            'create' => 'Přidať atribút',
+            'create' => 'Pridať atribút',
         ],
+    ];
+
+    protected $layouts = [
+        'form-top' => 'setProductAttributes',
     ];
 }

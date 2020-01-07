@@ -23,7 +23,7 @@ class Attribute extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'store.products';
+    protected $group = 'products';
 
     protected $reversed = true;
 
