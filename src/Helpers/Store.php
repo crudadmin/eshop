@@ -12,6 +12,22 @@ class Store
 {
     private $storeSettings;
 
+    private $taxes;
+
+    private $hasB2B = false;
+
+    /*
+     * Return all taxes
+     */
+    public function getTaxes()
+    {
+        if ( ! $this->taxes ) {
+            $this->taxes = Admin::getModel('Tax')->pluck('tax', 'id')->toArray();
+        }
+
+        return $this->taxes;
+    }
+
     public function getSettings()
     {
         if ( ! $this->storeSettings ) {
@@ -49,6 +65,7 @@ class Store
 
     /*
      * Returns prices in correct number format
+     * For basket we want fixed 2 decimals
      */
     public function numberFormatWithoutTax($number)
     {
@@ -64,11 +81,34 @@ class Store
     }
 
     /*
-     * Return price in correct number format
+     * Add tax to given price
      */
-    public function priceWithoutTax($number)
+    public function priceWithTax($price, $tax_id)
     {
-        return $this->numberFormatWithoutTax($number). ' '. $this->getCurrency();
+        $taxes = $this->getTaxes();
+
+        $tax = array_key_exists($tax_id, $taxes) ? $taxes[$tax_id] : null;
+
+        return Store::roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
+    }
+
+    /*
+     * Show tax prices for B2b
+     */
+    public function hasB2B()
+    {
+        return session('b2b', $this->hasB2B);
+    }
+
+    /*
+     * Set b2b prices
+     */
+    public function setB2B($tax = false)
+    {
+        session()->put('b2b', $tax);
+        session()->save();
+
+        $this->hasB2B = $tax;
     }
 }
 

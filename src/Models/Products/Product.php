@@ -2,8 +2,10 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Eloquent\Concerns\HasBasket;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasWarehouse;
+use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Models\Store\Manufacturer;
 use AdminEshop\Traits\ProductTrait;
 use Admin\Eloquent\AdminModel;
@@ -17,7 +19,9 @@ class Product extends AdminModel
 {
     use ProductTrait,
         HasProductImage,
-        HasWarehouse;
+        HasWarehouse,
+        PriceMutator,
+        HasBasket;
 
     /*
      * Model created date, for ordering tables in database and in user interface

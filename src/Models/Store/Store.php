@@ -39,7 +39,7 @@ class Store extends AdminModel
         return [
             'email' => 'name:Email obchodu|email',
             'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
-            'default_image' => 'name:Obrázok pri produktoch bez fotografie|image|required',
+            'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
         ];
     }
 

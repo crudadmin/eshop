@@ -12,5 +12,16 @@ use Admin;
 
 class BasketController extends Controller
 {
+    public function addItem()
+    {
+        $product = Admin::getModelByTable('products')
+                        ->select(['id'])
+                        ->where('id', request('product_id'))
+                        ->onStock()
+                        ->firstOrFail();
 
+        $items = Basket::add($product->getKey(), request('quantity'), request('variant_id'));
+
+        return $items->all();
+    }
 }
