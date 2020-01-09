@@ -43,6 +43,8 @@ class Product extends AdminModel
 
     protected $sluggable = 'name';
 
+    protected $appends = ['priceWithTax', 'priceWithoutTax', 'finalPrice'];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -111,4 +113,9 @@ class Product extends AdminModel
     protected $layouts = [
         'form-top' => 'setProductTabs',
     ];
+
+    public function scopeBasketSelect($query)
+    {
+        $query->select(['id', 'name', 'price', 'tax_id']);
+    }
 }

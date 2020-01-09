@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Eloquent\Concerns\HasBasket;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasWarehouse;
@@ -14,7 +15,8 @@ class ProductsVariant extends AdminModel
     use HasProductAttributes,
         HasWarehouse,
         HasProductImage,
-        PriceMutator;
+        PriceMutator,
+        HasBasket;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -99,14 +101,17 @@ class ProductsVariant extends AdminModel
         'autoreset' => false,
     ];
 
-    protected $appends = [
-        'finalPrice',
-    ];
+    protected $appends = ['priceWithTax', 'priceWithoutTax', 'finalPrice'];
 
     public function options()
     {
         return [
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
         ];
+    }
+
+    public function scopeBasketSelect($query)
+    {
+        $query->select(['id', 'name', 'price', 'tax_id']);
     }
 }

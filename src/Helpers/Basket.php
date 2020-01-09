@@ -17,9 +17,9 @@ class Basket
      */
     private $items = [];
 
-    private $loadedProducts = null;
+    private $loadedProducts = [];
 
-    private $loadedVariants = null;
+    private $loadedVariants = [];
 
     /*
      * Session key
@@ -28,17 +28,76 @@ class Basket
 
     public function __construct()
     {
-        $this->items = new Collection($this->getItemsFromSession());
+        $this->items = new Collection($this->fetchItemsFromSession());
 
-        $p = new Product(['id' => 50]);
-        $p->id = 1;
-
-        $this->loadedProducts = new Collection([ $p ]);
+        $this->loadedProducts = new Collection();
 
         $this->loadedVariants = new Collection();
     }
 
-    private function getItemsFromSession()
+    /**
+     * Add product into basket and save it into session
+     * @param Product     $product
+     * @param int|integer $quantity
+     */
+    public function add(int $productId, int $quantity = 1, $variantId = null)
+    {
+        //If items does not exists in basket
+        if ( $item = $this->getItemFromBasket($productId, $variantId) )
+        {
+            $this->updateQuantity($productId, $item->quantity + $quantity, $variantId);
+        } else {
+            $this->addNewItem($productId, $quantity, $variantId);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Update quantity for existing item in basket
+     *
+     * @param  int  $productId
+     * @param  int  $quantity
+     * @param  int|null  $variantId
+     * @return  this
+     */
+    public function updateQuantity(int $productId, $quantity, $variantId)
+    {
+        if ( ! ($item = $this->getItemFromBasket($productId, $variantId)) ) {
+            abort(500, _('Produkt neexistuje v košíku.'));
+        }
+
+        $item->quantity = $this->checkQuantity($quantity);
+
+        $this->save();
+
+        return $this;
+    }
+
+    /**
+     * Remove item from basket
+     *
+     * @param  int  $productId
+     * @param  int|null  $variantId
+     * @return  this
+     */
+    public function remove(int $productId, $variantId = null)
+    {
+        $this->items = $this->items->reject(function($item) use ($productId, $variantId) {
+            return $item->id == $productId && (
+                $variantId ? $item->variant_id == $variantId : true
+            );
+        });
+
+        $this->save();
+
+        return $this;
+    }
+
+    /*
+     * Fetch items from session
+     */
+    private function fetchItemsFromSession()
     {
         $items = session($this->key, []);
 
@@ -51,52 +110,44 @@ class Basket
     }
 
     /**
-     * Add product into basket and save it into session
-     * @param Product     $product
-     * @param int|integer $quantity
+     * Returns item from basket
+     *
+     * @param  int  $productId
+     * @param  int|null  $variantId
+     * @return null|object
      */
-    public function add(int $productId, int $quantity = 1, $variantId = null)
+    public function getItemFromBasket(int $productId, $variantId = null)
     {
-        $productId = (int)$productId;
+        $items = $this->items->where('id', $productId);
 
         if ( $variantId ) {
-            $variantId = (int)$variantId;
+            return $items->where('variant_id', $variantId)->first();
         }
 
-        //If items does not exists in basket
-        if ( ! $this->items->has($productId) )
-        {
-            $item = new \StdClass();
-            $item->id = $productId;
-            $item->quantity = $variantId ? 0 : $quantity;
-            $item->variants = [];
+        return $items->first();
+    }
 
-            //Add variant if is selected
-            if ( $variantId ) {
-                $item->variants[$variantId] = $this->checkQuantity($quantity);
-            }
+    /**
+     * Add new item into basket
+     *
+     * @param  int  $productId
+     * @param  int  $quantity
+     * @param  int|null  $variantId
+     */
+    private function addNewItem($productId, $quantity, $variantId)
+    {
+        $item = new \StdClass();
+        $item->id = $productId;
 
-            $this->items[ $productId ] = $item;
-        } else {
-            if ( $variantId ){
-                //Add new variant into product
-                if ( ! array_key_exists($variantId, $this->items[ $productId ]->variants) ) {
-                    $this->items[ $productId ]->variants[$variantId] = $this->checkQuantity($quantity);
-                }
-
-                //Update existing variant
-                else {
-                    $this->items[ $productId ]->variants[$variantId] += $this->checkQuantity($quantity);
-                }
-            } else {
-                //Update simple product quantity
-                $this->items[ $productId ]->quantity += $this->checkQuantity($quantity);
-            }
+        if ( $variantId ) {
+            $item->variant_id = $variantId;
         }
+
+        $item->quantity = $this->checkQuantity($quantity);
+
+        $this->items[] = $item;
 
         $this->save();
-
-        return $this;
     }
 
     /**
@@ -111,7 +162,7 @@ class Basket
     }
 
     /*
-     * Save items in basket
+     * Save items from basket into session
      */
     public function save()
     {
@@ -126,39 +177,66 @@ class Basket
     }
 
     /**
-     * Get all items
+     * Get all items from basket with loaded products and variants from db
      *
      * @return Collection
      */
     public function all()
     {
-        $this->loadMissingProductDataFromDb();
+        $this->fetchMissingProductDataFromDb();
 
         return $this->items->map(function($item){
             return $this->mapProductData($item);
         });
     }
 
-    public function loadMissingProductDataFromDb()
+    /*
+     * Fetch products/variants from db
+     */
+    public function fetchMissingProductDataFromDb()
     {
-        $productIds = array_diff(array_keys($this->items->toArray()), $this->loadedProducts->pluck('id')->toArray());
-        $productVariantsIds = [];
+        $productIds = array_diff(
+            $this->items->pluck(['id'])->toArray(),
+            $this->loadedProducts->pluck('id')->toArray()
+        );
+
+        $productVariantsIds = array_diff(
+            array_filter($this->items->pluck('variant_id')->toArray()),
+            $this->loadedVariants->pluck('id')->toArray()
+        );
 
         //If there is any non-fetched products
         if ( count($productIds) > 0 ) {
-            $fechedProducts = Admin::getModelByTable('products')
-                                    ->basketSelect()
-                                    ->whereIn('id', $productIds)
-                                    ->get();
+            $fechedProducts = Admin::getModelByTable('products')->basketSelect()
+                                    ->whereIn('id', $productIds)->get();
 
             //Merge fetched products into existing collection
             $this->loadedProducts = $this->loadedProducts->merge($fechedProducts);
         }
+
+        //If there is any non-fetched variants
+        if ( count($productVariantsIds) > 0 ) {
+            $fechedProducts = Admin::getModelByTable('products_variants')->basketSelect()
+                                    ->whereIn('id', $productVariantsIds)->get();
+
+            //Merge fetched products into existing collection
+            $this->loadedVariants = $this->loadedVariants->merge($fechedProducts);
+        }
     }
 
+    /**
+     * Add fetched product and variant into basket item
+     *
+     * @param  object  $item
+     * @return object
+     */
     public function mapProductData($item)
     {
         $item->product = $this->loadedProducts->find($item->id);
+
+        if ( isset($item->variant_id) ) {
+            $item->variant = $this->loadedVariants->find($item->variant_id);
+        }
 
         return $item;
     }
