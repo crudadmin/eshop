@@ -6,7 +6,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use \AdminEshop\Models\Store\AttributesItem;
 
-class ProductsVariantsAttribute extends AdminModel
+class ProductsAttribute extends AdminModel
 {
     /*
      * Model created date, for ordering tables in database and in user interface

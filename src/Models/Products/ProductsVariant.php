@@ -76,7 +76,7 @@ class ProductsVariant extends AdminModel
             'Sklad' => Group::tab([
                 'warehouse_quantity' => 'name:Počet na sklade|type:integer|default:0',
             ])->grid(7)->icon('fa-gear'),
-            Group::tab( ProductsVariantsAttribute::class ),
+            Group::tab( ProductsAttribute::class ),
         ];
     }
 
@@ -101,7 +101,9 @@ class ProductsVariant extends AdminModel
         'autoreset' => false,
     ];
 
-    protected $appends = ['priceWithTax', 'priceWithoutTax', 'finalPrice'];
+    protected $appends = [
+        'priceWithTax', 'priceWithoutTax', 'defaultPriceWithoutTax', 'defaultPriceWithTax', 'finalPrice', 'stockText', 'hasStock',
+    ];
 
     public function options()
     {
@@ -110,8 +112,10 @@ class ProductsVariant extends AdminModel
         ];
     }
 
-    public function scopeBasketSelect($query)
-    {
-        $query->select(['id', 'name', 'price', 'tax_id']);
-    }
+    /*
+     * This items will be selected frm db for basket items
+     */
+    protected $basketSelect = [
+        'id', 'name', 'image', 'price', 'tax_id'
+    ];
 }

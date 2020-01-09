@@ -27,8 +27,9 @@ class BasketController extends Controller
      */
     private function getVariantId()
     {
-        if ( ! request('variant_id') )
+        if ( ! request('variant_id') ) {
             return;
+        }
 
         return Admin::cache('basket.variant_id', function(){
             return Admin::getModelByTable('products_variants')

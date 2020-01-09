@@ -186,7 +186,14 @@ class Basket
         $this->fetchMissingProductDataFromDb();
 
         return $this->items->map(function($item){
-            return $this->mapProductData($item);
+            return $this->mapProductData(clone $item);
+        })->reject(function($item){
+            //If product or variant is missing from basket item, remove this basket item
+            if ( ! $item->product || isset($item->variant_id) && ! $item->variant ) {
+                $this->remove($item->id, @$item->variant_id ?: null);
+
+                return true;
+            }
         });
     }
 
@@ -208,7 +215,7 @@ class Basket
         //If there is any non-fetched products
         if ( count($productIds) > 0 ) {
             $fechedProducts = Admin::getModelByTable('products')->basketSelect()
-                                    ->whereIn('id', $productIds)->get();
+                                    ->whereIn('products.id', $productIds)->get();
 
             //Merge fetched products into existing collection
             $this->loadedProducts = $this->loadedProducts->merge($fechedProducts);
@@ -216,11 +223,12 @@ class Basket
 
         //If there is any non-fetched variants
         if ( count($productVariantsIds) > 0 ) {
-            $fechedProducts = Admin::getModelByTable('products_variants')->basketSelect()
-                                    ->whereIn('id', $productVariantsIds)->get();
+            $fechedVariants = Admin::getModelByTable('products_variants')->basketSelect()
+                                    ->with(['attributesItems'])
+                                    ->whereIn('products_variants.id', $productVariantsIds)->get();
 
             //Merge fetched products into existing collection
-            $this->loadedVariants = $this->loadedVariants->merge($fechedProducts);
+            $this->loadedVariants = $this->loadedVariants->merge($fechedVariants);
         }
     }
 
