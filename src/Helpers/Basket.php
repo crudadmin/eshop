@@ -2,16 +2,19 @@
 
 namespace AdminEshop\Helpers;
 
-use \Illuminate\Database\Eloquent\Collection;
-use AdminEshop\Models\Products\Product;
+use Admin;
 use AdminEshop\Models\Orders\OrdersProduct;
+use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Store\Country;
+use AdminEshop\Traits\BasketTrait;
 use DB;
 use Store;
-use Admin;
+use \Illuminate\Database\Eloquent\Collection;
 
 class Basket
 {
+    use BasketTrait;
+
     /*
      * Items in basket
      */
@@ -24,7 +27,12 @@ class Basket
     /*
      * Session key
      */
-    private $key = 'basket_items';
+    private $key = 'basket.items';
+
+    /*
+     * Discount code key
+     */
+    private $discountKey = 'basket.discount';
 
     public function __construct()
     {
@@ -40,15 +48,20 @@ class Basket
      * @param Product     $product
      * @param int|integer $quantity
      */
-    public function add(int $productId, int $quantity = 1, $variantId = null)
+    public function addOrUpdate(int $productId, int $quantity = 1, $variantId = null)
     {
+
         //If items does not exists in basket
-        if ( $item = $this->getItemFromBasket($productId, $variantId) )
-        {
+        if ( $item = $this->getItemFromBasket($productId, $variantId) ) {
             $this->updateQuantity($productId, $item->quantity + $quantity, $variantId);
-        } else {
-            $this->addNewItem($productId, $quantity, $variantId);
+
+            $this->pushToAdded($item);
+
+            return $this;
         }
+
+        $this->addNewItem($productId, $quantity, $variantId);
+
 
         return $this;
     }
@@ -70,6 +83,8 @@ class Basket
         $item->quantity = $this->checkQuantity($quantity);
 
         $this->save();
+
+        $this->pushToUpdated($item);
 
         return $this;
     }
@@ -94,19 +109,53 @@ class Basket
         return $this;
     }
 
-    /*
-     * Fetch items from session
+    /**
+     * Check if discount code does exists
+     *
+     * @param  string|null  $code
+     * @return bool
      */
-    private function fetchItemsFromSession()
+    public function getDiscountCode($code = null)
     {
-        $items = session($this->key, []);
+        //If code is not present, use code from session
+        if ( $code === null ) {
+            $code = session($this->discountKey);
+        }
 
-        if ( ! is_array($items) )
-            return [];
+        //If any code is present
+        if ( ! $code ) {
+            return;
+        }
 
-        return array_map(function($item){
-            return (object)$item;
-        }, $items);
+        $model = Admin::getModelByTable('discounts_codes');
+
+        return $model->where('code', $code)->where('usage', '>', 'used')->first();
+    }
+
+    /*
+     * Save discount code into session
+     */
+    public function saveDiscountCode($code)
+    {
+        session()->put($this->discountKey, $code);
+        session()->save();
+
+        return $this;
+    }
+
+    /**
+     * Returns basket response
+     *
+     * @return  array
+     */
+    public function response()
+    {
+        return [
+            'basket' => $this->all(),
+            'discounts' => [],
+            'addedItems' => $this->addedItems,
+            'updatedItems' => $this->updatedItems,
+        ];
     }
 
     /**
@@ -148,17 +197,10 @@ class Basket
         $this->items[] = $item;
 
         $this->save();
-    }
 
-    /**
-     * Check quantity type
-     */
-    private function checkQuantity($quantity)
-    {
-        if ( ! is_numeric($quantity) || $quantity < 0 )
-            return 1;
+        $this->pushToAdded($item);
 
-        return (int)$quantity;
+        return $this;
     }
 
     /*
@@ -195,58 +237,6 @@ class Basket
                 return true;
             }
         });
-    }
-
-    /*
-     * Fetch products/variants from db
-     */
-    public function fetchMissingProductDataFromDb()
-    {
-        $productIds = array_diff(
-            $this->items->pluck(['id'])->toArray(),
-            $this->loadedProducts->pluck('id')->toArray()
-        );
-
-        $productVariantsIds = array_diff(
-            array_filter($this->items->pluck('variant_id')->toArray()),
-            $this->loadedVariants->pluck('id')->toArray()
-        );
-
-        //If there is any non-fetched products
-        if ( count($productIds) > 0 ) {
-            $fechedProducts = Admin::getModelByTable('products')->basketSelect()
-                                    ->whereIn('products.id', $productIds)->get();
-
-            //Merge fetched products into existing collection
-            $this->loadedProducts = $this->loadedProducts->merge($fechedProducts);
-        }
-
-        //If there is any non-fetched variants
-        if ( count($productVariantsIds) > 0 ) {
-            $fechedVariants = Admin::getModelByTable('products_variants')->basketSelect()
-                                    ->with(['attributesItems'])
-                                    ->whereIn('products_variants.id', $productVariantsIds)->get();
-
-            //Merge fetched products into existing collection
-            $this->loadedVariants = $this->loadedVariants->merge($fechedVariants);
-        }
-    }
-
-    /**
-     * Add fetched product and variant into basket item
-     *
-     * @param  object  $item
-     * @return object
-     */
-    public function mapProductData($item)
-    {
-        $item->product = $this->loadedProducts->find($item->id);
-
-        if ( isset($item->variant_id) ) {
-            $item->variant = $this->loadedVariants->find($item->variant_id);
-        }
-
-        return $item;
     }
 }
 

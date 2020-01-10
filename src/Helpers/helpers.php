@@ -2,7 +2,6 @@
 function operator_types($allow = null, $except = [])
 {
     $operators = [
-        'default' => 'Použiť predvolené',
         '+%' => '% - Pričítať k aktualnej cene',
         '-%' => '% - Odčítať z aktuálnej ceny',
         '+' => '+ Pripočítať k cene',

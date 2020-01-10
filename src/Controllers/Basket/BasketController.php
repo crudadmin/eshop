@@ -43,22 +43,39 @@ class BasketController extends Controller
 
     public function addItem()
     {
-        $items = Basket::add($this->getProductId(), request('quantity'), $this->getVariantId());
+        Basket::addOrUpdate($this->getProductId(), request('quantity'), $this->getVariantId());
 
-        return $items->all();
+        return Basket::response();
     }
 
     public function updateQuantity()
     {
-        $items = Basket::updateQuantity($this->getProductId(), request('quantity'), $this->getVariantId());
+        Basket::updateQuantity($this->getProductId(), request('quantity'), $this->getVariantId());
 
-        return $items->all();
+        return Basket::response();
     }
 
     public function removeItem()
     {
-        $items = Basket::remove($this->getProductId(), $this->getVariantId());
+        Basket::remove($this->getProductId(), $this->getVariantId());
 
-        return $items->all();
+        return Basket::response();
+    }
+
+    public function addDiscountCode()
+    {
+        $code = request('code');
+
+        validator()->make(request()->all(), ['code' => 'required'])->validate();
+
+        if ( !($code = Basket::getDiscountCode($code)) ) {
+            autoAjax()->throwValidationError([
+                'code' => _('Zadaný kod nie je platný'),
+            ]);
+        }
+
+        Basket::saveDiscountCode($code->code);
+
+        return Basket::response();
     }
 }

@@ -71,7 +71,7 @@ class Product extends AdminModel
                 ])->width(8),
                 'Zľava' => Group::fields([
                     'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
-                    'discount' => 'name:Výška zľavy|type:decimal|required_with:discount_operator|hidden',
+                    'discount' => 'name:Výška zľavy|type:decimal|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
                 ])->width(4),
             ])->id('price')->icon('fa-money'),
             'Popis' => Group::tab([
