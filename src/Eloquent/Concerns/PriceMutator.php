@@ -6,14 +6,63 @@ use Store;
 
 trait PriceMutator
 {
+    /**
+     * Prices levels
+     * *
+     *
+     * initialPriceWithTax / initialPriceWithoutTax / initialClientPrice - initial price without any discount
+     * defaultPriceWithTax / defaultPriceWithoutTax / defaultClientPrice - initial price with product discount
+     * priceWithTax / priceWithoutTax / clientPrice - price with all prossible discounts
+     */
+
+    /*
+     * Here will be stored all additional products discount from basket
+     */
     protected $availableProductDiscounts = [];
 
-    public function addDiscount($type, $value)
+    /**
+     * Add product discount
+     *
+     * @param  string  $type
+     * @param  integer/float/callable  $value
+     */
+    public function addDiscount(string $name, string $type, $value)
     {
-        $this->availableProductDiscounts[] = [
+        $this->availableProductDiscounts[$name] = [
             'operator' => $type,
             'value' => $value,
         ];
+    }
+
+    /**
+     * Apply given discounts on given price
+     *
+     * @param  float/int  $price
+     * @param  array/null  $allowedDiscounts
+     * @param  array  $exceptDiscounts
+     * @return float/ing
+     */
+    public function applyDiscounts($price, $allowedDiscounts = null, $exceptDiscounts = [])
+    {
+        $exceptDiscounts = array_wrap($exceptDiscounts);
+
+        //Apply all registered discounts
+        if ( $allowedDiscounts === null ) {
+            $allowedDiscounts = array_keys($this->availableProductDiscounts);
+        }
+
+        //Apply all discounts into final price
+        foreach ($this->availableProductDiscounts as $name => $item) {
+            //Skip non allowed discounts
+            if ( in_array($name, $allowedDiscounts) && !in_array($name, $exceptDiscounts) ) {
+                $value = is_callable($item['value']) ? $item['value']() : $item['value'];
+
+                $price = operator_modifier($price, $item['operator'], $value);
+            }
+
+        }
+
+        return $price;
     }
 
     /*
@@ -25,55 +74,29 @@ trait PriceMutator
     }
 
     /*
-     * Price without TAX after discounts
+     * Return pure default product price without all discounts and without TAX
      */
-    public function getPriceWithDiscountsAttribute()
+    public function getInitialPriceWithoutTaxAttribute()
     {
-        $price = operator_modifier($this->price, $this->discount_operator, $this->discount);
-
-        foreach ($this->availableProductDiscounts as $item) {
-            $price = operator_modifier($price, $item['operator'], $item['value']);
-        }
-
-        return $price;
+        return Store::roundNumber($this->price);
     }
 
     /*
-     * Returns price with discounts but without tax
+     * Return pure default product price without all discounts, with TAX
      */
-    public function getPriceWithoutTaxAttribute()
+    public function getInitialPriceWithTaxAttribute($value)
     {
-        return Store::roundNumber($this->priceWithDiscounts);
+        return Store::priceWithTax($this->initialPriceWithoutTax, $this->tax_id);
     }
 
     /*
-     * Return price with tax & discounts
-     */
-    public function getPriceWithTaxAttribute()
-    {
-        return Store::priceWithTax($this->priceWithDiscounts, $this->tax_id);
-    }
-
-    /**
-     * Return B2B or B2C price by client settings
-     *
-     * @return float
-     */
-    public function getFinalPriceAttribute()
-    {
-        if ( $this->showTaxPrices() ) {
-            return $this->priceWithTax;
-        }
-
-        return $this->priceWithoutTax;
-    }
-
-    /*
-     * Price without TAX after discounts
+     * Price without TAX after initial product discounts
      */
     public function getDefaultPriceWithoutTaxAttribute()
     {
-        return Store::roundNumber($this->price);
+        $price = operator_modifier($this->price, $this->discount_operator, $this->discount);
+
+        return Store::roundNumber($price);
     }
 
     /*
@@ -84,17 +107,63 @@ trait PriceMutator
         return Store::priceWithTax($this->defaultPriceWithoutTax, $this->tax_id);
     }
 
+    /*
+     * Returns price with discounts but without tax
+     */
+    public function getPriceWithoutTaxAttribute()
+    {
+        $price = $this->applyDiscounts($this->defaultPriceWithoutTax);
+
+        return Store::roundNumber($price);
+    }
+
+    /*
+     * Return price with tax & discounts
+     */
+    public function getPriceWithTaxAttribute()
+    {
+        return Store::priceWithTax($this->priceWithoutTax, $this->tax_id);
+    }
+
     /**
-     * Return B2B or B2C price by client settings
+     * Return B2B or B2C initial product price by client settings
      *
      * @return float
      */
-    public function getDefaultFinalPriceAttribute()
+    public function getInitialClientPriceAttribute()
+    {
+        if ( $this->showTaxPrices() ) {
+            return $this->initialPriceWithTax;
+        }
+
+        return $this->initialPriceWithoutTax;
+    }
+
+    /**
+     * Return B2B or B2C with default product discount price by client settings
+     *
+     * @return float
+     */
+    public function getDefaultClientPriceAttribute()
     {
         if ( $this->showTaxPrices() ) {
             return $this->defaultPriceWithTax;
         }
 
         return $this->defaultPriceWithoutTax;
+    }
+
+    /**
+     * Return B2B or B2C price with all available discount by client settings
+     *
+     * @return float
+     */
+    public function getClientPriceAttribute()
+    {
+        if ( $this->showTaxPrices() ) {
+            return $this->priceWithTax;
+        }
+
+        return $this->priceWithoutTax;
     }
 }

@@ -87,13 +87,23 @@ trait BasketTrait
         }
     }
 
+    /*
+     * Add discounts codes into item product/variant model
+     */
     public function applyCodeDiscounts($item, $code)
     {
         if ( $code->discount_percent ) {
-            $item->product->addDiscount('-%', $code->discount_percent);
+            $item->product->addDiscount('basket_code', '-%', $code->discount_percent);
+
+            if ( isset($item->variant) ) {
+                $item->variant->addDiscount('basket_code', '-%', $code->discount_percent);
+            }
         }
     }
 
+    /*
+     * Register all discounts into product
+     */
     public function applyAllDiscounts($item)
     {
         if ( $code = $this->getDiscountCode() ) {

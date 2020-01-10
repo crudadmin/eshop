@@ -59,6 +59,7 @@ class DiscountsCode extends AdminModel
 
     protected $settings = [
         'title.insert' => 'Nový zľavový kód',
+        'title.update' => 'Upravujete kód :code',
     ];
 
     protected $rules = [

@@ -102,7 +102,9 @@ class ProductsVariant extends AdminModel
     ];
 
     protected $appends = [
-        'priceWithTax', 'priceWithoutTax', 'defaultPriceWithoutTax', 'defaultPriceWithTax', 'finalPrice', 'stockText', 'hasStock',
+        'initialPriceWithTax', 'initialPriceWithoutTax',
+        'defaultPriceWithoutTax', 'defaultPriceWithTax',
+        'priceWithTax', 'priceWithoutTax', 'clientPrice', 'stockText', 'hasStock',
     ];
 
     public function options()

@@ -113,7 +113,10 @@ class Product extends AdminModel
     ];
 
     protected $appends = [
-        'priceWithTax', 'priceWithoutTax', 'defaultPriceWithTax', 'defaultPriceWithoutTax', 'finalPrice', 'stockText', 'hasStock',
+        'initialPriceWithTax', 'initialPriceWithoutTax',
+        'defaultPriceWithTax', 'defaultPriceWithoutTax',
+        'priceWithTax', 'priceWithoutTax', 'clientPrice',
+        'stockText', 'hasStock',
     ];
 
     /*
