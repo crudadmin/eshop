@@ -116,6 +116,7 @@ class ProductsVariant extends AdminModel
      * This items will be selected frm db for basket items
      */
     protected $basketSelect = [
-        'id', 'name', 'image', 'price', 'tax_id'
+        'id', 'name', 'image', 'price', 'tax_id',
+        'discount_operator', 'discount',
     ];
 }

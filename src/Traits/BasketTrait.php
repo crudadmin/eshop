@@ -87,6 +87,22 @@ trait BasketTrait
         }
     }
 
+    public function applyCodeDiscounts($item, $code)
+    {
+        if ( $code->discount_percent ) {
+            $item->product->addDiscount('-%', $code->discount_percent);
+        }
+    }
+
+    public function applyAllDiscounts($item)
+    {
+        if ( $code = $this->getDiscountCode() ) {
+            $this->applyCodeDiscounts($item, $code);
+        }
+
+        return $item;
+    }
+
     /**
      * Add fetched product and variant into basket item
      *
@@ -100,6 +116,8 @@ trait BasketTrait
         if ( isset($item->variant_id) ) {
             $item->variant = $this->loadedVariants->find($item->variant_id);
         }
+
+        $this->applyAllDiscounts($item);
 
         return $item;
     }

@@ -6,6 +6,16 @@ use Store;
 
 trait PriceMutator
 {
+    protected $availableProductDiscounts = [];
+
+    public function addDiscount($type, $value)
+    {
+        $this->availableProductDiscounts[] = [
+            'operator' => $type,
+            'value' => $value,
+        ];
+    }
+
     /*
      * Has product price with Tax?
      */
@@ -19,7 +29,13 @@ trait PriceMutator
      */
     public function getPriceWithDiscountsAttribute()
     {
-        return operator_modifier($this->price, $this->discount_operator, $this->discount);
+        $price = operator_modifier($this->price, $this->discount_operator, $this->discount);
+
+        foreach ($this->availableProductDiscounts as $item) {
+            $price = operator_modifier($price, $item['operator'], $item['value']);
+        }
+
+        return $price;
     }
 
     /*

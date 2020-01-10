@@ -129,7 +129,7 @@ class Basket
 
         $model = Admin::getModelByTable('discounts_codes');
 
-        return $model->where('code', $code)->where('usage', '>', 'used')->first();
+        return $model->where('code', $code)->whereRaw('`usage` > `used`')->first();
     }
 
     /*
