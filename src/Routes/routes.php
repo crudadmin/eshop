@@ -6,6 +6,7 @@ Route::group([ 'namespace' => 'AdminEshop\Controllers', 'middleware' => 'web' ],
     Route::post('/basket/add', 'Basket\BasketController@addItem')->name('basket::addItem');
     Route::post('/basket/remove', 'Basket\BasketController@removeItem')->name('basket::removeItem');
     Route::post('/basket/updateQuantity', 'Basket\BasketController@updateQuantity')->name('basket::updateQuantity');
-    Route::post('/basket/addCode', 'Basket\BasketController@addDiscountCode')->name('basket::addDiscountCode');
+    Route::post('/basket/addDiscountCode', 'Basket\BasketController@addDiscountCode')->name('basket::addDiscountCode');
+    Route::post('/basket/removeDiscountCode', 'Basket\BasketController@removeDiscountCode')->name('basket::removeDiscountCode');
 });
 ?>

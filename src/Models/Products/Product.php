@@ -123,7 +123,7 @@ class Product extends AdminModel
      * This items will be selected frm db for basket items
      */
     protected $basketSelect = [
-        'id', 'name', 'price', 'tax_id', 'code', 'warehouse_quantity', 'warehouse_type', 'warehouse_sold',
+        'id', 'slug', 'name', 'price', 'tax_id', 'code', 'warehouse_quantity', 'warehouse_type', 'warehouse_sold',
         'discount_operator', 'discount',
     ];
 }

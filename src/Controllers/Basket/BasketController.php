@@ -70,12 +70,19 @@ class BasketController extends Controller
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
         if ( !($code = $discountClass->getDiscountCode($code)) ) {
-            autoAjax()->throwValidationError([
+            autoAjax()->throwValidation([
                 'code' => _('Zadaný kod nie je platný'),
             ]);
         }
 
         $discountClass->saveDiscountCode($code->code);
+
+        return Basket::response();
+    }
+
+    public function removeDiscountCode(DiscountCode $discountClass)
+    {
+        $discountClass->removeDiscountCode();
 
         return Basket::response();
     }

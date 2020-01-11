@@ -40,6 +40,8 @@ class DiscountCode extends Discount
         $this->canApplyOnProductInBasket = $code->discount_percent ? true : false;
 
         $this->freeDelivery = $code->free_delivery ? true : false;
+
+        $this->code = $code;
     }
 
     /**
@@ -68,12 +70,28 @@ class DiscountCode extends Discount
         });
     }
 
-    /*
+    /**
      * Save discount code into session
+     *
+     * @param  string  $code
+     * @return this
      */
-    public function saveDiscountCode($code)
+    public function saveDiscountCode(string $code)
     {
         session()->put($this->discountKey, $code);
+        session()->save();
+
+        return $this;
+    }
+
+    /**
+     * Remove saved discount code
+     *
+     * @return  this
+     */
+    public function removeDiscountCode()
+    {
+        session()->forget($this->discountKey);
         session()->save();
 
         return $this;
