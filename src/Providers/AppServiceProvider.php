@@ -10,12 +10,12 @@ class AppServiceProvider extends ServiceProvider
     protected $providers = [
         ConfigServiceProvider::class,
         StoreServiceProvider::class,
-        BasketServiceProvider::class,
         RulesServiceProvider::class,
     ];
 
     protected $facades = [
         'Store' => \AdminEshop\Facades\StoreFacade::class,
+        'StoreDiscounts' => \AdminEshop\Facades\StoreDiscounts::class,
         'Basket' => \AdminEshop\Facades\BasketFacade::class,
     ];
 

@@ -2,9 +2,10 @@
 
 namespace AdminEshop\Controllers\Basket;
 
-use \AdminEshop\Controllers\Controller;
-use Basket;
 use Admin;
+use AdminEshop\Contracts\Discounts\DiscountCode;
+use Basket;
+use \AdminEshop\Controllers\Controller;
 
 class BasketController extends Controller
 {
@@ -62,19 +63,19 @@ class BasketController extends Controller
         return Basket::response();
     }
 
-    public function addDiscountCode()
+    public function addDiscountCode(DiscountCode $discountClass)
     {
         $code = request('code');
 
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
-        if ( !($code = Basket::getDiscountCode($code)) ) {
+        if ( !($code = $discountClass->getDiscountCode($code)) ) {
             autoAjax()->throwValidationError([
                 'code' => _('Zadaný kod nie je platný'),
             ]);
         }
 
-        Basket::saveDiscountCode($code->code);
+        $discountClass->saveDiscountCode($code->code);
 
         return Basket::response();
     }

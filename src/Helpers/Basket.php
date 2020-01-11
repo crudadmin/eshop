@@ -2,14 +2,11 @@
 
 namespace AdminEshop\Helpers;
 
-use Admin;
-use AdminEshop\Models\Orders\OrdersProduct;
-use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Store\Country;
-use AdminEshop\Traits\BasketTrait;
-use DB;
-use Store;
 use \Illuminate\Database\Eloquent\Collection;
+use AdminEshop\Traits\BasketTrait;
+use StoreDiscounts;
+use Store;
+use Admin;
 
 class Basket
 {
@@ -28,11 +25,6 @@ class Basket
      * Session key
      */
     private $key = 'basket.items';
-
-    /*
-     * Discount code key
-     */
-    private $discountKey = 'basket.discount';
 
     public function __construct()
     {
@@ -110,40 +102,6 @@ class Basket
     }
 
     /**
-     * Check if discount code does exists
-     *
-     * @param  string|null  $code
-     * @return bool
-     */
-    public function getDiscountCode($code = null)
-    {
-        //If code is not present, use code from session
-        if ( $code === null ) {
-            $code = session($this->discountKey);
-        }
-
-        //If any code is present
-        if ( ! $code ) {
-            return;
-        }
-
-        $model = Admin::getModelByTable('discounts_codes');
-
-        return $model->where('code', $code)->whereRaw('`usage` > `used`')->first();
-    }
-
-    /*
-     * Save discount code into session
-     */
-    public function saveDiscountCode($code)
-    {
-        session()->put($this->discountKey, $code);
-        session()->save();
-
-        return $this;
-    }
-
-    /**
      * Returns basket response
      *
      * @return  array
@@ -152,7 +110,7 @@ class Basket
     {
         return [
             'basket' => $this->all(),
-            'discounts' => [],
+            'discounts' => StoreDiscounts::getDiscounts(),
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
         ];

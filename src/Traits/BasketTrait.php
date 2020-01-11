@@ -3,6 +3,7 @@
 namespace AdminEshop\Traits;
 
 use Admin;
+use StoreDiscounts;
 
 trait BasketTrait
 {
@@ -87,30 +88,24 @@ trait BasketTrait
         }
     }
 
-    /*
-     * Add discounts codes into item product/variant model
+    /**
+     * Register basket discount into basket
+     *
+     * @param  string  $name
+     * @param  string  $operator
+     * @param  int/float  $value
+     * @param  bool  $applyOnProducts
+     * @param  mixed  $additional
      */
-    public function applyCodeDiscounts($item, $code)
+    public function addBasketDiscount(string $name, string $operator, $value, bool $applyOnProducts = false, $additional = null)
     {
-        if ( $code->discount_percent ) {
-            $item->product->addDiscount('basket_code', '-%', $code->discount_percent);
-
-            if ( isset($item->variant) ) {
-                $item->variant->addDiscount('basket_code', '-%', $code->discount_percent);
-            }
-        }
-    }
-
-    /*
-     * Register all discounts into product
-     */
-    public function applyAllDiscounts($item)
-    {
-        if ( $code = $this->getDiscountCode() ) {
-            $this->applyCodeDiscounts($item, $code);
-        }
-
-        return $item;
+        $this->discounts[$name] = [
+            'name' => $name,
+            'operator' => $operator,
+            'value' => $value,
+            'applyOnProducts' => $applyOnProducts,
+            'additional' => $additional,
+        ];
     }
 
     /**
@@ -127,7 +122,7 @@ trait BasketTrait
             $item->variant = $this->loadedVariants->find($item->variant_id);
         }
 
-        $this->applyAllDiscounts($item);
+        StoreDiscounts::applyDiscountsOnBasketItem($item);
 
         return $item;
     }
