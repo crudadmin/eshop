@@ -3,6 +3,8 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use Admin\Core\Contracts\DataStore;
+use StoreDiscounts;
+use Basket;
 
 class Discount
 {
@@ -39,6 +41,13 @@ class Discount
     public $canApplyOnProductInBasket = false;
 
     /**
+     * Can apply discount on products in whole website
+     *
+     * @var  bool
+     */
+    public $canApplyOnProduct = false;
+
+    /**
      * Can apply free delivery on whole basket
      *
      * @var  bool
@@ -58,21 +67,33 @@ class Discount
     /**
      * Boot discount parameters after isActive check
      *
+     * @param  mixed  $isActiveResponse
      * @return void
      */
-    public function boot()
+    public function boot($isActiveResponse)
     {
         //$this->freeDelivery = true;
         //...
     }
 
     /**
-     * If discount can be applied in specific/all producti in basket
+     * If discount can be applied in specific/all product on whole website
      *
-     * @param  object  $item
+     * @param  Admin\Eloquent\AdminModel  $item
      * @return  bool
      */
-    public function canApplyOnProductInBasket(object $item)
+    public function canApplyOnProduct($item)
+    {
+        return $this->canApplyOnProduct;
+    }
+
+    /**
+     * If discount can be applied in specific/all product in basket
+     *
+     * @param  Admin\Eloquent\AdminModel  $item
+     * @return  bool
+     */
+    public function canApplyOnProductInBasket($item)
     {
         return $this->canApplyOnProductInBasket;
     }
@@ -83,6 +104,19 @@ class Discount
     public function getDiscountName()
     {
         return $this->name ?: get_class($this);
+    }
+
+    /**
+     * Return all basket items without actual discount
+     * If actual discount would be applied, intifity loop will throw and error
+     *
+     * @return  Collection
+     */
+    public function getBasketItems()
+    {
+        $exceptAcutal = StoreDiscounts::getDiscounts([ $this->getDiscountName() ]);
+
+        return Basket::all($exceptAcutal);
     }
 }
 

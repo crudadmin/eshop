@@ -179,14 +179,15 @@ class Basket
     /**
      * Get all items from basket with loaded products and variants from db
      *
-     * @return Collection
+     * @param  null|array  $discounts = null
+     * @return  Collection
      */
-    public function all()
+    public function all($discounts = null)
     {
         $this->fetchMissingProductDataFromDb();
 
-        return $this->items->map(function($item){
-            return $this->mapProductData(clone $item);
+        return $this->items->map(function($item) use ($discounts) {
+            return $this->mapProductData(clone $item, $discounts);
         })->reject(function($item){
             //If product or variant is missing from basket item, remove this basket item
             if ( ! $item->product || isset($item->variant_id) && ! $item->variant ) {

@@ -112,9 +112,10 @@ trait BasketTrait
      * Add fetched product and variant into basket item
      *
      * @param  object  $item
+     * @param  array|null  $discounts
      * @return object
      */
-    public function mapProductData($item)
+    public function mapProductData($item, $discounts = null)
     {
         $item->product = $this->loadedProducts->find($item->id);
 
@@ -122,7 +123,13 @@ trait BasketTrait
             $item->variant = $this->loadedVariants->find($item->variant_id);
         }
 
-        StoreDiscounts::applyDiscountsOnBasketItem($item);
+        StoreDiscounts::applyDiscounts(
+            @$item->variant ?: $item->product,
+            $discounts,
+            function($discount, $item){
+                return $discount->canApplyOnProductInBasket($item);
+            }
+        );
 
         return $item;
     }

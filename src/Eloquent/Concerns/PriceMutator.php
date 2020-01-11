@@ -2,7 +2,9 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use AdminEshop\Contracts\Discounts\Discount;
 use Store;
+use StoreDiscounts;
 
 trait PriceMutator
 {
@@ -15,49 +17,47 @@ trait PriceMutator
      * priceWithTax / priceWithoutTax / clientPrice - price with all prossible discounts
      */
 
-    /*
+    /**
      * Here will be stored all additional products discount from basket
+     *
+     * @var  array
      */
-    protected $availableProductDiscounts = [];
+    protected $registredDiscounts = [];
 
     /**
      * Add product discount
      *
-     * @param  string  $type
-     * @param  integer/float/callable  $value
+     * @param  AdminEshop\Contracts\Discounts\Discount  $discount
      */
-    public function addDiscount(string $name, string $type, $value)
+    public function addDiscount(Discount $discount)
     {
-        $this->availableProductDiscounts[$name] = [
-            'operator' => $type,
-            'value' => $value,
-        ];
+        $this->registredDiscounts[$discount->getDiscountName()] = $discount;
     }
 
     /**
      * Apply given discounts on given price
      *
      * @param  float/int  $price
-     * @param  array/null  $allowedDiscounts
-     * @param  array  $exceptDiscounts
+     * @param  array/null $discounts
      * @return float/ing
      */
-    public function applyDiscounts($price, $allowedDiscounts = null, $exceptDiscounts = [])
+    public function applyDiscounts($price, $discounts = null)
     {
-        $exceptDiscounts = array_wrap($exceptDiscounts);
+        StoreDiscounts::applyDiscounts($this, $discounts, function($discount){
+            return $discount->canApplyOnProduct($this);
+        });
 
-        //Apply all registered discounts
-        if ( $allowedDiscounts === null ) {
-            $allowedDiscounts = array_keys($this->availableProductDiscounts);
-        }
+        $allowedDiscounts = array_map(function($discount){
+            return $discount->getDiscountName();
+        }, $discounts ?: []);
 
         //Apply all discounts into final price
-        foreach ($this->availableProductDiscounts as $name => $item) {
+        foreach ($this->registredDiscounts as $discount) {
             //Skip non allowed discounts
-            if ( in_array($name, $allowedDiscounts) && !in_array($name, $exceptDiscounts) ) {
-                $value = is_callable($item['value']) ? $item['value']() : $item['value'];
+            if ( $discounts === null || in_array($discount->getDiscountName(), $allowedDiscounts) ) {
+                $value = is_callable($discount->value) ? $discount->value() : $discount->value;
 
-                $price = operator_modifier($price, $item['operator'], $value);
+                $price = operator_modifier($price, $discount->operator, $value);
             }
 
         }

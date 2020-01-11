@@ -2,11 +2,13 @@
 
 namespace AdminEshop\Contracts;
 
-use Admin;
 use AdminEshop\Contracts\Discounts\DiscountCode;
+use Admin\Core\Contracts\DataStore;
 
 class StoreDiscounts
 {
+    use DataStore;
+
     /*
      * All registered discounts applied on basket items and whole store
      */
@@ -19,46 +21,67 @@ class StoreDiscounts
      *
      * @param  string  $discountClass
      */
-    public function addDiscounts($discountClass)
+    public function addDiscount($discountClass)
     {
         $this->discounts[] = $discountClass;
     }
 
-    /*
+    /**
      * Get all registered discounts in basket
+     *
+     * @param  array  $exceps
+     * @return array
      */
-    public function getDiscounts()
+    public function getDiscounts($exceps = [])
     {
-        $discounts = Admin::cache('store_discounts', function(){
+        $discounts = $this->cache('store_discounts', function(){
             return array_map(function($className){
                 return new $className;
             }, $this->discounts);
         });
 
         //Returns only active discounts
-        return array_filter($discounts, function($discount){
-            return $discount->isActive();
+        return array_filter($discounts, function($discount) use ($exceps) {
+            if ( in_array($discount->getDiscountName(), $exceps) || !($response = $discount->isActive()) ) {
+                return false;
+            }
+
+            $discount->boot($response);
+
+            return true;
         });
     }
 
-
-    /*
-     * Register all discounts into product
+    /**
+     * Return all discounts except given
+     *
+     * @param  array  $exceps
+     * @return array
      */
-    public function applyDiscountsOnBasketItem($item)
+    public function exceptDiscounts($exceps = [])
     {
-        $discounts = $this->getDiscounts();
+        return $this->getDiscounts($exceps);
+    }
+
+
+    /**
+     * Register all discounts into product
+     *
+     * @param  object  $item
+     * @param  array  $discounts
+     * @param  callable  $rule
+     *
+     * @return object
+     */
+    public function applyDiscounts($item, array $discounts = null, callable $canApplyDiscount)
+    {
+        $discounts = $discounts !== null ? $discounts : $this->getDiscounts();
 
         foreach ($discounts as $discount) {
-            $discount->boot();
 
             //If discount is allowed for basket items
-            if ( $discount->canApplyOnProductInBasket($item) === true ) {
-                ($item->product ?: $item->product)->addDiscount(
-                    $discount->getDiscountName(),
-                    $discount->operator,
-                    $discount->value
-                );
+            if ( $canApplyDiscount($discount, $item) ) {
+                $item->addDiscount($discount);
             }
         }
 

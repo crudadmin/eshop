@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use Admin;
+use AdminEshop\Contracts\Discounts\Discount;
 
 class DiscountCode extends Discount
 {
@@ -21,13 +22,17 @@ class DiscountCode extends Discount
      */
     public function isActive()
     {
-        return $this->getDiscountCode() ? true : false;
+        return $this->getDiscountCode() ?: false;
     }
 
-    public function boot()
+    /**
+     * Boot discount parameters after isActive check
+     *
+     * @param  mixed  $code
+     * @return void
+     */
+    public function boot($code)
     {
-        $code = $this->getDiscountCode();
-
         $this->operator = $code->discount_percent ? '-%' : '-';
 
         $this->value = $code->discount_percent ?: $code->dicount_price;
