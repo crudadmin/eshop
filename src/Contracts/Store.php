@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Helpers;
+namespace AdminEshop\Contracts;
 
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Orders\OrdersProduct;

@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Helpers;
+namespace AdminEshop\Contracts;
 
 use \Illuminate\Database\Eloquent\Collection;
 use AdminEshop\Traits\BasketTrait;
