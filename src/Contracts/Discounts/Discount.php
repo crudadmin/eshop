@@ -3,7 +3,7 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use Admin\Core\Contracts\DataStore;
-use StoreDiscounts;
+use Discounts;
 use Basket;
 
 class Discount
@@ -114,7 +114,7 @@ class Discount
      */
     public function getBasketItems()
     {
-        $exceptAcutal = StoreDiscounts::getDiscounts([ $this->getDiscountName() ]);
+        $exceptAcutal = Discounts::getDiscounts([ $this->getDiscountName() ]);
 
         return Basket::all($exceptAcutal);
     }

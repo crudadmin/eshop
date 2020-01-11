@@ -5,7 +5,7 @@ namespace AdminEshop\Contracts;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use Admin\Core\Contracts\DataStore;
 
-class StoreDiscounts
+class Discounts
 {
     use DataStore;
 

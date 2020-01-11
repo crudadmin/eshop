@@ -13,7 +13,7 @@ class StoreServiceProvider extends ServiceProvider {
     public function register()
     {
         $this->app->bind('store', \AdminEshop\Contracts\Store::class);
-        $this->app->bind('store.discounts', \AdminEshop\Contracts\StoreDiscounts::class);
+        $this->app->bind('store.discounts', \AdminEshop\Contracts\Discounts::class);
         $this->app->bind('basket', \AdminEshop\Contracts\Basket::class);
     }
 }

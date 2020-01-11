@@ -4,7 +4,7 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Contracts\Discounts\Discount;
 use Store;
-use StoreDiscounts;
+use Discounts;
 
 trait PriceMutator
 {
@@ -43,7 +43,7 @@ trait PriceMutator
      */
     public function applyDiscounts($price, $discounts = null)
     {
-        StoreDiscounts::applyDiscounts($this, $discounts, function($discount){
+        Discounts::applyDiscounts($this, $discounts, function($discount){
             return $discount->canApplyOnProduct($this);
         });
 

@@ -4,7 +4,7 @@ namespace AdminEshop\Traits;
 
 use Admin;
 use Store;
-use StoreDiscounts;
+use Discounts;
 
 trait BasketTrait
 {
@@ -124,7 +124,7 @@ trait BasketTrait
             $item->variant = $this->loadedVariants->find($item->variant_id);
         }
 
-        StoreDiscounts::applyDiscounts(
+        Discounts::applyDiscounts(
             @$item->variant ?: $item->product,
             $discounts,
             function($discount, $item){
@@ -145,7 +145,7 @@ trait BasketTrait
     public function isDiscountableTaxSummaryKey($key)
     {
         //If is not discountable attribute
-        if ( ! in_array($key, StoreDiscounts::getDiscountableAttributes()) )
+        if ( ! in_array($key, Discounts::getDiscountableAttributes()) )
             return;
 
         if ( strpos($key, 'WithTax') !== false )

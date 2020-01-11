@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected $facades = [
         'Store' => \AdminEshop\Facades\StoreFacade::class,
-        'StoreDiscounts' => \AdminEshop\Facades\StoreDiscounts::class,
+        'Discounts' => \AdminEshop\Facades\Discounts::class,
         'Basket' => \AdminEshop\Facades\BasketFacade::class,
     ];
 

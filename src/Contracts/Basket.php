@@ -4,7 +4,7 @@ namespace AdminEshop\Contracts;
 
 use \Illuminate\Database\Eloquent\Collection;
 use AdminEshop\Traits\BasketTrait;
-use StoreDiscounts;
+use Discounts;
 use Store;
 use Admin;
 
@@ -110,7 +110,7 @@ class Basket
     {
         $items = $this->all();
 
-        $discounts = StoreDiscounts::getDiscounts();
+        $discounts = Discounts::getDiscounts();
 
         return [
             'basket' => $items,
