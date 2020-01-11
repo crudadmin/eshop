@@ -3,10 +3,10 @@ namespace AdminEshop\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class BasketFacade extends Facade
+class CartFacade extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'basket';
+        return 'cart';
     }
 }

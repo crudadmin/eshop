@@ -15,7 +15,7 @@ class DiscountCode extends Discount
     /*
      * Discount code key in session
      */
-    private $discountKey = 'basket.discount';
+    private $discountKey = 'cart.discount';
 
     /*
      * Check if is discount active
@@ -37,7 +37,7 @@ class DiscountCode extends Discount
 
         $this->value = $code->discount_percent ?: $code->discount_price;
 
-        $this->canApplyOnProductInBasket = $code->discount_percent ? true : false;
+        $this->canApplyOnProductInCart = $code->discount_percent ? true : false;
 
         $this->freeDelivery = $code->free_delivery ? true : false;
 

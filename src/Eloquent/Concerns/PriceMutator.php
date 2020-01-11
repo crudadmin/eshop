@@ -18,7 +18,7 @@ trait PriceMutator
      */
 
     /**
-     * Here will be stored all additional products discount from basket
+     * Here will be stored all additional products discount from cart
      *
      * @var  array
      */

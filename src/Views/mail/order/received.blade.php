@@ -7,12 +7,12 @@
 @component('mail::table')
 | {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ _('Cena bez dph') }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
-@foreach( Basket::all() as $item )
-| {{ $item->product->name }} @if ( $item->product->variant )<small> @foreach($item->product->variant->attributes as $attribute) {{ $attribute->attribute->name }}: {{ $attribute->item->name.$attribute->attribute->unit }}@if(!$loop->last),@endif @endforeach </small> @endif| {{ $item->quantity }} | {{ Basket::priceWithoutTax($item->product->priceWithoutTax * $item->quantity) }} | {{ Basket::price($item->product->priceWithTax * $item->quantity) }} |
+@foreach( Cart::all() as $item )
+| {{ $item->product->name }} @if ( $item->product->variant )<small> @foreach($item->product->variant->attributes as $attribute) {{ $attribute->attribute->name }}: {{ $attribute->item->name.$attribute->attribute->unit }}@if(!$loop->last),@endif @endforeach </small> @endif| {{ $item->quantity }} | {{ Cart::priceWithoutTax($item->product->priceWithoutTax * $item->quantity) }} | {{ Cart::price($item->product->priceWithTax * $item->quantity) }} |
 @endforeach
-| {{ $delivery->name }} | - | {{ Basket::priceWithoutTax($delivery->priceWithoutTax) }} | {{ Basket::price($delivery->priceWithTax) }} |
-| {{ $payment_method->name }} | - | {{ Basket::priceWithoutTax($payment_method->priceWithoutTax) }} | {{ Basket::price($payment_method->priceWithTax) }} |
-| <strong><small>{{ _('Cena celkem') }}:</small></strong> | | {{ Basket::getTotalBalance(true, false) . ' ' . Basket::getCurrency() }} | {{ Basket::getTotalBalance() . ' ' . Basket::getCurrency() }} |
+| {{ $delivery->name }} | - | {{ Cart::priceWithoutTax($delivery->priceWithoutTax) }} | {{ Cart::price($delivery->priceWithTax) }} |
+| {{ $payment_method->name }} | - | {{ Cart::priceWithoutTax($payment_method->priceWithoutTax) }} | {{ Cart::price($payment_method->priceWithTax) }} |
+| <strong><small>{{ _('Cena celkem') }}:</small></strong> | | {{ Cart::getTotalBalance(true, false) . ' ' . Cart::getCurrency() }} | {{ Cart::getTotalBalance() . ' ' . Cart::getCurrency() }} |
 @endcomponent
 
 @component('mail::panel')

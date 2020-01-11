@@ -88,7 +88,7 @@ class Store
 
     /*
      * Returns prices in correct number format
-     * For basket we want fixed 2 decimals
+     * For cart we want fixed 2 decimals
      */
     public function numberFormatWithoutTax($number)
     {

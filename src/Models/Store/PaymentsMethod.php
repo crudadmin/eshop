@@ -4,7 +4,6 @@ namespace AdminEshop\Models\Store;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Basket;
 
 class PaymentsMethod extends AdminModel
 {

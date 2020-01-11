@@ -1,20 +1,20 @@
 <?php
 
-namespace AdminEshop\Controllers\Basket;
+namespace AdminEshop\Controllers\Cart;
 
 use Admin;
 use AdminEshop\Contracts\Discounts\DiscountCode;
-use Basket;
-use \AdminEshop\Controllers\Controller;
+use AdminEshop\Controllers\Controller;
+use Cart;
 
-class BasketController extends Controller
+class CartController extends Controller
 {
     /*
      * Verify if row exists in db and return row key
      */
     private function getProductId()
     {
-        return Admin::cache('basket.product_id', function(){
+        return Admin::cache('cart.product_id', function(){
             return Admin::getModelByTable('products')
                         ->select(['id'])
                         ->where('id', request('product_id'))
@@ -32,7 +32,7 @@ class BasketController extends Controller
             return;
         }
 
-        return Admin::cache('basket.variant_id', function(){
+        return Admin::cache('cart.variant_id', function(){
             return Admin::getModelByTable('products_variants')
                         ->select(['id'])
                         ->where('id', request('variant_id'))
@@ -44,23 +44,23 @@ class BasketController extends Controller
 
     public function addItem()
     {
-        Basket::addOrUpdate($this->getProductId(), request('quantity'), $this->getVariantId());
+        Cart::addOrUpdate($this->getProductId(), request('quantity'), $this->getVariantId());
 
-        return Basket::response();
+        return Cart::response();
     }
 
     public function updateQuantity()
     {
-        Basket::updateQuantity($this->getProductId(), request('quantity'), $this->getVariantId());
+        Cart::updateQuantity($this->getProductId(), request('quantity'), $this->getVariantId());
 
-        return Basket::response();
+        return Cart::response();
     }
 
     public function removeItem()
     {
-        Basket::remove($this->getProductId(), $this->getVariantId());
+        Cart::remove($this->getProductId(), $this->getVariantId());
 
-        return Basket::response();
+        return Cart::response();
     }
 
     public function addDiscountCode(DiscountCode $discountClass)
@@ -77,13 +77,13 @@ class BasketController extends Controller
 
         $discountClass->saveDiscountCode($code->code);
 
-        return Basket::response();
+        return Cart::response();
     }
 
     public function removeDiscountCode(DiscountCode $discountClass)
     {
         $discountClass->removeDiscountCode();
 
-        return Basket::response();
+        return Cart::response();
     }
 }

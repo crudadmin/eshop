@@ -4,7 +4,7 @@ namespace AdminEshop\Models\Delivery;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Basket;
+use Cart;
 
 class Delivery extends AdminModel
 {
@@ -72,6 +72,6 @@ class Delivery extends AdminModel
      */
     public function getPriceWithTaxAttribute()
     {
-        return Basket::priceWithTax($this->priceWithoutTax, $this->tax_id);
+        return Cart::priceWithTax($this->priceWithoutTax, $this->tax_id);
     }
 }

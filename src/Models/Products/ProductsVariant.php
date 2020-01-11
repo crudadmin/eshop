@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
-use AdminEshop\Eloquent\Concerns\HasBasket;
+use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasWarehouse;
@@ -16,7 +16,7 @@ class ProductsVariant extends AdminModel
         HasWarehouse,
         HasProductImage,
         PriceMutator,
-        HasBasket;
+        HasCart;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -115,9 +115,9 @@ class ProductsVariant extends AdminModel
     }
 
     /*
-     * This items will be selected frm db for basket items
+     * This items will be selected frm db for cart items
      */
-    protected $basketSelect = [
+    protected $cartSelect = [
         'id', 'name', 'image', 'price', 'tax_id',
         'discount_operator', 'discount',
     ];

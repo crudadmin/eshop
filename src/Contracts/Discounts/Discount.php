@@ -4,7 +4,7 @@ namespace AdminEshop\Contracts\Discounts;
 
 use Admin\Core\Contracts\DataStore;
 use Discounts;
-use Basket;
+use Cart;
 
 class Discount
 {
@@ -34,11 +34,11 @@ class Discount
     public $value = null;
 
     /**
-     * Can apply discount on products in basket
+     * Can apply discount on products in cart
      *
      * @var  bool
      */
-    public $canApplyOnProductInBasket = false;
+    public $canApplyOnProductInCart = false;
 
     /**
      * Can apply discount on products in whole website
@@ -48,7 +48,7 @@ class Discount
     public $canApplyOnProduct = false;
 
     /**
-     * Can apply free delivery on whole basket
+     * Can apply free delivery on whole cart
      *
      * @var  bool
      */
@@ -88,14 +88,14 @@ class Discount
     }
 
     /**
-     * If discount can be applied in specific/all product in basket
+     * If discount can be applied in specific/all product in cart
      *
      * @param  Admin\Eloquent\AdminModel  $item
      * @return  bool
      */
-    public function canApplyOnProductInBasket($item)
+    public function canApplyOnProductInCart($item)
     {
-        return $this->canApplyOnProductInBasket;
+        return $this->canApplyOnProductInCart;
     }
 
     /*
@@ -107,16 +107,16 @@ class Discount
     }
 
     /**
-     * Return all basket items without actual discount
+     * Return all cart items without actual discount
      * If actual discount would be applied, intifity loop will throw and error
      *
      * @return  Collection
      */
-    public function getBasketItems()
+    public function getCartItems()
     {
         $exceptAcutal = Discounts::getDiscounts([ $this->getDiscountName() ]);
 
-        return Basket::all($exceptAcutal);
+        return Cart::all($exceptAcutal);
     }
 
     /**

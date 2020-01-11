@@ -3,9 +3,9 @@
 namespace AdminEshop\Middleware;
 
 use Closure;
-use Basket;
+use Cart;
 
-class BasketMiddleware
+class CartMiddleware
 {
     /**
      * Handle an incoming request.

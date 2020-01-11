@@ -1,16 +1,17 @@
 <?php
 
-namespace AdminEshop\Controllers\Basket;
+namespace AdminEshop\Controllers\Cart;
 
 use Illuminate\Http\Request;
 use \AdminEshop\Controllers\Controller;
 use \AdminEshop\Models\Products\Product;
 use \AdminEshop\Models\Store\Store;
 use \AdminEshop\Models\Store\Country;
-use Basket;
+use \AdminEshop\Models\Clients\Client;
+use Cart;
 use Admin;
 
-class DeliveryController extends Controller
+class BillingInformationController extends Controller
 {
 
 }

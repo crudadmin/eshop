@@ -16,13 +16,13 @@ class AppServiceProvider extends ServiceProvider
     protected $facades = [
         'Store' => \AdminEshop\Facades\StoreFacade::class,
         'Discounts' => \AdminEshop\Facades\Discounts::class,
-        'Basket' => \AdminEshop\Facades\BasketFacade::class,
+        'Cart' => \AdminEshop\Facades\CartFacade::class,
     ];
 
     protected $routeMiddleware = [
         'client' => \AdminEshop\Middleware\Authenticate::class,
         'client.guest' => \AdminEshop\Middleware\RedirectIfAuthenticated::class,
-        'basket' => \AdminEshop\Middleware\BasketMiddleware::class,
+        'cart' => \AdminEshop\Middleware\CartMiddleware::class,
     ];
 
     /**

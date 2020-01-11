@@ -3,17 +3,17 @@
 namespace AdminEshop\Contracts;
 
 use Admin;
-use AdminEshop\Contracts\Concerns\BasketTrait;
+use AdminEshop\Contracts\Concerns\CartTrait;
 use Discounts;
 use Store;
 use \Illuminate\Database\Eloquent\Collection;
 
-class Basket
+class Cart
 {
-    use BasketTrait;
+    use CartTrait;
 
     /*
-     * Items in basket
+     * Items in cart
      */
     private $items = [];
 
@@ -24,7 +24,7 @@ class Basket
     /*
      * Session key
      */
-    private $key = 'basket.items';
+    private $key = 'cart.items';
 
     public function __construct()
     {
@@ -36,15 +36,15 @@ class Basket
     }
 
     /**
-     * Add product into basket and save it into session
+     * Add product into cart and save it into session
      * @param Product     $product
      * @param int|integer $quantity
      */
     public function addOrUpdate(int $productId, int $quantity = 1, $variantId = null)
     {
 
-        //If items does not exists in basket
-        if ( $item = $this->getItemFromBasket($productId, $variantId) ) {
+        //If items does not exists in cart
+        if ( $item = $this->getItemFromCart($productId, $variantId) ) {
             $this->updateQuantity($productId, $item->quantity + $quantity, $variantId);
 
             $this->pushToAdded($item);
@@ -59,7 +59,7 @@ class Basket
     }
 
     /**
-     * Update quantity for existing item in basket
+     * Update quantity for existing item in cart
      *
      * @param  int  $productId
      * @param  int  $quantity
@@ -68,7 +68,7 @@ class Basket
      */
     public function updateQuantity(int $productId, $quantity, $variantId)
     {
-        if ( ! ($item = $this->getItemFromBasket($productId, $variantId)) ) {
+        if ( ! ($item = $this->getItemFromCart($productId, $variantId)) ) {
             abort(500, _('Produkt neexistuje v košíku.'));
         }
 
@@ -82,7 +82,7 @@ class Basket
     }
 
     /**
-     * Remove item from basket
+     * Remove item from cart
      *
      * @param  int  $productId
      * @param  int|null  $variantId
@@ -102,7 +102,7 @@ class Basket
     }
 
     /**
-     * Returns basket response
+     * Returns cart response
      *
      * @return  array
      */
@@ -113,7 +113,7 @@ class Basket
         $discounts = Discounts::getDiscounts();
 
         return [
-            'basket' => $items,
+            'cart' => $items,
             'discounts' => $discounts,
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
@@ -122,13 +122,13 @@ class Basket
     }
 
     /**
-     * Returns item from basket
+     * Returns item from cart
      *
      * @param  int  $productId
      * @param  int|null  $variantId
      * @return null|object
      */
-    public function getItemFromBasket(int $productId, $variantId = null)
+    public function getItemFromCart(int $productId, $variantId = null)
     {
         $items = $this->items->where('id', $productId);
 
@@ -140,7 +140,7 @@ class Basket
     }
 
     /**
-     * Add new item into basket
+     * Add new item into cart
      *
      * @param  int  $productId
      * @param  int  $quantity
@@ -167,7 +167,7 @@ class Basket
     }
 
     /*
-     * Save items from basket into session
+     * Save items from cart into session
      */
     public function save()
     {
@@ -182,7 +182,7 @@ class Basket
     }
 
     /**
-     * Get all items from basket with loaded products and variants from db
+     * Get all items from cart with loaded products and variants from db
      *
      * @param  null|array  $discounts = null
      * @return  Collection
@@ -194,7 +194,7 @@ class Basket
         return $this->items->map(function($item) use ($discounts) {
             return $this->mapProductData(clone $item, $discounts);
         })->reject(function($item){
-            //If product or variant is missing from basket item, remove this basket item
+            //If product or variant is missing from cart item, remove this cart item
             if ( ! $item->product || isset($item->variant_id) && ! $item->variant ) {
                 $this->remove($item->id, @$item->variant_id ?: null);
 

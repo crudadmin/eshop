@@ -6,15 +6,15 @@ use Admin;
 use Store;
 use Discounts;
 
-trait BasketTrait
+trait CartTrait
 {
     /*
-     * Which items has been added into basket
+     * Which items has been added into cart
      */
     public $addedItems = [];
 
     /*
-     * Which items has been updated in basket
+     * Which items has been updated in cart
      */
     public $updatedItems = [];
 
@@ -71,7 +71,7 @@ trait BasketTrait
 
         //If there is any non-fetched products
         if ( count($productIds) > 0 ) {
-            $fechedProducts = Admin::getModelByTable('products')->basketSelect()
+            $fechedProducts = Admin::getModelByTable('products')->cartSelect()
                                     ->whereIn('products.id', $productIds)->get();
 
             //Merge fetched products into existing collection
@@ -80,7 +80,7 @@ trait BasketTrait
 
         //If there is any non-fetched variants
         if ( count($productVariantsIds) > 0 ) {
-            $fechedVariants = Admin::getModelByTable('products_variants')->basketSelect()
+            $fechedVariants = Admin::getModelByTable('products_variants')->cartSelect()
                                     ->with(['attributesItems'])
                                     ->whereIn('products_variants.id', $productVariantsIds)->get();
 
@@ -90,7 +90,7 @@ trait BasketTrait
     }
 
     /**
-     * Register basket discount into basket
+     * Register cart discount into cart
      *
      * @param  string  $name
      * @param  string  $operator
@@ -98,7 +98,7 @@ trait BasketTrait
      * @param  bool  $applyOnProducts
      * @param  mixed  $additional
      */
-    public function addBasketDiscount(string $name, string $operator, $value, bool $applyOnProducts = false, $additional = null)
+    public function addCartDiscount(string $name, string $operator, $value, bool $applyOnProducts = false, $additional = null)
     {
         $this->discounts[$name] = [
             'name' => $name,
@@ -110,7 +110,7 @@ trait BasketTrait
     }
 
     /**
-     * Add fetched product and variant into basket item
+     * Add fetched product and variant into cart item
      *
      * @param  object  $item
      * @param  array|null  $discounts
@@ -128,7 +128,7 @@ trait BasketTrait
             @$item->variant ?: $item->product,
             $discounts,
             function($discount, $item){
-                return $discount->canApplyOnProductInBasket($item);
+                return $discount->canApplyOnProductInCart($item);
             }
         );
 
@@ -156,7 +156,7 @@ trait BasketTrait
     }
 
     /**
-     * Get all available basket summary prices
+     * Get all available cart summary prices
      *
      * @param  Collection  $items
      * @return array
@@ -167,8 +167,8 @@ trait BasketTrait
 
         $sum = [];
 
-        foreach ($items as $basketItem) {
-            $array = (@$basketItem->variant ?: $basketItem->product)->toArray();
+        foreach ($items as $cartItem) {
+            $array = (@$cartItem->variant ?: $cartItem->product)->toArray();
 
             foreach ($array as $key => $value) {
                 //If does not have price in attribute name
@@ -180,7 +180,7 @@ trait BasketTrait
                     $sum[$key] = 0;
                 }
 
-                $sum[$key] = $basketItem->quantity * $array[$key];
+                $sum[$key] = $cartItem->quantity * $array[$key];
             }
         }
 

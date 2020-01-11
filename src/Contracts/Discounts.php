@@ -10,7 +10,7 @@ class Discounts
     use DataStore;
 
     /*
-     * All registered discounts applied on basket items and whole store
+     * All registered discounts applied on cart items and whole store
      */
     private $discounts = [
         DiscountCode::class,
@@ -34,7 +34,7 @@ class Discounts
     }
 
     /**
-     * Get all registered discounts in basket
+     * Get all registered discounts in cart
      *
      * @param  array  $exceps
      * @return array
@@ -86,7 +86,7 @@ class Discounts
 
         foreach ($discounts as $discount) {
 
-            //If discount is allowed for basket items
+            //If discount is allowed for cart items
             if ( $canApplyDiscount($discount, $item) ) {
                 $item->addDiscount($discount);
             }
