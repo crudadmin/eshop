@@ -31,7 +31,7 @@ trait PriceMutator
      */
     public function addDiscount(Discount $discount)
     {
-        $this->registredDiscounts[$discount->getDiscountName()] = $discount;
+        $this->registredDiscounts[$discount->getKey()] = $discount;
     }
 
     /**
@@ -48,13 +48,13 @@ trait PriceMutator
         });
 
         $allowedDiscounts = array_map(function($discount){
-            return $discount->getDiscountName();
+            return $discount->getKey();
         }, $discounts ?: []);
 
         //Apply all discounts into final price
         foreach ($this->registredDiscounts as $discount) {
             //Skip non allowed discounts
-            if ( $discounts === null || in_array($discount->getDiscountName(), $allowedDiscounts) ) {
+            if ( $discounts === null || in_array($discount->getKey(), $allowedDiscounts) ) {
                 $value = is_callable($discount->value) ? $discount->value() : $discount->value;
 
                 $price = operator_modifier($price, $discount->operator, $value);

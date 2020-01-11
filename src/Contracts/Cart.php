@@ -113,8 +113,10 @@ class Cart
         $discounts = Discounts::getDiscounts();
 
         return [
-            'cart' => $items,
-            'discounts' => $discounts,
+            'items' => $items,
+            'discounts' => array_map(function($discount){
+                return $discount->toArray();
+            }, $discounts),
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
             'summary' => $this->getSummary($items, $discounts),

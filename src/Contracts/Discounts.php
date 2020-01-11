@@ -36,11 +36,13 @@ class Discounts
     /**
      * Get all registered discounts in cart
      *
-     * @param  array  $exceps
+     * @param  array|string  $exceps
      * @return array
      */
     public function getDiscounts($exceps = [])
     {
+        $exceps = array_wrap($exceps);
+
         $discounts = $this->cache('store_discounts', function(){
             return array_map(function($className){
                 return new $className;
@@ -49,11 +51,12 @@ class Discounts
 
         //Returns only active discounts
         return array_values(array_filter($discounts, function($discount) use ($exceps) {
-            if ( in_array($discount->getDiscountName(), $exceps) || !($response = $discount->isActive()) ) {
+            if ( in_array($discount->getKey(), $exceps) || !($response = $discount->isActive()) ) {
                 return false;
             }
 
             $discount->boot($response);
+            $discount->setMessage($discount->getMessage($response));
 
             return true;
         }));
@@ -62,7 +65,7 @@ class Discounts
     /**
      * Return all discounts except given
      *
-     * @param  array  $exceps
+     * @param  array|string  $exceps
      * @return array
      */
     public function exceptDiscounts($exceps = [])
