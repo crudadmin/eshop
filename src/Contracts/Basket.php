@@ -2,11 +2,11 @@
 
 namespace AdminEshop\Contracts;
 
-use \Illuminate\Database\Eloquent\Collection;
-use AdminEshop\Traits\BasketTrait;
+use Admin;
+use AdminEshop\Contracts\Concerns\BasketTrait;
 use Discounts;
 use Store;
-use Admin;
+use \Illuminate\Database\Eloquent\Collection;
 
 class Basket
 {

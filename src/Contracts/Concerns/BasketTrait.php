@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Traits;
+namespace AdminEshop\Contracts\Concerns;
 
 use Admin;
 use Store;

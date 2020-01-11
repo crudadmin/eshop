@@ -6,19 +6,12 @@ use AdminEshop\Eloquent\Concerns\HasBasket;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasWarehouse;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
-use AdminEshop\Models\Store\Manufacturer;
-use AdminEshop\Traits\ProductTrait;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Admin\Helpers\File as AdminFile;
-use Basket;
-use Illuminate\Support\Collection;
-use Store;
 
 class Product extends AdminModel
 {
-    use ProductTrait,
-        HasProductImage,
+    use HasProductImage,
         HasWarehouse,
         PriceMutator,
         HasBasket;

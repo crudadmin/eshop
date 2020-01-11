@@ -5,13 +5,11 @@ namespace AdminEshop\Models\Orders;
 use Admin\Eloquent\AdminModel;
 use Illuminate\Notifications\Notifiable;
 use Admin\Fields\Group;
-use AdminEshop\Traits\OrderTrait;
 use Store;
 
 class Order extends AdminModel
 {
-    use Notifiable,
-        OrderTrait;
+    use Notifiable;
 
     /*
      * Model created date, for ordering tables in database and in user interface

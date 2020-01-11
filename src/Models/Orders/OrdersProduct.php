@@ -2,16 +2,13 @@
 
 namespace AdminEshop\Models\Orders;
 
+use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use AdminEshop\Traits\ProductTrait;
-use AdminEshop\Models\Products\ProductsVariant;
 use Store;
 
 class OrdersProduct extends AdminModel
 {
-    use ProductTrait;
-
     /*
      * Model created date, for ordering tables in database and in user interface
      */
