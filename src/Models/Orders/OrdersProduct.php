@@ -99,7 +99,7 @@ class OrdersProduct extends AdminModel
     }
 
     protected $rules = [
-        \AdminEshop\Rules\OnUpdateOrderProduct::class,
+        \AdminEshop\Admin\Rules\OnUpdateOrderProduct::class,
     ];
 
     public function onUpdate()

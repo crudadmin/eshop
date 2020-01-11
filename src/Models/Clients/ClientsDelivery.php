@@ -87,6 +87,6 @@ class ClientsDelivery extends AdminModel
     }
 
     protected $rules = [
-        \AdminEshop\Rules\SetDefaultDeliveryAddress::class,
+        \AdminEshop\Rules\Admin\SetDefaultDeliveryAddress::class,
     ];
 }
