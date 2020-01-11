@@ -35,7 +35,7 @@ class DiscountCode extends Discount
     {
         $this->operator = $code->discount_percent ? '-%' : '-';
 
-        $this->value = $code->discount_percent ?: $code->dicount_price;
+        $this->value = $code->discount_percent ?: $code->discount_price;
 
         $this->canApplyOnProductInBasket = $code->discount_percent ? true : false;
 

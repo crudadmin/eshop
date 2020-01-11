@@ -1,5 +1,5 @@
 <?php
-function operator_types($allow = null, $except = [])
+function operator_types($except = [])
 {
     $operators = [
         '+%' => '% - Pričítať k aktualnej cene',

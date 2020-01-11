@@ -38,7 +38,7 @@ trait PriceMutator
      * Apply given discounts on given price
      *
      * @param  float/int  $price
-     * @param  array/null $discounts
+     * @param  array/null $discounts (null = all)
      * @return float/ing
      */
     public function applyDiscounts($price, $discounts = null)

@@ -3,6 +3,7 @@
 namespace AdminEshop\Traits;
 
 use Admin;
+use Store;
 use StoreDiscounts;
 
 trait BasketTrait
@@ -132,6 +133,79 @@ trait BasketTrait
         );
 
         return $item;
+    }
+
+
+    /**
+     * Check if given key is with tax
+     *
+     * @param  string  $key
+     * @return  bool
+     */
+    public function isDiscountableTaxSummaryKey($key)
+    {
+        //If is not discountable attribute
+        if ( ! in_array($key, StoreDiscounts::getDiscountableAttributes()) )
+            return;
+
+        if ( strpos($key, 'WithTax') !== false )
+            return true;
+
+        if ( strpos($key, 'WithoutTax') !== false )
+            return false;
+    }
+
+    /**
+     * Get all available basket summary prices
+     *
+     * @param  Collection  $items
+     * @return array
+     */
+    public function getSummary($items = null, $discounts = null)
+    {
+        $items = $items === null ? $this->all() : $items;
+
+        $sum = [];
+
+        foreach ($items as $basketItem) {
+            $array = (@$basketItem->variant ?: $basketItem->product)->toArray();
+
+            foreach ($array as $key => $value) {
+                //If does not have price in attribute name
+                if ( strpos(strtolower($key), 'price') === false ) {
+                    continue;
+                }
+
+                if ( !array_key_exists($key, $sum) ) {
+                    $sum[$key] = 0;
+                }
+
+                $sum[$key] = $basketItem->quantity * $array[$key];
+            }
+        }
+
+        foreach ($sum as $key => $value) {
+            foreach ($discounts as $discount) {
+                if ( ! $discount->hasSummaryPriceOperator() ) {
+                    continue;
+                }
+
+                //If is no withTax/withoutTax price atribute
+                if ( ($isTax = $this->isDiscountableTaxSummaryKey($key)) === null ) {
+                    continue;
+                }
+
+                $discountValue = $isTax ? Store::priceWithTax($discount->value) : $discount->value;
+
+                $sum[$key] = operator_modifier($sum[$key], $discount->operator, $discountValue);
+            }
+
+            //Round numbers, and make sure all numbers are positive
+            $sum[$key] = $sum[$key] < 0 ? 0 : $sum[$key];
+            $sum[$key] = Store::roundNumber($sum[$key]);
+        }
+
+        return $sum;
     }
 }
 

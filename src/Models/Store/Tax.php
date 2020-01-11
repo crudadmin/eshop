@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Store;
 
+use AdminEshop\Admin\Rules\SetDefaultTax;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
@@ -32,7 +33,8 @@ class Tax extends AdminModel
     {
         return [
             'name' => 'name:Názov|required',
-            'tax' => 'name:Sazba DPH|type:decimal|required',
+            'tax' => 'name:Sadzba DPH|type:decimal|required',
+            'default' => 'name:Predvolená DPH|type:checkbox|title:Bude platit pre zľavy, a všetký ceny bez definovanej DPH.',
         ];
     }
 
@@ -40,6 +42,10 @@ class Tax extends AdminModel
         'title.insert' => 'Nová sadzba',
         'title.update' => ':name',
         'increments' => true,
+    ];
+
+    protected $rules = [
+        SetDefaultTax::class,
     ];
 
 }

@@ -118,6 +118,16 @@ class Discount
 
         return Basket::all($exceptAcutal);
     }
+
+    /**
+     * Check if discount is given from final price
+     *
+     * @return  bool
+     */
+    public function hasSummaryPriceOperator()
+    {
+        return in_array($this->operator, ['-', '+', '*']);
+    }
 }
 
 ?>

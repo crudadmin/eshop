@@ -108,11 +108,16 @@ class Basket
      */
     public function response()
     {
+        $items = $this->all();
+
+        $discounts = StoreDiscounts::getDiscounts();
+
         return [
-            'basket' => $this->all(),
-            'discounts' => StoreDiscounts::getDiscounts(),
+            'basket' => $items,
+            'discounts' => $discounts,
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
+            'summary' => $this->getSummary($items, $discounts),
         ];
     }
 

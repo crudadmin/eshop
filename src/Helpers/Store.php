@@ -4,16 +4,16 @@ namespace AdminEshop\Helpers;
 
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Orders\OrdersProduct;
-use Cache;
+use Admin\Core\Contracts\DataStore;
 use Admin;
-use DB;
 
 class Store
 {
-    private $storeSettings;
+    use DataStore;
 
-    private $taxes;
-
+    /*
+     * Should eshop automatically show B2B prices?
+     */
     private $hasB2B = false;
 
     /*
@@ -21,20 +21,43 @@ class Store
      */
     public function getTaxes()
     {
-        if ( ! $this->taxes ) {
-            $this->taxes = Admin::getModel('Tax')->pluck('tax', 'id')->toArray();
-        }
+        return $this->cache('taxes', function(){
+            return Admin::getModel('Tax')->get();
+        });
+    }
 
-        return $this->taxes;
+    /*
+     * Returns default tax value
+     */
+    public function getDefaultTax()
+    {
+        return $this->cache('tax.default', function(){
+            $tax = $this->getTaxes()->where('default', true)->first();
+
+            return $tax ? $tax->tax : 0;
+        });
+    }
+
+    /**
+     * Returns default tax value
+     *
+     * @param  int  $taxId
+     * @return int/float
+     */
+    public function getTaxById($taxId)
+    {
+        return $this->cache('tax.'.$taxId, function() use ($taxId) {
+            $tax = $this->getTaxes()->where('id', $taxId)->first();
+
+            return $tax ? $tax->tax : 0;
+        });
     }
 
     public function getSettings()
     {
-        if ( ! $this->storeSettings ) {
-            $this->storeSettings = Admin::getModel('Store')->first();
-        }
-
-        return $this->storeSettings;
+        return $this->cache('storeSettings', function(){
+            return Admin::getModel('Store')->first();
+        });
     }
 
     public function getCurrency()
@@ -80,14 +103,18 @@ class Store
         return $this->numberFormat($number). ' '. $this->getCurrency();
     }
 
-    /*
+    /**
      * Add tax to given price
+     *
+     * @param  float/int  $price
+     * @param  int/null  $taxId
+     * @return float/int
      */
-    public function priceWithTax($price, $tax_id)
+    public function priceWithTax($price, $taxId = null)
     {
         $taxes = $this->getTaxes();
 
-        $tax = array_key_exists($tax_id, $taxes) ? $taxes[$tax_id] : null;
+        $tax = $taxId === null ? $this->getDefaultTax() : $this->getTaxById($taxId);
 
         return Store::roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
     }

@@ -16,6 +16,13 @@ class StoreDiscounts
         DiscountCode::class,
     ];
 
+    /*
+     * Which model attributes are discountable
+     */
+    private $discountableAttributes = [
+        'priceWithTax', 'priceWithoutTax', 'clientPrice',
+    ];
+
     /**
      * Add discount class
      *
@@ -41,7 +48,7 @@ class StoreDiscounts
         });
 
         //Returns only active discounts
-        return array_filter($discounts, function($discount) use ($exceps) {
+        return array_values(array_filter($discounts, function($discount) use ($exceps) {
             if ( in_array($discount->getDiscountName(), $exceps) || !($response = $discount->isActive()) ) {
                 return false;
             }
@@ -49,7 +56,7 @@ class StoreDiscounts
             $discount->boot($response);
 
             return true;
-        });
+        }));
     }
 
     /**
@@ -86,6 +93,30 @@ class StoreDiscounts
         }
 
         return $item;
+    }
+
+    /**
+     * Add discountable attribute
+     *
+     * @param  string|array  $key
+     */
+    public function addDiscountableAttributes($attribute)
+    {
+        foreach (array_wrap($attribute) as $key) {
+            $this->discountableAttributes[] = $key;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Return discountable attributes
+     *
+     * @return  array
+     */
+    public function getDiscountableAttributes()
+    {
+        return $this->discountableAttributes;
     }
 
 }
