@@ -50,8 +50,8 @@ class DiscountsCode extends AdminModel
             ]),
 
             'Vyberte jednu alebo viac zliav' => Group::half([
-                'discount_percent' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|type:decimal|removeFromFormIfNot:discount_price,|required_without_all:discount_price,free_delivery',
-                'discount_price' => 'name:Zľava v €|title:Z celkovej ceny objednávky, bez DPH.|min:0|type:decimal|removeFromFormIfNot:discount_percent,|required_without_all:discount_percent,free_delivery',
+                'discount_percentage' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|type:decimal|removeFromFormIfNot:discount_price,|required_without_all:discount_price,free_delivery',
+                'discount_price' => 'name:Zľava v €|title:Z celkovej ceny objednávky, bez DPH.|min:0|type:decimal|removeFromFormIfNot:discount_percentage,|required_without_all:discount_percent,free_delivery',
                 'free_delivery' => 'name:Doprava zdarma|type:checkbox|default:0',
             ])->inline(),
         ];

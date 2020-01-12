@@ -37,11 +37,11 @@ class DiscountCode extends Discount
      */
     public function boot($code)
     {
-        $this->operator = $code->discount_percent ? '-%' : '-';
+        $this->operator = $code->discount_percentage ? '-%' : '-';
 
-        $this->value = $code->discount_percent ?: $code->discount_price;
+        $this->value = $code->discount_percentage ?: $code->discount_price;
 
-        $this->canApplyOnProductInCart = $code->discount_percent ? true : false;
+        $this->canApplyOnProductInCart = $code->discount_percentage ? true : false;
 
         $this->freeDelivery = $code->free_delivery ? true : false;
 
@@ -129,19 +129,19 @@ class DiscountCode extends Discount
         }
 
         //If is percentual discount
-        else if ($code->percentage_price) {
-            $value .= $code->percentage_price.'%';
+        else if ($code->discount_percentage) {
+            $value .= $code->discount_percentage.'%';
         }
 
         //If has free delivery
         if ( $code->free_delivery ) {
-            $freeDelivery = ($code->discount_price ?: $code->discount_price) > 0 ? ' + ' : '';
-            $freeDelivery .= _('Doprava zdarma');
+            $freeDeliveryText = ($code->discount_price ?: $code->discount_price) > 0 ? ' + ' : '';
+            $freeDeliveryText .= _('Doprava zdarma');
         }
 
         return [
-            'withTax' => (@$valueWithTax ?: $value) . $freeDelivery,
-            'withoutTax' => $value . $freeDelivery,
+            'withTax' => (@$valueWithTax ?: $value) . $freeDeliveryText,
+            'withoutTax' => $value . $freeDeliveryText,
         ];
     }
 }
