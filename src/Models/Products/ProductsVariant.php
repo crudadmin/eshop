@@ -9,6 +9,7 @@ use AdminEshop\Eloquent\Concerns\HasWarehouse;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store;
 
 class ProductsVariant extends AdminModel
 {
@@ -65,7 +66,7 @@ class ProductsVariant extends AdminModel
             ])->icon('fa-file-text-o'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
-                    'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|required|canAdd|hidden',
+                    'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|required|canAdd|hidden',
                     'price' => 'name:Cena bez DPH|type:decimal|default:0',
                 ])->width(8),
                 'Zľava' => Group::fields([
@@ -110,6 +111,7 @@ class ProductsVariant extends AdminModel
     public function options()
     {
         return [
+            'tax_id' => Store::getTaxes(),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
         ];
     }

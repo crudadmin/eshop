@@ -30,10 +30,6 @@ return [
         '$2y$10$/EPMalvPaQ3JHk8ynrTuku036RnQ0OeCDLbw1gVOmGlMxA9qmAAmq',
     ],
 
-    'styles' => [
-        'css/admin.css',
-    ],
-
     'components' => [
         __DIR__.'/../Views/components',
     ],
