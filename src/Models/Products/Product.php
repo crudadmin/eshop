@@ -139,6 +139,6 @@ class Product extends AdminModel
             abort(500, 'Type '.$type.' does not exists.');
         }
 
-        return $this->type == $type;
+        return $this->product_type == $type;
     }
 }
