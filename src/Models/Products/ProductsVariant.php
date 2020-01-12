@@ -54,7 +54,7 @@ class ProductsVariant extends AdminModel
             'Nastavenie varianty' => Group::tab([
                 'product_type' => 'type:imaginary|component:AddTypeFieldIntoRequest',
                 Group::fields([
-                    'name' => 'name:Názov varianty',
+                    'name' => 'name:Názov varianty|required',
                     'image' => 'name:Obrázok varianty|image',
                 ])->inline(),
                 Group::fields([
@@ -84,7 +84,7 @@ class ProductsVariant extends AdminModel
 
     protected $settings = [
         'title.insert' => 'Nová varianta',
-        'title.update' => 'Úprava varianty',
+        'title.update' => 'Úprava varianty :name',
         'title.rows' => 'Zoznam variant',
         // 'columns.id.hidden' => true,
         'grid' => [
