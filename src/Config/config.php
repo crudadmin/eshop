@@ -8,10 +8,12 @@ return [
         'regular' => [
             'name' => 'Základny produkt',
             'variants' => false,
+            'orderableVariants' => false
         ],
         'variants' => [
             'name' => 'Produkt s variantami',
             'variants' => true,
+            'orderableVariants' => true
         ]
     ],
 ];

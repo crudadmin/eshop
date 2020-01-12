@@ -4,6 +4,8 @@ namespace AdminEshop\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationRuleParser;
+use Store;
 
 class RulesServiceProvider extends ServiceProvider
 {
@@ -14,11 +16,31 @@ class RulesServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Validator::extend('dic', function ($attribute, $value, $parameters, $validator)
-        {
-            $value = trim(mb_strtolower($value));
+        $this->addProductsValidators();
+    }
 
-            return preg_match("/^[a-z]{2}[0-9]{7,10}$/", $value);
-        });
+    public function addProductsValidators()
+    {
+        Validator::extend('positivePriceIfRequired', function ($attribute, $value, $parameters, $validator)
+        {
+            $type = $parameters[0];
+
+            //If is non orderable product type, just continue...
+            if ( $type == 'products' && !in_array(request('product_type'), Store::orderableProductTypes()) ) {
+                return true;
+            }
+
+            //If is orderable product type, just continue...
+            if ( $type == 'variants' && in_array(request('product_type'), Store::orderableProductTypes()) ) {
+                return true;
+            }
+
+            //We need set positive price for this product type
+            if ( ! $value || $value == 0 ) {
+                return false;
+            }
+
+            return true;
+        }, 'Cena produktu musí byť kladná.');
     }
 }

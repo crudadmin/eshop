@@ -50,7 +50,7 @@ class Product extends AdminModel
             Group::tab([
                 Group::fields([
                     'name' => 'name:Názov produktu|index|limit:30|required',
-                    'type' => 'name:Typ produktu|type:select|option:name|required|default:regular',
+                    'product_type' => 'name:Typ produktu|type:select|option:name|required|default:variants',
                 ])->inline(),
                 'image' => 'name:Obrázok|type:file|image',
                 Group::fields([
@@ -61,11 +61,11 @@ class Product extends AdminModel
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
                     'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|required|canAdd|hidden',
-                    'price' => 'name:Cena bez DPH|type:decimal|default:0',
+                    'price' => 'name:Cena bez DPH|type:decimal|default:0|component:PriceField|positivePriceIfRequired:products|required_if:product_type,'.implode(',', Store::orderableProductTypes()),
                 ])->width(8),
                 'Zľava' => Group::fields([
                     'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
-                    'discount' => 'name:Výška zľavy|type:decimal|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
+                    'discount' => 'name:Výška zľavy|type:decimal|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
                 ])->width(4),
             ])->id('price')->icon('fa-money'),
             'Popis' => Group::tab([
@@ -87,7 +87,7 @@ class Product extends AdminModel
     {
         return [
             'tax_id' => Store::getTaxes(),
-            'type' => config('admineshop.product_types', []),
+            'product_type' => config('admineshop.product_types', []),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
             'warehouse_type' => [
                 'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
@@ -121,4 +121,24 @@ class Product extends AdminModel
         'id', 'slug', 'name', 'price', 'tax_id', 'code', 'warehouse_quantity', 'warehouse_type', 'warehouse_sold',
         'discount_operator', 'discount',
     ];
+
+    public function scopeNonVariantProducts($query)
+    {
+        $query->whereIn('product_type', Store::nonVariantsProductTypes());
+    }
+
+    /**
+     * Check if product is given type
+     *
+     * @param  string  $type
+     * @return bool
+     */
+    public function isType($type)
+    {
+        if ( ! array_key_exists($type, config('admineshop.product_types')) ) {
+            abort(500, 'Type '.$type.' does not exists.');
+        }
+
+        return $this->type == $type;
+    }
 }

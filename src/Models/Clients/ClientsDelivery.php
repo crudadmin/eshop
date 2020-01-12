@@ -49,7 +49,7 @@ class ClientsDelivery extends AdminModel
             ])->grid(4),
 
             'Firemné údaje' => Group::fields([
-                'company_name' => 'name:Názov firmy|component:companyField',
+                'company_name' => 'name:Názov firmy',
                 'company_id' => 'name:IČO|numeric',
                 'tax_id' => 'name:DIČ|dic',
                 'vat_id' => 'name:IČ DPH|dic',

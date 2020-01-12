@@ -137,6 +137,46 @@ class Store
 
         $this->hasB2B = $tax;
     }
+
+    /**
+     * Filter config by given key
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return  array
+     */
+    public function filterConfig(string $configKey, $value)
+    {
+        $arr = [];
+
+        foreach (config('admineshop.product_types') as $key => $item) {
+            if ( @$item[$configKey] === false ) {
+                $arr[] = $key;
+            }
+        }
+
+        return $arr;
+    }
+
+    /**
+     * Which product cant consists of variants
+     *
+     * @return  array
+     */
+    function nonVariantsProductTypes()
+    {
+        return $this->filterConfig('variants', false);
+    }
+
+    /**
+     * Which product types are orderable
+     *
+     * @return  array
+     */
+    function orderableProductTypes()
+    {
+        return $this->filterConfig('orderableVariants', false);
+    }
 }
 
 ?>

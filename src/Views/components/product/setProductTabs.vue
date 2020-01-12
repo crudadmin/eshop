@@ -11,18 +11,16 @@ export default {
         /*
          * You can watch actual field value, or other form fields in row variable
          */
-        this.$watch('row.type', function(type){
+        this.$watch('row.product_type', function(type){
             this.setTabsVisibility(type);
         });
 
-        this.setTabsVisibility(this.model.fields.type.value);
+        this.setTabsVisibility(this.model.fields.product_type.value);
     },
 
     methods: {
         setTabsVisibility(type){
-            type = type||this.model.fields.type.default;
-
-            var hasVariants = _.find(this.model.fields.type.options, { 0 : type })[1].variants;
+            var hasVariants = _.find(this.model.fields.product_type.options, { 0 : type })[1].variants;
 
             this.model.setTabVisibility('products_variants', hasVariants);
             // this.model.setTabVisibility('price', !hasVariants);
