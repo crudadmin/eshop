@@ -50,7 +50,7 @@ class Product extends AdminModel
             Group::tab([
                 Group::fields([
                     'name' => 'name:Názov produktu|index|limit:30|required',
-                    'product_type' => 'name:Typ produktu|type:select|option:name|required|default:variants',
+                    'product_type' => 'name:Typ produktu|type:select|option:name|required',
                 ])->inline(),
                 'image' => 'name:Obrázok|type:file|image',
                 Group::fields([

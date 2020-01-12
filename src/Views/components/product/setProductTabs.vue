@@ -20,11 +20,14 @@ export default {
 
     methods: {
         setTabsVisibility(type){
-            var hasVariants = _.find(this.model.fields.product_type.options, { 0 : type })[1].variants;
+            var selectedType = _.find(this.model.fields.product_type.options, { 0 : type });
+
+            var hasVariants = selectedType ? selectedType[1].variants : false,
+                hasOrderableVariants = selectedType ? selectedType[1].orderableVariants : false;
 
             this.model.setTabVisibility('products_variants', hasVariants);
-            // this.model.setTabVisibility('price', !hasVariants);
-            // this.model.hideFromForm('warehouse_quantity', hasVariants);
+            this.model.setTabVisibility('price', !hasOrderableVariants);
+            this.model.hideFromForm('warehouse_quantity', hasOrderableVariants);
         }
     }
 }
