@@ -6,6 +6,7 @@ use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Orders\OrdersProduct;
 use Admin\Core\Contracts\DataStore;
 use Admin;
+use Cart;
 
 class Store
 {
@@ -196,6 +197,27 @@ class Store
     function orderableProductTypes()
     {
         return $this->filterConfig('orderableVariants', false);
+    }
+
+    /**
+     *  Return payment methods for selected delivery
+     *
+     * @return  array
+     */
+    public function getPaymentMethodsByDelivery()
+    {
+        $delivery = Cart::getSelectedDelivery();
+
+        $allowedPaymentMethods = $delivery->payments()->pluck('payments_methods.id')->toArray();
+
+        //If any rule is present, allow all payment methods
+        if ( count($allowedPaymentMethods) == 0 ) {
+            return $this->getPaymentMethods();
+        }
+
+        return $this->getPaymentMethods()->filter(function($item) use ($allowedPaymentMethods) {
+            return in_array($item->getKey(), $allowedPaymentMethods);
+        });
     }
 }
 

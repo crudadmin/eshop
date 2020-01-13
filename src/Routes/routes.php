@@ -8,5 +8,7 @@ Route::group([ 'namespace' => 'AdminEshop\Controllers', 'middleware' => 'web' ],
     Route::post('/cart/updateQuantity', 'Cart\CartController@updateQuantity')->name('cart::updateQuantity');
     Route::post('/cart/addDiscountCode', 'Cart\CartController@addDiscountCode')->name('cart::addDiscountCode');
     Route::post('/cart/removeDiscountCode', 'Cart\CartController@removeDiscountCode')->name('cart::removeDiscountCode');
+    Route::post('/cart/setDelivery', 'Cart\CartController@setDelivery')->name('cart::setDelivery');
+    Route::post('/cart/setPaymentMethod', 'Cart\CartController@setPaymentMethod')->name('cart::setPaymentMethod');
 });
 ?>

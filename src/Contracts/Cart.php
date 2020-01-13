@@ -29,9 +29,19 @@ class Cart
     private $fullCartResponse = false;
 
     /*
-     * Session key
+     * Session key for basket items
      */
     private $key = 'cart.items';
+
+    /*
+     * Session key for delivery
+     */
+    private $deliveryKey = 'cart.delivery';
+
+    /*
+     * Session key for payment method
+     */
+    private $paymentMethodKey = 'cart.paymentMethod';
 
     public function __construct()
     {
@@ -131,7 +141,9 @@ class Cart
         if ( $fullCartResponse == true ){
             $response = array_merge($response, [
                 'deliveries' => $this->addCartDiscountsIntoModel(Store::getDeliveries()),
-                'paymentMethods' => $this->addCartDiscountsIntoModel(Store::getPaymentMethods()),
+                'paymentMethods' => $this->addCartDiscountsIntoModel(Store::getPaymentMethodsByDelivery()),
+                'selectedDelivery' => Cart::getSelectedDelivery(),
+                'selectedPaymentMethod' => Cart::getSelectedPaymentMethod(),
             ]);
         }
 
@@ -228,6 +240,54 @@ class Cart
                 return true;
             }
         });
+    }
+
+    /**
+     * Save delivery into session
+     *
+     * @param  int|null  $id
+     * @return  this
+     */
+    public function saveDelivery($id = null)
+    {
+        session()->put($this->deliveryKey, $id);
+        session()->save();
+
+        return $this;
+    }
+
+    /**
+     * Save payment method into session
+     *
+     * @param  int|null  $id
+     * @return  this
+     */
+    public function savePaymentMethod($id = null)
+    {
+        session()->put($this->paymentMethodKey, $id);
+        session()->save();
+
+        return $this;
+    }
+
+    /*
+     * Save delivery into session
+     */
+    public function getSelectedDelivery()
+    {
+        $id = session()->get($this->deliveryKey);
+
+        return $this->addCartDiscountsIntoModel(Store::getDeliveries()->where('id', $id)->first());
+    }
+
+    /*
+     * Save delivery into session
+     */
+    public function getSelectedPaymentMethod()
+    {
+        $id = session()->get($this->paymentMethodKey);
+
+        return $this->addCartDiscountsIntoModel(Store::getPaymentMethodsByDelivery()->where('id', $id)->first());
     }
 }
 

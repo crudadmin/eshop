@@ -5,6 +5,8 @@ namespace AdminEshop\Controllers\Cart;
 use Admin;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Controllers\Controller;
+use AdminEshop\Models\Delivery\Delivery;
+use AdminEshop\Models\Store\PaymentsMethod;
 use Cart;
 
 class CartController extends Controller
@@ -85,5 +87,34 @@ class CartController extends Controller
         DiscountCode::removeDiscountCode();
 
         return Cart::response();
+    }
+
+    public function setDelivery()
+    {
+        $deliveryId = request('delivery_id');
+
+        $delivery = Delivery::findOrFail($deliveryId);
+
+        Cart::saveDelivery($delivery->getKey());
+
+        //If no payment method is present, reset payment method to null
+        //Because payment method may be selected, but will be unavailable
+        //under this selected delivery
+        if ( ! Cart::getSelectedPaymentMethod() ) {
+            Cart::savePaymentMethod(null);
+        }
+
+        return Cart::fullCartResponse();
+    }
+
+    public function setPaymentMethod()
+    {
+        $paymentMethodId = request('payment_method_id');
+
+        $paymentMethod = PaymentsMethod::findOrFail($paymentMethodId);
+
+        Cart::savePaymentMethod($paymentMethod->getKey());
+
+        return Cart::fullCartResponse();
     }
 }

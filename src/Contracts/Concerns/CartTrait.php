@@ -132,8 +132,13 @@ trait CartTrait
      * @param  AdminModel  $item
      * @param  array|null  $discounts
      */
-    public function addCartDiscountsIntoModel($itemOrItems, $discounts = null)
+    public function addCartDiscountsIntoModel($itemOrItems = null, $discounts = null)
     {
+        //Item or items must be present
+        if ( ! $itemOrItems ) {
+            return $itemOrItems;
+        }
+
         $items = ($itemOrItems instanceof Collection) ? $itemOrItems : collect([ $itemOrItems ]);
 
         foreach ($items as $row) {

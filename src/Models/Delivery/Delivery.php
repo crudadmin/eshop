@@ -5,7 +5,7 @@ namespace AdminEshop\Models\Delivery;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Cart;
+use Store;
 
 class Delivery extends AdminModel
 {
@@ -46,14 +46,13 @@ class Delivery extends AdminModel
     {
         return [
             'name' => 'name:Názov dopravy|placeholder:Zadejte názov dopravy|required|max:90',
-            'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|canAdd',
-            'price' => 'name:Zakladná cena bez DPH|type:decimal|component:priceField|required',
+            'tax' => 'name:Sadza DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|canAdd',
+            'price' => 'name:Základná cena bez DPH|type:decimal|component:priceField|required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis dopravy|hidden',
 
             'Obmedzenia' => Group::tab([
-                'payments' => 'name:Platobné metódy|belongsToMany:payments_methods,name|canAdd',
-                'countries' => 'name:Krajiny|belongsToMany:countries,name|canAdd',
+                'payments' => 'name:Dostupné platobné metódy|belongsToMany:payments_methods,name|title:Pri žiadnej vybranej platia všetký|canAdd',
             ])->icon('fa-gear'),
         ];
     }
@@ -64,6 +63,13 @@ class Delivery extends AdminModel
         'title.update' => ':name',
         'columns.id.hidden' => true,
     ];
+
+    public function options()
+    {
+        return [
+            'tax_id' => Store::getTaxes(),
+        ];
+    }
 
     public function getThumbnailAttribute()
     {

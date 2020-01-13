@@ -2,11 +2,15 @@
 
 namespace AdminEshop\Models\Store;
 
+use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store;
 
 class PaymentsMethod extends AdminModel
 {
+    use PriceMutator;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -23,6 +27,8 @@ class PaymentsMethod extends AdminModel
 
     protected $icon = 'fa-money';
 
+    protected $appends = ['thumbnail', 'priceWithoutTax', 'priceWithTax', 'clientPrice'];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -34,16 +40,30 @@ class PaymentsMethod extends AdminModel
     {
         return [
             'name' => 'name:Názov platby|max:40|required',
+            'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|canAdd',
+            'price' => 'name:Základna cena bez DPH|type:decimal|component:PriceField||required',
+            'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis platby|type:text',
-            'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|canAdd',
-            'price' => 'name:Základna cena bez DPH|type:decimal|required',
         ];
     }
 
     protected $hidden = ['created_at', 'deleted_at', 'updated_at', 'description'];
 
     protected $settings = [
+        'grid.default' => 'medium',
         'title.update' => ':name',
         'columns.id.hidden' => true,
     ];
+
+    public function options()
+    {
+        return [
+            'tax_id' => Store::getTaxes(),
+        ];
+    }
+
+    public function getThumbnailAttribute()
+    {
+        return $this->image ? $this->image->resize(null, 180)->url : null;
+    }
 }

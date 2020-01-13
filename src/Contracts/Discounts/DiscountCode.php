@@ -99,19 +99,19 @@ class DiscountCode extends Discount
         $freeDeliveryText = '';
 
         //If is only discount from order sum
-        if ($code->discount_price) {
+        if (!is_null($code->discount_price)) {
             $value = Store::priceFormat($code->discount_price);
             $valueWithTax = Store::priceFormat(Store::priceWithTax($code->discount_price));
         }
 
         //If is percentual discount
-        else if ($code->discount_percentage) {
-            $value .= $code->discount_percentage.'%';
+        else if (!is_null($code->discount_percentage)) {
+            $value .= $code->discount_percentage.' %';
         }
 
         //If has free delivery
         if ( $code->free_delivery ) {
-            $freeDeliveryText = ($code->discount_percentage ?: $code->discount_price) > 0 ? ' + ' : '';
+            $freeDeliveryText = (!is_null($code->discount_percentage) || !is_null($code->discount_price)) > 0 ? ' + ' : '';
             $freeDeliveryText .= _('Doprava zdarma');
         }
 
