@@ -11,7 +11,14 @@ class DiscountCode extends Discount
     /*
      * Discount code key in session
      */
-    private $sessionKey = 'cart.discount';
+    private static $sessionKey = 'cart.discount';
+
+    /**
+     * Discount code cant be applied outside cart
+     *
+     * @var  bool
+     */
+    public $canApplyOutsideCart = false;
 
     /*
      * Discount name
@@ -26,7 +33,7 @@ class DiscountCode extends Discount
      */
     public function isActive()
     {
-        return $this->getDiscountCode() ?: false;
+        return self::getDiscountCode() ?: false;
     }
 
     /**
@@ -41,11 +48,33 @@ class DiscountCode extends Discount
 
         $this->value = $code->discount_percentage ?: $code->discount_price;
 
-        $this->canApplyOnProductInCart = $code->discount_percentage ? true : false;
-
         $this->freeDelivery = $code->free_delivery ? true : false;
 
         $this->code = $code;
+    }
+
+    /**
+     * Apply this discount on models
+     *
+     * @return  [type]
+     */
+    public function applyOnModels()
+    {
+        //Allow apply on models only if is percentage discount from orders
+        if ( $this->getResponse()->discount_percentage )
+            return parent::applyOnModels();
+    }
+
+    /**
+     * If is fix price discount, then apply on whole order
+     *
+     * @return  bool
+     */
+    public function applyOnWholeCart()
+    {
+        $code = $this->getResponse();
+
+        return $code->discount_price && !$code->discount_percentage ? true : false;
     }
 
     /**
@@ -55,60 +84,7 @@ class DiscountCode extends Discount
      */
     public function getVisible()
     {
-        return array_merge(parent::getVisible(), ['code']);
-    }
-
-    /**
-     * Check if discount code does exists
-     *
-     * @param  string|null  $code
-     * @return bool
-     */
-    public function getDiscountCode($code = null)
-    {
-        //If code is not present, use code from session
-        if ( $code === null ) {
-            $code = session($this->sessionKey);
-        }
-
-        //If any code is present
-        if ( ! $code ) {
-            return;
-        }
-
-        //Cache eloquent into class dataStore
-        return $this->cache('code.'.$code, function() use ($code) {
-            $model = Admin::getModelByTable('discounts_codes');
-
-            return $model->where('code', $code)->whereRaw('`usage` > `used`')->first();
-        });
-    }
-
-    /**
-     * Save discount code into session
-     *
-     * @param  string  $code
-     * @return this
-     */
-    public function saveDiscountCode(string $code)
-    {
-        session()->put($this->sessionKey, $code);
-        session()->save();
-
-        return $this;
-    }
-
-    /**
-     * Remove saved discount code
-     *
-     * @return  this
-     */
-    public function removeDiscountCode()
-    {
-        session()->forget($this->sessionKey);
-        session()->save();
-
-        return $this;
+        return array_merge(parent::getVisible(), ['code', 'freeDelivery']);
     }
 
     /**
@@ -135,7 +111,7 @@ class DiscountCode extends Discount
 
         //If has free delivery
         if ( $code->free_delivery ) {
-            $freeDeliveryText = ($code->discount_price ?: $code->discount_price) > 0 ? ' + ' : '';
+            $freeDeliveryText = ($code->discount_percentage ?: $code->discount_price) > 0 ? ' + ' : '';
             $freeDeliveryText .= _('Doprava zdarma');
         }
 
@@ -143,6 +119,55 @@ class DiscountCode extends Discount
             'withTax' => (@$valueWithTax ?: $value) . $freeDeliveryText,
             'withoutTax' => $value . $freeDeliveryText,
         ];
+    }
+
+    /**
+     * Check if discount code does exists
+     *
+     * @param  string|null  $code
+     * @return bool
+     */
+    public static function getDiscountCode($code = null)
+    {
+        //If code is not present, use code from session
+        if ( $code === null ) {
+            $code = session(self::$sessionKey);
+        }
+
+        //If any code is present
+        if ( ! $code ) {
+            return;
+        }
+
+        //Cache eloquent into class dataStore
+        return Admin::cache('code.'.$code, function() use ($code) {
+            $model = Admin::getModelByTable('discounts_codes');
+
+            return $model->where('code', $code)->whereRaw('`usage` > `used`')->first();
+        });
+    }
+
+    /**
+     * Save discount code into session
+     *
+     * @param  string  $code
+     * @return this
+     */
+    public static function saveDiscountCode(string $code)
+    {
+        session()->put(self::$sessionKey, $code);
+        session()->save();
+    }
+
+    /**
+     * Remove saved discount code
+     *
+     * @return  this
+     */
+    public static function removeDiscountCode()
+    {
+        session()->forget(self::$sessionKey);
+        session()->save();
     }
 }
 

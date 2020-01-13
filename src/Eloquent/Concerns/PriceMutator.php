@@ -3,8 +3,10 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Contracts\Discounts\Discount;
-use Store;
+use AdminEshop\Models\Delivery\Delivery;
+use AdminEshop\Models\Store\PaymentsMethod;
 use Discounts;
+use Store;
 
 trait PriceMutator
 {
@@ -43,8 +45,8 @@ trait PriceMutator
      */
     public function applyDiscounts($price, $discounts = null)
     {
-        Discounts::applyDiscounts($this, $discounts, function($discount){
-            return $discount->canApplyOnProduct($this);
+        Discounts::applyDiscountsOnModel($this, $discounts, function($discount){
+            return $discount->canApplyOutsideCart($this);
         });
 
         $allowedDiscounts = array_map(function($discount){
@@ -59,7 +61,6 @@ trait PriceMutator
 
                 $price = operator_modifier($price, $discount->operator, $value);
             }
-
         }
 
         return $price;

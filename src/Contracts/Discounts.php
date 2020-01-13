@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts;
 
 use AdminEshop\Contracts\Discounts\DiscountCode;
+use AdminEshop\Contracts\Discounts\FreeDelivery;
 use Admin\Core\Contracts\DataStore;
 
 class Discounts
@@ -14,6 +15,7 @@ class Discounts
      */
     private $discounts = [
         DiscountCode::class,
+        FreeDelivery::class,
     ];
 
     /*
@@ -55,6 +57,8 @@ class Discounts
                 return false;
             }
 
+            //Set is active response
+            $discount->setResponse($response);
             $discount->boot($response);
             $discount->setMessage($discount->getMessage($response));
 
@@ -83,14 +87,14 @@ class Discounts
      *
      * @return object
      */
-    public function applyDiscounts($item, array $discounts = null, callable $canApplyDiscount)
+    public function applyDiscountsOnModel($item, array $discounts = null, callable $canApplyDiscount)
     {
         $discounts = $discounts !== null ? $discounts : $this->getDiscounts();
 
         foreach ($discounts as $discount) {
 
             //If discount is allowed for cart items
-            if ( $canApplyDiscount($discount, $item) ) {
+            if ( $discount->canApplyOnModel($item) && $canApplyDiscount($discount, $item) ) {
                 $item->addDiscount($discount);
             }
         }

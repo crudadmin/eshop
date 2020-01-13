@@ -25,6 +25,8 @@ class Country extends AdminModel
 
     protected $group = 'store.settings';
 
+    protected $reversed = true;
+
     /*
      * Automatic form and database generation
      * @name - field name

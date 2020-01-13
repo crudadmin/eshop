@@ -37,7 +37,7 @@ export default {
         valueOrDefault(){
             //We want rewrite value only if is initial null state
             if ( _.isNil(this.field.value) ) {
-                return this.field.default;
+                return this.field.default||0;
             }
 
             return this.field.value;

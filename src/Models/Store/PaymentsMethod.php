@@ -10,7 +10,7 @@ class PaymentsMethod extends AdminModel
     /*
      * Model created date, for ordering tables in database and in user interface
      */
-    protected $migration_date = '2018-01-24 19:20:16';
+    protected $migration_date = '2018-01-07 17:48:18';
 
     /*
      * Template name

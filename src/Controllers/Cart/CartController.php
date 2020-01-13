@@ -63,26 +63,26 @@ class CartController extends Controller
         return Cart::response();
     }
 
-    public function addDiscountCode(DiscountCode $discountClass)
+    public function addDiscountCode()
     {
         $code = request('code');
 
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
-        if ( !($code = $discountClass->getDiscountCode($code)) ) {
+        if ( !($code = DiscountCode::getDiscountCode($code)) ) {
             autoAjax()->throwValidation([
                 'code' => _('Zadaný kod nie je platný'),
             ]);
         }
 
-        $discountClass->saveDiscountCode($code->code);
+        DiscountCode::saveDiscountCode($code->code);
 
         return Cart::response();
     }
 
-    public function removeDiscountCode(DiscountCode $discountClass)
+    public function removeDiscountCode()
     {
-        $discountClass->removeDiscountCode();
+        DiscountCode::removeDiscountCode();
 
         return Cart::response();
     }

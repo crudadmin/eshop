@@ -2,10 +2,13 @@
 
 namespace AdminEshop\Contracts\Discounts;
 
+use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Core\Contracts\DataStore;
+use Admin\Eloquent\AdminModel;
+use Cart;
 use Discounts;
 use Store;
-use Cart;
 
 class Discount
 {
@@ -27,32 +30,39 @@ class Discount
     public $value = null;
 
     /**
-     * Can apply discount on products in cart
-     *
-     * @var  bool
-     */
-    public $canApplyOnProductInCart = false;
-
-    /**
-     * Can apply discount on products in whole website
-     *
-     * @var  bool
-     */
-    public $canApplyOnProduct = false;
-
-    /**
-     * Can apply free delivery on whole cart
-     *
-     * @var  bool
-     */
-    public $freeDelivery = false;
-
-    /**
      * Discount message
      *
      * @var  string
      */
     public $message = '';
+
+    /**
+     * Discount can be applied on those models
+     *
+     * @var  array
+     */
+    public $applyOnModels = [Product::class, ProductsVariant::class];
+
+    /**
+     * Can apply discount on items on whole ecommerce including cart
+     *
+     * @var  bool
+     */
+    public $canApplyOutsideCart = true;
+
+    /**
+     * Can apply discount on products in cart
+     *
+     * @var  bool
+     */
+    public $canApplyInCart = true;
+
+    /**
+     * Here will be binded response from isActive
+     *
+     * @var  mixed
+     */
+    public $response = null;
 
     /**
      * Discount key
@@ -93,8 +103,7 @@ class Discount
      */
     public function boot($isActiveResponse)
     {
-        //$this->freeDelivery = true;
-        //...
+        //set your values...
     }
 
     /**
@@ -113,14 +122,42 @@ class Discount
     }
 
     /**
-     * If discount can be applied in specific/all product on whole website
+     * On which models can be applied this discount
      *
-     * @param  Admin\Eloquent\AdminModel  $item
+     * @return  array
+     */
+    public function applyOnModels()
+    {
+        return $this->applyOnModels;
+    }
+
+    /**
+     * Can be this discount applied on whole order?
+     *
      * @return  bool
      */
-    public function canApplyOnProduct($item)
+    public function applyOnWholeCart()
     {
-        return $this->canApplyOnProduct;
+        return false;
+    }
+
+    /**
+     * If discount can be applied in specific/all product on whole website
+     *
+     * @param  Admin\Eloquent\AdminModel  $model
+     * @return  bool
+     */
+    public function canApplyOnModel(AdminModel $model)
+    {
+        return $this->cache('applyOnModels.'.$model->getTable(), function() use ($model) {
+            $item = get_class($model);
+
+            $models = array_map(function($item){
+                return class_basename($item);
+            }, $this->applyOnModels() ?: []);
+
+            return in_array(class_basename($item), $models);
+        });
     }
 
     /**
@@ -129,9 +166,20 @@ class Discount
      * @param  Admin\Eloquent\AdminModel  $item
      * @return  bool
      */
-    public function canApplyOnProductInCart($item)
+    public function canApplyInCart($item)
     {
-        return $this->canApplyOnProductInCart;
+        return $this->canApplyInCart;
+    }
+
+    /**
+     * If discount can be applied in specific/all product in cart
+     *
+     * @param  Admin\Eloquent\AdminModel  $item
+     * @return  bool
+     */
+    public function canApplyOutsideCart($item)
+    {
+        return $this->canApplyOutsideCart;
     }
 
     /**
@@ -152,9 +200,9 @@ class Discount
      *
      * @return  bool
      */
-    public function hasSummaryPriceOperator()
+    public function hasSumPriceOperator()
     {
-        return in_array($this->operator, ['-', '+', '*']);
+        return in_array($this->operator, ['-', '+']);
     }
 
     /**
@@ -165,6 +213,26 @@ class Discount
     public function setMessage($message)
     {
         $this->message = $message;
+    }
+
+    /**
+     * Set isActive response
+     *
+     * @param  mixed  $message
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * Set isActive response
+     *
+     * @param  mixed  $message
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 
     /**
@@ -180,7 +248,6 @@ class Discount
             'message',
             'operator',
             'value',
-            'freeDelivery',
         ];
     }
 

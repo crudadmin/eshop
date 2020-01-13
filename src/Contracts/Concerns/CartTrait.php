@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Concerns;
 use Admin;
 use Store;
 use Discounts;
+use Illuminate\Support\Collection;
 
 trait CartTrait
 {
@@ -18,14 +19,30 @@ trait CartTrait
      */
     public $updatedItems = [];
 
+    /**
+     * Items has been added into cart
+     *
+     * @param  object  $item
+     * @return  this
+     */
     public function pushToAdded($item)
     {
         $this->addedItems[] = $item;
+
+        return $this;
     }
 
+    /**
+     * Items has been updated into cart
+     *
+     * @param  object  $item
+     * @return  this
+     */
     public function pushToUpdated($item)
     {
         $this->updatedItems[] = $item;
+
+        return $this;
     }
 
     /*
@@ -90,26 +107,6 @@ trait CartTrait
     }
 
     /**
-     * Register cart discount into cart
-     *
-     * @param  string  $name
-     * @param  string  $operator
-     * @param  int/float  $value
-     * @param  bool  $applyOnProducts
-     * @param  mixed  $additional
-     */
-    public function addCartDiscount(string $name, string $operator, $value, bool $applyOnProducts = false, $additional = null)
-    {
-        $this->discounts[$name] = [
-            'name' => $name,
-            'operator' => $operator,
-            'value' => $value,
-            'applyOnProducts' => $applyOnProducts,
-            'additional' => $additional,
-        ];
-    }
-
-    /**
      * Add fetched product and variant into cart item
      *
      * @param  object  $item
@@ -124,15 +121,32 @@ trait CartTrait
             $item->variant = $this->loadedVariants->find($item->variant_id);
         }
 
-        Discounts::applyDiscounts(
-            @$item->variant ?: $item->product,
-            $discounts,
-            function($discount, $item){
-                return $discount->canApplyOnProductInCart($item);
-            }
-        );
+        $this->addCartDiscountsIntoModel(@$item->variant ?: $item->product, $discounts);
 
         return $item;
+    }
+
+    /**
+     * Add cart discounts into model
+     *
+     * @param  AdminModel  $item
+     * @param  array|null  $discounts
+     */
+    public function addCartDiscountsIntoModel($itemOrItems, $discounts = null)
+    {
+        $items = ($itemOrItems instanceof Collection) ? $itemOrItems : collect([ $itemOrItems ]);
+
+        foreach ($items as $row) {
+            Discounts::applyDiscountsOnModel(
+                $row,
+                $discounts,
+                function($discount, $item){
+                    return $discount->canApplyInCart($item);
+                }
+            );
+        }
+
+        return $itemOrItems;
     }
 
 
@@ -144,15 +158,17 @@ trait CartTrait
      */
     public function isDiscountableTaxSummaryKey($key)
     {
-        //If is not discountable attribute
-        if ( ! in_array($key, Discounts::getDiscountableAttributes()) )
-            return;
-
         if ( strpos($key, 'WithTax') !== false )
             return true;
 
         if ( strpos($key, 'WithoutTax') !== false )
             return false;
+
+        //If is not discountable attribute by withTax/WithouTax
+        //try other dynamic fields from discounts settings
+        if ( in_array($key, Discounts::getDiscountableAttributes()) ) {
+            return 0;
+        }
     }
 
     /**
@@ -161,10 +177,8 @@ trait CartTrait
      * @param  Collection  $items
      * @return array
      */
-    public function getSummary($items = null, $discounts = null)
+    public function getDefaultSummary($items)
     {
-        $items = $items === null ? $this->all() : $items;
-
         $sum = [];
 
         foreach ($items as $cartItem) {
@@ -184,9 +198,25 @@ trait CartTrait
             }
         }
 
+        return $sum;
+    }
+
+    /**
+     * Get all available cart summary prices with discounts
+     *
+     * @param  Collection  $items
+     * @return array
+     */
+    public function getSummary($items = null, $discounts = null)
+    {
+        $items = $items === null ? $this->all() : $items;
+
+        $sum = $this->getDefaultSummary($items);
+
         foreach ($sum as $key => $value) {
             foreach ($discounts as $discount) {
-                if ( ! $discount->hasSummaryPriceOperator() ) {
+                //Apply this discount only
+                if ( $discount->applyOnWholeCart() !== true ) {
                     continue;
                 }
 
@@ -195,7 +225,11 @@ trait CartTrait
                     continue;
                 }
 
-                $discountValue = $isTax ? Store::priceWithTax($discount->value) : $discount->value;
+                //If is tax attribute, and discount value is with + or - operator
+                //Then we need to add tax to this discount
+                $discountValue = $isTax === true && $discount->hasSumPriceOperator() ?
+                                    Store::priceWithTax($discount->value)
+                                    : $discount->value;
 
                 $sum[$key] = operator_modifier($sum[$key], $discount->operator, $discountValue);
             }

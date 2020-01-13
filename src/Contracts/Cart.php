@@ -21,6 +21,13 @@ class Cart
 
     private $loadedVariants = [];
 
+    /**
+     * Returns response with all payments
+     *
+     * @var  bool
+     */
+    private $fullCartResponse = false;
+
     /*
      * Session key
      */
@@ -53,7 +60,6 @@ class Cart
         }
 
         $this->addNewItem($productId, $quantity, $variantId);
-
 
         return $this;
     }
@@ -106,13 +112,13 @@ class Cart
      *
      * @return  array
      */
-    public function response()
+    public function response($fullCartResponse = false)
     {
         $items = $this->all();
 
         $discounts = Discounts::getDiscounts();
 
-        return [
+        $response = [
             'items' => $items,
             'discounts' => array_map(function($discount){
                 return $discount->toArray();
@@ -121,6 +127,25 @@ class Cart
             'updatedItems' => $this->updatedItems,
             'summary' => $this->getSummary($items, $discounts),
         ];
+
+        if ( $fullCartResponse == true ){
+            $response = array_merge($response, [
+                'deliveries' => $this->addCartDiscountsIntoModel(Store::getDeliveries()),
+                'paymentMethods' => $this->addCartDiscountsIntoModel(Store::getPaymentMethods()),
+            ]);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Returns cart response with all additional payments
+     *
+     * @return  this
+     */
+    public function fullCartResponse()
+    {
+        return $this->response(true);
     }
 
     /**

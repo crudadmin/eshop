@@ -27,6 +27,26 @@ class Store
     }
 
     /*
+     * Return all payment methods
+     */
+    public function getPaymentMethods()
+    {
+        return $this->cache('paymentMethods', function(){
+            return Admin::getModel('PaymentsMethod')->get();
+        });
+    }
+
+    /*
+     * Return all payment methods
+     */
+    public function getDeliveries()
+    {
+        return $this->cache('deliveries', function(){
+            return Admin::getModel('Delivery')->get();
+        });
+    }
+
+    /*
      * Returns default tax value
      */
     public function getDefaultTax()
