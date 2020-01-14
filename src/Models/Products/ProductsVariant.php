@@ -83,10 +83,10 @@ class ProductsVariant extends AdminModel
     }
 
     protected $settings = [
+        'increments' => false,
         'title.insert' => 'Nová varianta',
         'title.update' => 'Úprava varianty :name',
         'title.rows' => 'Zoznam variant',
-        // 'columns.id.hidden' => true,
         'grid' => [
             'default' =>'full',
             'disabled' => true,

@@ -3,6 +3,7 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Products\ProductsStocksLog;
 use AdminEshop\Models\Products\ProductsVariant;
 
 trait HasWarehouse
@@ -36,6 +37,11 @@ trait HasWarehouse
         return false;
     }
 
+    /**
+     * Returns stock text value
+     *
+     * @return  string
+     */
     public function getStockTextAttribute()
     {
         if ( $this->hasStock ) {
@@ -54,6 +60,7 @@ trait HasWarehouse
             return _('Skladom');
         }
 
+        //If is custom message
         if ( $this->canOrderEverytime() && $this->warehouse_sold ) {
             return $this->warehouse_sold;
         }
@@ -91,5 +98,32 @@ trait HasWarehouse
                         });
                 });
         }
+    }
+
+    /**
+     * Commit product warehouse change
+     *
+     * @param  int  $sub
+     * @param  int  $orderId
+     * @return void
+     */
+    public function commitWarehouseChange($type = '-', int $sub, $orderId, $message = null)
+    {
+        //Set sub on product type
+        $sub = ($type == '-' ? $sub * -1 : $sub);
+
+        $updatedStock = $this->warehouse_quantity + $sub;
+
+        $this->warehouse_quantity = $updatedStock < 0 ? 0 : $updatedStock;
+        $this->save();
+
+        ProductsStocksLog::create([
+            'order_id' => $orderId,
+            'product_id' => $this instanceof Product ? $this->getKey() : $this->product_id,
+            'variant_id' => $this instanceof ProductsVariant ? $this->getKey() : null,
+            'sub' => $sub,
+            'stock' => $this->warehouse_quantity,
+            'message' => $message,
+        ]);
     }
 }

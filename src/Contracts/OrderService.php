@@ -67,7 +67,7 @@ class OrderService
             ]);
         }
 
-        $this->order->syncWarehouse();
+        $this->order->syncWarehouse('-', 'order.new');
     }
 
     /**

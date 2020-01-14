@@ -5,6 +5,7 @@ namespace AdminEshop\Models\Orders;
 use Admin;
 use AdminEshop\Admin\Rules\OnUpdateOrderProduct;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
+use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
@@ -75,19 +76,48 @@ class OrdersItem extends AdminModel
     public function options()
     {
         return [
+            'product_id' => $this->getAvailableProducts(),
             'variant_id' => $this->getAvailableVariants(),
         ];
     }
 
+    protected $layouts = [
+        'form-top' => 'setOrderItemPrices',
+    ];
+
     /*
      * Skip variants non orderable variants
      * Product can also have variants, bud this variants may not be orderable. We want skip this variants.
+     *
+     * @return Collection
      */
     public function getAvailableVariants()
     {
-        return ProductsVariant::select(['id', 'product_id', 'name'])->whereHas('product', function($query){
-            $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
-        })->get();
+        return ProductsVariant::select(['id', 'product_id', 'name', 'price', 'tax_id', 'discount_operator', 'discount'])
+                ->whereHas('product', function($query){
+                    $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
+                })->get()->map(function($item){
+                    $item->setVisible(['id', 'product_id', 'name', 'tax_id', 'priceWithTax', 'priceWithoutTax'])
+                         ->setAppends(['priceWithTax', 'priceWithoutTax']);
+
+                    return $item;
+                });
+    }
+
+    /**
+     * Return products with needed attributes
+     *
+     * @return  Collection
+     */
+    public function getAvailableProducts()
+    {
+        return Product::select(['id', 'name', 'price', 'tax_id', 'discount_operator', 'discount'])
+                ->get()->map(function($item){
+                    $item->setVisible(['id', 'name', 'tax_id', 'priceWithTax', 'priceWithoutTax'])
+                         ->setAppends(['priceWithTax', 'priceWithoutTax']);
+
+                    return $item;
+                });
     }
 
     public function settings()
@@ -104,6 +134,13 @@ class OrdersItem extends AdminModel
 
             //Add currency after columns
             'columns.price_tax.add_after' => ' '.Store::getCurrency(),
+        ];
+    }
+
+    public function beforeInitialAdminRequest()
+    {
+        return [
+            'storeTaxes' => Store::getTaxes(),
         ];
     }
 

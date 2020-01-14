@@ -8,8 +8,10 @@ use Store;
 
 trait OrderTrait
 {
-    /*
+    /**
      * Recalculate order price
+     *
+     * @return  void
      */
     public function calculatePrices()
     {
@@ -28,10 +30,13 @@ trait OrderTrait
         $this->save();
     }
 
-    /*
+    /**
      * Count down products from order in warehouse counts
+     *
+     * @param  string  $type '-' or '+'
+     * @return  void
      */
-    public function syncWarehouse($add = false)
+    public function syncWarehouse($type, $message)
     {
         //Uncount quantity
         foreach ($this->items as $item) {
@@ -40,8 +45,7 @@ trait OrderTrait
                 continue;
             }
 
-            $product->warehouse_quantity -= ($item->quantity * ($add == true ? -1 : 1));
-            $product->save();
+            $product->commitWarehouseChange($type, $item->quantity, $this->getKey(), $message);
         }
     }
 }

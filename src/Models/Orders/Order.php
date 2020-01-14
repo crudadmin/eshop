@@ -52,9 +52,9 @@ class Order extends AdminModel
             'client' => 'name:Klient|belongsTo:clients|invisible',
             'Fakturačné údaje' => Group::fields([
                 'username' => 'name:Meno a priezvisko|required|hidden',
-                'email' => 'name:Kontaktný email|email|required',
+                'email' => 'name:Email|email|required',
                 'phone' => 'name:Telefón',
-                'street' => 'name:Ulica a č.p.|required',
+                'street' => 'name:Ulica a č.p.|column_name:Ulica|required',
                 'city' => 'name:Mesto|required',
                 'zipcode' => 'name:PSČ|required',
                 'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|exists:countries,id',
@@ -74,19 +74,19 @@ class Order extends AdminModel
                 'Firemné údaje' => Group::fields([
                     'is_company' => 'name:Nákup na firmu|type:checkbox|default:0',
                     Group::fields([
-                        'company_name' => 'name:Názov firmy|required_with:is_company|hidden',
-                        'company_id' => 'name:IČ|required_with:is_company|numeric|hidden',
-                        'company_tax_id' => 'name:DIČ|required_with:is_company|hidden',
-                        'company_vat_id' => 'name:IČ DPH|hidden',
+                        'company_name' => 'name:Názov firmy|required_with:is_company',
+                        'company_id' => 'name:IČ|required_with:is_company|numeric',
+                        'company_tax_id' => 'name:DIČ|required_with:is_company',
+                        'company_vat_id' => 'name:IČ DPH',
                     ])->add('hideFieldIfNot:is_company,1')
-                ]),
+                ])->add('hidden'),
             ])->grid(4),
             'Nastavenia objednávky' => Group::fields([
                 Group::fields([
                     'note' => 'name:Poznámka|type:text|hidden',
                     'internal_note' => 'name:Interná poznámka|type:text|hidden',
                 ])->inline(),
-                'status' => 'name:Stav objednávky|type:select|required|default:new',
+                'status' => 'name:Stav objednávky|column_name:Stav|type:select|required|default:new',
             ]),
             'Doprava' => Group::fields([
                 Group::fields([
@@ -97,7 +97,7 @@ class Order extends AdminModel
             ])->grid(6)->add('required'),
             'Platobná metóda' => Group::fields([
                 Group::fields([
-                    'payment_method' => 'name:Platobná metóda|belongsTo:payments_methods,name',
+                    'payment_method' => 'name:Platobná metóda|column_name:Platba|belongsTo:payments_methods,name',
                     'payment_method_tax' => 'name:DPH plat. metody %|fillBy:payment_method.tax|hidden|type:decimal',
                 ])->inline(),
                 'payment_method_price' => 'name:Cena plat. metódy|type:decimal|fillBy:payment_method.price|component:PriceField|hidden',
@@ -172,7 +172,7 @@ class Order extends AdminModel
     {
         $attributes['client_name'] = $this->client ? $this->client->clientName : '';
 
-        $attributes['created'] = $this->created_at ? $this->created_at->format('d.m.Y H:i') : '';
+        $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d. M \o H:i') : '';
 
         return $attributes;
     }

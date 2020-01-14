@@ -15,7 +15,7 @@ class Store extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Nastavenia';
+    protected $name = 'Parametre eshopu';
 
     /*
      * Template title

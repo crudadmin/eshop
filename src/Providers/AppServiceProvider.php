@@ -3,6 +3,7 @@ namespace AdminEshop\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\Kernel;
+use Carbon\Carbon;
 use Admin;
 
 class AppServiceProvider extends ServiceProvider
@@ -40,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
             ViewServiceProvider::class,
             ClientAuthServiceProvider::class,
         ]);
+
+        Carbon::setLocale(config('admin.locale', 'sk'));
     }
 
     /**

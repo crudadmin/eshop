@@ -15,7 +15,7 @@ class RebuildOrder extends AdminRule
     public function created(AdminModel $row)
     {
         //If is order created via admin, then uncount
-        $row->countProductsFromWarehouse();
+        $row->syncWarehouse('-', 'order.new-backend');
 
         $row->calculatePrices();
     }
@@ -27,7 +27,7 @@ class RebuildOrder extends AdminRule
     {
         //If order is canceled, then add products back to warehouse
         if ( $row->status == 'canceled' && $row->getOriginal('status') != 'canceled') {
-            $row->countProductsFromWarehouse(true);
+            $row->syncWarehouse('+', 'order.canceled');
         }
 
         //Change delivery prices etc..
@@ -40,7 +40,7 @@ class RebuildOrder extends AdminRule
     public function deleted($row)
     {
         if ( $row->status != 'canceled' ) {
-            $row->countProductsFromWarehouse(true);
+            $row->syncWarehouse('+', 'order.deleted');
         }
     }
 }
