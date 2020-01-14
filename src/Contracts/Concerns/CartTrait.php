@@ -2,10 +2,11 @@
 
 namespace AdminEshop\Contracts\Concerns;
 
+use \Illuminate\Database\Eloquent\Collection;
+use AdminEshop\Contracts\CartItem;
+use Discounts;
 use Admin;
 use Store;
-use Discounts;
-use Illuminate\Support\Collection;
 
 trait CartTrait
 {
@@ -18,6 +19,16 @@ trait CartTrait
      * Which items has been updated in cart
      */
     public $updatedItems = [];
+
+    /*
+     * Fetched products from db
+     */
+    private $fetchedProducts;
+
+    /*
+     * Fetched variants from db
+     */
+    private $fetchedVariants;
 
     /**
      * Items has been added into cart
@@ -55,9 +66,9 @@ trait CartTrait
         if ( ! is_array($items) )
             return [];
 
-        return array_map(function($item){
-            return (object)$item;
-        }, $items);
+        return new Collection(array_map(function($item){
+            return new CartItem($item['id'], $item['quantity'], @$item['variant_id']);
+        }, $items));
     }
 
     /**
@@ -71,19 +82,21 @@ trait CartTrait
         return (int)$quantity;
     }
 
-    /*
+    /**
      * Fetch products/variants from db
+     *
+     * @return  this
      */
     public function fetchMissingProductDataFromDb()
     {
         $productIds = array_diff(
             $this->items->pluck(['id'])->toArray(),
-            $this->loadedProducts->pluck('id')->toArray()
+            $this->getFetchedProducts()->pluck('id')->toArray()
         );
 
         $productVariantsIds = array_diff(
             array_filter($this->items->pluck('variant_id')->toArray()),
-            $this->loadedVariants->pluck('id')->toArray()
+            $this->getFetchedVariants()->pluck('id')->toArray()
         );
 
         //If there is any non-fetched products
@@ -92,7 +105,7 @@ trait CartTrait
                                     ->whereIn('products.id', $productIds)->get();
 
             //Merge fetched products into existing collection
-            $this->loadedProducts = $this->loadedProducts->merge($fechedProducts);
+            $this->fetchedProducts = $this->getFetchedProducts()->merge($fechedProducts);
         }
 
         //If there is any non-fetched variants
@@ -102,28 +115,10 @@ trait CartTrait
                                     ->whereIn('products_variants.id', $productVariantsIds)->get();
 
             //Merge fetched products into existing collection
-            $this->loadedVariants = $this->loadedVariants->merge($fechedVariants);
-        }
-    }
-
-    /**
-     * Add fetched product and variant into cart item
-     *
-     * @param  object  $item
-     * @param  array|null  $discounts
-     * @return object
-     */
-    public function mapProductData($item, $discounts = null)
-    {
-        $item->product = $this->loadedProducts->find($item->id);
-
-        if ( isset($item->variant_id) ) {
-            $item->variant = $this->loadedVariants->find($item->variant_id);
+            $this->fetchedVariants = $this->getFetchedVariants()->merge($fechedVariants);
         }
 
-        $this->addCartDiscountsIntoModel(@$item->variant ?: $item->product, $discounts);
-
-        return $item;
+        return $this;
     }
 
     /**
@@ -247,6 +242,26 @@ trait CartTrait
         }
 
         return $sum;
+    }
+
+    /**
+     * Returns fetched products
+     *
+     * @return  Collection
+     */
+    public function getFetchedProducts()
+    {
+        return $this->fetchedProducts ?: new Collection([]);
+    }
+
+    /**
+     * Returns fetched variants
+     *
+     * @return  Collection
+     */
+    public function getFetchedVariants()
+    {
+        return $this->fetchedVariants ?: new Collection([]);
     }
 }
 

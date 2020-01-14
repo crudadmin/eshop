@@ -31,22 +31,8 @@ trait OrderTrait
     /*
      * Count down products from order in warehouse counts
      */
-    public function countProductsFromWarehouse($add = false)
+    public function syncWarehouse($add = false)
     {
-        //Check product quantity
-        if ( $add == false ) {
-            foreach ($this->items as $item) {
-                //If is product without relationship, just relative item
-                if (!($product = $item->getProduct())) {
-                    continue;
-                }
-
-                if ( Admin::isAdmin() && $product->warehouse_quantity - $item->quantity < 0 ) {
-                    Ajax::warning('Produkt <strong>'.$product->name.'</strong> ma nedostačujúce množstvo ('.$product->warehouse_quantity.') pre odčítanie ('.$item->quantity.') produktov.');
-                }
-            }
-        }
-
         //Uncount quantity
         foreach ($this->items as $item) {
             //If is product without relationship, just relative item

@@ -6,7 +6,6 @@ use Admin;
 use AdminEshop\Contracts\Concerns\CartTrait;
 use Discounts;
 use Store;
-use \Illuminate\Database\Eloquent\Collection;
 
 class Cart
 {
@@ -16,10 +15,6 @@ class Cart
      * Items in cart
      */
     private $items = [];
-
-    private $loadedProducts = [];
-
-    private $loadedVariants = [];
 
     /**
      * Returns response with all payments
@@ -45,11 +40,7 @@ class Cart
 
     public function __construct()
     {
-        $this->items = new Collection($this->fetchItemsFromSession());
-
-        $this->loadedProducts = new Collection();
-
-        $this->loadedVariants = new Collection();
+        $this->items = $this->fetchItemsFromSession();
     }
 
     /**
@@ -110,7 +101,7 @@ class Cart
             return $item->id == $productId && (
                 $variantId ? $item->variant_id == $variantId : true
             );
-        });
+        })->values();
 
         $this->save();
 
@@ -187,14 +178,7 @@ class Cart
      */
     private function addNewItem($productId, $quantity, $variantId)
     {
-        $item = new \StdClass();
-        $item->id = $productId;
-
-        if ( $variantId ) {
-            $item->variant_id = $variantId;
-        }
-
-        $item->quantity = $this->checkQuantity($quantity);
+        $item = new CartItem($productId, $quantity, $variantId);
 
         $this->items[] = $item;
 
@@ -221,7 +205,7 @@ class Cart
     }
 
     /**
-     * Get all items from cart with loaded products and variants from db
+     * Get all items from cart with fetched products and variants from db
      *
      * @param  null|array  $discounts = null
      * @return  Collection
@@ -231,15 +215,15 @@ class Cart
         $this->fetchMissingProductDataFromDb();
 
         return $this->items->map(function($item) use ($discounts) {
-            return $this->mapProductData(clone $item, $discounts);
+            return (clone $item)->fetchItemModels($discounts);
         })->reject(function($item){
             //If product or variant is missing from cart item, remove this cart item
-            if ( ! $item->product || isset($item->variant_id) && ! $item->variant ) {
-                $this->remove($item->id, @$item->variant_id ?: null);
+            if ( ! $item->product || $item->variant_id && ! $item->variant ) {
+                $this->remove($item->id, $item->variant_id);
 
                 return true;
             }
-        });
+        })->values();
     }
 
     /**
