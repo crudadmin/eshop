@@ -84,6 +84,37 @@ class CartItem
 
         return $this;
     }
+
+    /**
+     * Returns if product in cart item is on stock
+     *
+     * @return  bool
+     */
+    public function hasQuantityOnStock()
+    {
+        //We can skip checking products which all allowed all the time
+        if ( $this->getItemProduct()->canOrderEverytime() ) {
+            return true;
+        }
+
+        //Check if quantity in cart is lower that quantity on stock
+        return $this->quantity <= $this->getItemProduct()->warehouse_quantity;
+    }
+
+    /**
+     * Add all item additional attributes
+     *
+     * @param  array|null  $discounts
+     * @return  this
+     */
+    public function render($discounts)
+    {
+        $this->fetchItemModels($discounts);
+
+        $this->hasQuantityOnStock = $this->hasQuantityOnStock();
+
+        return $this;
+    }
 }
 
 ?>

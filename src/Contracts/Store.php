@@ -218,7 +218,7 @@ class Store
     {
         $delivery = Cart::getSelectedDelivery();
 
-        $allowedPaymentMethods = $delivery->payments()->pluck('payments_methods.id')->toArray();
+        $allowedPaymentMethods = !$delivery ? [] : $delivery->payments()->pluck('payments_methods.id')->toArray();
 
         //If any rule is present, allow all payment methods
         if ( count($allowedPaymentMethods) == 0 ) {

@@ -39,6 +39,18 @@ trait HasWarehouse
     public function getStockTextAttribute()
     {
         if ( $this->hasStock ) {
+            if ( $this->canOrderEverytime() == false ) {
+                $stockText = $this->warehouse_quantity;
+
+                foreach ([100, 50, 20, 10] as $onStock) {
+                    if ( $this->warehouse_quantity > $onStock ){
+                        return sprintf(_('Skladom >%sks'), $stockText);
+                    }
+                }
+
+                return sprintf(_('Skladom %sks'), $stockText);
+            }
+
             return _('Skladom');
         }
 

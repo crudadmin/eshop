@@ -2,20 +2,42 @@
 
 namespace AdminEshop\Contracts;
 
-use Cart;
+use AdminEshop\Contracts\Order\HasRequest;
+use AdminEshop\Contracts\Order\HasSession;
+use AdminEshop\Contracts\Order\HasValidation;
+use Admin;
 use Store;
+use Cart;
 
 class OrderService
 {
+    use HasRequest,
+        HasSession,
+        HasValidation;
+
     /**
-     * Clean order row
+     * Order row
      *
-     * @param  array  $row
-     * @return  this
+     * @var  Admin\Eloquent\AdminModel|null
      */
-    public function prepareOrderRow($oldRow)
+    protected $order;
+
+    public function store()
     {
-        $row = $this->cleanOrderRow($oldRow);
+        $row = $this->buildOrderData();
+
+        $this->order = Admin::getModel('Order')->create($row);
+    }
+
+    /**
+     * Returns order row data
+     *
+     * @return  array
+     */
+    public function buildOrderData()
+    {
+        $row = $this->getRequestData();
+
         $row = $this->addDelivery($row);
         $row = $this->addPaymentMethod($row);
         $row = $this->addOrderPrices($row);
@@ -26,16 +48,16 @@ class OrderService
     /**
      * Add items from cart into order
      *
-     * @param  AdminModel  $order
+     * @return this;
      */
-    public function addItemsIntoOrder($order)
+    public function addItemsIntoOrder()
     {
         $cart = Cart::all();
 
         foreach ($cart as $item) {
             $product = (@$item->variant ?: $item->product);
 
-            $order->items()->create([
+            $this->order->items()->create([
                 'product_id' => $item->id,
                 'variant_id' => @$item->variant_id,
                 'quantity' => @$item->quantity,
@@ -44,20 +66,8 @@ class OrderService
                 'price_tax' => @$product->priceWithTax,
             ]);
         }
-    }
 
-    /**
-     * Clean order row
-     *
-     * @param  array  $row
-     * @return  $row
-     */
-    public function cleanOrderRow($row)
-    {
-        $row = $this->cleanDiferentDeliveryDetails($row);
-        $row = $this->cleanCompanyDetails($row);
-
-        return $row;
+        $this->order->syncWarehouse();
     }
 
     /**
@@ -72,45 +82,6 @@ class OrderService
 
         $row['price'] = $summary['priceWithoutTax'];
         $row['price_tax'] = $summary['priceWithTax'];
-
-        return $row;
-    }
-
-    /**
-     * Reset different delivery fields
-     * If different delivery is not present
-     *
-     * @param  array  $row
-     * @return array
-     */
-    public function cleanDiferentDeliveryDetails($row)
-    {
-        if ( @$row['delivery_different'] != 1 ) {
-            foreach ([
-                'delivery_username', 'delivery_phone', 'delivery_street',
-                'delivery_city', 'delivery_zipcode', 'delivery_city', 'delivery_country_id'
-            ] as $key) {
-                $row[$key] = null;
-            }
-        }
-
-        return $row;
-    }
-
-    /**
-     * Reset company fields
-     * If company is not present
-     *
-     * @param  array  $row
-     * @return array
-     */
-    public function cleanCompanyDetails($row)
-    {
-        if ( @$row['company_id'] != 1 ) {
-            foreach (['company_name', 'company_id', 'company_tax_id', 'company_vat_id'] as $key) {
-                $row[$key] = null;
-            }
-        }
 
         return $row;
     }
@@ -147,6 +118,20 @@ class OrderService
         $row['payment_method_id'] = $paymentMethod->getKey();
 
         return $row;
+    }
+
+    /**
+     * Return
+     *
+     * @param
+     * @return Response
+     */
+    public function errorResponse()
+    {
+        return response()->json([
+            'orderErrors' => $this->getErrorMessages(),
+            'cart' => Cart::fullCartResponse(),
+        ], 422);
     }
 }
 

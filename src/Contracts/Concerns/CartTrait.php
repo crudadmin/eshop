@@ -63,8 +63,9 @@ trait CartTrait
     {
         $items = session($this->key, []);
 
-        if ( ! is_array($items) )
+        if ( ! is_array($items) ) {
             return [];
+        }
 
         return new Collection(array_map(function($item){
             return new CartItem($item['id'], $item['quantity'], @$item['variant_id']);

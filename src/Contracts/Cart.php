@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts;
 
 use Admin;
 use AdminEshop\Contracts\Concerns\CartTrait;
+use OrderService;
 use Discounts;
 use Store;
 
@@ -135,6 +136,7 @@ class Cart
                 'paymentMethods' => $this->addCartDiscountsIntoModel(Store::getPaymentMethodsByDelivery()),
                 'selectedDelivery' => Cart::getSelectedDelivery(),
                 'selectedPaymentMethod' => Cart::getSelectedPaymentMethod(),
+                'clientData' => OrderService::getFromSession(),
             ]);
         }
 
@@ -215,7 +217,7 @@ class Cart
         $this->fetchMissingProductDataFromDb();
 
         return $this->items->map(function($item) use ($discounts) {
-            return (clone $item)->fetchItemModels($discounts);
+            return (clone $item)->render($discounts);
         })->reject(function($item){
             //If product or variant is missing from cart item, remove this cart item
             if ( ! $item->product || $item->variant_id && ! $item->variant ) {
