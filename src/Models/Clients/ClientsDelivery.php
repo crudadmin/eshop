@@ -42,7 +42,7 @@ class ClientsDelivery extends AdminModel
             ]),
 
             'Adresa' => Group::half([
-                'street' => 'name:Ulice a č.p.|required',
+                'street' => 'name:Ulica a č.p.|required',
                 'city' => 'name:Mesto|required',
                 'zipcode' => 'name:PSČ|required',
                 'country' => 'name:Krajina|belongsTo:countries,name|required|exists:countries,id',

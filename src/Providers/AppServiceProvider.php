@@ -14,9 +14,10 @@ class AppServiceProvider extends ServiceProvider
     ];
 
     protected $facades = [
+        'Cart' => \AdminEshop\Facades\CartFacade::class,
         'Store' => \AdminEshop\Facades\StoreFacade::class,
         'Discounts' => \AdminEshop\Facades\Discounts::class,
-        'Cart' => \AdminEshop\Facades\CartFacade::class,
+        'OrderService' => \AdminEshop\Facades\OrderServiceFacade::class,
     ];
 
     protected $routeMiddleware = [

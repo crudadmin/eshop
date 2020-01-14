@@ -3,10 +3,11 @@
 namespace AdminEshop\Rules;
 
 use Admin\Eloquent\AdminModel;
+use Admin\Eloquent\AdminRule;
 use Admin;
 use Ajax;
 
-class SetDefaultDeliveryAddress
+class SetDefaultDeliveryAddress extends AdminRule;
 {
     //On all events
     public function fire(AdminModel $row)

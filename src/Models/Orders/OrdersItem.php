@@ -2,12 +2,15 @@
 
 namespace AdminEshop\Models\Orders;
 
+use Admin;
+use AdminEshop\Admin\Rules\OnUpdateOrderProduct;
+use AdminEshop\Admin\Rules\ReloadProductQuantity;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class OrdersProduct extends AdminModel
+class OrdersItem extends AdminModel
 {
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -17,7 +20,7 @@ class OrdersProduct extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Produkty k objednávce';
+    protected $name = 'Produkty k objednávke';
 
     /*
      * Template title
@@ -33,12 +36,9 @@ class OrdersProduct extends AdminModel
 
     protected $withoutParent = true;
 
-    protected $inTab = true;
-
     protected $publishable = false;
-    protected $sortable = false;
 
-    private $product_item = null;
+    protected $sortable = false;
 
     /*
      * Automatic form and database generation
@@ -55,7 +55,7 @@ class OrdersProduct extends AdminModel
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
             ]),
             Group::half([
-                'variant' => 'name:Varianta produktu|belongsTo:products_variants,value|filterBy:product|required_with_values|hidden',
+                'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|required_with_values|hidden',
                 'variant_text' => 'name:Popis varianty',
             ]),
             Group::fields([
@@ -72,15 +72,33 @@ class OrdersProduct extends AdminModel
         ];
     }
 
+    public function options()
+    {
+        return [
+            'variant_id' => $this->getAvailableVariants(),
+        ];
+    }
+
+    /*
+     * Skip variants non orderable variants
+     * Product can also have variants, bud this variants may not be orderable. We want skip this variants.
+     */
+    public function getAvailableVariants()
+    {
+        return ProductsVariant::select(['id', 'product_id', 'name'])->whereHas('product', function($query){
+            $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
+        })->get();
+    }
+
     public function settings()
     {
         return [
-            'title.insert' => 'Nový produkt k objednávce',
-            'title.update' => 'Upravujete produkt v objednávce',
+            'increments' => false,
+            'title.insert' => 'Nová položka',
+            'title.update' => 'Upravujete položku v objednávke',
             'grid.hidden' => true,
-            'columns.id.hidden' => true,
             'columns.total' => [
-                'title' => 'Cena celkem',
+                'title' => 'Cena spolu',
                 'after' => 'price_tax',
             ],
 
@@ -89,56 +107,30 @@ class OrdersProduct extends AdminModel
         ];
     }
 
-    public function getAdminAttributes()
+    public function setAdminAttributes($attributes)
     {
-        $attributes = parent::getAdminAttributes();
-
-        $attributes['total'] = Store::roundNumber($this->price_tax * $this->quantity);
+        $attributes['total'] = Store::priceFormat($this->price_tax * $this->quantity);
 
         return $attributes;
     }
 
     protected $rules = [
-        \AdminEshop\Admin\Rules\OnUpdateOrderProduct::class,
+        OnUpdateOrderProduct::class,
+        ReloadProductQuantity::class,
     ];
-
-    public function onUpdate()
-    {
-        $this->order->calculatePrices();
-    }
-
-    public function onCreate()
-    {
-        $this->order->calculatePrices();
-    }
-
-    public function onDelete()
-    {
-        $this->order->calculatePrices();
-    }
-
-    public function options()
-    {
-        return [
-            'variant' => $this->getVariantsOptions(),
-        ];
-    }
 
     /*
      * Get product/attribute relationship
      */
     public function getProduct()
     {
-        if ( $this->product_item )
-            return $this->product_item;
+        return Admin::cache('ordersItems.'.$this->getKey(), function(){
+            //Bind product or variant for uncounting from warehouse
+            if ( $this->variant_id )
+                return $this->variant;
 
-        //Bind product or variant for uncounting from warehouse
-        if ( $this->variant_id )
-            $this->product_item = $this->variant;
-        else
-            $this->product_item = $this->product;
-
-        return $this->product_item;
+            return $this->product;
+        });
     }
 
     public function getPriceWithoutTaxAttribute()

@@ -28,9 +28,11 @@ export default {
     },
 
     mounted(){
-        this.bindTaxChange();
+        //On tax value change
+        this.onTaxChange();
 
-        this.changeTaxValue(this.row.tax_id);
+        //Bind default tax value
+        this.changeTaxValue(this.row[this.getTaxFieldKey()]);
     },
 
     computed: {
@@ -54,6 +56,17 @@ export default {
     },
 
     methods: {
+        getFieldPrefix(){
+            var fieldPrefix = this.field_key.split('_').slice(0, -1).join('_');
+
+            return fieldPrefix ? fieldPrefix+'_' : '';
+        },
+        hasStaticFieldTax(){
+            return this.model.fields[this.getFieldPrefix()+'tax_id'] ? false : true;
+        },
+        getTaxFieldKey(){
+            return this.getFieldPrefix()+(this.hasStaticFieldTax() ? 'tax' : 'tax_id');
+        },
         onChange(e){
             this.field.value = e.target.value;
         },
@@ -63,15 +76,19 @@ export default {
         recalculateWithoutTaxPrice(e){
             this.field.value = (e.target.value / (1 + (this.tax / 100))).toFixed(2);
         },
-        bindTaxChange(){
-            this.$watch('row.tax_id', this.changeTaxValue);
+        onTaxChange(){
+            this.$watch('row.'+this.getTaxFieldKey(), this.changeTaxValue);
         },
-        changeTaxValue(tax_id){
-            var options = this.model.fields['tax_id'].options;
+        changeTaxValue(taxValue){
+            if ( this.hasStaticFieldTax() ) {
+                this.tax = taxValue;
+            } else {
+                var options = this.model.fields['tax_id'].options;
 
-            for ( var i = 0; i < options.length; i++ ) {
-                if ( options[i][0] == tax_id ) {
-                    this.tax = options[i][1].tax;
+                for ( var i = 0; i < options.length; i++ ) {
+                    if ( options[i][0] == taxValue ) {
+                        this.tax = options[i][1].tax;
+                    }
                 }
             }
         }

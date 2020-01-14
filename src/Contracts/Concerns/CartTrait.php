@@ -216,6 +216,8 @@ trait CartTrait
     {
         $items = $items === null ? $this->all() : $items;
 
+        $discounts = $discounts === null ? Discounts::getDiscounts() : $discounts;
+
         $sum = $this->getDefaultSummary($items);
 
         foreach ($sum as $key => $value) {

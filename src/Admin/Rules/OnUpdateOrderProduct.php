@@ -1,35 +1,36 @@
 <?php
 
-namespace AdminEshop\Rules;
+namespace AdminEshop\Admin\Rules;
 
+use Admin\Eloquent\AdminRule;
 use Admin\Eloquent\AdminModel;
 use Admin;
 use Ajax;
+use Store;
 
-class OnUpdateOrderProduct
+class OnUpdateOrderProduct extends AdminRule
 {
     //On all events
     public function fire(AdminModel $row)
     {
-        if ( $row->order->status == 'canceled' )
-            return Ajax::error('Nelze upravovat produkty v již zrušené objednávce.');
+        if ( $row->order && $row->order->status == 'canceled' ) {
+            return Ajax::error('Nie je možné upravovať produkty v už zrušenej objednávke.');
+        }
 
         //Set default tax
-        if ( ! $row->tax && $row->product && $row->product->tax )
-            $row->tax = $row->product->tax->tax;
-
-        //Automatically variant text by variant
-        if ($row->variant_id)
-            $row->variant_text = $row->variant->getVariantText();
+        if ( ! $row->tax && ($product = $row->getProduct()) && $product->tax_id ) {
+            $row->tax = Store::getTaxValueById($product->tax_id);
+        }
 
         //Automatically fill product price if is empty
-        if ( $row->price !== 0  && ! $row->price && ! $row->price_tax )
-            $row->price = $row->product->setProductVariant( $row->variant )->priceWithoutTax;
+        if ( $row->price !== 0  && ! $row->price && ! $row->price_tax ) {
+            $row->price = $row->getProduct()->priceWithoutTax;
+        }
 
         if ( ! $row->price )
-            $row->price = $row->price_tax / (1 + ($row->tax / 100));
+            $row->price = Store::roundNumber($row->price_tax / (1 + ($row->tax / 100)));
         else if ( ! $row->price_tax )
-            $row->price_tax = $row->price * (1 + ($row->tax / 100));
+            $row->price_tax = Store::roundNumber($row->price * (1 + ($row->tax / 100)));
     }
 
     /*
@@ -38,7 +39,9 @@ class OnUpdateOrderProduct
     public function create(AdminModel $row)
     {
         //Add change of items into quantity
-        $this->checkQuantity($row, $row->quantity);
+        if ( $row->order ) {
+            $this->checkQuantity($row, $row->quantity);
+        }
     }
 
     /*
@@ -47,7 +50,9 @@ class OnUpdateOrderProduct
     public function update(AdminModel $row)
     {
         //Add change of items into quantity
-        $this->checkQuantity($row, $row->quantity - $row->getOriginal('quantity'));
+        if ( $row->order ) {
+            $this->checkQuantity($row, $row->quantity - $row->getOriginal('quantity'));
+        }
     }
 
     /*
@@ -56,14 +61,17 @@ class OnUpdateOrderProduct
     public function delete(AdminModel $row)
     {
         //Add into quantity
-        $this->checkQuantity($row, -$row->quantity);
+        if ( $row->order ) {
+            $this->checkQuantity($row, -$row->quantity);
+        }
     }
 
     private function checkQuantity($row, $qty)
     {
         //If order item has related product
-        if ( ! ($product = $row->getProduct()) )
+        if ( ! ($product = $row->getProduct()) ){
             return;
+        }
 
         //If in product does not matter about warehouse stock
         if ( $row->product->canOrderEverytime()  )
@@ -71,8 +79,9 @@ class OnUpdateOrderProduct
 
         $available = ($row->getProduct()->warehouse_quantity -= $qty);
 
-        if ( $available < 0 )
-            return Ajax::error('Není dostatečný počet produktů na skladě pro přidání daného množství do objednávky.');
+        if ( $available < 0 ) {
+            return Ajax::error('Nie je dostatočný produktu produktov na sklade, pre pridanie daného produktu do objednávky.');
+        }
 
         $row->getProduct()->save();
     }

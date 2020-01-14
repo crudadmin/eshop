@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Store;
 
+use AdminEshop\Admin\Rules\SetDefault;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
@@ -27,6 +28,8 @@ class Country extends AdminModel
 
     protected $reversed = true;
 
+    protected $visible = ['id', 'name', 'code'];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -38,7 +41,8 @@ class Country extends AdminModel
     {
         return [
             'name' => 'name:Krajina|required',
-            'code' => 'name:Skratka krajiny|max:5|required'
+            'code' => 'name:Skratka krajiny|max:5|required',
+            'default' => 'name:Predvolená krajina|type:checkbox',
         ];
     }
 
@@ -46,5 +50,9 @@ class Country extends AdminModel
         'title.insert' => 'Nová krajina',
         'title.update' => ':name',
         'columns.id.hidden' => true,
+    ];
+
+    protected $rules = [
+        SetDefault::class,
     ];
 }

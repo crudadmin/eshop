@@ -2,10 +2,11 @@
 
 namespace AdminEshop\Admin\Rules;
 
+use Admin\Eloquent\AdminRule;
 use Admin\Eloquent\AdminModel;
 use Ajax;
 
-class SetDefaultTax
+class SetDefault extends AdminRule
 {
     //On all events
     public function fire(AdminModel $row)
@@ -27,7 +28,7 @@ class SetDefaultTax
     public function delete(AdminModel $row)
     {
         if ( $row->default == true ) {
-            Ajax::error(_('Nie je možné vymazať predvolenú DPH.'));
+            Ajax::error(_('Nie je možné vymazať predvolený záznam.'));
         }
     }
 }

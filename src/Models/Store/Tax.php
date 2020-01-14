@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Models\Store;
 
-use AdminEshop\Admin\Rules\SetDefaultTax;
+use AdminEshop\Admin\Rules\SetDefault;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
@@ -45,7 +45,7 @@ class Tax extends AdminModel
     ];
 
     protected $rules = [
-        SetDefaultTax::class,
+        SetDefault::class,
     ];
 
 }

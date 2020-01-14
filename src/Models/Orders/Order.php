@@ -2,14 +2,20 @@
 
 namespace AdminEshop\Models\Orders;
 
+use AdminEshop\Admin\Rules\RebuildOrder;
+use AdminEshop\Eloquent\Concerns\OrderTrait;
+use AdminEshop\Models\Delivery\Delivery;
+use AdminEshop\Models\Store\Country;
+use AdminEshop\Models\Store\PaymentsMethod;
 use Admin\Eloquent\AdminModel;
-use Illuminate\Notifications\Notifiable;
 use Admin\Fields\Group;
+use Illuminate\Notifications\Notifiable;
 use Store;
 
 class Order extends AdminModel
 {
-    use Notifiable;
+    use Notifiable,
+        OrderTrait;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -30,9 +36,8 @@ class Order extends AdminModel
     protected $group = 'store';
 
     protected $publishable = false;
+
     protected $sortable = false;
-    protected $insertable = false;
-    protected $history = true;
 
     /*
      * Automatic form and database generation
@@ -45,58 +50,63 @@ class Order extends AdminModel
     {
         return [
             'client' => 'name:Klient|belongsTo:clients|invisible',
-            'Fakturační údaje' => Group::fields([
+            'Fakturačné údaje' => Group::fields([
+                'username' => 'name:Meno a priezvisko|required|hidden',
                 'email' => 'name:Kontaktný email|email|required',
-                'phone' => 'name:Telefón|required|phone:CZ,SK',
-                'firstname' => 'name:Krstné meno|required|hidden',
-                'lastname' => 'name:Priezvisko|required|hidden',
-                'street' => 'name:Ulice a č.p.|required',
+                'phone' => 'name:Telefón',
+                'street' => 'name:Ulica a č.p.|required',
                 'city' => 'name:Mesto|required',
                 'zipcode' => 'name:PSČ|required',
-                'country' => 'name:Krajiny|hidden|belongsTo:countries,name|exists:countries,id',
+                'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|exists:countries,id',
             ])->grid(4),
-            'Dodací údaje' => Group::fields([
+            'Dodacie údaje' => Group::fields([
                 'delivery_different' => 'name:Doručiť na inú adresu|type:checkbox|default:0',
-                'delivery_phone' => 'name:Telefón|required_with:different_delivery',
-                'delivery_company_name' => 'name:Názov firmy',
-                'delivery_firstname' => 'name:Krstné meno|required_with:different_delivery',
-                'delivery_lastname' => 'name:Priezvisko|required_with:different_delivery',
-                'delivery_street' => 'name:Ulice a č.p.|required_with:different_delivery',
-                'delivery_city' => 'name:Mesto|required_with:different_delivery',
-                'delivery_zipcode' => 'name:PSČ|required_with:different_delivery',
-                'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|required_with:different_delivery',
+                Group::fields([
+                    'delivery_username' => 'name:Meno a priezvisko / Firma|required_with:delivery_different',
+                    'delivery_phone' => 'name:Telefón|required_with:delivery_different',
+                    'delivery_street' => 'name:Ulica a č.p.|required_with:delivery_different',
+                    'delivery_city' => 'name:Mesto|required_with:delivery_different',
+                    'delivery_zipcode' => 'name:PSČ|required_with:delivery_different',
+                    'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1|required_with:delivery_different',
+                ])->add('hideFieldIfNot:delivery_different,1')
             ])->add('hidden')->grid(4),
             Group::fields([
-                'Firemní údaje' => Group::fields([
-                    'company_name' => 'name:Názov firmy|required_with:is_company|hidden',
-                    'company_id' => 'name:IČ|required_with:is_company|numeric|hidden',
-                    'company_tax_id' => 'name:DIČ|required_with:is_company|hidden',
-                    'company_vat_id' => 'name:IČ DPH|hidden',
-                ]),
-                'Nastavenia objednávky' => Group::fields([
-                    'note' => 'name:Poznámka|type:text|hidden',
-                    'internal_note' => 'name:Interná poznámka|type:text|hidden',
-                    'pdf' => 'name:PDF|type:file|extensions:pdf|invisible',
-                    'status' => 'name:Stav objednávky|type:select|required|default:new',
+                'Firemné údaje' => Group::fields([
+                    'is_company' => 'name:Nákup na firmu|type:checkbox|default:0',
+                    Group::fields([
+                        'company_name' => 'name:Názov firmy|required_with:is_company|hidden',
+                        'company_id' => 'name:IČ|required_with:is_company|numeric|hidden',
+                        'company_tax_id' => 'name:DIČ|required_with:is_company|hidden',
+                        'company_vat_id' => 'name:IČ DPH|hidden',
+                    ])->add('hideFieldIfNot:is_company,1')
                 ]),
             ])->grid(4),
-            'Platba a ceny' => Group::fields([
-                'Doprava' => Group::fields([
-                    'delivery' => 'name:Typ dopravy|belongsTo:deliveries,name',
-                    'delivery_tax' => 'name:DPH dopravy|hidden|type:decimal',
-                    'delivery_price' => 'name:Cena za dopravu|type:decimal|component:priceField|hidden',
-                ])->grid(4)->add('required'),
-                'Platební metoda' => Group::fields([
+            'Nastavenia objednávky' => Group::fields([
+                Group::fields([
+                    'note' => 'name:Poznámka|type:text|hidden',
+                    'internal_note' => 'name:Interná poznámka|type:text|hidden',
+                ])->inline(),
+                'status' => 'name:Stav objednávky|type:select|required|default:new',
+            ]),
+            'Doprava' => Group::fields([
+                Group::fields([
+                    'delivery' => 'name:Doprava|belongsTo:deliveries,name',
+                    'delivery_tax' => 'name:DPH dopravy %|fillBy:delivery.tax|hidden|type:decimal',
+                ])->inline(),
+                'delivery_price' => 'name:Cena za dopravu|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
+            ])->grid(6)->add('required'),
+            'Platobná metóda' => Group::fields([
+                Group::fields([
                     'payment_method' => 'name:Platobná metóda|belongsTo:payments_methods,name',
-                    'payment_method_tax' => 'name:DPH plat. metody (%)|hidden|type:decimal',
-                    'payment_method_price' => 'name:Cena plat. metódy bez DPH|type:decimal|component:priceField|hidden',
-                ])->grid(4)->add('required'),
-                'Objednávka' => Group::fields([
-                    Group::fields([
-                        'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                        'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
-                    ]),
-                ])->grid(4),
+                    'payment_method_tax' => 'name:DPH plat. metody %|fillBy:payment_method.tax|hidden|type:decimal',
+                ])->inline(),
+                'payment_method_price' => 'name:Cena plat. metódy|type:decimal|fillBy:payment_method.price|component:PriceField|hidden',
+            ])->grid(6)->add('required'),
+            'Cena objednávky' => Group::fields([
+                Group::fields([
+                    'price' => 'name:Cena bez DPH|disabled|type:decimal',
+                    'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
+                ]),
             ]),
         ];
     }
@@ -104,6 +114,7 @@ class Order extends AdminModel
     public function settings()
     {
         return [
+            'autoreset' => false,
             'title.insert' => 'Nová objednávka',
             'title.update' => 'Objednávka č. :id - :created',
             'grid.enabled' => false,
@@ -115,39 +126,60 @@ class Order extends AdminModel
                 'after' => 'id',
                 'name' => 'Zákazník',
             ],
-            'columns.username' => [
-                'after' => 'id',
-                'name' => 'Meno a priezvisko',
+        ];
+    }
+
+    protected $rules = [
+        RebuildOrder::class,
+    ];
+
+    public function options()
+    {
+        $countries = Country::all();
+
+        return [
+            'country_id' => $countries,
+            'delivery_country_id' => $countries,
+            'delivery_id' => $this->getDeliveries(),
+            'payment_method_id' => $this->getPaymentMethods(),
+            'status' => [
+                'new' => 'Prijatá',
+                'waiting' => 'Čaká za spracovaním',
+                'delivery' => 'Doručuje sa',
+                'payment-waiting' => 'Čaká na zaplatenie',
+                'paid' => 'Zaplatená',
+                'ok' => 'Vybavená',
+                'canceled' => 'Zrušená',
             ],
         ];
     }
 
-    protected $options = [
-        'status' => [
-            'new' => 'Prijatá',
-            'waiting' => 'čaka za spracovaním',
-            'delivery' => 'Doručuje sa',
-            'payment-waiting' => 'Čaká na zaplatenie',
-            'paid' => 'Zaplatená',
-            'ok' => 'Vybavená',
-            'canceled' => 'Zrušená',
-        ],
-    ];
+    public function getDeliveries()
+    {
+        return Delivery::leftJoin('taxes', 'deliveries.tax_id', '=', 'taxes.id')
+                        ->select(['deliveries.id', 'deliveries.name', 'deliveries.price', 'taxes.tax'])
+                        ->get();
+    }
+
+    public function getPaymentMethods()
+    {
+        return PaymentsMethod::leftJoin('taxes', 'payments_methods.tax_id', '=', 'taxes.id')
+                        ->select(['payments_methods.id', 'payments_methods.name', 'payments_methods.price', 'taxes.tax'])
+                        ->get();
+    }
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['created'] = $this->created_at ? $this->created_at->format('d.m.Y H:i') : '';
-
         $attributes['client_name'] = $this->client ? $this->client->clientName : '';
 
-        $attributes['username'] = $this->username;
+        $attributes['created'] = $this->created_at ? $this->created_at->format('d.m.Y H:i') : '';
 
         return $attributes;
     }
 
     public function isCompany()
     {
-        return $this->company_name || $this->company_id || $this->company_tax_id;
+        return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
 
     public function getNumberAttribute()
@@ -155,30 +187,13 @@ class Order extends AdminModel
         return str_pad($this->getKey(), 6, '0', STR_PAD_LEFT);
     }
 
-
-    public function getUsernameAttribute()
-    {
-        if ( !$this->firstname && !$this->lastname )
-            return null;
-
-        return $this->firstname . ' ' . $this->lastname;
-    }
-
-    public function getDeliveryUsernameAttribute()
-    {
-        if ( count(array_filter([$this->delivery_firstname, $this->delivery_lastname])) == 0 )
-            return null;
-
-        return $this->delivery_firstname . ' ' . $this->delivery_lastname;
-    }
-
     public function getPaymentMethodPriceWithTaxAttribute()
     {
-        return $this->payment_method_price * (1 + ($this->payment_method_tax/100));
+        return Store::roundNumber($this->payment_method_price * (1 + ($this->payment_method_tax/100)));
     }
 
     public function getDeliveryPriceWithTaxAttribute()
     {
-        return $this->delivery_price * (1 + ($this->delivery_tax/100));
+        return Store::roundNumber($this->delivery_price * (1 + ($this->delivery_tax/100)));
     }
 }

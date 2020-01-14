@@ -7,6 +7,7 @@ use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Discounts;
 use Store;
+use Admin;
 
 trait PriceMutator
 {
@@ -45,6 +46,11 @@ trait PriceMutator
      */
     public function applyDiscounts($price, $discounts = null)
     {
+        //We skip all prices in administration
+        if ( Admin::isAdmin() ) {
+            return $price;
+        }
+
         Discounts::applyDiscountsOnModel($this, $discounts, function($discount){
             return $discount->canApplyOutsideCart($this);
         });

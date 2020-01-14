@@ -28,6 +28,16 @@ class Store
     }
 
     /*
+     * Return all countries
+     */
+    public function getCountries()
+    {
+        return $this->cache('countries', function(){
+            return Admin::getModel('Country')->get();
+        });
+    }
+
+    /*
      * Return all payment methods
      */
     public function getPaymentMethods()
@@ -65,7 +75,7 @@ class Store
      * @param  int  $taxId
      * @return int/float
      */
-    public function getTaxById($taxId)
+    public function getTaxValueById($taxId)
     {
         return $this->cache('tax.'.$taxId, function() use ($taxId) {
             $tax = $this->getTaxes()->where('id', $taxId)->first();
@@ -135,7 +145,7 @@ class Store
     {
         $taxes = $this->getTaxes();
 
-        $tax = $taxId === null ? $this->getDefaultTax() : $this->getTaxById($taxId);
+        $tax = $taxId === null ? $this->getDefaultTax() : $this->getTaxValueById($taxId);
 
         return Store::roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
     }
@@ -171,7 +181,7 @@ class Store
         $arr = [];
 
         foreach (config('admineshop.product_types') as $key => $item) {
-            if ( @$item[$configKey] === false ) {
+            if ( @$item[$configKey] === $value ) {
                 $arr[] = $key;
             }
         }

@@ -46,7 +46,7 @@ class Delivery extends AdminModel
     {
         return [
             'name' => 'name:Názov dopravy|placeholder:Zadejte názov dopravy|required|max:90',
-            'tax' => 'name:Sadza DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|canAdd',
+            'tax' => 'name:Sadza DPH|belongsTo:taxes,:name (:tax%)|required|defaultByOption:default,1|canAdd',
             'price' => 'name:Základná cena bez DPH|type:decimal|component:priceField|required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis dopravy|hidden',

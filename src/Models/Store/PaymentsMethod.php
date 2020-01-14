@@ -40,7 +40,7 @@ class PaymentsMethod extends AdminModel
     {
         return [
             'name' => 'name:Názov platby|max:40|required',
-            'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|canAdd',
+            'tax' => 'name:Sadza DPH|belongsTo:taxes,:name (:tax%)|required|defaultByOption:default,1|canAdd',
             'price' => 'name:Základna cena bez DPH|type:decimal|component:PriceField||required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis platby|type:text',
