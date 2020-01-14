@@ -3,14 +3,15 @@
     "type": "library",
     "description": "Laravel Eshop package for administration based on crudadmin system",
     "keywords": ["eshop", "admin", "laravel"],
-    "homepage": "marekgogol.sk",
+    "homepage": "https://www.marekgogol.sk",
     "license": "MIT",
     "authors": [
         { "name": "Marek Gogoľ", "email": "info@marekgogol.sk" }
     ],
     "require": {
         "php": ">=5.6.4",
-        "laravel/framework": "^6.0"
+        "laravel/framework": "^6.0",
+        "crudadmin/crudadmin": "^3.0"
     },
     "autoload": {
         "psr-4": {
