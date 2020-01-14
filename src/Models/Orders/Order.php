@@ -196,4 +196,9 @@ class Order extends AdminModel
     {
         return Store::roundNumber($this->delivery_price * (1 + ($this->delivery_tax/100)));
     }
+
+    public function getHash()
+    {
+        return sha1(env('APP_KEY').$this->getKey().'XL');
+    }
 }

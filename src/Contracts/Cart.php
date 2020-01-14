@@ -256,6 +256,28 @@ class Cart
         return $this;
     }
 
+    /**
+     * Forget all saved cart and order details
+     *
+     * @param  int|null  $id
+     * @return  this
+     */
+    public function forget()
+    {
+        //On local environment does not flush data
+        if ( ! app()->environment('local') ) {
+            session()->forget($this->key);
+            session()->forget($this->deliveryKey);
+            session()->forget($this->paymentMethodKey);
+
+            OrderService::flushFromSession();
+        }
+
+        session()->save();
+
+        return $this;
+    }
+
     /*
      * Save delivery into session
      */

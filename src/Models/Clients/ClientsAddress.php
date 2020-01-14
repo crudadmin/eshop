@@ -2,10 +2,11 @@
 
 namespace AdminEshop\Models\Clients;
 
+use AdminEshop\Admin\Rules\SetDefaultDeliveryAddress;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
-class ClientsDelivery extends AdminModel
+class ClientsAddress extends AdminModel
 {
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -32,12 +33,11 @@ class ClientsDelivery extends AdminModel
     public function fields($row)
     {
         return [
+            'type' => 'name:Typ adresy|type:select|required',
+            'name' => 'name:Názov adresy|required',
             'Osobné údaje' => Group::fields([
-                'type' => 'name:Typ adresy|type:select|required',
-                'name' => 'name:Názov adresy|required',
-                'firstname' => 'name:Krstné meno|required',
-                'lastname' => 'name:Priezvisko|required',
-                'phone' => 'name:Tel. číslo|required|phone:CZ,SK',
+                'username' => 'name:Meno a priezvisko / Firma|required',
+                'phone' => 'name:Tel. číslo|required',
                 'default' => 'name:Predvolené|default:0|type:checkbox',
             ]),
 
@@ -46,14 +46,14 @@ class ClientsDelivery extends AdminModel
                 'city' => 'name:Mesto|required',
                 'zipcode' => 'name:PSČ|required',
                 'country' => 'name:Krajina|belongsTo:countries,name|required|exists:countries,id',
-            ])->grid(4),
+            ])->grid(6),
 
             'Firemné údaje' => Group::fields([
                 'company_name' => 'name:Názov firmy',
                 'company_id' => 'name:IČO|numeric',
                 'tax_id' => 'name:DIČ|dic',
                 'vat_id' => 'name:IČ DPH|dic',
-            ])->grid(4)->add('hidden'),
+            ])->grid(6)->add('hidden|removeFromFormIf:type,delivery'),
         ];
     }
 
@@ -81,12 +81,7 @@ class ClientsDelivery extends AdminModel
         return $this->company_name || $this->company_id || $this->company_tax_id;
     }
 
-    public function getUsernameAttribute()
-    {
-        return $this->firstname . ' ' . $this->lastname;
-    }
-
     protected $rules = [
-        \AdminEshop\Rules\Admin\SetDefaultDeliveryAddress::class,
+        SetDefaultDeliveryAddress::class,
     ];
 }

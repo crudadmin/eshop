@@ -22,11 +22,40 @@ class OrderService
      */
     protected $order;
 
+    /**
+     * Store order int osession
+     *
+     * @return  this
+     */
     public function store()
     {
         $row = $this->buildOrderData();
 
-        $this->order = Admin::getModel('Order')->create($row);
+        $this->setOrder(Admin::getModel('Order')->create($row));
+
+        return $this;
+    }
+
+    /**
+     * Set order
+     *
+     * @param  AdminModel|null  $order
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    /**
+     * Returns order
+     *
+     * @return  null|Admin\Eloquent\AdminModel
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**
@@ -68,6 +97,8 @@ class OrderService
         }
 
         $this->order->syncWarehouse('-', 'order.new');
+
+        return $this;
     }
 
     /**

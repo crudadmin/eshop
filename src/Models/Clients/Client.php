@@ -5,8 +5,6 @@ namespace AdminEshop\Models\Clients;
 use Admin\Eloquent\Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Admin\Fields\Group;
-use Carbon\Carbon;
-use DB;
 
 class Client extends Authenticatable
 {
@@ -36,14 +34,13 @@ class Client extends Authenticatable
         return [
             'Osobné údaje' => Group::fields([
                 'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
-                'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '|nullable' ),
-                'firstname' => 'name:Meno',
-                'lastname' => 'name:Priezvisko',
-                'phone' => 'name:Telefon|phone:CZ,SK',
+                'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
+                'username' => 'name:Meno a priezvisko',
+                'phone' => 'name:Telefon',
                 'groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd',
             ]),
             'Fakturačné údaje' => Group::half([
-                'street' => 'name:Ulice a č.p.',
+                'street' => 'name:Ulica a č.p.',
                 'city' => 'name:Mesto',
                 'zipcode' => 'name:PSČ',
                 'country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id',
@@ -51,15 +48,15 @@ class Client extends Authenticatable
             'Firemné údaje' => Group::half([
                 'company_name' => 'name:Názov firmy|required_with:is_company',
                 'company_id' => 'name:IČO|required_with:is_company|numeric',
-                'tax_id' => 'name:DIČ|required_with:is_company|dic',
-                'vat_id' => 'name:IČ DPH',
+                'company_tax_id' => 'name:DIČ|required_with:is_company',
+                'company_vat_id' => 'name:IČ DPH',
             ])->add('hidden'),
         ];
     }
 
     protected $settings = [
         'title.insert' => 'Nový klient',
-        'title.update' => 'Klient :firstname :lastname',
+        'title.update' => 'Klient :username',
         'grid' => [
             'default' => 'full',
             'enabled' => false,
@@ -68,11 +65,6 @@ class Client extends Authenticatable
         'columns.orders.before' => 'last_logged_at',
         'columns.last_order.name' => 'Posledná objednávka',
     ];
-
-    public function getUsernameAttribute()
-    {
-        return $this->firstname . ' ' . $this->lastname;
-    }
 
     public function getClientNameAttribute()
     {
@@ -89,8 +81,8 @@ class Client extends Authenticatable
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['orders'] = $this->orders->count();
-        $attributes['last_order'] = ($order = $this->orders->first()) ? $order->created_at->format('d.m.Y') : '';
+        $attributes['orders'] = $this->orders()->count();
+        $attributes['last_order'] = ($order = $this->orders()->first()) ? $order->created_at->format('d.m.Y') : '';
 
         return $attributes;
     }

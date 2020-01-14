@@ -1,13 +1,11 @@
 <?php
 
-namespace AdminEshop\Rules;
+namespace AdminEshop\Admin\Rules;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
-use Admin;
-use Ajax;
 
-class SetDefaultDeliveryAddress extends AdminRule;
+class SetDefaultDeliveryAddress extends AdminRule
 {
     //On all events
     public function fire(AdminModel $row)

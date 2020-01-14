@@ -2,6 +2,8 @@
 
 namespace AdminEshop\Contracts\Order;
 
+use Cart;
+
 trait HasSession
 {
     /**
@@ -19,6 +21,19 @@ trait HasSession
     public function storeIntoSession()
     {
         session()->put($this->sessionKey, $this->getRequestData());
+        session()->save();
+
+        return $this;
+    }
+
+    /**
+     * Flush client data from session
+     *
+     * @return  this
+     */
+    public function flushFromSession()
+    {
+        session()->forget($this->sessionKey);
         session()->save();
 
         return $this;

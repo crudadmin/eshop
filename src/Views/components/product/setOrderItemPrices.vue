@@ -7,11 +7,6 @@ export default {
     },
 
     methods: {
-        getTaxValue(taxId){
-            var tax = _.find(this.model.storeTaxes, { id : parseInt(taxId) });
-
-            return tax.tax||0;
-        },
         bindChanges(){
             //On product change bind fields
             this.$watch('row.product_id', id => {
@@ -23,7 +18,7 @@ export default {
                 //If product does not have variants
                 this.row.price = product && availableVariants.length == 0 ? product.priceWithoutTax : null;
                 this.row.price_tax = product && availableVariants.length == 0 ? product.priceWithTax : null;
-                this.row.tax = product && availableVariants.length == 0 ? this.getTaxValue(product.tax_id) : null;
+                this.row.tax = product && availableVariants.length == 0 ? product.taxValue : null;
             });
 
             //On variant change bind fields
@@ -33,7 +28,7 @@ export default {
                 //If product does not have variants
                 this.row.price = product ? product.priceWithoutTax : null;
                 this.row.price_tax = product ? product.priceWithTax : null;
-                this.row.tax = product ? this.getTaxValue(product.tax_id) : null;
+                this.row.tax = product ? product.taxValue : null;
             });
         },
     }

@@ -97,8 +97,8 @@ class OrdersItem extends AdminModel
                 ->whereHas('product', function($query){
                     $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
                 })->get()->map(function($item){
-                    $item->setVisible(['id', 'product_id', 'name', 'tax_id', 'priceWithTax', 'priceWithoutTax'])
-                         ->setAppends(['priceWithTax', 'priceWithoutTax']);
+                    $item->setVisible(['id', 'product_id', 'name', 'priceWithTax', 'priceWithoutTax', 'taxValue'])
+                         ->setAppends(['priceWithTax', 'priceWithoutTax', 'taxValue']);
 
                     return $item;
                 });
@@ -113,8 +113,8 @@ class OrdersItem extends AdminModel
     {
         return Product::select(['id', 'name', 'price', 'tax_id', 'discount_operator', 'discount'])
                 ->get()->map(function($item){
-                    $item->setVisible(['id', 'name', 'tax_id', 'priceWithTax', 'priceWithoutTax'])
-                         ->setAppends(['priceWithTax', 'priceWithoutTax']);
+                    $item->setVisible(['id', 'name', 'priceWithTax', 'priceWithoutTax', 'taxValue'])
+                         ->setAppends(['priceWithTax', 'priceWithoutTax', 'taxValue']);
 
                     return $item;
                 });
@@ -134,13 +134,6 @@ class OrdersItem extends AdminModel
 
             //Add currency after columns
             'columns.price_tax.add_after' => ' '.Store::getCurrency(),
-        ];
-    }
-
-    public function beforeInitialAdminRequest()
-    {
-        return [
-            'storeTaxes' => Store::getTaxes(),
         ];
     }
 

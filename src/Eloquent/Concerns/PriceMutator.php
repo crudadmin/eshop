@@ -173,4 +173,14 @@ trait PriceMutator
 
         return $this->priceWithoutTax;
     }
+
+    /**
+     * Returns tax value attribute
+     *
+     * @return  int/float
+     */
+    public function getTaxValueAttribute()
+    {
+        return Store::getTaxValueById($this->tax_id);
+    }
 }
