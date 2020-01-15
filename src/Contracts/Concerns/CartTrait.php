@@ -165,11 +165,7 @@ trait CartTrait
         if ( strpos($key, 'WithoutTax') !== false )
             return false;
 
-        //If is not discountable attribute by withTax/WithouTax
-        //try other dynamic fields from discounts settings
-        if ( in_array($key, Discounts::getDiscountableAttributes()) ) {
-            return 0;
-        }
+        return Discounts::getDiscountableAttributeTaxValue($key);
     }
 
     /**
@@ -203,12 +199,67 @@ trait CartTrait
     }
 
     /**
+     * Add additional prices into order sum, as
+     *
+     * @param  int/float  $price If is no withTax/withoutTax price atribute
+     * @param  bool  $isTax
+     */
+    public function addAdditionalPaymentsIntoSum($price, bool $isTax)
+    {
+        $selectedDelivery = $this->getSelectedDelivery();
+        $selectedPaymentMethod = $this->getSelectedPaymentMethod();
+
+        //Add delivery
+        if ( $selectedDelivery ) {
+            $price += $selectedDelivery->{$isTax ? 'priceWithTax' : 'priceWithoutTax'};
+        }
+
+        if ( $selectedPaymentMethod ) {
+            $price += $selectedPaymentMethod->{$isTax ? 'priceWithTax' : 'priceWithoutTax'};
+        }
+
+        return $price;
+    }
+
+    /**
+     * Apply given discounts on whole sum
+     *
+     * @param  int/float  $price
+     * @param  array  $discounts
+     * @param  bool/null  $isTax
+     *
+     * @return int/float
+     */
+    public function addDiscountsIntoFinalSum($price, $discounts, $isTax = null)
+    {
+        foreach ($discounts as $discount) {
+            //If this discount is not applied on whole cart,
+            //Or is not discountableTax attribute
+            if ( $discount->applyOnWholeCart() !== true || $isTax === null ) {
+                continue;
+            }
+
+            //If is tax attribute, and discount value is with + or - operator
+            //Then we need to apply tax to this discount
+            $discountValue = $isTax === true && $discount->hasSumPriceOperator() ?
+                                    Store::priceWithTax($discount->value) : $discount->value;
+
+            //Apply given discount
+            $price = operator_modifier($price, $discount->operator, $discountValue);
+        }
+
+        return $price;
+    }
+
+    /**
      * Get all available cart summary prices with discounts
      *
      * @param  Collection  $items
+     * @param  array  $discounts
+     * @param  bool  $$fullCartResponse - add payment and delivery prices into sum
      * @return array
      */
-    public function getSummary($items = null, $discounts = null)
+    public function getSummary($items = null, $discounts = null, $fullCartResponse = false)
     {
         $items = $items === null ? $this->all() : $items;
 
@@ -217,24 +268,15 @@ trait CartTrait
         $sum = $this->getDefaultSummary($items);
 
         foreach ($sum as $key => $value) {
-            foreach ($discounts as $discount) {
-                //Apply this discount only
-                if ( $discount->applyOnWholeCart() !== true ) {
-                    continue;
-                }
+            //Check if we can apply sum modifications into this key
+            $isTax = $this->isDiscountableTaxSummaryKey($key);
 
-                //If is no withTax/withoutTax price atribute
-                if ( ($isTax = $this->isDiscountableTaxSummaryKey($key)) === null ) {
-                    continue;
-                }
+            //Add statics discount int osummary
+            $sum[$key] = $this->addDiscountsIntoFinalSum($sum[$key], $discounts, $isTax);
 
-                //If is tax attribute, and discount value is with + or - operator
-                //Then we need to add tax to this discount
-                $discountValue = $isTax === true && $discount->hasSumPriceOperator() ?
-                                    Store::priceWithTax($discount->value)
-                                    : $discount->value;
-
-                $sum[$key] = operator_modifier($sum[$key], $discount->operator, $discountValue);
+            //Add delivery, payment method prices etc...
+            if ( $fullCartResponse === true && $isTax !== null ) {
+                $sum[$key] = $this->addAdditionalPaymentsIntoSum($sum[$key], $isTax);
             }
 
             //Round numbers, and make sure all numbers are positive

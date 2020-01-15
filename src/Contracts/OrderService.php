@@ -109,7 +109,8 @@ class OrderService
      */
     public function addOrderPrices($row)
     {
-        $summary = Cart::getSummary();
+        //We want summary with delivery and payment method...
+        $summary = Cart::getSummary(null, null, true);
 
         $row['price'] = $summary['priceWithoutTax'];
         $row['price_tax'] = $summary['priceWithTax'];

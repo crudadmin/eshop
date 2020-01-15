@@ -4,13 +4,15 @@ namespace AdminEshop\Contracts;
 
 use Admin;
 use AdminEshop\Contracts\Concerns\CartTrait;
-use OrderService;
+use Admin\Core\Contracts\DataStore;
 use Discounts;
+use OrderService;
 use Store;
 
 class Cart
 {
-    use CartTrait;
+    use CartTrait,
+        DataStore;
 
     /*
      * Items in cart
@@ -127,7 +129,7 @@ class Cart
             }, $discounts),
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
-            'summary' => $this->getSummary($items, $discounts),
+            'summary' => $this->getSummary($items, $discounts, $fullCartResponse),
         ];
 
         if ( $fullCartResponse == true ){
@@ -285,7 +287,9 @@ class Cart
     {
         $id = session()->get($this->deliveryKey);
 
-        return $this->addCartDiscountsIntoModel(Store::getDeliveries()->where('id', $id)->first());
+        return $this->cache('selectedDelivery'.$id, function() use ($id) {
+            return $this->addCartDiscountsIntoModel(Store::getDeliveries()->where('id', $id)->first());
+        });
     }
 
     /*
@@ -295,7 +299,14 @@ class Cart
     {
         $id = session()->get($this->paymentMethodKey);
 
-        return $this->addCartDiscountsIntoModel(Store::getPaymentMethodsByDelivery()->where('id', $id)->first());
+        //We need to save also delivery key into cacheKey,
+        //because if delivery would change, paymentMethod can dissapear
+        //if is not assigned into selected delivery
+        $delivery = $this->getSelectedDelivery();
+
+        return $this->cache('selectedPaymentMethod'.$id.'-'.($delivery ? $delivery->getKey() : 0), function() use ($id) {
+            return $this->addCartDiscountsIntoModel(Store::getPaymentMethodsByDelivery()->where('id', $id)->first());
+        });
     }
 }
 

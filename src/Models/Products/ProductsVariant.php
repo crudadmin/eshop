@@ -122,6 +122,6 @@ class ProductsVariant extends AdminModel
      */
     protected $cartSelect = [
         'id', 'name', 'image', 'price', 'tax_id',
-        'discount_operator', 'discount',
+        'discount_operator', 'discount', 'warehouse_quantity',
     ];
 }

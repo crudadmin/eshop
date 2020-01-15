@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Discounts\FreeDelivery;
 use Admin\Core\Contracts\DataStore;
+use Store;
 
 class Discounts
 {
@@ -20,9 +21,11 @@ class Discounts
 
     /*
      * Which model attributes are discountable
+     * 'myOtherParam' => true/false
+     * (true = withTax / false = withoutTax / auto = 'by client type')
      */
     private $discountableAttributes = [
-        'priceWithTax', 'priceWithoutTax', 'clientPrice',
+        'clientPrice' => 'auto',
     ];
 
     /**
@@ -107,11 +110,12 @@ class Discounts
      *
      * @param  string|array  $key
      */
-    public function addDiscountableAttributes($attribute)
+    public function addDiscountableAttributes($attributes)
     {
-        foreach (array_wrap($attribute) as $key) {
-            $this->discountableAttributes[] = $key;
-        }
+        $this->discountableAttributes = array_merge(
+            $this->discountableAttributes,
+            $attributes
+        );
 
         return $this;
     }
@@ -124,6 +128,24 @@ class Discounts
     public function getDiscountableAttributes()
     {
         return $this->discountableAttributes;
+    }
+
+    /**
+     * Returns value of tax for given parameter
+     *
+     * @return  bool|null
+     */
+    public function getDiscountableAttributeTaxValue($key)
+    {
+        $discountableAttributes = $this->getDiscountableAttributes();
+
+        //If is not discountable attribute by withTax/WithouTax
+        //try other dynamic fields from discounts settings
+        if ( array_key_exists($key, $discountableAttributes) ) {
+            $taxValue = $discountableAttributes[$key];
+
+            return $taxValue == 'auto' ? !Store::hasB2B() : $taxValue;
+        }
     }
 
 }

@@ -11,8 +11,6 @@ class ReloadProductQuantity  extends AdminRule
     public function create($row)
     {
         if ( $order = $row->order ) {
-            $order->calculatePrices();
-
             $this->checkQuantity($row, $row->quantity, 'item.add');
         }
     }
@@ -20,8 +18,6 @@ class ReloadProductQuantity  extends AdminRule
     public function update($row)
     {
         if ( $order = $row->order ) {
-            $order->calculatePrices();
-
             $this->checkQuantity($row, $row->quantity - $row->getOriginal('quantity'), 'item.update');
         }
     }
@@ -29,8 +25,6 @@ class ReloadProductQuantity  extends AdminRule
     public function delete($row)
     {
         if ( $order = $row->order ) {
-            $order->calculatePrices();
-
             $this->checkQuantity($row, -$row->quantity, 'item.remove');
         }
     }

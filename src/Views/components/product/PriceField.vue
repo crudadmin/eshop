@@ -3,15 +3,15 @@
         <div class="row">
             <div class="col-md-4">
                 <label>{{ field.name }} <span class="required" v-if="required">*</span></label>
-                <input type="number" :name="field_key" :value="valueOrDefault" @keyup="onChange" class="form-control">
+                <input type="number" step=".01" :name="field_key" :value="valueOrDefault" @keyup="onChange" class="form-control">
             </div>
             <div class="col-md-4">
                 <label>DPH</label>
-                <input type="number" :value="taxSize" disabled class="form-control">
+                <input type="number" step=".01" :value="taxSize" disabled class="form-control">
             </div>
             <div class="col-md-4">
                 <label>Cena s DPH</label>
-                <input type="number" step=".2" :value="taxPrice" @keyup="changePrice" @change="recalculateWithoutTaxPrice" class="form-control">
+                <input type="number" step=".01" :value="taxPrice" @keyup="changePrice" @change="recalculateWithoutTaxPrice" class="form-control">
             </div>
         </div>
     </div>

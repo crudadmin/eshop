@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Orders;
 
 use Admin;
 use AdminEshop\Admin\Rules\OnUpdateOrderProduct;
+use AdminEshop\Admin\Rules\RebuildOrderOnItemChange;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
@@ -147,6 +148,7 @@ class OrdersItem extends AdminModel
     protected $rules = [
         OnUpdateOrderProduct::class,
         ReloadProductQuantity::class,
+        RebuildOrderOnItemChange::class, //We need reload order prices after quantity check
     ];
 
     /*
