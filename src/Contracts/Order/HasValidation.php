@@ -49,7 +49,14 @@ trait HasValidation
      */
     public function validate()
     {
-        foreach ($this->orderValidators as $validation) {
+        $validators = $this->orderValidators;
+
+        //Register validators from all mutators
+        foreach ($this->getMutators() as $mutator) {
+            $validators = array_merge($validators, $mutator->getValidators());
+        }
+
+        foreach ($validators as $validation) {
             $validation = new $validation;
 
             if ( $validation->pass() === false )  {

@@ -5,8 +5,8 @@ namespace AdminEshop\Contracts;
 use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\HasRequest;
-use AdminEshop\Contracts\Order\HasSession;
 use AdminEshop\Contracts\Order\HasValidation;
+use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use Admin\Core\Contracts\DataStore;
@@ -18,7 +18,6 @@ class OrderService
 {
     use DataStore,
         HasRequest,
-        HasSession,
         HasValidation;
 
     /**
@@ -34,6 +33,7 @@ class OrderService
      * @var  array
      */
     protected $mutators = [
+        ClientDataMutator::class,
         DeliveryMutator::class,
         PaymentMethodMutator::class,
     ];
@@ -49,9 +49,6 @@ class OrderService
 
         $this->setOrder($order);
 
-        //Build order from store request and all
-        $this->buildOrderFromRequest();
-
         //Build order with all attributes
         $this->rebuildOrder(Cart::all());
 
@@ -59,6 +56,31 @@ class OrderService
 
         return $this;
     }
+
+    /**
+     * Store row into session
+     *
+     * @return  this
+     */
+    public function storeIntoSession()
+    {
+        $requestData = $this->getRequestData();
+
+        (new ClientDataMutator)->setClientData($requestData);
+
+        return $this;
+    }
+
+    /**
+     * Get row data from session
+     *
+     * @return  this
+     */
+    public function getFromSession()
+    {
+        return (new ClientDataMutator)->getClientData();
+    }
+
 
     /**
      * Set order
@@ -87,20 +109,6 @@ class OrderService
     public function getOrder()
     {
         return $this->order;
-    }
-
-    /**
-     * Returns order row data
-     *
-     * @return  array
-     */
-    public function buildOrderFromRequest()
-    {
-        $row = $this->getRequestData();
-
-        $this->getOrder()->fill($row);
-
-        return $this;
     }
 
     /**
@@ -201,29 +209,42 @@ class OrderService
     }
 
     /**
+     * Returns all available order mutators
+     *
+     * @return  array
+     */
+    public function getMutators()
+    {
+        return $this->cache('orderMutators', function(){
+            return array_map(function($item){
+                return new $item;
+            }, $this->mutators);
+        });
+    }
+
+    /**
      * Returns active mutators for given order
      *
      * @return  array
      */
     public function getActiveMutators()
     {
-        $mutators = $this->cache('orderMutators', function(){
-            return array_map(function($item){
-                return new $item;
-            }, $this->mutators);
-        });
-
         return array_filter(array_map(function($mutator){
             if ( Admin::isAdmin() ) {
-                $response = $mutator->isActive($this->getOrder());
+                $response = $mutator->isActiveInAdmin($this->getOrder());
             } else {
                 $response = $mutator->isActive($this->getOrder());
+            }
+
+            //If no response has been given, skip this mutator
+            if ( ! $response ) {
+                return;
             }
 
             $mutator->setActiveResponse($response);
 
             return $mutator;
-        }, $mutators));
+        }, $this->getMutators()));
     }
 
     /**

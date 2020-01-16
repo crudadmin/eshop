@@ -2,13 +2,29 @@
 
 namespace AdminEshop\Contracts\Order\Mutators;
 
+use Admin;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
+use AdminEshop\Contracts\Order\Validation\DeliveryValidator;
 use AdminEshop\Models\Orders\Order;
-use Store;
 use Cart;
+use Store;
 
 class DeliveryMutator extends Mutator
 {
+    /**
+     * Register validator with this mutators
+     *
+     * @var  array
+     */
+    protected $validators = [
+        DeliveryValidator::class,
+    ];
+
+    /*
+     * Session key for delivery
+     */
+    private $sessionKey = 'cart.delivery';
+
     /**
      * Returns if mutators is active
      * And sends state to other methods
@@ -17,7 +33,7 @@ class DeliveryMutator extends Mutator
      */
     public function isActive()
     {
-        return Cart::getSelectedDelivery();
+        return $this->getSelectedDelivery();
     }
 
     /**
@@ -60,6 +76,67 @@ class DeliveryMutator extends Mutator
         $price += $delivery->{$withTax ? 'priceWithTax' : 'priceWithoutTax'};
 
         return $price;
+    }
+
+    /**
+     * Mutation of cart response request
+     *
+     * @param  $response
+     * @return  array
+     */
+    public function mutateCartResponse($response) : array
+    {
+        return array_merge($response, [
+            'deliveries' => Cart::addCartDiscountsIntoModel($this->getDeliveries()),
+            'selectedDelivery' => $this->getSelectedDelivery(),
+        ]);
+    }
+
+    /*
+     * Return cached all deliveries
+     */
+    public function getDeliveries()
+    {
+        return $this->cache('deliveries', function(){
+            return Admin::getModel('Delivery')->get();
+        });
+    }
+
+    /*
+     * Save delivery into session
+     */
+    public function getSelectedDelivery()
+    {
+        $id = session()->get($this->sessionKey);
+
+        return $this->cache('selectedDelivery'.$id, function() use ($id) {
+            return Cart::addCartDiscountsIntoModel($this->getDeliveries()->where('id', $id)->first());
+        });
+    }
+
+    /**
+     * Save delivery into session
+     *
+     * @param  int|null  $id
+     * @return  this
+     */
+    public function saveDelivery($id = null)
+    {
+        session()->put($this->sessionKey, $id);
+        session()->save();
+
+        return $this;
+    }
+
+    /**
+     * When cart is being forget state, we can flush session here
+     * for this mutator.
+     *
+     * @return  void
+     */
+    public function onCartForget()
+    {
+        session()->forget($this->sessionKey);
     }
 }
 

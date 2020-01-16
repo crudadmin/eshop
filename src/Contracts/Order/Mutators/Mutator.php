@@ -3,9 +3,19 @@
 namespace AdminEshop\Contracts\Order\Mutators;
 
 use AdminEshop\Models\Orders\Order;
+use Admin\Core\Contracts\DataStore;
 
 class Mutator
 {
+    use DataStore;
+
+    /**
+     * Register order validator with this mutators
+     *
+     * @var  array
+     */
+    protected $validators = [];
+
     /**
      * Response from isActive/isActiveInAdmin methods
      *
@@ -39,7 +49,8 @@ class Mutator
      * Add delivery field into order row
      *
      * @param  array  $row
-     * @return array
+     *
+     * @return void
      */
     public function mutateOrder(Order $order, $activeResponse)
     {
@@ -52,11 +63,24 @@ class Mutator
      * @param  AdminEshop\Models\Delivery\Delivery|null  $delivery
      * @param  float  $price
      * @param  bool  $withTax
+     *
      * @return  void
      */
     public function mutatePrice($activeResponse, $price, bool $withTax)
     {
         return $price;
+    }
+
+    /**
+     * Mutation of cart response request
+     *
+     * @param  $response
+     *
+     * @return  array
+     */
+    public function mutateCartResponse($response) : array
+    {
+        return [];
     }
 
     /**
@@ -79,6 +103,16 @@ class Mutator
     public function getActiveResponse()
     {
         return $this->activeResponse;
+    }
+
+    /**
+     * Returns mutation validators
+     *
+     * @return  array
+     */
+    public function getValidators()
+    {
+        return $this->validators;
     }
 }
 

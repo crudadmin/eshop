@@ -9,6 +9,8 @@ use AdminEshop\Controllers\Controller;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Cart;
+use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
+use Facades\AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 
 class CartController extends Controller
 {
@@ -102,13 +104,13 @@ class CartController extends Controller
 
         $delivery = Delivery::findOrFail($deliveryId);
 
-        Cart::saveDelivery($delivery->getKey());
+        DeliveryMutator::saveDelivery($delivery->getKey());
 
         //If no payment method is present, reset payment method to null
         //Because payment method may be selected, but will be unavailable
         //under this selected delivery
-        if ( ! Cart::getSelectedPaymentMethod() ) {
-            Cart::savePaymentMethod(null);
+        if ( ! PaymentMethodMutator::getSelectedPaymentMethod() ) {
+            PaymentMethodMutator::savePaymentMethod(null);
         }
 
         return Cart::fullCartResponse();
@@ -120,7 +122,7 @@ class CartController extends Controller
 
         $paymentMethod = PaymentsMethod::findOrFail($paymentMethodId);
 
-        Cart::savePaymentMethod($paymentMethod->getKey());
+        PaymentMethodMutator::savePaymentMethod($paymentMethod->getKey());
 
         return Cart::fullCartResponse();
     }

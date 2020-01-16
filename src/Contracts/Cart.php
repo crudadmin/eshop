@@ -5,6 +5,8 @@ namespace AdminEshop\Contracts;
 use Admin;
 use AdminEshop\Contracts\Cart\Identifier;
 use AdminEshop\Contracts\Concerns\CartTrait;
+use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
+use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use Admin\Core\Contracts\DataStore;
 use Discounts;
 use OrderService;
@@ -31,16 +33,6 @@ class Cart
      * Session key for basket items
      */
     private $key = 'cart.items';
-
-    /*
-     * Session key for delivery
-     */
-    private $deliveryKey = 'cart.delivery';
-
-    /*
-     * Session key for payment method
-     */
-    private $paymentMethodKey = 'cart.paymentMethod';
 
     public function __construct()
     {
@@ -127,13 +119,11 @@ class Cart
         ];
 
         if ( $fullCartResponse == true ){
-            $response = array_merge($response, [
-                'deliveries' => $this->addCartDiscountsIntoModel(Store::getDeliveries()),
-                'paymentMethods' => $this->addCartDiscountsIntoModel(Store::getPaymentMethodsByDelivery()),
-                'selectedDelivery' => Cart::getSelectedDelivery(),
-                'selectedPaymentMethod' => Cart::getSelectedPaymentMethod(),
-                'clientData' => OrderService::getFromSession(),
-            ]);
+            foreach (OrderService::getMutators() as $mutator) {
+                if ( method_exists($mutator, 'mutateCartResponse') ) {
+                    $response = $mutator->mutateCartResponse($response);
+                }
+            }
         }
 
         return $response;
@@ -214,34 +204,6 @@ class Cart
     }
 
     /**
-     * Save delivery into session
-     *
-     * @param  int|null  $id
-     * @return  this
-     */
-    public function saveDelivery($id = null)
-    {
-        session()->put($this->deliveryKey, $id);
-        session()->save();
-
-        return $this;
-    }
-
-    /**
-     * Save payment method into session
-     *
-     * @param  int|null  $id
-     * @return  this
-     */
-    public function savePaymentMethod($id = null)
-    {
-        session()->put($this->paymentMethodKey, $id);
-        session()->save();
-
-        return $this;
-    }
-
-    /**
      * Forget all saved cart and order details
      *
      * @param  int|null  $id
@@ -252,44 +214,18 @@ class Cart
         //On local environment does not flush data
         if ( ! app()->environment('local') ) {
             session()->forget($this->key);
-            session()->forget($this->deliveryKey);
-            session()->forget($this->paymentMethodKey);
 
-            OrderService::flushFromSession();
+            //Remove all order mutators from session
+            foreach (OrderService::getMutators() as $mutator) {
+                if ( method_exists($mutator, 'onCartForget') ) {
+                    $response = $mutator->onCartForget();
+                }
+            }
         }
 
         session()->save();
 
         return $this;
-    }
-
-    /*
-     * Save delivery into session
-     */
-    public function getSelectedDelivery()
-    {
-        $id = session()->get($this->deliveryKey);
-
-        return $this->cache('selectedDelivery'.$id, function() use ($id) {
-            return $this->addCartDiscountsIntoModel(Store::getDeliveries()->where('id', $id)->first());
-        });
-    }
-
-    /*
-     * Save delivery into session
-     */
-    public function getSelectedPaymentMethod()
-    {
-        $id = session()->get($this->paymentMethodKey);
-
-        //We need to save also delivery key into cacheKey,
-        //because if delivery would change, paymentMethod can dissapear
-        //if is not assigned into selected delivery
-        $delivery = $this->getSelectedDelivery();
-
-        return $this->cache('selectedPaymentMethod'.$id.'-'.($delivery ? $delivery->getKey() : 0), function() use ($id) {
-            return $this->addCartDiscountsIntoModel(Store::getPaymentMethodsByDelivery()->where('id', $id)->first());
-        });
     }
 }
 

@@ -42,7 +42,7 @@ class StockValidator extends Validator
     /**
      * Returns validation message
      *
-     * @return  [type]
+     * @return  message
      */
     public function getMessage()
     {
