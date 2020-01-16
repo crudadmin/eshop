@@ -116,16 +116,14 @@ class Cart
     {
         $items = $this->all();
 
-        $discounts = Discounts::getDiscounts();
-
         $response = [
             'items' => $items,
             'discounts' => array_map(function($discount){
                 return $discount->toArray();
-            }, $discounts),
+            }, Discounts::getDiscounts()),
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
-            'summary' => $this->getSummary($items, $discounts, $fullCartResponse),
+            'summary' => $items->getSummary($fullCartResponse),
         ];
 
         if ( $fullCartResponse == true ){

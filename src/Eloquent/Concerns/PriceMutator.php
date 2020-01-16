@@ -9,16 +9,53 @@ use Discounts;
 use Store;
 use Admin;
 
-/**
- * Prices levels
- * *
- *
- * initialPriceWithTax / initialPriceWithoutTax / initialClientPrice - initial price without any discount
- * defaultPriceWithTax / defaultPriceWithoutTax / defaultClientPrice - initial price with product discount
- * priceWithTax / priceWithoutTax / clientPrice - price with all prossible discounts
- */
 trait PriceMutator
 {
+    /**
+     * Here will be stored all additional products discount from cart
+     *
+     * @var  array
+     */
+    protected $registredDiscounts = [];
+
+    /**
+     * Can be discounts applied in administration?
+     *
+     * @var  bool
+     */
+    protected $applyDiscountsInAdmin = false;
+
+    /**
+     * All available price levels
+     *
+     * @var  array
+     */
+    protected $priceAttributes = [
+        'initialPriceWithTax', 'initialPriceWithoutTax', //initial price without any discount
+        'defaultPriceWithTax', 'defaultPriceWithoutTax', //initial price with product discount
+        'priceWithTax', 'priceWithoutTax', 'clientPrice', //price with all prossible discounts
+    ];
+
+    /**
+     * Add price attribute
+     *
+     * @param  string|array  $attribute
+     */
+    public function addPriceAttribute($attribute)
+    {
+        $this->priceAttributes = array_merge($this->priceAttributes, array_wrap($attribute));
+    }
+
+    /**
+     * Returns registred price attributes
+     *
+     * @return  array
+     */
+    public function getPriceAttributes()
+    {
+        return $this->priceAttributes;
+    }
+
     /**
      * Can be applied discounts on this model in administration?
      *
@@ -26,16 +63,20 @@ trait PriceMutator
      */
     public function canApplyDiscountsInAdmin()
     {
-        return false;
+        return $this->applyDiscountsInAdmin;
     }
 
-
     /**
-     * Here will be stored all additional products discount from cart
+     * Set apply discounts in admin
      *
-     * @var  array
+     * @param  bool  $state
      */
-    protected $registredDiscounts = [];
+    public function setApplyDiscountsInAdmin(bool $state)
+    {
+        $this->applyDiscountsInAdmin = $state;
+
+        return $this;
+    }
 
     /**
      * Add product discount
@@ -75,7 +116,10 @@ trait PriceMutator
             if ( $discounts === null || in_array($discount->getKey(), $allowedDiscounts) ) {
                 $value = is_callable($discount->value) ? $discount->value() : $discount->value;
 
-                $price = operator_modifier($price, $discount->operator, $value);
+                //If discount operator is set
+                if ( $discount->operator && is_numeric($value) ) {
+                    $price = operator_modifier($price, $discount->operator, $value);
+                }
             }
         }
 
@@ -192,5 +236,12 @@ trait PriceMutator
     public function getTaxValueAttribute()
     {
         return Store::getTaxValueById($this->tax_id);
+    }
+
+    public function toCartArray()
+    {
+        $this->append($this->priceAttributes);
+
+        return $this->toArray();
     }
 }

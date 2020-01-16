@@ -4,9 +4,9 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
+use OrderService;
 use Ajax;
 use Cart;
-use Discounts;
 use Store;
 
 trait OrderTrait
@@ -21,19 +21,13 @@ trait OrderTrait
         $price = 0;
         $priceWithTax = 0;
 
+        $items = (new CartCollection($this->items))
+                    ->applyOnOrderCart()
+                    ->allowApplyDiscountsInAdmin();
+
         //Set order into discounts factory
-        Discounts::setOrder($this);
-
-        $items = (new CartCollection($this->items))->applyOnOrderCart();
-
-        foreach ($items as $item) {
-            $price += $item->priceWithoutTax * $item->quantity;
-            $priceWithTax += $item->priceWithTax * $item->quantity;
-        }
-
-        $this->price = Store::roundNumber($price + $this->payment_method_price + $this->delivery_price);
-
-        $this->price_tax = Store::roundNumber($priceWithTax + $this->paymentMethodPriceWithTax + $this->deliveryPriceWithTax);
+        OrderService::setOrder($this);
+        OrderService::rebuildOrder($items);
 
         $this->save();
     }

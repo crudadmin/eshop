@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use Admin;
+use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Models\Orders\Order;
 use Store;
@@ -15,7 +16,7 @@ class DiscountCode extends Discount
     private static $sessionKey = 'cart.discount';
 
     /**
-     * Discount code cant be applied outside cart
+     * Discount code can't be applied outside cart
      *
      * @var  bool
      */
@@ -143,13 +144,11 @@ class DiscountCode extends Discount
      * @param  array  $row
      * @return  array
      */
-    public function mutateOrderRow(array $row = [])
+    public function mutateOrderRow(Order $order, CartCollection $items)
     {
         if ( $code = self::getDiscountCode() ) {
-            $row['discount_code_id'] = $code->getKey();
+            $order->discount_code_id = $code->getKey();
         }
-
-        return $row;
     }
 
     /**

@@ -64,6 +64,16 @@ class Delivery extends AdminModel
         'columns.id.hidden' => true,
     ];
 
+    /**
+     * We need allow applying discoints in administration for this model all the time
+     *
+     * @return  bool
+     */
+    public function canApplyDiscountsInAdmin()
+    {
+        return true;
+    }
+
     public function options()
     {
         return [

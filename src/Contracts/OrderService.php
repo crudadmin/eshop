@@ -3,16 +3,21 @@
 namespace AdminEshop\Contracts;
 
 use Admin;
+use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasSession;
 use AdminEshop\Contracts\Order\HasValidation;
-use Discounts;
+use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
+use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
+use Admin\Core\Contracts\DataStore;
 use Cart;
+use Discounts;
 use Store;
 
 class OrderService
 {
-    use HasRequest,
+    use DataStore,
+        HasRequest,
         HasSession,
         HasValidation;
 
@@ -24,15 +29,33 @@ class OrderService
     protected $order;
 
     /**
+     * Available order mutators
+     *
+     * @var  array
+     */
+    protected $mutators = [
+        DeliveryMutator::class,
+        PaymentMethodMutator::class,
+    ];
+
+    /**
      * Store order int osession
      *
      * @return  this
      */
     public function store()
     {
-        $row = $this->buildOrderData();
+        $order = clone Admin::getModelByTable('orders');
 
-        $this->setOrder(Admin::getModel('Order')->create($row));
+        $this->setOrder($order);
+
+        //Build order from store request and all
+        $this->buildOrderFromRequest();
+
+        //Build order with all attributes
+        $this->rebuildOrder(Cart::all());
+
+        $order->save();
 
         return $this;
     }
@@ -44,6 +67,13 @@ class OrderService
      */
     public function setOrder($order)
     {
+        //We need register order into discounts factory
+        //because we want apply discounts on this order
+        //in administraiton
+        if ( Admin::isAdmin() ) {
+            Discounts::setOrder($order);
+        }
+
         $this->order = $order;
 
         return $this;
@@ -64,16 +94,13 @@ class OrderService
      *
      * @return  array
      */
-    public function buildOrderData()
+    public function buildOrderFromRequest()
     {
         $row = $this->getRequestData();
 
-        $row = $this->addDelivery($row);
-        $row = $this->addPaymentMethod($row);
-        $row = $this->addDiscountsData($row);
-        $row = $this->addOrderPrices($row);
+        $this->getOrder()->fill($row);
 
-        return $row;
+        return $this;
     }
 
     /**
@@ -106,71 +133,114 @@ class OrderService
     }
 
     /**
+     * Add additional prices into order sum.
+     *
+     * @param  int/float  $price
+     * @param  bool  $withTax
+     */
+    public function addAdditionalPaymentsIntoSum($price, bool $withTax)
+    {
+        foreach ($this->getActiveMutators() as $mutator) {
+            if ( method_exists($mutator, 'mutatePrice') ) {
+                $price = $mutator->mutatePrice($mutator->getActiveResponse(), $price, $withTax, $this->getOrder());
+            }
+        }
+
+        return $price;
+    }
+
+    /**
      * Add prices into order
      *
      * @param  array  $row
      * @return  array
      */
-    public function addOrderPrices($row)
+    public function addOrderPrices(CartCollection $items)
     {
-        //We want summary with delivery and payment method...
-        $summary = Cart::getSummary(null, null, true);
+        $order = $this->getOrder();
 
-        $row['price'] = $summary['priceWithoutTax'];
-        $row['price_tax'] = $summary['priceWithTax'];
+        $summary = $items->getSummary(true);
 
-        return $row;
+        $order->price = $summary['priceWithoutTax'];
+        $order->price_tax = $summary['priceWithTax'];
+
+        return $this;
     }
 
     /**
-     * Add delivery field into order row
+     * Add prices into order
      *
      * @param  array  $row
-     * @return array
+     * @return  array
      */
-    public function addDelivery($row)
+    public function rebuildOrder(CartCollection $items)
     {
-        $delivery = Cart::getSelectedDelivery();
+        $order = $this->getOrder();
 
-        $row['delivery_tax'] = Store::getTaxes()->where('id', $delivery->tax_id)->first()->tax;
-        $row['delivery_price'] = $delivery->priceWithoutTax;
-        $row['delivery_id'] = $delivery->getKey();
+        $this->addOrderPrices($items);
+        $this->addDiscountsData($items);
+        $this->fireMutators();
 
-        return $row;
+        return $order;
     }
 
     /**
-     * Add delivery field into order row
+     * Fire all registered mutators and apply them on order
      *
-     * @param  array  $row
-     * @return array
+     * @return  this
      */
-    public function addPaymentMethod($row)
+    public function fireMutators()
     {
-        $paymentMethod = Cart::getSelectedPaymentMethod();
+        foreach ($this->getActiveMutators() as $mutator) {
+            if ( method_exists($mutator, 'mutateOrder') ) {
+                $mutator->mutateOrder($this->getOrder(), $mutator->getActiveResponse());
+            }
+        }
 
-        $row['payment_method_tax'] = Store::getTaxes()->where('id', $paymentMethod->tax_id)->first()->tax;
-        $row['payment_method_price'] = $paymentMethod->priceWithoutTax;
-        $row['payment_method_id'] = $paymentMethod->getKey();
+        return $this;
+    }
 
-        return $row;
+    /**
+     * Returns active mutators for given order
+     *
+     * @return  array
+     */
+    public function getActiveMutators()
+    {
+        $mutators = $this->cache('orderMutators', function(){
+            return array_map(function($item){
+                return new $item;
+            }, $this->mutators);
+        });
+
+        return array_filter(array_map(function($mutator){
+            if ( Admin::isAdmin() ) {
+                $response = $mutator->isActive($this->getOrder());
+            } else {
+                $response = $mutator->isActive($this->getOrder());
+            }
+
+            $mutator->setActiveResponse($response);
+
+            return $mutator;
+        }, $mutators));
     }
 
     /**
      * Add discounts additional fields
      *
-     * @param  array  $row
+     * @param  CartCollection  $items
      * @return array
      */
-    public function addDiscountsData($row)
+    public function addDiscountsData($items)
     {
         foreach (Discounts::getDiscounts() as $discount) {
             if ( method_exists($discount, 'mutateOrderRow') ) {
-                $row = $discount->mutateOrderRow($row);
+                $discount->mutateOrderRow($this->getOrder(), $items);
             }
         }
 
-        return $row;
+        return $this;
     }
 
     /**
@@ -185,6 +255,16 @@ class OrderService
             'orderErrors' => $this->getErrorMessages(),
             'cart' => Cart::fullCartResponse(),
         ], 422);
+    }
+
+    /**
+     * Register new order mutator
+     *
+     * @param  string  $namespace
+     */
+    public function addMutator($namespace)
+    {
+        $this->mutators[] = $namespace;
     }
 }
 

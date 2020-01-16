@@ -194,7 +194,6 @@ class Discounts
             return $taxValue == 'auto' ? !Store::hasB2B() : $taxValue;
         }
     }
-
 }
 
 ?>

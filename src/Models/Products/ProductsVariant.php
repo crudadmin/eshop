@@ -19,6 +19,19 @@ class ProductsVariant extends AdminModel
         PriceMutator,
         HasCart;
 
+    /**
+     * Model constructor
+     *
+     * @param  array  $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->append($this->getPriceAttributes());
+        $this->append($this->getStockAttributes());
+
+        parent::__construct($options);
+    }
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -101,12 +114,6 @@ class ProductsVariant extends AdminModel
             'create' => 'Pridať variantu',
         ],
         'autoreset' => false,
-    ];
-
-    protected $appends = [
-        'initialPriceWithTax', 'initialPriceWithoutTax',
-        'defaultPriceWithoutTax', 'defaultPriceWithTax',
-        'priceWithTax', 'priceWithoutTax', 'clientPrice', 'stockText', 'hasStock',
     ];
 
     public function options()

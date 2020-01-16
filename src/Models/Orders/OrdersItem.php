@@ -47,16 +47,6 @@ class OrdersItem extends AdminModel
 
     protected $sortable = false;
 
-    /**
-     * Apply discounts on this item also in administration
-     *
-     * @return  bool
-     */
-    public function canApplyDiscountsInAdmin()
-    {
-        return true;
-    }
-
     /*
      * Automatic form and database generation
      * @name - field name

@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Discounts;
 
 use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Models\Delivery\Delivery;
+use AdminEshop\Models\Orders\Order;
 use Store;
 
 class FreeDelivery extends Discount
@@ -16,7 +17,7 @@ class FreeDelivery extends Discount
     public $applyOnModels = [ Delivery::class ];
 
     /**
-     * Free delivery cant be applied outside cart
+     * Free delivery discount can't be applied outside cart
      *
      * @var  bool
      */
@@ -35,7 +36,36 @@ class FreeDelivery extends Discount
      */
     public function isActive()
     {
-        return DiscountCode::getDiscountCode();
+        $code = DiscountCode::getDiscountCode();
+
+        return $this->hasCodeFreeDelivery($code);
+    }
+
+    /*
+     * Check if is discount active in administration
+     */
+    public function isActiveInAdmin(Order $order)
+    {
+        //Get discount code in order, if exists..
+        if ( $order->discount_code_id && $order->discountCode ) {
+            return $this->hasCodeFreeDelivery($order->discountCode);
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if code has free delivery
+     *
+     * @param  AdminEshop\Contracts\Discounts\DiscountCode  $code
+     * @return  bool
+     */
+    private function hasCodeFreeDelivery($code)
+    {
+        if ( ! $code || $code->free_delivery != true )
+            return false;
+
+        return $code;
     }
 
     /**
@@ -46,11 +76,9 @@ class FreeDelivery extends Discount
      */
     public function boot($code)
     {
-        if ( $code->free_delivery ) {
-            $this->operator = '*';
+        $this->operator = '*';
 
-            $this->value = 0;
-        }
+        $this->value = 0;
     }
 }
 

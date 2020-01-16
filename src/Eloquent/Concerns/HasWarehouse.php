@@ -8,6 +8,35 @@ use AdminEshop\Models\Products\ProductsVariant;
 
 trait HasWarehouse
 {
+    /**
+     * Avaiable stock attributes
+     *
+     * @var  array
+     */
+    protected $stockAttributes = [
+        'stockText', 'hasStock',
+    ];
+
+    /**
+     * Get all stock attributes
+     *
+     * @return  array
+     */
+    public function getStockAttributes()
+    {
+        return $this->stockAttributes;
+    }
+
+    /**
+     * Add stock attribute
+     *
+     * @param  string|array  $attribute
+     */
+    public function addStockAttribute($attribute)
+    {
+        $this->stockAttributes = array_merge($this->stockAttributes, array_wrap($attribute));
+    }
+
     public function getHasStockAttribute()
     {
         return $this->warehouse_quantity > 0;

@@ -138,9 +138,9 @@ class Discount
      * @param  array  $row
      * @return  array
      */
-    public function mutateOrderRow(array $row = [])
+    public function mutateOrderRow(Order $order, CartCollection $items)
     {
-        return $row;
+        //$order->somethingId = 5;
     }
 
     /**
@@ -156,6 +156,8 @@ class Discount
 
         if ( in_array($this->operator, ['+%', '-%']) )
             return $this->value.' %';
+
+        return '';
     }
 
     /**

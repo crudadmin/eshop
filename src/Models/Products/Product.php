@@ -17,6 +17,19 @@ class Product extends AdminModel
         PriceMutator,
         HasCart;
 
+    /**
+     * Model constructor
+     *
+     * @param  array  $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->append($this->getPriceAttributes());
+        $this->append($this->getStockAttributes());
+
+        parent::__construct($options);
+    }
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -105,13 +118,6 @@ class Product extends AdminModel
 
     protected $layouts = [
         'form-top' => 'setProductTabs',
-    ];
-
-    protected $appends = [
-        'initialPriceWithTax', 'initialPriceWithoutTax',
-        'defaultPriceWithTax', 'defaultPriceWithoutTax',
-        'priceWithTax', 'priceWithoutTax', 'clientPrice',
-        'stockText', 'hasStock',
     ];
 
     /*
