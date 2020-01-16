@@ -65,7 +65,7 @@ trait CartTrait
      * @param  string  $name
      * @return null|AdminEshop\Contracts\Cart\Identifier
      */
-    public function getCartItemIdentifier($name)
+    public function getIdentifierByName($name)
     {
         $identifiers = $this->getRegistredIdentifiers();
 
@@ -117,7 +117,7 @@ trait CartTrait
             //If cart identifier is missing
             //This may happend if someone has something id cart, and code will change
             //Or identifier will be renamed
-            if (!($identifier = $this->getCartItemIdentifier($item->identifier))) {
+            if (!($identifier = $this->getIdentifierByName($item->identifier))) {
                 return;
             }
 

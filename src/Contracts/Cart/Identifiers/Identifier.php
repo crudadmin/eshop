@@ -121,10 +121,10 @@ class Identifier implements HasIdentifier
     /**
      * Returns if given cart belongs to this identifier
      *
-     * @param  AdminEshop\Contracts\CartItem  $item
+     * @param  HasIdentifier  $item
      * @return  bool
      */
-    public function isThisCartItem(HasIdentifier $item)
+    public function hasThisItem(HasIdentifier $item)
     {
         foreach ($this->getIdentifyKeys() as $key => $options) {
             $identifierValue = $this->getIdentifier($key);

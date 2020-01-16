@@ -250,7 +250,7 @@ class Discount implements Discountable
         $order = Discounts::getOrder();
 
         $items = $order->items->map(function($item) use ($discounts) {
-            $identifier = Cart::getCartItemIdentifier($item->identifier) ?: new DefaultIdentifier;
+            $identifier = Cart::getIdentifierByName($item->identifier) ?: new DefaultIdentifier;
 
             $identifier = $identifier->cloneFormItem($item);
 

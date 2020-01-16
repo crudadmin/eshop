@@ -91,7 +91,7 @@ class Cart
     public function remove(HasIdentifier $identifier)
     {
         $this->items = $this->items->reject(function($item) use ($identifier) {
-            return $identifier->isThisCartItem($item);
+            return $identifier->hasThisItem($item);
         })->values();
 
         $this->save();
@@ -149,7 +149,7 @@ class Cart
     {
         //All identifiers must match
         $items = $this->items->filter(function($item) use ($identifier) {
-            return $identifier->isThisCartItem($item);
+            return $identifier->hasThisItem($item);
         });
 
         return $items->first();

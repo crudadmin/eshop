@@ -44,7 +44,7 @@ trait IdentifierSupport
      */
     public function getIdentifierClass()
     {
-        $identifier = Cart::getCartItemIdentifier($this->identifier);
+        $identifier = Cart::getIdentifierByName($this->identifier);
 
         $identifier->cloneFormItem($this);
 
