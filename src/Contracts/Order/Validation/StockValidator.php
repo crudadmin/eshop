@@ -25,7 +25,13 @@ class StockValidator extends Validator
         $cart = Cart::all();
 
         foreach ($cart as $item) {
-            if ( $item->hasQuantityOnStock() === false ) {
+            $identifier = $item->getIdentifierClass();
+
+            //If identifier has method for quantity check
+            if (
+                method_exists($identifier, 'hasQuantityOnStock')
+                && $identifier->hasQuantityOnStock($item) === false
+            ) {
                 return false;
             }
         }

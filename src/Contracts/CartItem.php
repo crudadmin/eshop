@@ -2,103 +2,82 @@
 
 namespace AdminEshop\Contracts;
 
+use AdminEshop\Contracts\Cart\Identifier;
+use AdminEshop\Contracts\Concerns\HasIdentifierSupport;
+use AdminEshop\Eloquent\Concerns\HasWarehouse;
 use Cart;
 
 class CartItem
 {
-    public $id = null;
+    use HasIdentifierSupport;
 
-    public $variant_id = null;
+    /**
+     * Cart item identififer
+     *
+     * @var  string
+     */
+    public $identifier;
 
+    /**
+     * Quantity of item
+     *
+     * @var  int
+     */
     public $quantity = 0;
 
-    public $product;
+    /**
+     * Identifier
+     *
+     * @param  Identifier  $identifier
+     * @param  int  $quantity
+     */
+    public function __construct(Identifier $identifier, $quantity = 0)
+    {
+        $this->identifier = $identifier->getName();
 
-    public $variant;
+        $this->setQuantity($quantity);
+
+        $this->loadIdentifier($identifier);
+    }
 
     /**
-     * Create new cart item
+     * Set quantity of cart item
      *
-     * @param  int  $id
      * @param  int  $quantity
-     * @param  int|null  $variantId
      */
-    public function __construct(int $id, int $quantity, $variantId = null)
+    public function setQuantity(int $quantity)
     {
-        $this->id = $id;
-
         $this->quantity = $quantity;
 
-        $this->variant_id = $variantId;
-    }
-
-    /**
-     * Set product of item
-     *
-     * @param  AdminModel  $product
-     */
-    public function setProduct($product)
-    {
-        $this->product = $product;
-
         return $this;
     }
 
     /**
-     * Set variant of item
+     * Get value from cart
      *
-     * @param  AdminModel  $product
+     * @param  strin  $key
+     * @return  mixed
      */
-    public function setVariant($variant)
+    public function getValue(string $key)
     {
-        $this->variant = $variant;
-
-        return $this;
+        if ( property_exists($this, $key) )
+            return $this->{$key};
     }
 
     /**
-     * Returns variant or product of item
+     * Set cart identifiers
      *
-     * @return  AdminModel
-     */
-    public function getItemProduct()
-    {
-        return @$this->variant ?: $this->product;
-    }
-
-    /**
-     * Add fetched product and variant into cart item
+     * @param  string  $identifier
      *
-     * @param  array|null  $discounts
-     * @return object
+     * @return  this
      */
-    public function fetchItemModels($discounts = null)
+    private function loadIdentifier(Identifier $identifier)
     {
-        $this->setProduct(Cart::getFetchedProducts()->find($this->id));
-
-        if ( isset($this->variant_id) ) {
-            $this->setVariant(Cart::getFetchedVariants()->find($this->variant_id));
+        foreach ($identifier->getIdentifyKeys() as $key => $config) {
+            $this->$key = $identifier->getIdentifier($key);
         }
 
-        Cart::addCartDiscountsIntoModel($this->getItemProduct(), $discounts);
-
         return $this;
-    }
-
-    /**
-     * Returns if product in cart item is on stock
-     *
-     * @return  bool
-     */
-    public function hasQuantityOnStock()
-    {
-        //We can skip checking products which all allowed all the time
-        if ( $this->getItemProduct()->canOrderEverytime() ) {
-            return true;
-        }
-
-        //Check if quantity in cart is lower that quantity on stock
-        return $this->quantity <= $this->getItemProduct()->warehouse_quantity;
     }
 
     /**
@@ -109,9 +88,16 @@ class CartItem
      */
     public function render($discounts)
     {
-        $this->fetchItemModels($discounts);
+        $identifier = $this->getIdentifierClass();
 
-        $this->hasQuantityOnStock = $this->hasQuantityOnStock();
+        if ( method_exists($identifier, 'onRender') ) {
+            $identifier->onRender($this);
+        }
+
+        //Bind items models into cart object
+        foreach ($this->itemModels as $key => $model) {
+            $this->{$key} = $model;
+        }
 
         return $this;
     }

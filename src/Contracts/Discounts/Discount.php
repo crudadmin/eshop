@@ -2,6 +2,10 @@
 
 namespace AdminEshop\Contracts\Discounts;
 
+use AdminEshop\Contracts\CartItem;
+use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
+use AdminEshop\Contracts\Collections\CartCollection;
+use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Core\Contracts\DataStore;
@@ -37,11 +41,22 @@ class Discount
     public $message = '';
 
     /**
+     * Order will be applied in administration for order items prices calculations
+     *
+     * @var  AdminEshop\Models\Orders\Order|null
+     */
+    public $order;
+
+    /**
      * Discount can be applied on those models
      *
      * @var  array
      */
-    public $applyOnModels = [Product::class, ProductsVariant::class];
+    public $applyOnModels = [
+        Product::class,
+        ProductsVariant::class,
+        OrdersItem::class,
+    ];
 
     /**
      * Can apply discount on items on whole ecommerce including cart
@@ -96,6 +111,16 @@ class Discount
     }
 
     /**
+     * Returns if discount is active in administration
+     *
+     * @return  bool
+     */
+    public function isActiveInAdmin(Order $order)
+    {
+        return false;
+    }
+
+    /**
      * Boot discount parameters after isActive check
      *
      * @param  mixed  $isActiveResponse
@@ -104,6 +129,18 @@ class Discount
     public function boot($isActiveResponse)
     {
         //set your values...
+    }
+
+    /**
+     * When order is before creation status, you can modify order data
+     * before creation from your discount.
+     *
+     * @param  array  $row
+     * @return  array
+     */
+    public function mutateOrderRow(array $row = [])
+    {
+        return $row;
     }
 
     /**
@@ -192,7 +229,34 @@ class Discount
     {
         $exceptAcutal = Discounts::getDiscounts([ $this->getKey() ]);
 
+        if ( Discounts::getOrder() ) {
+            return $this->buildCartFromOrder($exceptAcutal);
+        }
+
         return Cart::all($exceptAcutal);
+    }
+
+    /**
+     * Build cart from given order in discounts
+     *
+     * @param  array  $discounts
+     * @return  Collection
+     */
+    public function buildCartFromOrder($discounts)
+    {
+        $order = Discounts::getOrder();
+
+        $items = $order->items->map(function($item) use ($discounts) {
+            $identifier = Cart::getCartItemIdentifier($item->identifier) ?: new DefaultIdentifier;
+
+            $identifier = $identifier->cloneFormItem($item);
+
+            return new CartItem($identifier, $item->quantity);
+        });
+
+        $collection = new CartCollection($items);
+
+        return $collection->toCartFormat($discounts);
     }
 
     /**
@@ -203,6 +267,26 @@ class Discount
     public function hasSumPriceOperator()
     {
         return in_array($this->operator, ['-', '+']);
+    }
+
+    /**
+     * Set order
+     *
+     * @param  mixed  $message
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * Get admin order
+     *
+     * @return  AdminEshop\Models\Orders\Order|null
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**

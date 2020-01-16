@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts;
 
 use Admin;
+use AdminEshop\Contracts\Cart\Identifier;
 use AdminEshop\Contracts\Concerns\CartTrait;
 use Admin\Core\Contracts\DataStore;
 use Discounts;
@@ -51,19 +52,18 @@ class Cart
      * @param Product     $product
      * @param int|integer $quantity
      */
-    public function addOrUpdate(int $productId, int $quantity = 1, $variantId = null)
+    public function addOrUpdate(Identifier $identifier, int $quantity = 1)
     {
-
         //If items does not exists in cart
-        if ( $item = $this->getItemFromCart($productId, $variantId) ) {
-            $this->updateQuantity($productId, $item->quantity + $quantity, $variantId);
+        if ( $item = $this->getItemFromCart($identifier) ) {
+            $this->updateQuantity($identifier, $item->quantity + $quantity);
 
             $this->pushToAdded($item);
 
             return $this;
         }
 
-        $this->addNewItem($productId, $quantity, $variantId);
+        $this->addNewItem($identifier, $quantity);
 
         return $this;
     }
@@ -71,18 +71,17 @@ class Cart
     /**
      * Update quantity for existing item in cart
      *
-     * @param  int  $productId
+     * @param  Identifier $identifier
      * @param  int  $quantity
-     * @param  int|null  $variantId
      * @return  this
      */
-    public function updateQuantity(int $productId, $quantity, $variantId)
+    public function updateQuantity(Identifier $identifier, $quantity)
     {
-        if ( ! ($item = $this->getItemFromCart($productId, $variantId)) ) {
-            abort(500, _('Produkt neexistuje v košíku.'));
+        if ( ! ($item = $this->getItemFromCart($identifier)) ) {
+            autoAjax()->message(_('Produkt nebol nájdeny v košíku.'))->code(422)->throw();
         }
 
-        $item->quantity = $this->checkQuantity($quantity);
+        $item->setQuantity($this->checkQuantity($quantity));
 
         $this->save();
 
@@ -94,16 +93,13 @@ class Cart
     /**
      * Remove item from cart
      *
-     * @param  int  $productId
-     * @param  int|null  $variantId
+     * @param  Identifier $identifier
      * @return  this
      */
-    public function remove(int $productId, $variantId = null)
+    public function remove(Identifier $identifier)
     {
-        $this->items = $this->items->reject(function($item) use ($productId, $variantId) {
-            return $item->id == $productId && (
-                $variantId ? $item->variant_id == $variantId : true
-            );
+        $this->items = $this->items->reject(function($item) use ($identifier) {
+            return $identifier->isThisCartItem($item);
         })->values();
 
         $this->save();
@@ -158,17 +154,15 @@ class Cart
     /**
      * Returns item from cart
      *
-     * @param  int  $productId
-     * @param  int|null  $variantId
+     * @param  CartIdentifier  $identifier
      * @return null|object
      */
-    public function getItemFromCart(int $productId, $variantId = null)
+    public function getItemFromCart(Identifier $identifier)
     {
-        $items = $this->items->where('id', $productId);
-
-        if ( $variantId ) {
-            return $items->where('variant_id', $variantId)->first();
-        }
+        //All identifiers must match
+        $items = $this->items->filter(function($item) use ($identifier) {
+            return $identifier->isThisCartItem($item);
+        });
 
         return $items->first();
     }
@@ -176,13 +170,12 @@ class Cart
     /**
      * Add new item into cart
      *
-     * @param  int  $productId
+     * @param  Identifier  $identifier
      * @param  int  $quantity
-     * @param  int|null  $variantId
      */
-    private function addNewItem($productId, $quantity, $variantId)
+    private function addNewItem(Identifier $identifier, $quantity)
     {
-        $item = new CartItem($productId, $quantity, $variantId);
+        $item = new CartItem($identifier, $quantity);
 
         $this->items[] = $item;
 
@@ -212,22 +205,14 @@ class Cart
      * Get all items from cart with fetched products and variants from db
      *
      * @param  null|array  $discounts = null
-     * @return  Collection
+     * @return  AdminEshop\Contracts\Collections\CartCollection
      */
     public function all($discounts = null)
     {
-        $this->fetchMissingProductDataFromDb();
-
-        return $this->items->map(function($item) use ($discounts) {
-            return (clone $item)->render($discounts);
-        })->reject(function($item){
-            //If product or variant is missing from cart item, remove this cart item
-            if ( ! $item->product || $item->variant_id && ! $item->variant ) {
-                $this->remove($item->id, $item->variant_id);
-
-                return true;
-            }
-        })->values();
+        return $this->items
+                    ->toCartFormat($discounts, function($item){
+                        $this->remove($item->getIdentifierClass());
+                    });
     }
 
     /**

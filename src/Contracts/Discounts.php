@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Discounts\FreeDelivery;
 use Admin\Core\Contracts\DataStore;
+use Admin\Eloquent\AdminModel;
 use Store;
 
 class Discounts
@@ -29,6 +30,13 @@ class Discounts
     ];
 
     /**
+     * Set order where discounts will be applied
+     *
+     * @var  Admin\Eloquent\AdminModel|null
+     */
+    private $order;
+
+    /**
      * Add discount class
      *
      * @param  string  $discountClass
@@ -36,6 +44,29 @@ class Discounts
     public function addDiscount($discountClass)
     {
         $this->discounts[] = $discountClass;
+    }
+
+    /**
+     * Set order where, from which will be loaded items to discounts
+     *
+     * @param  AdminModel  $order
+     * @return  this
+     */
+    public function setOrder(AdminModel $order)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    /**
+     * Returns order of discounts
+     *
+     * @return  Admin\Eloquent\AdminModel|null
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**
@@ -56,7 +87,23 @@ class Discounts
 
         //Returns only active discounts
         return array_values(array_filter($discounts, function($discount) use ($exceps) {
-            if ( in_array($discount->getKey(), $exceps) || !($response = $discount->isActive()) ) {
+            //If is in except mode
+            if ( in_array($discount->getKey(), $exceps) ) {
+                return false;
+            }
+
+            //If is not active in backend/administration
+            if ( $order = $this->getOrder() ) {
+                //Set order into every discount
+                $discount->setOrder($this->getOrder());
+
+                if ( !($response = $discount->isActiveInAdmin($order)) ) {
+                    return false;
+                }
+            }
+
+            //If is not active in frontend
+            else if ( !($response = $discount->isActive()) ) {
                 return false;
             }
 

@@ -2,12 +2,13 @@
 
 namespace AdminEshop\Contracts;
 
+use Admin;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasSession;
 use AdminEshop\Contracts\Order\HasValidation;
-use Admin;
-use Store;
+use Discounts;
 use Cart;
+use Store;
 
 class OrderService
 {
@@ -69,6 +70,7 @@ class OrderService
 
         $row = $this->addDelivery($row);
         $row = $this->addPaymentMethod($row);
+        $row = $this->addDiscountsData($row);
         $row = $this->addOrderPrices($row);
 
         return $row;
@@ -84,15 +86,17 @@ class OrderService
         $cart = Cart::all();
 
         foreach ($cart as $item) {
-            $product = (@$item->variant ?: $item->product);
+            $product = $item->getItemModel();
 
             $this->order->items()->create([
+                'identifier' => $item->getIdentifierClass()->getName(),
                 'product_id' => $item->id,
-                'variant_id' => @$item->variant_id,
-                'quantity' => @$item->quantity,
-                'price' => @$product->priceWithoutTax,
+                'variant_id' => $item->variant_id,
+                'quantity' => $item->quantity,
+                'default_price' => $product->defaultPriceWithoutTax,
+                'price' => $product->priceWithoutTax,
                 'tax' => Store::getTaxValueById($product->tax_id),
-                'price_tax' => @$product->priceWithTax,
+                'price_tax' => $product->priceWithTax,
             ]);
         }
 
@@ -148,6 +152,23 @@ class OrderService
         $row['payment_method_tax'] = Store::getTaxes()->where('id', $paymentMethod->tax_id)->first()->tax;
         $row['payment_method_price'] = $paymentMethod->priceWithoutTax;
         $row['payment_method_id'] = $paymentMethod->getKey();
+
+        return $row;
+    }
+
+    /**
+     * Add discounts additional fields
+     *
+     * @param  array  $row
+     * @return array
+     */
+    public function addDiscountsData($row)
+    {
+        foreach (Discounts::getDiscounts() as $discount) {
+            if ( method_exists($discount, 'mutateOrderRow') ) {
+                $row = $discount->mutateOrderRow($row);
+            }
+        }
 
         return $row;
     }

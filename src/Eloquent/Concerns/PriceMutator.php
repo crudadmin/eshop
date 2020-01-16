@@ -9,16 +9,26 @@ use Discounts;
 use Store;
 use Admin;
 
+/**
+ * Prices levels
+ * *
+ *
+ * initialPriceWithTax / initialPriceWithoutTax / initialClientPrice - initial price without any discount
+ * defaultPriceWithTax / defaultPriceWithoutTax / defaultClientPrice - initial price with product discount
+ * priceWithTax / priceWithoutTax / clientPrice - price with all prossible discounts
+ */
 trait PriceMutator
 {
     /**
-     * Prices levels
-     * *
+     * Can be applied discounts on this model in administration?
      *
-     * initialPriceWithTax / initialPriceWithoutTax / initialClientPrice - initial price without any discount
-     * defaultPriceWithTax / defaultPriceWithoutTax / defaultClientPrice - initial price with product discount
-     * priceWithTax / priceWithoutTax / clientPrice - price with all prossible discounts
+     * @return  bool
      */
+    public function canApplyDiscountsInAdmin()
+    {
+        return false;
+    }
+
 
     /**
      * Here will be stored all additional products discount from cart
@@ -46,8 +56,8 @@ trait PriceMutator
      */
     public function applyDiscounts($price, $discounts = null)
     {
-        //We skip all prices in administration
-        if ( Admin::isAdmin() ) {
+        //We skip all prices in administration for disabled models
+        if ( $this->canApplyDiscountsInAdmin() === false && Admin::isAdmin() ) {
             return $price;
         }
 
@@ -101,7 +111,7 @@ trait PriceMutator
      */
     public function getDefaultPriceWithoutTaxAttribute()
     {
-        $price = operator_modifier($this->price, $this->discount_operator, $this->discount);
+        $price = operator_modifier($this->initialPriceWithoutTax, $this->discount_operator, $this->discount);
 
         return Store::roundNumber($price);
     }

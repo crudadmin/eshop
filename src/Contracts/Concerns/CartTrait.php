@@ -2,10 +2,14 @@
 
 namespace AdminEshop\Contracts\Concerns;
 
-use \Illuminate\Database\Eloquent\Collection;
-use AdminEshop\Contracts\CartItem;
-use Discounts;
 use Admin;
+use AdminEshop\Contracts\CartItem;
+use AdminEshop\Contracts\Cart\CartItemIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
+use AdminEshop\Contracts\Collections\CartCollection;
+use \Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use Discounts;
 use Store;
 
 trait CartTrait
@@ -21,14 +25,52 @@ trait CartTrait
     public $updatedItems = [];
 
     /*
-     * Fetched products from db
+     * Fetched models from db
      */
-    private $fetchedProducts;
+    private $fetchedModels = [];
 
     /*
-     * Fetched variants from db
+     * Available cart identifiers
      */
-    private $fetchedVariants;
+    private $cartIdentifiers = [
+        CartItemIdentifier::class,
+        DefaultIdentifier::class,
+    ];
+
+    /**
+     * Returns all booted cart identifiers objects mapped with keys
+     *
+     * @return  array
+     */
+    public function getRegistredIdentifiers()
+    {
+        return $this->cache('cartIdentifiers', function(){
+            $identifiers = array_map(function($item){
+                return new $item;
+            }, $this->cartIdentifiers);
+
+            $identifiersKeys = array_map(function($identifier){
+                return $identifier->getName();
+            }, $identifiers);
+
+            return array_combine($identifiersKeys, $identifiers);
+        });
+    }
+
+    /**
+     * Return cart item identifier
+     *
+     * @param  string  $name
+     * @return null|AdminEshop\Contracts\Cart\Identifier
+     */
+    public function getCartItemIdentifier($name)
+    {
+        $identifiers = $this->getRegistredIdentifiers();
+
+        if ( array_key_exists($name, $identifiers) ) {
+            return clone $identifiers[$name];
+        }
+    }
 
     /**
      * Items has been added into cart
@@ -64,12 +106,25 @@ trait CartTrait
         $items = session($this->key, []);
 
         if ( ! is_array($items) ) {
-            return [];
+            return new CartCollection;
         }
 
-        return new Collection(array_map(function($item){
-            return new CartItem($item['id'], $item['quantity'], @$item['variant_id']);
-        }, $items));
+        $items = array_map(function($item){
+            $item = (object)$item;
+
+            //If cart identifier is missing
+            //This may happend if someone has something id cart, and code will change
+            //Or identifier will be renamed
+            if (!($identifier = $this->getCartItemIdentifier($item->identifier))) {
+                return;
+            }
+
+            $identifier->cloneFormItem($item);
+
+            return new CartItem($identifier, @$item->quantity ?: 0);
+        }, $items);
+
+        return new CartCollection(array_filter($items));
     }
 
     /**
@@ -86,37 +141,47 @@ trait CartTrait
     /**
      * Fetch products/variants from db
      *
+     * @var CartCollection $item
+     *
      * @return  this
      */
-    public function fetchMissingProductDataFromDb()
+    public function fetchMissingModels(CartCollection $items)
     {
-        $productIds = array_diff(
-            $this->items->pluck(['id'])->toArray(),
-            $this->getFetchedProducts()->pluck('id')->toArray()
-        );
+        if ( $items->count() == 0 )
+            return $this;
 
-        $productVariantsIds = array_diff(
-            array_filter($this->items->pluck('variant_id')->toArray()),
-            $this->getFetchedVariants()->pluck('id')->toArray()
-        );
+        $identifiers = $this->getRegistredIdentifiers();
 
-        //If there is any non-fetched products
-        if ( count($productIds) > 0 ) {
-            $fechedProducts = Admin::getModelByTable('products')->cartSelect()
-                                    ->whereIn('products.id', $productIds)->get();
+        foreach ($identifiers as $identifier) {
+            $fetchConfig = $identifier->getIdentifyKeys();
 
-            //Merge fetched products into existing collection
-            $this->fetchedProducts = $this->getFetchedProducts()->merge($fechedProducts);
-        }
+            foreach ($fetchConfig as $key => $options) {
+                //If no identifier items has been found
+                if ( ($identifierItems = $items->where('identifier', $identifier->getName()))->count() == 0) {
+                    continue;
+                }
 
-        //If there is any non-fetched variants
-        if ( count($productVariantsIds) > 0 ) {
-            $fechedVariants = Admin::getModelByTable('products_variants')->cartSelect()
-                                    ->with(['attributesItems'])
-                                    ->whereIn('products_variants.id', $productVariantsIds)->get();
+                $key = $identifier->tryOrderItemsColumn($key, $identifierItems->first());
 
-            //Merge fetched products into existing collection
-            $this->fetchedVariants = $this->getFetchedVariants()->merge($fechedVariants);
+                $itemsIds = array_filter($identifierItems->pluck([ $key ])->toArray());
+                $alreadyFetched = $this->getFetchedModels($options['table'])->pluck(['id'])->toArray();
+
+                $missingIdsToFetch = array_diff($itemsIds, $alreadyFetched);
+
+                //If there are any non-fetched products
+                if ( count($missingIdsToFetch) > 0 ) {
+                    $model = Admin::getModelByTable($options['table']);
+
+                    //Apply scope on model
+                    if ( is_callable($options['scope']) ) {
+                        $model = $options['scope']($model);
+                    }
+
+                    $fetchedModels = $model->whereIn($model->getModel()->fixAmbiguousColumn('id'), $missingIdsToFetch)->get();
+
+                    $this->addFetchedModels($options['table'], $fetchedModels);
+                }
+            }
         }
 
         return $this;
@@ -179,7 +244,7 @@ trait CartTrait
         $sum = [];
 
         foreach ($items as $cartItem) {
-            $array = (@$cartItem->variant ?: $cartItem->product)->toArray();
+            $array = $cartItem->getItemModel()->toArray();
 
             foreach ($array as $key => $value) {
                 //If does not have price in attribute name
@@ -292,19 +357,32 @@ trait CartTrait
      *
      * @return  Collection
      */
-    public function getFetchedProducts()
+    public function getFetchedModels($table)
     {
-        return $this->fetchedProducts ?: new Collection([]);
+        if ( array_key_exists($table, $this->fetchedModels) ){
+            return $this->fetchedModels[$table] ?: new EloquentCollection([]);
+        }
+
+        return new EloquentCollection([]);
     }
 
     /**
-     * Returns fetched variants
+     * Save fetched models from db
      *
-     * @return  Collection
+     * @var string  $table
+     * @var Collection  $items
+     *
+     * @return  this
      */
-    public function getFetchedVariants()
+    public function addFetchedModels($table, $items)
     {
-        return $this->fetchedVariants ?: new Collection([]);
+        if ( !array_key_exists($table, $this->fetchedModels ?: []) ){
+            $this->fetchedModels[$table] = new EloquentCollection([]);
+        }
+
+        $this->fetchedModels[$table] = $this->fetchedModels[$table]->merge($items);
+
+        return $this;
     }
 }
 

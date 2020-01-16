@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Discounts;
 
 use Admin;
 use AdminEshop\Contracts\Discounts\Discount;
+use AdminEshop\Models\Orders\Order;
 use Store;
 
 class DiscountCode extends Discount
@@ -36,6 +37,19 @@ class DiscountCode extends Discount
         return self::getDiscountCode() ?: false;
     }
 
+    /*
+     * Check if is discount active in administration
+     */
+    public function isActiveInAdmin(Order $order)
+    {
+        //Get discount code in order, if exists..
+        if ( $order->discount_code_id && $order->discountCode ) {
+            return $order->discountCode;
+        }
+
+        return false;
+    }
+
     /**
      * Boot discount parameters after isActive check
      *
@@ -56,13 +70,14 @@ class DiscountCode extends Discount
     /**
      * Apply this discount on models
      *
-     * @return  [type]
+     * @return  array|null
      */
     public function applyOnModels()
     {
         //Allow apply on models only if is percentage discount from orders
-        if ( $this->getResponse()->discount_percentage )
+        if ( $this->getResponse()->discount_percentage ) {
             return parent::applyOnModels();
+        }
     }
 
     /**
@@ -119,6 +134,22 @@ class DiscountCode extends Discount
             'withTax' => (@$valueWithTax ?: $value) . $freeDeliveryText,
             'withoutTax' => $value . $freeDeliveryText,
         ];
+    }
+
+    /**
+     * When order is before creation status, you can modify order data
+     * before creation from your discount.
+     *
+     * @param  array  $row
+     * @return  array
+     */
+    public function mutateOrderRow(array $row = [])
+    {
+        if ( $code = self::getDiscountCode() ) {
+            $row['discount_code_id'] = $code->getKey();
+        }
+
+        return $row;
     }
 
     /**

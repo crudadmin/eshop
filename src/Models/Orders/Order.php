@@ -102,12 +102,17 @@ class Order extends AdminModel
                 ])->inline(),
                 'payment_method_price' => 'name:Cena plat. metódy|type:decimal|fillBy:payment_method.price|component:PriceField|hidden',
             ])->grid(6)->add('required'),
-            'Cena objednávky' => Group::fields([
-                Group::fields([
-                    'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                    'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
-                ]),
-            ]),
+            Group::fields([
+                'Cena objednávky' => Group::fields([
+                    Group::fields([
+                        'price' => 'name:Cena bez DPH|disabled|type:decimal',
+                        'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
+                    ]),
+                ])->width(6),
+                'Zľavy' => Group::fields([
+                    'discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|canAdd',
+                ])->width(6),
+            ])
         ];
     }
 

@@ -6,6 +6,8 @@ use Admin;
 use AdminEshop\Admin\Rules\OnUpdateOrderProduct;
 use AdminEshop\Admin\Rules\RebuildOrderOnItemChange;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
+use AdminEshop\Contracts\Concerns\HasIdentifierSupport;
+use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
@@ -14,6 +16,9 @@ use Store;
 
 class OrdersItem extends AdminModel
 {
+    use PriceMutator,
+        HasIdentifierSupport;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -42,6 +47,16 @@ class OrdersItem extends AdminModel
 
     protected $sortable = false;
 
+    /**
+     * Apply discounts on this item also in administration
+     *
+     * @return  bool
+     */
+    public function canApplyDiscountsInAdmin()
+    {
+        return true;
+    }
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -53,6 +68,7 @@ class OrdersItem extends AdminModel
     {
         return [
             Group::half([
+                'identifier' => 'name:Cart identifier|invisible|index',
                 'product' => 'name:Produkt|belongsTo:products,name|limit:50|max:90',
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
             ]),
@@ -61,18 +77,16 @@ class OrdersItem extends AdminModel
                 'variant_text' => 'name:Popis varianty',
             ]),
             Group::fields([
-                Group::third([
-                    'price' => 'name:Cena/j bez DPH|title:Pri prázdnej hodnote sa vyplní podľa produktu|required_without:product_id|type:decimal',
-                ]),
-                Group::third([
-                    'tax' => 'name:DPH %|title:Pri prázdnej hodnote sa vyplní podľa produktu|type:decimal',
-                ]),
-                Group::third([
-                    'price_tax' => 'name:Cena/j s DPH|title:Pri prázdnej hodnote sa vypočíta|required_without:product_id|type:decimal',
-                ])
-            ])
+                'default_price' => 'name:Pôvodna cena bez DPH|type:decimal|disabledIf:manual_price,0',
+                'price' => 'name:Cena/j bez DPH|title:Pri prázdnej hodnote sa vyplní podľa produktu|type:decimal|disabledIf:manual_price,0',
+                'tax' => 'name:DPH %|title:Pri prázdnej hodnote sa vyplní podľa produktu|type:decimal|disabledIf:manual_price,0',
+                'price_tax' => 'name:Cena/j s DPH|title:Pri prázdnej hodnote sa vypočíta|type:decimal|disabledIf:manual_price,0',
+                'manual_price' => 'name:Manuálna cena|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
+            ])->inline()
         ];
     }
+
+    protected $inMenu = true;
 
     public function options()
     {
@@ -165,8 +179,12 @@ class OrdersItem extends AdminModel
         });
     }
 
-    public function getPriceWithoutTaxAttribute()
+    /*
+     * Set initial price for discounts
+     */
+    public function getInitialPriceWithoutTaxAttribute()
     {
-        return $this->price;
+        return Store::roundNumber($this->default_price);
     }
+
 }

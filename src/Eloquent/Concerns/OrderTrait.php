@@ -3,7 +3,10 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
+use AdminEshop\Contracts\Collections\CartCollection;
 use Ajax;
+use Cart;
+use Discounts;
 use Store;
 
 trait OrderTrait
@@ -18,9 +21,14 @@ trait OrderTrait
         $price = 0;
         $priceWithTax = 0;
 
-        foreach ($this->items as $item) {
-            $price += $item->price * $item->quantity;
-            $priceWithTax += $item->price_tax * $item->quantity;
+        //Set order into discounts factory
+        Discounts::setOrder($this);
+
+        $items = (new CartCollection($this->items))->applyOnOrderCart();
+
+        foreach ($items as $item) {
+            $price += $item->priceWithoutTax * $item->quantity;
+            $priceWithTax += $item->priceWithTax * $item->quantity;
         }
 
         $this->price = Store::roundNumber($price + $this->payment_method_price + $this->delivery_price);
