@@ -1,11 +1,12 @@
 <?php
 
-namespace AdminEshop\Contracts\Cart;
+namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Cart\Identifier;
+use AdminEshop\Contracts\Cart\Identifiers\HasIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 
-class CartItemIdentifier extends Identifier
+class ProductsIdentifier extends Identifier implements HasIdentifier
 {
     /*
      * Retuns name of identifier

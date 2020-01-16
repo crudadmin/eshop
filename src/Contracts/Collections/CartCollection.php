@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Collections;
 
+use AdminEshop\Contracts\CartItem;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Cart;
@@ -14,6 +15,7 @@ class CartCollection extends Collection
 {
     /**
      * Convert cart items into cart format
+     * This function is suitable only for carItem
      *
      * @param  array  $discounts
      * @param  callable|null  $onItemRejected
@@ -66,11 +68,11 @@ class CartCollection extends Collection
     public function applyCartDiscounts($discounts = null)
     {
         return $this->map(function($item) use ($discounts) {
-            //We need apply discounts on cart item also, when has discounts trait
-            if ( is_object($item) && in_array(PriceMutator::class, class_uses_recursive($item)) ) {
-                Cart::addCartDiscountsIntoModel($item, $discounts);
-            }
+            //We would yty apply discounts on cart item also.
+            //If item would have discountable trait, cart discounts will be applied
+            Cart::addCartDiscountsIntoModel($item, $discounts);
 
+            //We also want apply discounts on item eloquent
             Cart::addCartDiscountsIntoModel($item->getItemModel(), $discounts);
 
             return $item;
@@ -86,7 +88,11 @@ class CartCollection extends Collection
     public function renderCartItems($discounts = null)
     {
         return $this->map(function($item) use ($discounts) {
-            return (clone $item)->render($discounts);
+            if ( $item instanceof CartItem ) {
+                return (clone $item)->render($discounts);
+            }
+
+            return $item;
         });
     }
 
@@ -107,11 +113,11 @@ class CartCollection extends Collection
                     $fetchedModels = Cart::getFetchedModels($options['table']);
 
                     //If identifier is not present
-                    if ( ! $identifier->getIdentifierValue($item, $key) ) {
+                    if ( ! ($identifierValue = $identifier->getIdentifierValue($item, $key)) ) {
                         continue;
                     }
 
-                    $relation = $fetchedModels->find($identifier->getIdentifierValue($item, $key));
+                    $relation = $fetchedModels->find($identifierValue);
 
                     $item->setItemModel($options['modelKey'], $relation);
                 }

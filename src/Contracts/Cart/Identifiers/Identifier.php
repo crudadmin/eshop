@@ -1,11 +1,12 @@
 <?php
 
-namespace AdminEshop\Contracts\Cart;
+namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
+use AdminEshop\Contracts\Cart\Identifiers\HasIdentifier;
 use AdminEshop\Models\Orders\OrdersItem;
 
-class Identifier
+class Identifier implements HasIdentifier
 {
     /**
      * Keys in array are assigned to eloquents tables
@@ -87,9 +88,9 @@ class Identifier
     }
 
     /**
-     * Clone identifiers from item
+     * Clone data from identifier to item.
      *
-     * @param  object  $item
+     * @param  object  $item (here may be typed any type of cart item, product, without HasIdentifier.)
      * @return  this
      */
     public function cloneFormItem(object $item)
@@ -123,7 +124,7 @@ class Identifier
      * @param  AdminEshop\Contracts\CartItem  $item
      * @return  bool
      */
-    public function isThisCartItem(CartItem $item)
+    public function isThisCartItem(HasIdentifier $item)
     {
         foreach ($this->getIdentifyKeys() as $key => $options) {
             $identifierValue = $this->getIdentifier($key);
@@ -155,12 +156,13 @@ class Identifier
     }
 
     /**
-     * Returns identifier by identifier name
+     * Returns identifier value by identifier name
      *
+     * @param  HasIdentifier  $item
      * @param  string  $key
      * @return  mixed
      */
-    public function getIdentifierValue(object $item, string $key)
+    public function getIdentifierValue(HasIdentifier $item, string $key)
     {
         $key = $this->tryOrderItemsColumn($key, $item);
 

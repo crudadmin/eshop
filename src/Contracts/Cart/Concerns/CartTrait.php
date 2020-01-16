@@ -1,10 +1,10 @@
 <?php
 
-namespace AdminEshop\Contracts\Concerns;
+namespace AdminEshop\Contracts\Cart\Concerns;
 
 use Admin;
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Cart\CartItemIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
@@ -35,7 +35,7 @@ trait CartTrait
      * Available cart identifiers
      */
     private $cartIdentifiers = [
-        CartItemIdentifier::class,
+        ProductsIdentifier::class,
         DefaultIdentifier::class,
     ];
 

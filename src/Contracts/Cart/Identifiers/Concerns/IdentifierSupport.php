@@ -1,11 +1,10 @@
 <?php
 
-namespace AdminEshop\Contracts\Concerns;
+namespace AdminEshop\Contracts\Cart\Identifiers\Concerns;
 
-use Admin\Eloquent\AdminModel;
 use Cart;
 
-trait HasIdentifierSupport
+trait IdentifierSupport
 {
     /**
      * Here will be saved items models when cart item will be eloquent

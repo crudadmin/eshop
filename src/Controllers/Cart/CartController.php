@@ -3,7 +3,7 @@
 namespace AdminEshop\Controllers\Cart;
 
 use Admin;
-use AdminEshop\Contracts\Cart\CartItemIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Controllers\Controller;
 use AdminEshop\Models\Delivery\Delivery;
@@ -49,7 +49,7 @@ class CartController extends Controller
 
     public function addItem()
     {
-        $identifier = new CartItemIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = new ProductsIdentifier($this->getProductId(), $this->getVariantId());
 
         Cart::addOrUpdate($identifier, request('quantity'));
 
@@ -58,7 +58,7 @@ class CartController extends Controller
 
     public function updateQuantity()
     {
-        $identifier = new CartItemIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = new ProductsIdentifier($this->getProductId(), $this->getVariantId());
 
         Cart::updateQuantity($identifier, request('quantity'));
 
@@ -67,7 +67,7 @@ class CartController extends Controller
 
     public function removeItem()
     {
-        $identifier = new CartItemIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = new ProductsIdentifier($this->getProductId(), $this->getVariantId());
 
         Cart::remove($identifier);
 

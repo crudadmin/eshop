@@ -240,7 +240,7 @@ trait PriceMutator
 
     public function toCartArray()
     {
-        $this->append($this->priceAttributes);
+        $this->append($this->getPriceAttributes());
 
         return $this->toArray();
     }
