@@ -44,7 +44,9 @@ class DeliveryMutator extends Mutator
      */
     public function isActiveInAdmin(Order $order)
     {
-        return $order->delivery_id && $order->delivery ? $order->delivery : null;
+        if ( $order->delivery_id && $order->delivery ) {
+            return $order->delivery;
+        }
     }
 
     /**

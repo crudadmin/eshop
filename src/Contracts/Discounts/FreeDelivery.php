@@ -3,11 +3,12 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use AdminEshop\Contracts\Discounts\Discount;
+use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
 use Store;
 
-class FreeDelivery extends Discount
+class FreeDelivery extends Discount implements Discountable
 {
     /**
      * Discount can be applied on those models

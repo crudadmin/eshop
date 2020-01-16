@@ -2,12 +2,13 @@
 
 namespace AdminEshop\Contracts\Collections;
 
-use Illuminate\Support\Collection;
+use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
-use OrderService;
-use Discounts;
-use Store;
 use Cart;
+use Discounts;
+use Illuminate\Support\Collection;
+use OrderService;
+use Store;
 
 class CartCollection extends Collection
 {
@@ -65,7 +66,8 @@ class CartCollection extends Collection
     public function applyCartDiscounts($discounts = null)
     {
         return $this->map(function($item) use ($discounts) {
-            if ( $item instanceof AdminModel ) {
+            //We need apply discounts on cart item also, when has discounts trait
+            if ( is_object($item) && in_array(PriceMutator::class, class_uses_recursive($item)) ) {
                 Cart::addCartDiscountsIntoModel($item, $discounts);
             }
 

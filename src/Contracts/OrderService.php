@@ -236,6 +236,9 @@ class OrderService
                 $response = $mutator->isActive($this->getOrder());
             }
 
+            //Apply all discounts on given reponse if is correct type
+            Cart::addCartDiscountsIntoModel($response);
+
             //If no response has been given, skip this mutator
             if ( ! $response ) {
                 return;

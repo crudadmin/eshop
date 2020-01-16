@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Discounts;
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
+use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
@@ -14,7 +15,7 @@ use Cart;
 use Discounts;
 use Store;
 
-class Discount
+class Discount implements Discountable
 {
     use DataStore;
 
@@ -101,7 +102,7 @@ class Discount
     }
 
     /**
-     * Returns if discount is active
+     * Returns if discount is active on website
      *
      * @return  bool
      */

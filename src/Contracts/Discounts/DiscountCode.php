@@ -5,10 +5,11 @@ namespace AdminEshop\Contracts\Discounts;
 use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Discounts\Discount;
+use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
 use Store;
 
-class DiscountCode extends Discount
+class DiscountCode extends Discount implements Discountable
 {
     /*
      * Discount code key in session

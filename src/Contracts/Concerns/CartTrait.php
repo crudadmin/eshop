@@ -7,10 +7,12 @@ use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\CartItemIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
-use \Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
+use AdminEshop\Eloquent\Concerns\PriceMutator;
+use Admin\Eloquent\AdminModel;
 use Discounts;
+use Illuminate\Support\Collection;
 use Store;
+use \Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait CartTrait
 {
@@ -203,6 +205,11 @@ trait CartTrait
         $items = ($itemOrItems instanceof Collection) ? $itemOrItems : collect([ $itemOrItems ]);
 
         foreach ($items as $row) {
+            //We need apply discounts only on discountable classes. So we want skip non discountable classes
+            if ( !(is_object($row) && in_array(PriceMutator::class, class_uses_recursive($row))) ) {
+                continue;
+            }
+
             Discounts::applyDiscountsOnModel(
                 $row,
                 $discounts,
