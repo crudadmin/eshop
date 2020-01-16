@@ -2,12 +2,13 @@
 
 namespace AdminEshop\Contracts;
 
-use AdminEshop\Contracts\Cart\Identifiers\HasIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
+use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Eloquent\Concerns\HasWarehouse;
 use Cart;
 
-class CartItem implements HasIdentifier
+class CartItem implements UsesIdentifier
 {
     use IdentifierSupport;
 
@@ -31,7 +32,7 @@ class CartItem implements HasIdentifier
      * @param  Identifier  $identifier
      * @param  int  $quantity
      */
-    public function __construct(HasIdentifier $identifier, $quantity = 0)
+    public function __construct(Identifier $identifier, $quantity = 0)
     {
         $this->identifier = $identifier->getName();
 
@@ -71,7 +72,7 @@ class CartItem implements HasIdentifier
      *
      * @return  this
      */
-    private function loadIdentifier(HasIdentifier $identifier)
+    private function loadIdentifier(Identifier $identifier)
     {
         foreach ($identifier->getIdentifyKeys() as $key => $config) {
             $this->$key = $identifier->getIdentifier($key);

@@ -3,7 +3,6 @@
 namespace AdminEshop\Contracts\Collections;
 
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Cart;
 use Discounts;
@@ -50,8 +49,14 @@ class CartCollection extends Collection
     public function allowApplyDiscountsInAdmin()
     {
         return $this->map(function($item){
-            if ( $model = $item->getItemModel() ) {
-                $item->getItemModel()->setApplyDiscountsInAdmin(true);
+            //We need apply discounts only on discountable items
+            if ( Discounts::hasDiscountableTrait($item) ) {
+                $item->setApplyDiscountsInAdmin(true);
+            }
+
+            //We also want apply cart item discounts on modelItems
+            if ( Discounts::hasDiscountableTrait($model = $item->getItemModel()) ) {
+                $model->setApplyDiscountsInAdmin(true);
             }
 
             return $item;

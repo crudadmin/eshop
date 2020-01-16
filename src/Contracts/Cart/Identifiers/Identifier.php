@@ -3,10 +3,10 @@
 namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Cart\Identifiers\HasIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Models\Orders\OrdersItem;
 
-class Identifier implements HasIdentifier
+class Identifier
 {
     /**
      * Keys in array are assigned to eloquents tables
@@ -90,7 +90,7 @@ class Identifier implements HasIdentifier
     /**
      * Clone data from identifier to item.
      *
-     * @param  object  $item (here may be typed any type of cart item, product, without HasIdentifier.)
+     * @param  object  $item (here may be typed any type of cart item, product, without UsesIdentifier.)
      * @return  this
      */
     public function cloneFormItem(object $item)
@@ -121,10 +121,10 @@ class Identifier implements HasIdentifier
     /**
      * Returns if given cart belongs to this identifier
      *
-     * @param  HasIdentifier  $item
+     * @param  UsesIdentifier  $item
      * @return  bool
      */
-    public function hasThisItem(HasIdentifier $item)
+    public function hasThisItem(UsesIdentifier $item)
     {
         foreach ($this->getIdentifyKeys() as $key => $options) {
             $identifierValue = $this->getIdentifier($key);
@@ -158,11 +158,11 @@ class Identifier implements HasIdentifier
     /**
      * Returns identifier value by identifier name
      *
-     * @param  HasIdentifier  $item
+     * @param  UsesIdentifier  $item
      * @param  string  $key
      * @return  mixed
      */
-    public function getIdentifierValue(HasIdentifier $item, string $key)
+    public function getIdentifierValue(UsesIdentifier $item, string $key)
     {
         $key = $this->tryOrderItemsColumn($key, $item);
 

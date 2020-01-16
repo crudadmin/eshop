@@ -3,10 +3,9 @@
 namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Cart\Identifiers\HasIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 
-class DefaultIdentifier extends Identifier implements HasIdentifier
+class DefaultIdentifier extends Identifier
 {
     /*
      * Retuns name of identifier

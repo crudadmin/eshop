@@ -4,7 +4,7 @@ namespace AdminEshop\Contracts;
 
 use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
-use AdminEshop\Contracts\Cart\Identifiers\HasIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use Admin\Core\Contracts\DataStore;
@@ -44,7 +44,7 @@ class Cart
      * @param Product     $product
      * @param int|integer $quantity
      */
-    public function addOrUpdate(HasIdentifier $identifier, int $quantity = 1)
+    public function addOrUpdate(Identifier $identifier, int $quantity = 1)
     {
         //If items does not exists in cart
         if ( $item = $this->getItemFromCart($identifier) ) {
@@ -63,11 +63,11 @@ class Cart
     /**
      * Update quantity for existing item in cart
      *
-     * @param  HasIdentifier $identifier
+     * @param  Identifier $identifier
      * @param  int  $quantity
      * @return  this
      */
-    public function updateQuantity(HasIdentifier $identifier, $quantity)
+    public function updateQuantity(Identifier $identifier, $quantity)
     {
         if ( ! ($item = $this->getItemFromCart($identifier)) ) {
             autoAjax()->message(_('Produkt nebol nájdeny v košíku.'))->code(422)->throw();
@@ -85,10 +85,10 @@ class Cart
     /**
      * Remove item from cart
      *
-     * @param  HasIdentifier $identifier
+     * @param  Identifier $identifier
      * @return  this
      */
-    public function remove(HasIdentifier $identifier)
+    public function remove(Identifier $identifier)
     {
         $this->items = $this->items->reject(function($item) use ($identifier) {
             return $identifier->hasThisItem($item);
@@ -142,10 +142,10 @@ class Cart
     /**
      * Returns item from cart
      *
-     * @param  HasIdentifier  $identifier
+     * @param  Identifier  $identifier
      * @return null|object
      */
-    public function getItemFromCart(HasIdentifier $identifier)
+    public function getItemFromCart(Identifier $identifier)
     {
         //All identifiers must match
         $items = $this->items->filter(function($item) use ($identifier) {
@@ -158,10 +158,10 @@ class Cart
     /**
      * Add new item into cart
      *
-     * @param  HasIdentifier  $identifier
+     * @param  Identifier  $identifier
      * @param  int  $quantity
      */
-    private function addNewItem(HasIdentifier $identifier, $quantity)
+    private function addNewItem(Identifier $identifier, $quantity)
     {
         $item = new CartItem($identifier, $quantity);
 

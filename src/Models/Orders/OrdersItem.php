@@ -7,7 +7,7 @@ use AdminEshop\Admin\Rules\OnUpdateOrderProduct;
 use AdminEshop\Admin\Rules\RebuildOrderOnItemChange;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
-use AdminEshop\Contracts\Cart\Identifiers\HasIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
@@ -15,7 +15,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class OrdersItem extends AdminModel implements HasIdentifier
+class OrdersItem extends AdminModel implements UsesIdentifier
 {
     use PriceMutator,
         IdentifierSupport;

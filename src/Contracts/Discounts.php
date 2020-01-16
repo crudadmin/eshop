@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts;
 
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Discounts\FreeDelivery;
+use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Core\Contracts\DataStore;
 use Admin\Eloquent\AdminModel;
 use Store;
@@ -193,6 +194,17 @@ class Discounts
 
             return $taxValue == 'auto' ? !Store::hasB2B() : $taxValue;
         }
+    }
+
+    /**
+     * Check if given item has discountable trait
+     *
+     * @param   mixed  $item
+     * @return  bool
+     */
+    public function hasDiscountableTrait($item)
+    {
+        return is_object($item) && in_array(PriceMutator::class, class_uses_recursive($item));
     }
 }
 
