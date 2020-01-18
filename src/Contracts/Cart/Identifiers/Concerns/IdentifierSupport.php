@@ -15,6 +15,13 @@ trait IdentifierSupport
     protected $itemModels = [];
 
     /**
+     * Previous object from which has been created this CartItem
+     *
+     * @var  mixed
+     */
+    private $originalObject;
+
+    /**
      * Set eloquent of cart item
      *
      * @param  string  $modelKey
@@ -74,5 +81,27 @@ trait IdentifierSupport
         }
 
         return $array;
+    }
+
+    /**
+     * Returns original object
+     *
+     * @return  mixed
+     */
+    public function getOriginalObject()
+    {
+        return $this->originalObject;
+    }
+
+    /**
+     * Saves original object
+     *
+     * @param  mixed  $object
+     */
+    public function setOriginalObject($object)
+    {
+        $this->originalObject = $object;
+
+        return $this;
     }
 }

@@ -148,7 +148,7 @@ class CartCollection extends Collection
                     $sum[$key] = 0;
                 }
 
-                $sum[$key] = $item->quantity * $array[$key];
+                $sum[$key] += ($item->quantity * $array[$key]);
             }
         }
 

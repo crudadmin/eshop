@@ -8,7 +8,7 @@ use Admin;
 use Ajax;
 use Store;
 
-class OnUpdateOrderProduct extends AdminRule
+class AddMissingPrices extends AdminRule
 {
     //On all events
     public function fire(AdminModel $row)
@@ -23,8 +23,8 @@ class OnUpdateOrderProduct extends AdminRule
         }
 
         //Automatically fill product price if is empty
-        if ( $row->price !== 0  && ! $row->price && ! $row->price_tax ) {
-            $row->price = $row->getProduct()->priceWithoutTax;
+        if ( $row->price !== 0 && ! $row->price && ! $row->price_tax && ($product = $row->getProduct()) ) {
+            $row->price = $product->priceWithoutTax;
         }
 
         //If one price is missing, calculate others... vat/novat

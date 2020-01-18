@@ -3,7 +3,9 @@
 namespace AdminEshop\Models\Orders;
 
 use Admin;
-use AdminEshop\Admin\Rules\OnUpdateOrderProduct;
+use AdminEshop\Admin\Rules\AddMissingPrices;
+use AdminEshop\Admin\Rules\BindDefaultPrice;
+use AdminEshop\Admin\Rules\BindIdentifierName;
 use AdminEshop\Admin\Rules\RebuildOrderOnItemChange;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
@@ -68,7 +70,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
                 'variant_text' => 'name:Popis varianty',
             ]),
             Group::fields([
-                'default_price' => 'name:Pôvodna cena bez DPH|type:decimal|title:Cena produktu v čase objednania.|disabled',
+                'default_price' => 'name:Pôvodna cena bez DPH|hidden|type:decimal|title:Cena produktu v čase objednania.|disabled',
                 'price' => 'name:Cena/j bez DPH|type:decimal|disabledIf:manual_price,0',
                 'tax' => 'name:DPH %|type:decimal|disabledIf:manual_price,0',
                 'price_tax' => 'name:Cena/j s DPH|type:decimal|disabledIf:manual_price,0',
@@ -132,7 +134,8 @@ class OrdersItem extends AdminModel implements UsesIdentifier
             'increments' => false,
             'title.insert' => 'Nová položka',
             'title.update' => 'Upravujete položku v objednávke',
-            'grid.hidden' => true,
+            'grid.default' => 'full',
+            'grid.disabled' => true,
             'columns.total' => [
                 'title' => 'Cena spolu',
                 'after' => 'price_tax',
@@ -151,7 +154,9 @@ class OrdersItem extends AdminModel implements UsesIdentifier
     }
 
     protected $rules = [
-        OnUpdateOrderProduct::class,
+        BindDefaultPrice::class,
+        BindIdentifierName::class,
+        AddMissingPrices::class,
         ReloadProductQuantity::class,
         RebuildOrderOnItemChange::class, //We need reload order prices after quantity check
     ];
@@ -188,6 +193,11 @@ class OrdersItem extends AdminModel implements UsesIdentifier
         //If is manualy typed price, we need return order item price
         if ( $this->hasManualPrice ) {
             return Store::roundNumber($this->price);
+        }
+
+        //If default price is missing, then use price attribute
+        if ( is_null($this->default_price) ) {
+            throw new \Exception('Ospravelňujeme sa, nastala nečakaná chyba. Predvolená cena produktu nie je definovaná. Prosím, kontaktujte administrátora.');
         }
 
         //But if price is calculated dynamically, we need use default price

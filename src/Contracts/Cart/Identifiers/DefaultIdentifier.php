@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
+use Discounts;
 
 class DefaultIdentifier extends Identifier
 {
@@ -36,6 +37,13 @@ class DefaultIdentifier extends Identifier
      */
     public function getItemModel($item, $cache)
     {
+        $originalObject = $item->getOriginalObject();
+
+        //If item has set original object if eloquent is missing.
+        if ( Discounts::hasDiscountableTrait($originalObject) ) {
+            return $originalObject;
+        }
+
         return false;
     }
 }

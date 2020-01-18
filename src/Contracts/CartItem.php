@@ -31,14 +31,17 @@ class CartItem implements UsesIdentifier
      *
      * @param  Identifier  $identifier
      * @param  int  $quantity
+     * @param  mixed  $originalObject
      */
-    public function __construct(Identifier $identifier, $quantity = 0)
+    public function __construct(Identifier $identifier, $quantity = 0, $originalObject = null)
     {
         $this->identifier = $identifier->getName();
 
         $this->setQuantity($quantity);
 
         $this->loadIdentifier($identifier);
+
+        $this->setOriginalObject($originalObject);
     }
 
     /**

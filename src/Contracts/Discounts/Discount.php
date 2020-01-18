@@ -266,7 +266,7 @@ class Discount implements Discountable
 
             $identifier = $identifier->cloneFormItem($item);
 
-            return new CartItem($identifier, $item->quantity);
+            return new CartItem($identifier, $item->quantity, $item);
         });
 
         $collection = new CartCollection($items);

@@ -169,8 +169,8 @@ class OrderService
 
         $summary = $items->getSummary(true);
 
-        $order->price = $summary['priceWithoutTax'];
-        $order->price_tax = $summary['priceWithTax'];
+        $order->price = $items->count() == 0 ? 0 : $summary['priceWithoutTax'];
+        $order->price_tax = $items->count() == 0 ? 0 : $summary['priceWithTax'];
 
         return $this;
     }

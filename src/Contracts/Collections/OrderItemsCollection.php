@@ -19,14 +19,12 @@ class OrderItemsCollection extends CartCollection
         return $this->map(function($item) {
             //If OrderItem price is typed manually, we also need reset product price of item
             //to this manualy typed price. And turn off discounts on this price.
-            //We also need rewrite tax value for calculating prices
+            //We also need rewrite tax value for calculating prices for given product
             if ( $item->hasManualPrice ) {
                 if ( $model = $item->getItemModel() ) {
                     $model->rewriteDefaultPrice($item->price);
                     $model->rewriteTaxValue($item->tax);
                 }
-
-                $item->rewriteTaxValue($item->tax);
             }
 
             //We need rewrite default price of OrdersItem property,
@@ -44,6 +42,10 @@ class OrderItemsCollection extends CartCollection
                 //If price is dynamic, we need allow discounts on this item
                 $this->allowItemDiscountsInAdmin($item);
             }
+
+            //We also need to set tax for cart item.
+            //Because prices calculation will be applied also for this items.
+            $item->rewriteTaxValue($item->tax);
 
             return $item;
         });
@@ -65,5 +67,20 @@ class OrderItemsCollection extends CartCollection
         if ( Discounts::hasDiscountableTrait($model = $item->getItemModel()) ) {
             $model->setApplyDiscountsInAdmin(true);
         }
+    }
+
+    /**
+     * Push into item original object.
+     * In this case item itself.
+     */
+    public function addOriginalObjects()
+    {
+        return $this->map(function($item){
+            if ( ! $item->getOriginalObject() ) {
+                $item->setOriginalObject($item);
+            }
+
+            return $item;
+        });
     }
 }

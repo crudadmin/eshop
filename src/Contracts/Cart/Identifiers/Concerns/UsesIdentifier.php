@@ -17,6 +17,13 @@ interface UsesIdentifier
      * @return  array
      */
     public function getPricesArray();
+
+    /**
+     * Returns original object
+     *
+     * @return  mixed
+     */
+    public function getOriginalObject();
 }
 
 ?>

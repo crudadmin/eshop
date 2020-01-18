@@ -30,6 +30,7 @@ trait OrderTrait
 
         $items = (new OrderItemsCollection($this->items))
                     ->fetchModels()
+                    ->addOriginalObjects()
                     ->rewritePricesInModels()
                     ->applyOnOrderCart();
 
@@ -42,7 +43,7 @@ trait OrderTrait
 
     public function syncOrderItemsWithCartDiscounts($items, OrdersItem $mutatingItem = null)
     {
-        foreach ($this->items as $item) {
+        foreach ($items as $item) {
             //If order item has setted manual price,
             //we does not want to modify this item.
             if ( $item->hasManualPrice ) {
@@ -69,7 +70,7 @@ trait OrderTrait
             }
 
             //We want modify original mutating item, not his clone
-            if ( $item->getKey() === $mutatingItem->getKey() ) {
+            if ( $mutatingItem && $item->getKey() === $mutatingItem->getKey() ) {
                 $this->cloneChangesIntoOriginalItem($item, $mutatingItem);
             }
         }
