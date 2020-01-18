@@ -190,8 +190,15 @@ class OrdersItem extends AdminModel implements UsesIdentifier
      */
     public function getInitialPriceWithoutTaxAttribute()
     {
-        //If is manualy typed price, we need return order item price
-        if ( $this->hasManualPrice ) {
+        //If is manualy typed price, we need return order item price.
+        //We also need return default price, if item does not have identifier with
+        //discounts support. Sometimes may happend that item had discounts support in,
+        //but after some time identifier may change his discounts support to false. In this
+        //case we need turn off default price, and return actual price.
+        if (
+            $this->hasManualPrice
+            || $this->getIdentifierClass()->hasDiscounts() === false
+        ) {
             return Store::roundNumber($this->price);
         }
 

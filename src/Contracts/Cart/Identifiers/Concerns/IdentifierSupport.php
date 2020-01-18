@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Cart\Identifiers\Concerns;
 
+use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use Cart;
 use Discounts;
 
@@ -52,7 +53,7 @@ trait IdentifierSupport
      */
     public function getIdentifierClass()
     {
-        $identifier = Cart::getIdentifierByName($this->identifier);
+        $identifier = Cart::getIdentifierByName($this->identifier) ?: new DefaultIdentifier;
 
         $identifier->cloneFormItem($this);
 

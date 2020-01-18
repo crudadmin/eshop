@@ -9,17 +9,8 @@ use AdminEshop\Models\Orders\OrdersItem;
 class Identifier
 {
     /**
-     * Keys in array are assigned to eloquents tables
-     *
-     * @return  array
-     */
-    public static function getIdentifyKeys()
-    {
-        return [];
-    }
-
-    /**
-     * Here will be binded identifiers
+     * Here will be binded identifiers data
+     * key and values. Which are identifiers of given item.
      *
      * @var  array
      */
@@ -37,6 +28,16 @@ class Identifier
             $this->setIdentifier($key, array_key_exists($i, $args) ? $args[$i] : null);
             $i++;
         }
+    }
+
+    /**
+     * Keys in array are assigned to eloquents tables
+     *
+     * @return  array
+     */
+    public static function getIdentifyKeys()
+    {
+        return [];
     }
 
     /*
@@ -75,6 +76,16 @@ class Identifier
     }
 
     /**
+     * Can discounts be applied on item with this identifier?
+     *
+     * @return  bool
+     */
+    public function hasDiscounts()
+    {
+        return false;
+    }
+
+    /**
      * Return identifier value
      *
      * @param  string  $key
@@ -85,6 +96,19 @@ class Identifier
         if ( array_key_exists($key, $this->identifiers) ) {
             return $this->identifiers[$key];
         }
+    }
+
+    /**
+     * Set identifier value
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     */
+    public function setIdentifier(string $key, $value)
+    {
+        $this->identifiers[$key] = $value;
+
+        return $this;
     }
 
     /**
@@ -101,19 +125,6 @@ class Identifier
 
             $this->setIdentifier($identifierKey, @$item->{$key} ?: null);
         }
-
-        return $this;
-    }
-
-    /**
-     * Set identifier value
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     */
-    public function setIdentifier(string $key, $value)
-    {
-        $this->identifiers[$key] = $value;
 
         return $this;
     }

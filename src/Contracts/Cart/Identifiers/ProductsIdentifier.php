@@ -16,6 +16,16 @@ class ProductsIdentifier extends Identifier
     }
 
     /**
+     * Can discounts be applied on item with this identifier?
+     *
+     * @return  bool
+     */
+    public function hasDiscounts()
+    {
+        return true;
+    }
+
+    /**
      * Keys in array are assigned to eloquents tables
      *
      * @return  array

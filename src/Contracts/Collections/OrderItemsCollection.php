@@ -27,11 +27,12 @@ class OrderItemsCollection extends CartCollection
                 }
             }
 
-            //We need rewrite default price of OrdersItem property,
-            //because if price of related product in OrdersItem would change,
-            //this price may modify whole OrdersItem price with this new product price.
-            //So we need remember old price of product from the time of order creation.
-            else {
+            //We need to remember default price of OrdersItem property,
+            //because when price of product will be changed, order may be modifier
+            //by this new price. This is wrong.
+            //We also need check if given identifier has discounts support. Because
+            //this suppor may change, id identifier will be missing.
+            else if ( $item->getIdentifierClass()->hasDiscounts() ) {
                 if (
                     $model = $item->getItemModel()
                     && !is_null($price = $item->default_price)
