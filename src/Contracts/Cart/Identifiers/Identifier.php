@@ -64,10 +64,10 @@ class Identifier
     }
 
     /**
-     * Modify cart item on render
+     * Modify item on cart items render into website
      *
      * @param  CartItem  $item
-     * @return  [type]
+     * @return  void
      */
     public function onRender(CartItem $item)
     {
@@ -96,10 +96,10 @@ class Identifier
     public function cloneFormItem(object $item)
     {
         //Build identifier
-        foreach ($this->getIdentifyKeys() as $key => $options) {
-            $key = $this->tryOrderItemsColumn($key, $item);
+        foreach ($this->getIdentifyKeys() as $identifierKey => $options) {
+            $key = $this->tryOrderItemsColumn($identifierKey, $item);
 
-            $this->setIdentifier($key, @$item->{$key} ?: null);
+            $this->setIdentifier($identifierKey, @$item->{$key} ?: null);
         }
 
         return $this;

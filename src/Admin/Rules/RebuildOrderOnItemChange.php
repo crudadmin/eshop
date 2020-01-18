@@ -16,7 +16,7 @@ class RebuildOrderOnItemChange extends AdminRule
     public function updated($row)
     {
         if ( $order = $row->order ) {
-            $order->calculatePrices();
+            $order->calculatePrices($row);
         }
     }
 

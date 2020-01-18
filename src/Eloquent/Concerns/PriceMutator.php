@@ -26,6 +26,20 @@ trait PriceMutator
     protected $applyDiscountsInAdmin = false;
 
     /**
+     * We can rewrite tax value of model
+     *
+     * @var  int/float
+     */
+    protected $rewritedTaxValue;
+
+    /**
+     * We can rewrite default price of model
+     *
+     * @var  int/float
+     */
+    protected $rewritedDefaultPrice;
+
+    /**
      * All available price levels
      *
      * @var  array
@@ -147,7 +161,7 @@ trait PriceMutator
      */
     public function getInitialPriceWithTaxAttribute($value)
     {
-        return Store::priceWithTax($this->initialPriceWithoutTax, $this->tax_id);
+        return $this->calculateTaxPrice($this->initialPriceWithoutTax);
     }
 
     /*
@@ -155,6 +169,10 @@ trait PriceMutator
      */
     public function getDefaultPriceWithoutTaxAttribute()
     {
+        if ( $defaultPrice = $this->getRewritedDefaultPrice() ) {
+            return Store::roundNumber($defaultPrice);
+        }
+
         $price = operator_modifier($this->initialPriceWithoutTax, $this->discount_operator, $this->discount);
 
         return Store::roundNumber($price);
@@ -165,7 +183,7 @@ trait PriceMutator
      */
     public function getDefaultPriceWithTaxAttribute()
     {
-        return Store::priceWithTax($this->defaultPriceWithoutTax, $this->tax_id);
+        return $this->calculateTaxPrice($this->defaultPriceWithoutTax);
     }
 
     /*
@@ -183,7 +201,7 @@ trait PriceMutator
      */
     public function getPriceWithTaxAttribute()
     {
-        return Store::priceWithTax($this->priceWithoutTax, $this->tax_id);
+        return $this->calculateTaxPrice($this->priceWithoutTax);
     }
 
     /**
@@ -229,6 +247,23 @@ trait PriceMutator
     }
 
     /**
+     * Calculation of tax price for given price
+     *
+     * @return  float/int
+     */
+    private function calculateTaxPrice($price)
+    {
+        $tax = $this->taxValue;
+
+        //If model has rewriten tax value
+        if ( ! is_null($this->getRewritedTaxValue()) ) {
+            $tax = $this->getRewritedTaxValue();
+        }
+
+        return Store::roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
+    }
+
+    /**
      * Returns tax value attribute
      *
      * @return  int/float
@@ -238,10 +273,61 @@ trait PriceMutator
         return Store::getTaxValueById($this->tax_id);
     }
 
+    /**
+     * Add all required price attributes for cart item array
+     *
+     * @return  array
+     */
     public function toCartArray()
     {
         $this->append($this->getPriceAttributes());
 
         return $this->toArray();
+    }
+
+    /**
+     * We can rewrite original model default price
+     *
+     * @param  int/float  $price
+     * @return
+     */
+    public function rewriteDefaultPrice($price)
+    {
+        $this->rewritedDefaultPrice = $price;
+
+        return $this;
+    }
+
+    /**
+     * Rewrited default price getter
+     *
+     * @return  float/int
+     */
+    public function getRewritedDefaultPrice()
+    {
+        return $this->rewritedDefaultPrice;
+    }
+
+    /**
+     * We can rewrite original model default price
+     *
+     * @param  int/float  $price
+     * @return
+     */
+    public function rewriteTaxValue($taxValue)
+    {
+        $this->rewritedTaxValue = $taxValue;
+
+        return $this;
+    }
+
+    /**
+     * Rewrited default tax value
+     *
+     * @return  float/int
+     */
+    public function getRewritedTaxValue()
+    {
+        return $this->rewritedTaxValue;
     }
 }

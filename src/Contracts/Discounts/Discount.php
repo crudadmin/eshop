@@ -240,6 +240,18 @@ class Discount implements Discountable
     }
 
     /**
+     * Returns given cart items prices summary
+     *
+     * @return  array
+     */
+    public function getCartSummary()
+    {
+        $exceptAcutal = Discounts::getDiscounts([ $this->getKey() ]);
+
+        return $this->getCartItems()->getSummary(null, $exceptAcutal);
+    }
+
+    /**
      * Build cart from given order in discounts
      *
      * @param  array  $discounts

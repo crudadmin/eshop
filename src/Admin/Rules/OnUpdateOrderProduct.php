@@ -27,10 +27,11 @@ class OnUpdateOrderProduct extends AdminRule
             $row->price = $row->getProduct()->priceWithoutTax;
         }
 
-        //Set product prices
-        if ( ! $row->price )
+        //If one price is missing, calculate others... vat/novat
+        if ( ! $row->price ) {
             $row->price = Store::roundNumber($row->price_tax / (1 + ($row->tax / 100)));
-        else if ( ! $row->price_tax )
+        }  else if ( ! $row->price_tax ) {
             $row->price_tax = Store::roundNumber($row->price * (1 + ($row->tax / 100)));
+        }
     }
 }

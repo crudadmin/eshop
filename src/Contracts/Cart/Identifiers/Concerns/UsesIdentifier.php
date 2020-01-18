@@ -10,6 +10,13 @@ interface UsesIdentifier
      * @return  Identifier
      */
     public function getIdentifierClass();
+
+    /**
+     * Returns array of available prices in cartItem
+     *
+     * @return  array
+     */
+    public function getPricesArray();
 }
 
 ?>

@@ -42,28 +42,6 @@ class CartCollection extends Collection
     }
 
     /**
-     * Set to each model that discounts can be applied also in administration
-     *
-     * @return  CartCollection
-     */
-    public function allowApplyDiscountsInAdmin()
-    {
-        return $this->map(function($item){
-            //We need apply discounts only on discountable items
-            if ( Discounts::hasDiscountableTrait($item) ) {
-                $item->setApplyDiscountsInAdmin(true);
-            }
-
-            //We also want apply cart item discounts on modelItems
-            if ( Discounts::hasDiscountableTrait($model = $item->getItemModel()) ) {
-                $model->setApplyDiscountsInAdmin(true);
-            }
-
-            return $item;
-        });
-    }
-
-    /**
      * Convert given items into cart format with order items
      *
      * @param  array  $discounts
@@ -73,7 +51,7 @@ class CartCollection extends Collection
     public function applyCartDiscounts($discounts = null)
     {
         return $this->map(function($item) use ($discounts) {
-            //We would yty apply discounts on cart item also.
+            //We would try apply discounts on cart item also.
             //If item would have discountable trait, cart discounts will be applied
             Cart::addCartDiscountsIntoModel($item, $discounts);
 
@@ -163,15 +141,9 @@ class CartCollection extends Collection
         $sum = [];
 
         foreach ($this as $item) {
-            $model = $item->getItemModel();
-            $array = $model->toCartArray();
+            $array = $item->getPricesArray();
 
             foreach ($array as $key => $value) {
-                //If does not have price in attribute name
-                if ( strpos(strtolower($key), 'price') === false ) {
-                    continue;
-                }
-
                 if ( !array_key_exists($key, $sum) ) {
                     $sum[$key] = 0;
                 }
@@ -204,13 +176,17 @@ class CartCollection extends Collection
      * Get all available cart summary prices with discounts
      *
      * @param  Collection  $items
-     * @param  array  $discounts
-     * @param  bool  $$fullCartResponse - add payment and delivery prices into sum
+     * @param  bool  $fullCartResponse - add payment and delivery prices into sum
+     * @param  array|null  $discounts
      * @return array
      */
-    public function getSummary($fullCartResponse = false)
+    public function getSummary($fullCartResponse = false, $discounts = null)
     {
-        $discounts = Discounts::getDiscounts();
+        //Set discounts if are missing
+        //Sometimes we may want discounts without specific discount...
+        if ( $discounts === null ) {
+            $discounts = Discounts::getDiscounts();
+        }
 
         $sum = $this->getDefaultSummary();
 
@@ -264,5 +240,4 @@ class CartCollection extends Collection
 
         return $price;
     }
-
 }

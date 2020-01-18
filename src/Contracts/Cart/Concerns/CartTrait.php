@@ -189,7 +189,10 @@ trait CartTrait
     }
 
     /**
-     * Add cart discounts into model
+     * Add cart discounts into model.
+     * Some discounts are not allowed outside cart.
+     * But if we want allow items to be allowed in cart,
+     * we can use this class.
      *
      * @param  AdminModel  $item
      * @param  array|null  $discounts

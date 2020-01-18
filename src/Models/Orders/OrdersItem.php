@@ -68,10 +68,10 @@ class OrdersItem extends AdminModel implements UsesIdentifier
                 'variant_text' => 'name:Popis varianty',
             ]),
             Group::fields([
-                'default_price' => 'name:Pôvodna cena bez DPH|type:decimal|disabledIf:manual_price,0',
-                'price' => 'name:Cena/j bez DPH|title:Pri prázdnej hodnote sa vyplní podľa produktu|type:decimal|disabledIf:manual_price,0',
-                'tax' => 'name:DPH %|title:Pri prázdnej hodnote sa vyplní podľa produktu|type:decimal|disabledIf:manual_price,0',
-                'price_tax' => 'name:Cena/j s DPH|title:Pri prázdnej hodnote sa vypočíta|type:decimal|disabledIf:manual_price,0',
+                'default_price' => 'name:Pôvodna cena bez DPH|type:decimal|title:Cena produktu v čase objednania.|disabled',
+                'price' => 'name:Cena/j bez DPH|type:decimal|disabledIf:manual_price,0',
+                'tax' => 'name:DPH %|type:decimal|disabledIf:manual_price,0',
+                'price_tax' => 'name:Cena/j s DPH|type:decimal|disabledIf:manual_price,0',
                 'manual_price' => 'name:Manuálna cena|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
             ])->inline()
         ];
@@ -170,12 +170,27 @@ class OrdersItem extends AdminModel implements UsesIdentifier
         });
     }
 
+    /**
+     * Returns if cart item has manual price
+     *
+     * @return  bool
+     */
+    public function getHasManualPriceAttribute()
+    {
+        return $this->manual_price === true;
+    }
+
     /*
      * Set initial price for discounts
      */
     public function getInitialPriceWithoutTaxAttribute()
     {
+        //If is manualy typed price, we need return order item price
+        if ( $this->hasManualPrice ) {
+            return Store::roundNumber($this->price);
+        }
+
+        //But if price is calculated dynamically, we need use default price
         return Store::roundNumber($this->default_price);
     }
-
 }

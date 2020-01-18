@@ -38,6 +38,13 @@ class Discounts
     private $order;
 
     /**
+     * Discounts caches for fixing recursive loops
+     *
+     * @var  bool
+     */
+    private $discountsCache = [];
+
+    /**
      * Add discount class
      *
      * @param  string  $discountClass
@@ -88,33 +95,53 @@ class Discounts
 
         //Returns only active discounts
         return array_values(array_filter($discounts, function($discount) use ($exceps) {
-            //If is in except mode
-            if ( in_array($discount->getKey(), $exceps) ) {
-                return false;
-            }
-
-            //If is not active in backend/administration
-            if ( $order = $this->getOrder() ) {
-                //Set order into every discount
-                $discount->setOrder($this->getOrder());
-
-                if ( !($response = $discount->isActiveInAdmin($order)) ) {
+            return $this->cache('discounts.'.$discount->getKey(), function() use ($discount, $exceps) {
+                //If is in except mode
+                if ( !($response = $this->isActiveDiscount($exceps, $discount)) ) {
                     return false;
                 }
-            }
 
-            //If is not active in frontend
-            else if ( !($response = $discount->isActive()) ) {
-                return false;
-            }
+                //Set is active response
+                $discount->setResponse($response);
+                $discount->boot($response);
+                $discount->setMessage($discount->getMessage($response));
 
-            //Set is active response
-            $discount->setResponse($response);
-            $discount->boot($response);
-            $discount->setMessage($discount->getMessage($response));
-
-            return true;
+                return true;
+            });
         }));
+    }
+
+    private function isActiveDiscount($exceps, $discount)
+    {
+        //
+
+        if ( in_array($discount->getKey(), $exceps) ) {
+            return $this->cacheDiscountState($discount, false);
+        }
+
+        //If is not active in backend/administration
+        if ( $order = $this->getOrder() ) {
+            //Set order into every discount
+            $discount->setOrder($this->getOrder());
+
+            if ( !($response = $discount->isActiveInAdmin($order)) ) {
+                return $this->cacheDiscountState($discount, false);
+            }
+        }
+
+        //If is not active in frontend
+        else if ( !($response = $discount->isActive()) ) {
+            return $this->cacheDiscountState($discount, false);
+        }
+
+        return $this->cacheDiscountState($discount, $response);
+    }
+
+    public function cacheDiscountState($discounts, $state)
+    {
+        $this->discountsCache[$discounts->getKey()] = $state;
+
+        return $state;
     }
 
     /**

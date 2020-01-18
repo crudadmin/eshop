@@ -83,10 +83,10 @@ class ProductsIdentifier extends Identifier
     }
 
     /**
-     * Modify item on render
+     * Modify item on cart items render into website
      *
      * @param  CartItem  $item
-     * @return  [type]
+     * @return  void
      */
     public function onRender(CartItem $item)
     {

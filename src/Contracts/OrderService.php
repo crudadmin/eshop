@@ -237,6 +237,8 @@ class OrderService
             }
 
             //Apply all discounts on given reponse if is correct type
+            //Sometimes mutator may return Discountable admin model.
+            //So we need apply discounts to this model
             Cart::addCartDiscountsIntoModel($response);
 
             //If no response has been given, skip this mutator
