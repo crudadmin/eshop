@@ -91,7 +91,7 @@ class Order extends AdminModel
             'Doprava' => Group::fields([
                 Group::fields([
                     'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
-                    'delivery_tax' => 'name:DPH dopravy %|fillBy:delivery.tax|required|hidden|type:select|default:'.Store::getDefaultTax(),
+                    'delivery_tax' => 'name:DPH dopravy %|disabledIf:delivery_manual,0|fillBy:delivery.tax|required|hidden|type:select|default:'.Store::getDefaultTax(),
                     'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
                 ])->inline(),
                 'delivery_price' => 'name:Cena za dopravu|disabledIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
@@ -99,7 +99,7 @@ class Order extends AdminModel
             'Platobná metóda' => Group::fields([
                 Group::fields([
                     'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
-                    'payment_method_tax' => 'name:DPH plat. metody %|fillBy:payment_method.tax|hidden|required|type:select|default:'.Store::getDefaultTax(),
+                    'payment_method_tax' => 'name:DPH plat. metody %|disabledIf:delivery_manual,0|fillBy:payment_method.tax|hidden|required|type:select|default:'.Store::getDefaultTax(),
                     'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
                 ])->inline(),
                 'payment_method_price' => 'name:Cena plat. metódy|disabledIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
