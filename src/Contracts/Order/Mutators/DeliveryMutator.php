@@ -57,11 +57,26 @@ class DeliveryMutator extends Mutator
      */
     public function mutateOrder(Order $order, $delivery)
     {
-        $order->fill([
-            'delivery_tax' => Store::getTaxValueById($delivery->tax_id),
-            'delivery_price' => $delivery->priceWithoutTax,
-            'delivery_id' => $delivery->getKey(),
-        ]);
+        //We can fill order with delivery only if is creating new order.
+        //Or if manual delivery is turned off.
+        if ( $this->canGenerateDelivery($order) ) {
+            $order->fill([
+                'delivery_tax' => Store::getTaxValueById($delivery->tax_id),
+                'delivery_price' => $delivery->priceWithoutTax,
+                'delivery_id' => $delivery->getKey(),
+            ]);
+        }
+    }
+
+    /**
+     * Check if order is in state where we can generate delivery prices automatically...
+     *
+     * @param  Order  $order
+     * @return  bool
+     */
+    private function canGenerateDelivery(Order $order)
+    {
+        return $order->exists == false || $order->delivery_manual == false;
     }
 
     /**
@@ -70,12 +85,24 @@ class DeliveryMutator extends Mutator
      * @param  AdminEshop\Models\Delivery\Delivery|null  $delivery
      * @param  float  $price
      * @param  bool  $withTax
+     * @param  Order  $order
      * @return  void
      */
-    public function mutatePrice($delivery, $price, bool $withTax)
+    public function mutatePrice($delivery, $price, bool $withTax, Order $order)
     {
-        //Add delivery price
-        $price += $delivery->{$withTax ? 'priceWithTax' : 'priceWithoutTax'};
+        //Add delivery price automatically
+        if ( $this->canGenerateDelivery($order) ) {
+            $price += $delivery->{$withTax ? 'priceWithTax' : 'priceWithoutTax'};
+        }
+
+        //Add manually typed delivery price into order price sum
+        else {
+            if ( $withTax ) {
+                $price += Store::addTax($order->delivery_price, $order->delivery_tax);
+            } else {
+                $price += $order->delivery_price;
+            }
+        }
 
         return $price;
     }

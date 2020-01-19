@@ -130,7 +130,18 @@ class Store
 
         $tax = $taxId === null ? $this->getDefaultTax() : $this->getTaxValueById($taxId);
 
-        return Store::roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
+        return $this->addTax($price, $tax);
+    }
+
+    /**
+     * Add given tax value into number
+     *
+     * @param  float  $price
+     * @param  float  $taxValue
+     */
+    public function addTax($price, $tax)
+    {
+        return $this->roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
     }
 
     /*

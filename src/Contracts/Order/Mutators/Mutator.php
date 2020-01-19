@@ -66,7 +66,7 @@ class Mutator
      *
      * @return  void
      */
-    public function mutatePrice($activeResponse, $price, bool $withTax)
+    public function mutatePrice($activeResponse, $price, bool $withTax, Order $order)
     {
         return $price;
     }

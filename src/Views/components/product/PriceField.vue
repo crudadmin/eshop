@@ -1,9 +1,9 @@
 <template>
-    <div class="form-group">
+    <div class="form-group" :class="{ disabled : disabled }">
         <div class="row">
             <div class="col-md-4">
                 <label>{{ field.name }} <span class="required" v-if="required">*</span></label>
-                <input type="number" step=".01" :name="field_key" :value="valueOrDefault" @keyup="onChange" class="form-control">
+                <input type="number" step=".01" :name="field_key" :value="valueOrDefault" @keyup="onChange" class="form-control" :readonly="disabled">
             </div>
             <div class="col-md-4">
                 <label>DPH</label>
@@ -11,7 +11,7 @@
             </div>
             <div class="col-md-4">
                 <label>Cena s DPH</label>
-                <input type="number" step=".01" :value="taxPrice" @keyup="changePrice" @change="recalculateWithoutTaxPrice" class="form-control">
+                <input type="number" step=".01" :value="taxPrice" @keyup="changePrice" @change="recalculateWithoutTaxPrice" class="form-control" :readonly="disabled">
             </div>
         </div>
     </div>
@@ -19,7 +19,7 @@
 
 <script type="text/javascript">
 export default {
-    props : ['field_key', 'field', 'row', 'model', 'required'],
+    props : ['field_key', 'field', 'row', 'model', 'required', 'disabled'],
 
     data(){
         return {

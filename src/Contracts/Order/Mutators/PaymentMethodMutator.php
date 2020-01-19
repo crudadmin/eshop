@@ -58,11 +58,24 @@ class PaymentMethodMutator extends Mutator
      */
     public function mutateOrder(Order $order, $paymentMethod)
     {
-        $order->fill([
-            'payment_method_tax' => Store::getTaxValueById($paymentMethod->tax_id),
-            'payment_method_price' => $paymentMethod->priceWithoutTax,
-            'payment_method_id' => $paymentMethod->getKey(),
-        ]);
+        if ( $this->canGeneratePaymentMethod($order) ) {
+            $order->fill([
+                'payment_method_tax' => Store::getTaxValueById($paymentMethod->tax_id),
+                'payment_method_price' => $paymentMethod->priceWithoutTax,
+                'payment_method_id' => $paymentMethod->getKey(),
+            ]);
+        }
+    }
+
+    /**
+     * Check if order is in state where we can generate paymentMethod prices automatically...
+     *
+     * @param  Order  $order
+     * @return  bool
+     */
+    private function canGeneratePaymentMethod(Order $order)
+    {
+        return $order->exists == false || $order->payment_method_manual == false;
     }
 
     /**
@@ -73,10 +86,18 @@ class PaymentMethodMutator extends Mutator
      * @param  bool  $withTax
      * @return  void
      */
-    public function mutatePrice($paymentMethod, $price, bool $withTax)
+    public function mutatePrice($paymentMethod, $price, bool $withTax, Order $order)
     {
         //Add payment method price
-        $price += $paymentMethod->{$withTax ? 'priceWithTax' : 'priceWithoutTax'};
+        if ( $this->canGeneratePaymentMethod($order) ) {
+            $price += $paymentMethod->{$withTax ? 'priceWithTax' : 'priceWithoutTax'};
+        } else {
+            if ( $withTax ) {
+                $price += Store::addTax($order->payment_method_price, $order->payment_method_tax);
+            } else {
+                $price += $order->payment_method_price;
+            }
+        }
 
         return $price;
     }
