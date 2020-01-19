@@ -2,10 +2,13 @@
 
 namespace AdminEshop\Contracts;
 
-use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Orders\OrdersProduct;
-use Admin\Core\Contracts\DataStore;
 use Admin;
+use AdminEshop\Models\Orders\OrdersProduct;
+use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Store\Country;
+use AdminEshop\Models\Store\Store as StoreModel;
+use AdminEshop\Models\Store\Tax;
+use Admin\Core\Contracts\DataStore;
 use Cart;
 
 class Store
@@ -23,7 +26,7 @@ class Store
     public function getTaxes()
     {
         return $this->cache('taxes', function(){
-            return Admin::getModel('Tax')->get();
+            return (Admin::getModel('Tax') ?: new Tax)->get();
         });
     }
 
@@ -33,7 +36,7 @@ class Store
     public function getCountries()
     {
         return $this->cache('countries', function(){
-            return Admin::getModel('Country')->get();
+            return (Admin::getModel('Country') ?: new Country)->get();
         });
     }
 
@@ -67,7 +70,7 @@ class Store
     public function getSettings()
     {
         return $this->cache('storeSettings', function(){
-            return Admin::getModel('Store')->first();
+            return (Admin::getModel('Store') ?: new StoreModel)->first();
         });
     }
 

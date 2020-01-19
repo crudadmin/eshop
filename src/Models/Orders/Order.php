@@ -91,24 +91,22 @@ class Order extends AdminModel
             'Doprava' => Group::fields([
                 Group::fields([
                     'delivery' => 'name:Doprava|belongsTo:deliveries,name',
-                    'delivery_tax' => 'name:DPH dopravy %|fillBy:delivery.tax|hidden|type:decimal',
+                    'delivery_tax' => 'name:DPH dopravy %|fillBy:delivery.tax|hidden|type:select|default:'.Store::getDefaultTax(),
                 ])->inline(),
                 'delivery_price' => 'name:Cena za dopravu|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
             ])->grid(6)->add('required'),
             'Platobná metóda' => Group::fields([
                 Group::fields([
                     'payment_method' => 'name:Platobná metóda|column_name:Platba|belongsTo:payments_methods,name',
-                    'payment_method_tax' => 'name:DPH plat. metody %|fillBy:payment_method.tax|hidden|type:decimal',
+                    'payment_method_tax' => 'name:DPH plat. metody %|fillBy:payment_method.tax|hidden|type:select|default:'.Store::getDefaultTax(),
                 ])->inline(),
                 'payment_method_price' => 'name:Cena plat. metódy|type:decimal|fillBy:payment_method.price|component:PriceField|hidden',
             ])->grid(6)->add('required'),
             Group::fields([
                 'Cena objednávky' => Group::fields([
-                    Group::fields([
-                        'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                        'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
-                    ]),
-                ])->width(6),
+                    'price' => 'name:Cena bez DPH|disabled|type:decimal',
+                    'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
+                ])->width(6)->inline(),
                 'Zľavy' => Group::fields([
                     'discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|canAdd',
                 ])->width(6),
@@ -142,7 +140,14 @@ class Order extends AdminModel
     {
         $countries = Country::all();
 
+        $taxOptions = Store::getTaxes()->map(function($item){
+            $item->taxValue = $item->tax.'%';
+            return $item;
+        })->pluck('taxValue', 'tax');
+
         return [
+            'delivery_tax' => $taxOptions,
+            'payment_method_tax' => $taxOptions,
             'country_id' => $countries,
             'delivery_country_id' => $countries,
             'delivery_id' => $this->getDeliveries(),

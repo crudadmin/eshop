@@ -72,7 +72,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
             Group::fields([
                 'default_price' => 'name:Pôvodna cena bez DPH|invisible|type:decimal|title:Cena produktu v čase objednania.|disabled',
                 'price' => 'name:Cena/j bez DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
-                'tax' => 'name:DPH %|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
+                'tax' => 'name:DPH %|type:select|default:'.Store::getDefaultTax().'|required_if:manual_price,1|disabledIf:manual_price,0',
                 'price_tax' => 'name:Cena/j s DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
                 'manual_price' => 'name:Manuálna cena|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
             ])->inline()
@@ -84,6 +84,10 @@ class OrdersItem extends AdminModel implements UsesIdentifier
     public function options()
     {
         return [
+            'tax' => Store::getTaxes()->map(function($item){
+                $item->taxValue = $item->tax.'%';
+                return $item;
+            })->pluck('taxValue', 'tax'),
             'product_id' => $this->getAvailableProducts(),
             'variant_id' => $this->getAvailableVariants(),
         ];
