@@ -62,18 +62,18 @@ class OrdersItem extends AdminModel implements UsesIdentifier
         return [
             Group::half([
                 'identifier' => 'name:Cart identifier|invisible|index',
-                'product' => 'name:Produkt|belongsTo:products,name|limit:50|max:90',
+                'product' => 'name:Produkt|belongsTo:products,name|required_without:manual_price|limit:50|max:90',
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
             ]),
             Group::half([
                 'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|required_with_values|hidden',
-                'variant_text' => 'name:Popis varianty',
+                'variant_text' => 'name:Popis položky|tooltip:Slúži pre položky bez priradeného produktu',
             ]),
             Group::fields([
-                'default_price' => 'name:Pôvodna cena bez DPH|hidden|type:decimal|title:Cena produktu v čase objednania.|disabled',
-                'price' => 'name:Cena/j bez DPH|type:decimal|disabledIf:manual_price,0',
-                'tax' => 'name:DPH %|type:decimal|disabledIf:manual_price,0',
-                'price_tax' => 'name:Cena/j s DPH|type:decimal|disabledIf:manual_price,0',
+                'default_price' => 'name:Pôvodna cena bez DPH|invisible|type:decimal|title:Cena produktu v čase objednania.|disabled',
+                'price' => 'name:Cena/j bez DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
+                'tax' => 'name:DPH %|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
+                'price_tax' => 'name:Cena/j s DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
                 'manual_price' => 'name:Manuálna cena|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
             ])->inline()
         ];
@@ -90,8 +90,44 @@ class OrdersItem extends AdminModel implements UsesIdentifier
     }
 
     protected $layouts = [
-        'form-top' => 'setOrderItemPrices',
+        'form-top' => [
+            'recalculateTaxPrices',
+            'setPricesFromProduct'
+        ],
     ];
+
+    protected $rules = [
+        BindDefaultPrice::class,
+        BindIdentifierName::class,
+        AddMissingPrices::class,
+        ReloadProductQuantity::class,
+        RebuildOrderOnItemChange::class, //We need reload order prices after quantity check
+    ];
+
+    public function settings()
+    {
+        return [
+            'increments' => false,
+            'title.insert' => 'Nová položka',
+            'title.update' => 'Upravujete položku v objednávke',
+            'grid.default' => 'full',
+            'grid.disabled' => true,
+            'columns.total' => [
+                'title' => 'Cena spolu',
+                'after' => 'price_tax',
+            ],
+
+            //Add currency after columns
+            'columns.price_tax.add_after' => ' '.Store::getCurrency(),
+        ];
+    }
+
+    public function setAdminAttributes($attributes)
+    {
+        $attributes['total'] = Store::priceFormat($this->price_tax * $this->quantity);
+
+        return $attributes;
+    }
 
     /*
      * Skip variants non orderable variants
@@ -127,39 +163,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier
                     return $item;
                 });
     }
-
-    public function settings()
-    {
-        return [
-            'increments' => false,
-            'title.insert' => 'Nová položka',
-            'title.update' => 'Upravujete položku v objednávke',
-            'grid.default' => 'full',
-            'grid.disabled' => true,
-            'columns.total' => [
-                'title' => 'Cena spolu',
-                'after' => 'price_tax',
-            ],
-
-            //Add currency after columns
-            'columns.price_tax.add_after' => ' '.Store::getCurrency(),
-        ];
-    }
-
-    public function setAdminAttributes($attributes)
-    {
-        $attributes['total'] = Store::priceFormat($this->price_tax * $this->quantity);
-
-        return $attributes;
-    }
-
-    protected $rules = [
-        BindDefaultPrice::class,
-        BindIdentifierName::class,
-        AddMissingPrices::class,
-        ReloadProductQuantity::class,
-        RebuildOrderOnItemChange::class, //We need reload order prices after quantity check
-    ];
 
     /*
      * Get product/attribute relationship
