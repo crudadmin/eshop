@@ -122,7 +122,7 @@ class Product extends AdminModel implements CanBeInCart
     ];
 
     /*
-     * This items will be selected frm db for cart items
+     * This items will be selected from db for cart items
      */
     protected $cartSelect = [
         'id', 'slug', 'name', 'price', 'tax_id', 'code', 'warehouse_quantity', 'warehouse_type', 'warehouse_sold',
@@ -132,6 +132,11 @@ class Product extends AdminModel implements CanBeInCart
     public function scopeNonVariantProducts($query)
     {
         $query->whereIn('product_type', Store::nonVariantsProductTypes());
+    }
+
+    public function scopeOrderableProducts($query)
+    {
+        $query->whereIn('product_type', Store::orderableProductTypes());
     }
 
     /**
