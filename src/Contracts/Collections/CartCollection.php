@@ -134,14 +134,16 @@ class CartCollection extends Collection
     /**
      * Get all available cart summary prices
      *
+     * @var  array $discounts
+     *
      * @return array
      */
-    public function getDefaultSummary()
+    public function getDefaultSummary($discounts)
     {
         $sum = [];
 
         foreach ($this as $item) {
-            $array = $item->getPricesArray();
+            $array = $item->getPricesArray($discounts);
 
             foreach ($array as $key => $value) {
                 if ( !array_key_exists($key, $sum) ) {
@@ -188,7 +190,7 @@ class CartCollection extends Collection
             $discounts = Discounts::getDiscounts();
         }
 
-        $sum = $this->getDefaultSummary();
+        $sum = $this->getDefaultSummary($discounts);
 
         foreach ($sum as $key => $value) {
             //Check if we can apply sum modifications into this key

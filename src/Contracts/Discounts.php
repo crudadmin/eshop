@@ -95,9 +95,13 @@ class Discounts
 
         //Returns only active discounts
         return array_values(array_filter($discounts, function($discount) use ($exceps) {
-            return $this->cache('discounts.'.$discount->getKey(), function() use ($discount, $exceps) {
+            if ( in_array($discount->getKey(), $exceps) ) {
+                return false;
+            }
+
+            return $this->cache('discounts.'.$discount->getKey(), function() use ($discount) {
                 //If is in except mode
-                if ( !($response = $this->isActiveDiscount($exceps, $discount)) ) {
+                if ( !($response = $this->isActiveDiscount($discount)) ) {
                     return false;
                 }
 
@@ -111,14 +115,8 @@ class Discounts
         }));
     }
 
-    private function isActiveDiscount($exceps, $discount)
+    private function isActiveDiscount($discount)
     {
-        //
-
-        if ( in_array($discount->getKey(), $exceps) ) {
-            return $this->cacheDiscountState($discount, false);
-        }
-
         //If is not active in backend/administration
         if ( $order = $this->getOrder() ) {
             //Set order into every discount

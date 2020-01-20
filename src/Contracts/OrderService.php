@@ -9,6 +9,7 @@ use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
+use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
@@ -91,7 +92,8 @@ class OrderService
     {
         //We need register order into discounts factory
         //because we want apply discounts on this order
-        //in administraiton
+        //in administraiton. Order object must not be available
+        //on frontend in discounts!
         if ( Admin::isAdmin() ) {
             Discounts::setOrder($order);
         }
@@ -150,7 +152,7 @@ class OrderService
     {
         foreach ($this->getActiveMutators() as $mutator) {
             if ( method_exists($mutator, 'mutatePrice') ) {
-                $price = $mutator->mutatePrice($mutator->getActiveResponse(), $price, $withTax, $this->getOrder());
+                $price = $mutator->mutatePrice($mutator->getActiveResponse(), $price, $withTax, $this->getOrder() ?: new Order);
             }
         }
 

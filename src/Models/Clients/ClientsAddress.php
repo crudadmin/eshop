@@ -23,6 +23,8 @@ class ClientsAddress extends AdminModel
 
     protected $belongsToModel = Client::class;
 
+    protected $hidden = ['created_at', 'deleted_at', 'published_at', '_order'];
+
     /*
      * Automatic form and database generation
      * @name - field name

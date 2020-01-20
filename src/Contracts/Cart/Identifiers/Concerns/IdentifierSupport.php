@@ -63,15 +63,17 @@ trait IdentifierSupport
     /**
      * Returns array of available prices in cartItem
      *
+     * @var  array $discounts
+     *
      * @return  array
      */
-    public function getPricesArray()
+    public function getPricesArray($discounts = null)
     {
         $array = [];
 
         //Add all attributes from model which consits of price name in key
         if ( $model = $this->getItemModel() ) {
-            foreach ($model->toCartArray() as $key => $price) {
+            foreach ($model->toCartArray($discounts) as $key => $price) {
                 //If does not have price in attribute name
                 if ( strpos(strtolower($key), 'price') === false ) {
                     continue;

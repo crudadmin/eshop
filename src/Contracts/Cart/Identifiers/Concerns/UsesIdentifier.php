@@ -16,7 +16,7 @@ interface UsesIdentifier
      *
      * @return  array
      */
-    public function getPricesArray();
+    public function getPricesArray($discounts = null);
 
     /**
      * Returns original object

@@ -40,6 +40,13 @@ trait PriceMutator
     protected $rewritedDefaultPrice;
 
     /**
+     * Discounts array when model is going to array with toArray()
+     *
+     * @var  null
+     */
+    protected $toCartArrayDiscounts = null;
+
+    /**
      * All available price levels
      *
      * @var  array
@@ -191,7 +198,7 @@ trait PriceMutator
      */
     public function getPriceWithoutTaxAttribute()
     {
-        $price = $this->applyDiscounts($this->defaultPriceWithoutTax);
+        $price = $this->applyDiscounts($this->defaultPriceWithoutTax, $this->toCartArrayDiscounts);
 
         return Store::roundNumber($price);
     }
@@ -276,11 +283,15 @@ trait PriceMutator
     /**
      * Add all required price attributes for cart item array
      *
+     * @var  array $discounts
+     *
      * @return  array
      */
-    public function toCartArray()
+    public function toCartArray($discounts = null)
     {
         $this->append($this->getPriceAttributes());
+
+        $this->toCartArrayDiscounts = $discounts;
 
         return $this->toArray();
     }

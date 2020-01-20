@@ -33,7 +33,10 @@ class Client extends Authenticatable
     {
         return [
             'Osobné údaje' => Group::fields([
-                'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
+                Group::fields([
+                    'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
+                    'photo' => 'name:Fotografia|type:file|image',
+                ])->inline(),
                 'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                 'username' => 'name:Meno a priezvisko',
                 'phone' => 'name:Telefon',

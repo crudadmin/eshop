@@ -91,7 +91,7 @@ class ClientDataMutator extends Mutator
      */
     public function getClientData()
     {
-        return session($this->sessionKey, []);
+        return session($this->sessionKey, null);
     }
 
     /**
