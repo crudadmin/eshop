@@ -68,11 +68,6 @@ class ConfigServiceProvider extends ServiceProvider
     {
         $config = $this->app['config']->get($key, []);
 
-        //Update default theme
-        if ( $config['theme'] == 'default' ) {
-            $config['theme'] = 'admineshop';
-        }
-
         //Add themes from admineshop
         $config['paths'] = array_merge($config['paths'], [
             __DIR__ . '/../Views/mail/',

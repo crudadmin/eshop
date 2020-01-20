@@ -9,11 +9,13 @@ use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
+use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
 use Store;
+use Mail;
 
 class OrderService
 {
@@ -192,6 +194,36 @@ class OrderService
         $this->fireMutators();
 
         return $order;
+    }
+
+    /**
+     * Send email to client
+     *
+     * @return  void
+     */
+    public function sentClientEmail()
+    {
+        $order = $this->getOrder();
+
+        $message = sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne prijatá.'), $order->number, $order->created_at->format('d.m.Y'));
+
+        Mail::to($order->email)->send(new OrderReceived($order, $message));
+    }
+
+    /**
+     * Send email into store
+     *
+     * @return  void
+     */
+    public function sentStoreEmail()
+    {
+        if ( $email = Store::getSettings()->email ) {
+            $order = $this->getOrder();
+
+            $message = sprintf(_('Gratulujeme! Obržali ste objednávku č. %s.'), $order->number);
+
+            Mail::to($email)->send(new OrderReceived($order, $message));
+        }
     }
 
     /**

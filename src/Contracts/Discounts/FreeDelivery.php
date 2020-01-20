@@ -24,6 +24,16 @@ class FreeDelivery extends Discount implements Discountable
      */
     public $canApplyOutsideCart = false;
 
+    /**
+     * Can be this discount shown in email?
+     *
+     * @return  bool
+     */
+    public function canShowInEmail()
+    {
+        return false;
+    }
+
     /*
      * Discount name
      */

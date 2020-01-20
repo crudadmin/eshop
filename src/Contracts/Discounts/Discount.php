@@ -351,6 +351,16 @@ class Discount implements Discountable
     }
 
     /**
+     * Can be this discount shown in email?
+     *
+     * @return  bool
+     */
+    public function canShowInEmail()
+    {
+        return true;
+    }
+
+    /**
      * Convert to array
      *
      * @return  array

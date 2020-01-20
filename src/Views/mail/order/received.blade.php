@@ -1,18 +1,25 @@
 @component('mail::message')
-# {{ _('Dobrý den') }},
+# {{ _('Dobrý deň') }},
 
-{{ sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne přijatá.'), $order->number, $order->created_at->format('d.m.Y')) }}
+@if ( isset($message) )
+{{ $message }}
+@endif
 
 ## {{ _('Objednaný tovar') }}
 @component('mail::table')
 | {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ _('Cena bez dph') }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
-@foreach( Cart::all() as $item )
-| {{ $item->product->name }} @if ( $item->product->variant )<small> @foreach($item->product->variant->attributes as $attribute) {{ $attribute->attribute->name }}: {{ $attribute->item->name.$attribute->attribute->unit }}@if(!$loop->last),@endif @endforeach </small> @endif| {{ $item->quantity }} | {{ Cart::priceWithoutTax($item->product->priceWithoutTax * $item->quantity) }} | {{ Cart::price($item->product->priceWithTax * $item->quantity) }} |
+@foreach( $items as $item )
+| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ Store::priceFormat($item->getItemModel()->priceWithoutTax * $item->quantity) }} | {{ Store::priceFormat($item->getItemModel()->priceWithTax * $item->quantity) }} |
 @endforeach
-| {{ $delivery->name }} | - | {{ Cart::priceWithoutTax($delivery->priceWithoutTax) }} | {{ Cart::price($delivery->priceWithTax) }} |
-| {{ $payment_method->name }} | - | {{ Cart::priceWithoutTax($payment_method->priceWithoutTax) }} | {{ Cart::price($payment_method->priceWithTax) }} |
-| <strong><small>{{ _('Cena celkem') }}:</small></strong> | | {{ Cart::getTotalBalance(true, false) . ' ' . Cart::getCurrency() }} | {{ Cart::getTotalBalance() . ' ' . Cart::getCurrency() }} |
+| {{ $delivery->name }} | - | {{ Store::priceFormat($order->delivery_price) }} | {{ Store::priceFormat($order->delivery_price_tax) }} |
+| {{ $payment_method->name }} | - | {{ Store::priceFormat($order->payment_method_price) }} | {{ Store::priceFormat($order->payment_method_price_tax) }} |
+@foreach($discounts as $discount)
+@if ( $discount->message && $discount->canShowInEmail() )
+| {{ $discount->getName() }} | - |  | {{ is_array($discount->message) ? $discount->message['withTax'] : $discount->message }} |
+@endif
+@endforeach
+| <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ Store::priceFormat($summary['priceWithoutTax']) }} | {{ Store::priceFormat($summary['priceWithTax']) }} |
 @endcomponent
 
 @component('mail::panel')
@@ -25,9 +32,9 @@
 @endcomponent
 
 @component('mail::panel')
-| {{ _('Fakturačná adresa') }} |
+| {{ $order->delivery_different ? _('Fakturačná adresa') : _('Fakturačná a dodacia adresa') }} |
 | :------------- | ----------:|
-@if ( $order->isCompany() )
+@if ( $order->is_company )
 | {{ _('Firma') }} | {{ $order->company_name }} |
 | {{ _('IČ') }} | {{ $order->company_id }} |
 | {{ _('DIČ') }} | {{ $order->company_tax_id }} |
@@ -38,22 +45,21 @@
 | {{ _('Ulica') }} : | {{ $order->street }} |
 | {{ _('Mesto') }} : | {{ $order->city }} |
 | {{ _('PSČ') }} : | {{ $order->zipcode }} |
-| {{ _('Krajina') }} : | {{ $order->country->name }} |
+| {{ _('Krajina') }} : | {{ $order->country ? $order->country->name : '' }} |
 @endcomponent
 
+@if ( $order->delivery_different )
 @component('mail::panel')
 | {{ _('Dodacia adresa') }} |
 | :------------- | ----------:|
-@if ( $order->delivery_company_name )
-| {{ _('Firma') }}: | {{ $order->delivery_company_name }} |
-@endif
-| {{ _('Meno a priezvisko') }}: | {{ $order->delivery_username }} |
+| {{ _('Meno a priezvisko / Firma') }}: | {{ $order->delivery_username }} |
 | {{ _('Telefón') }} : | {{ $order->delivery_phone }} |
 | {{ _('Ulica') }} : | {{ $order->delivery_street }} |
 | {{ _('Mesto') }} : | {{ $order->delivery_city }} |
 | {{ _('PSČ') }} : | {{ $order->delivery_zipcode }} |
-| {{ _('Krajina') }} : | {{ $order->delivery_country->name }} |
+| {{ _('Krajina') }} : | {{ $order->delivery_country ? $order->delivery_country->name : '' }} |
 @endcomponent
+@endif
 
 @if ( $order->note )
 @component('mail::panel')
