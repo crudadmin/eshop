@@ -79,8 +79,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier
         ];
     }
 
-    protected $inMenu = true;
-
     public function options()
     {
         return [
