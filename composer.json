@@ -1,5 +1,5 @@
 {
-    "name": "marekgogol/eshop",
+    "name": "crudadmin/eshop",
     "type": "library",
     "description": "Laravel Eshop package for administration based on crudadmin system",
     "keywords": ["eshop", "admin", "laravel"],
