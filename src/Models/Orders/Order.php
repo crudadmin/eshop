@@ -85,8 +85,7 @@ class Order extends AdminModel
                 Group::fields([
                     'note' => 'name:Poznámka|type:text|hidden',
                     'internal_note' => 'name:Interná poznámka|type:text|hidden',
-                ])->inline(),
-                'status' => 'name:Stav objednávky|column_name:Stav|type:select|required|default:new',
+                ])->inline()
             ]),
             'Doprava' => Group::fields([
                 Group::fields([
@@ -106,9 +105,15 @@ class Order extends AdminModel
             ])->grid(6),
             Group::fields([
                 'Cena objednávky' => Group::fields([
-                    'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                    'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
-                ])->width(6)->inline(),
+                    Group::fields([
+                        'status' => 'name:Stav objednávky|column_name:Stav|type:select|required|default:new',
+                        'paid_at' => 'name:Zaplatené dňa|type:datetime',
+                    ])->inline(),
+                    Group::fields([
+                        'price' => 'name:Cena bez DPH|disabled|type:decimal',
+                        'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
+                    ])->inline(),
+                ])->width(6),
                 'Zľavy' => Group::fields([
                     'discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|canAdd',
                 ])->width(6),
@@ -158,8 +163,6 @@ class Order extends AdminModel
                 'new' => 'Prijatá',
                 'waiting' => 'Čaká za spracovaním',
                 'delivery' => 'Doručuje sa',
-                'payment-waiting' => 'Čaká na zaplatenie',
-                'paid' => 'Zaplatená',
                 'ok' => 'Vybavená',
                 'canceled' => 'Zrušená',
             ],

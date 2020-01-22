@@ -192,8 +192,16 @@ class OrderService
         $this->addOrderPrices($items);
         $this->addDiscountsData($items);
         $this->fireMutators();
+        $this->addClientIntoOrder();
 
         return $order;
+    }
+
+    private function addClientIntoOrder()
+    {
+        if ( client() ) {
+            $this->getOrder()->client_id = client()->getKey();
+        }
     }
 
     /**

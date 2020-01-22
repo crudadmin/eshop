@@ -139,6 +139,11 @@ class Product extends AdminModel implements CanBeInCart
         $query->whereIn('product_type', Store::orderableProductTypes());
     }
 
+    public function scopeNonOrderableProducts($query)
+    {
+        $query->whereNotIn('product_type', Store::orderableProductTypes());
+    }
+
     /**
      * Check if product is given type
      *
