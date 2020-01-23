@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
+use AdminEshop\Models\Products\ProductsVariant;
 
 class ProductsIdentifier extends Identifier
 {
@@ -79,7 +80,7 @@ class ProductsIdentifier extends Identifier
     public function hasQuantityOnStock($item)
     {
         //If item product is not present
-        if ( ! ($model = $item->getItemModel()) ) {
+        if ( ! ($model = $item->getItemModel('product')) ) {
             return true;
         }
 
@@ -89,7 +90,7 @@ class ProductsIdentifier extends Identifier
         }
 
         //Check if quantity in cart is lower that quantity on stock
-        return $item->quantity <= $model->warehouse_quantity;
+        return $item->quantity <= $item->getItemModel()->warehouse_quantity;
     }
 
     /**

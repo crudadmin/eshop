@@ -181,6 +181,17 @@ class Identifier
             return $item->{$key};
         }
     }
+
+    /**
+     * Add joins when fetching row from db...
+     *
+     * @param  Builder  $query
+     * @return  Builder
+     */
+    public function onFetchItems($query)
+    {
+        return $query;
+    }
 }
 
 ?>

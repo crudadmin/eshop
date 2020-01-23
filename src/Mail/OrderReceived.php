@@ -3,12 +3,13 @@
 namespace AdminEshop\Mail;
 
 use AdminEshop\Models\Orders\Order;
+use App\Model\Invoice\Invoice;
+use Cart;
+use Discounts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Cart;
-use Discounts;
 
 class OrderReceived extends Mailable
 {
@@ -27,11 +28,13 @@ class OrderReceived extends Mailable
      *
      * @return void
      */
-    public function __construct(Order $order, $message = null)
+    public function __construct(Order $order, $message = null, Invoice $invoice = null)
     {
         $this->order = $order;
 
         $this->message = $message;
+
+        $this->invoice = $invoice;
 
         $this->cartItems = Cart::all();
 
@@ -59,9 +62,11 @@ class OrderReceived extends Mailable
                     ->subject(_('Objednávka č. ') . $this->order->number);
 
         //Attach order pdf
-        // $mail->attach($this->order->pdf->path, [
-        //     'as' => 'objednavka-'.$this->order->number.'.pdf',
-        // ]);
+        if ( $invoice = $this->invoice ) {
+            $mail->attach($invoice->getPdf()->path, [
+                'as' => 'objednavka-'.$invoice->number.'.pdf',
+            ]);
+        }
 
         return $mail;
 

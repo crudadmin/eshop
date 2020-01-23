@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts;
 
 use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
+use AdminEshop\Contracts\Order\Concerns\HasPayments;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
@@ -14,13 +15,14 @@ use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
-use Store;
 use Mail;
+use Store;
 
 class OrderService
 {
     use DataStore,
         HasRequest,
+        HasPayments,
         HasValidation;
 
     /**
@@ -215,7 +217,9 @@ class OrderService
 
         $message = sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne prijatá.'), $order->number, $order->created_at->format('d.m.Y'));
 
-        Mail::to($order->email)->send(new OrderReceived($order, $message));
+        $invoice = $order->makeInvoice('proform');
+
+        Mail::to($order->email)->send(new OrderReceived($order, $message, $invoice));
     }
 
     /**

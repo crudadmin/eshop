@@ -38,11 +38,20 @@ trait IdentifierSupport
     /**
      * Get eloquent of cart item by assigned identifier
      *
+     * @var string $type
+     *
+     * @return  mixed
      */
-    public function getItemModel()
+    public function getItemModel($type = null)
     {
         $identifier = $this->getIdentifierClass();
 
+        //Return given type
+        if ( $type ) {
+            return @$this->itemModels[$type];
+        }
+
+        //Return default
         return $identifier->getItemModel($this, $this->itemModels);
     }
 

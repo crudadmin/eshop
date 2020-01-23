@@ -10,5 +10,7 @@ Route::group([ 'namespace' => 'AdminEshop\Controllers', 'middleware' => 'web' ],
     Route::post('/cart/removeDiscountCode', 'Cart\CartController@removeDiscountCode')->name('cart::removeDiscountCode');
     Route::post('/cart/setDelivery', 'Cart\CartController@setDelivery')->name('cart::setDelivery');
     Route::post('/cart/setPaymentMethod', 'Cart\CartController@setPaymentMethod')->name('cart::setPaymentMethod');
+
+    Route::get('/api/payments/gopay/{payment}/{type}/{hash}', 'Payments\GopayController@paymentStatus');
 });
 ?>

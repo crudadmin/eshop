@@ -178,7 +178,9 @@ trait CartTrait
                         $model = $options['scope']($model);
                     }
 
-                    $fetchedModels = $model->whereIn($model->getModel()->fixAmbiguousColumn('id'), $missingIdsToFetch)->get();
+                    $query = $model->whereIn($model->getModel()->fixAmbiguousColumn('id'), $missingIdsToFetch);
+
+                    $fetchedModels = $identifier->onFetchItems($query)->get();
 
                     $this->addFetchedModels($options['table'], $fetchedModels);
                 }

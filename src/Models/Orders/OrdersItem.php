@@ -215,4 +215,9 @@ class OrdersItem extends AdminModel implements UsesIdentifier
         //But if price is calculated dynamically, we need use default price
         return Store::roundNumber($this->default_price);
     }
+
+    public function getProductNameAttribute()
+    {
+        return $this->product->name.($this->variant ? ' - '.$this->variant->name : '');
+    }
 }
