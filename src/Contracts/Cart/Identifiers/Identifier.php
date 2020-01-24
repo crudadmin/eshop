@@ -86,6 +86,16 @@ class Identifier
     }
 
     /**
+     * Can be this sum skipped in summary?
+     *
+     * @return  bool
+     */
+    public function skipInSummary()
+    {
+        return false;
+    }
+
+    /**
      * Return identifier value
      *
      * @param  string  $key

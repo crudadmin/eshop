@@ -127,6 +127,7 @@ class Order extends AdminModel
         return [
             'autoreset' => false,
             'title.insert' => 'Nová objednávka',
+            'buttons.insert' => 'Vytvoriť novú objednávku',
             'title.update' => 'Objednávka č. :id - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',

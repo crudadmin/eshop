@@ -141,9 +141,34 @@ class OrderService
             ]);
         }
 
+        //Add all order items into order
+        $this->addDiscountableItemsIntoOrder();
+
         $this->order->syncWarehouse('-', 'order.new');
 
         return $this;
+    }
+
+    public function addDiscountableItemsIntoOrder()
+    {
+        $discounts = Discounts::getDiscounts();
+
+        $order = $this->getOrder();
+
+        foreach ($discounts as $discount) {
+            if ( ! $discount->hasSumPriceOperator() ) {
+                continue;
+            }
+
+            $order->items()->create([
+                'identifier' => 'discount',
+                'name' => $discount->getName() ?: _('Zľava'),
+                'quantity' => 1,
+                'price' => $discount->value * ($discount->operator == '-' ? -1 : 1),
+                'tax' => Store::getDefaultTax(),
+                'price_tax' => Store::priceWithTax($discount->value) * ($discount->operator == '-' ? -1 : 1),
+            ]);
+        }
     }
 
     /**

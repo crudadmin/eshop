@@ -80,6 +80,11 @@ trait IdentifierSupport
     {
         $array = [];
 
+        //This prices wont be added into summary
+        if ( $this->getIdentifierClass()->skipInSummary() === true ) {
+            return [];
+        }
+
         //Add all attributes from model which consits of price name in key
         if ( $model = $this->getItemModel() ) {
             foreach ($model->toCartArray($discounts) as $key => $price) {

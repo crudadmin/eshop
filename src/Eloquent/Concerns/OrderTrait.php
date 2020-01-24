@@ -39,6 +39,10 @@ trait OrderTrait
         $this->save();
 
         $this->syncOrderItemsWithCartDiscounts($items, $mutatingItem);
+
+        //Remove and add again all discounts
+        $this->items()->where('identifier', 'discount')->delete();
+        OrderService::addDiscountableItemsIntoOrder();
     }
 
     public function syncOrderItemsWithCartDiscounts($items, OrdersItem $mutatingItem = null)

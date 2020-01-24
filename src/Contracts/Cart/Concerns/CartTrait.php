@@ -4,8 +4,9 @@ namespace AdminEshop\Contracts\Cart\Concerns;
 
 use Admin;
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\DiscountIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use Admin\Eloquent\AdminModel;
 use Discounts;
@@ -36,6 +37,7 @@ trait CartTrait
     private $cartIdentifiers = [
         ProductsIdentifier::class,
         DefaultIdentifier::class,
+        DiscountIdentifier::class,
     ];
 
     /**

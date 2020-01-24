@@ -17,16 +17,6 @@ class DefaultIdentifier extends Identifier
     }
 
     /**
-     * Keys in array are assigned to eloquents tables
-     *
-     * @return  array
-     */
-    public static function getIdentifyKeys()
-    {
-        return [];
-    }
-
-    /**
      * Get model by given cart type
      * If this method returns false instead of null
      * item without model will be valid and

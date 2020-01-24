@@ -62,12 +62,12 @@ class OrdersItem extends AdminModel implements UsesIdentifier
         return [
             Group::half([
                 'identifier' => 'name:Cart identifier|invisible|index',
-                'product' => 'name:Produkt|belongsTo:products,name|required_without:manual_price|limit:50|max:90',
+                'product' => 'name:Produkt|belongsTo:products,name|required_without:manual_price|disabledIf:identifier,discount|limit:50|hidden',
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
             ]),
             Group::half([
-                'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|required_with_values',
-                'variant_text' => 'name:Popis položky|tooltip:Slúži pre položky bez priradeného produktu',
+                'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|hidden|required_with_values',
+                'name' => 'name:Popis položky|tooltip:Slúži pre položky bez priradeného produktu|hidden',
             ]),
             Group::fields([
                 'default_price' => 'name:Pôvodna cena bez DPH|invisible|type:decimal|title:Cena produktu v čase objednania.|disabled',
@@ -110,11 +110,14 @@ class OrdersItem extends AdminModel implements UsesIdentifier
     {
         return [
             'increments' => false,
-            'title.insert' => 'Nová položka',
+            'buttons.insert' => 'Nová položka do objednávky',
+            'title.insert' => 'Pridajte položku do objednávky',
             'title.update' => 'Upravujete položku v objednávke',
             'grid.default' => 'full',
             'grid.disabled' => true,
-            'columns.quantity.after' => 'variant_text',
+            'columns.product_name.name' => 'Položka',
+            'columns.product_name.before' => 'quantity',
+            'columns.quantity.after' => 'name',
             'columns.total' => [
                 'title' => 'Cena spolu',
                 'after' => 'price_tax',
@@ -122,12 +125,15 @@ class OrdersItem extends AdminModel implements UsesIdentifier
 
             //Add currency after columns
             'columns.price_tax.add_after' => ' '.Store::getCurrency(),
+            'reloadOnUpdate' => true,
+            'refresh_interval' => 5000,
         ];
     }
 
     public function setAdminAttributes($attributes)
     {
         $attributes['total'] = Store::priceFormat($this->price_tax * $this->quantity);
+        $attributes['product_name'] = $this->productName;
 
         return $attributes;
     }
@@ -219,6 +225,12 @@ class OrdersItem extends AdminModel implements UsesIdentifier
 
     public function getProductNameAttribute()
     {
-        return $this->product->name.($this->variant ? ' - '.$this->variant->name : '');
+        $items = [
+            $this->product ? $this->product->name : null,
+            $this->variant ? $this->variant->name : null,
+            $this->getValue('name') ? $this->getValue('name') : null,
+        ];
+
+        return implode(' - ', array_filter($items));
     }
 }
