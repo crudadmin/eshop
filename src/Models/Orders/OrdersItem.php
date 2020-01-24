@@ -66,7 +66,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
             ]),
             Group::half([
-                'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|required_with_values|hidden',
+                'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|required_with_values',
                 'variant_text' => 'name:Popis položky|tooltip:Slúži pre položky bez priradeného produktu',
             ]),
             Group::fields([
@@ -114,6 +114,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
             'title.update' => 'Upravujete položku v objednávke',
             'grid.default' => 'full',
             'grid.disabled' => true,
+            'columns.quantity.after' => 'variant_text',
             'columns.total' => [
                 'title' => 'Cena spolu',
                 'after' => 'price_tax',

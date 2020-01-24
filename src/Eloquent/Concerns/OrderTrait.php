@@ -135,7 +135,7 @@ trait OrderTrait
             'country' => 'sk',
         ]);
 
-        //If order has proform
+        //If is creating invoice, and order has proform
         if (
             $type == 'invoice'
             && $proform = $this->invoices()->where('type', 'proform')->select(['id'])->first()
@@ -149,8 +149,19 @@ trait OrderTrait
                 unset($data[$column]);
         }
 
-        $invoice = invoice()->make($type, $data);
-        $invoice->save();
+        //If invoice exists, regenerate it.
+        if ( $invoice = $this->invoices()->where('type', $type)->first() ){
+            //Delete invoice items for invoice regeneration
+            $invoice->items()->forceDelete();
+
+            $invoice->update($data);
+        }
+
+        //If invoice does not exists
+        else {
+            $invoice = invoice()->make($type, $data);
+            $invoice->save();
+        }
 
         $this->addMissingInvoiceOrderItems([], $invoice);
 

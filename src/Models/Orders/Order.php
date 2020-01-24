@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Orders;
 
+use AdminEshop\Admin\Buttons\GenerateInvoice;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
@@ -139,6 +140,10 @@ class Order extends AdminModel
         ];
     }
 
+    protected $buttons = [
+        GenerateInvoice::class,
+    ];
+
     protected $rules = [
         RebuildOrder::class,
     ];
@@ -162,7 +167,7 @@ class Order extends AdminModel
             'status' => [
                 'new' => 'Prijatá',
                 'waiting' => 'Čaká za spracovaním',
-                'delivery' => 'Doručuje sa',
+                'shipped' => 'Doručuje sa',
                 'ok' => 'Vybavená',
                 'canceled' => 'Zrušená',
             ],
