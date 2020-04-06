@@ -23,7 +23,7 @@
 @endcomponent
 
 @component('mail::panel')
-| {{ _('Informácie o objednávke') }} |
+| {{ _('Informácie o objednávke') }} | |
 | :------------- | ----------:|
 | {{ _('Spôsob platby') }}: | {{ $payment_method->name }} |
 | {{ _('Doprava') }}: | {{ $delivery->name }} |
@@ -32,7 +32,7 @@
 @endcomponent
 
 @component('mail::panel')
-| {{ $order->delivery_different ? _('Fakturačná adresa') : _('Fakturačná a dodacia adresa') }} |
+| {{ $order->delivery_different ? _('Fakturačná adresa') : _('Fakturačná a dodacia adresa') }} | |
 | :------------- | ----------:|
 @if ( $order->is_company )
 | {{ _('Firma') }} | {{ $order->company_name }} |
@@ -50,7 +50,7 @@
 
 @if ( $order->delivery_different )
 @component('mail::panel')
-| {{ _('Dodacia adresa') }} |
+| {{ _('Dodacia adresa') }} | |
 | :------------- | ----------:|
 | {{ _('Meno a priezvisko / Firma') }}: | {{ $order->delivery_username }} |
 | {{ _('Telefón') }} : | {{ $order->delivery_phone }} |
