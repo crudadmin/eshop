@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Admin\Buttons;
 
+use OrderService;
 use Admin\Eloquent\AdminModel;
 use Admin\Helpers\Button;
 use Invoice;
@@ -21,6 +22,9 @@ class GenerateInvoice extends Button
 
         //Button Icon
         $this->icon = 'fa-file-pdf-o';
+
+        //Allow button only when invoices are created
+        $this->active = OrderService::hasInvoices();
     }
 
     /*

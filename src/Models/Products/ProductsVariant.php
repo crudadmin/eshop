@@ -83,11 +83,11 @@ class ProductsVariant extends AdminModel implements CanBeInCart
                 'Cena' => Group::fields([
                     'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|required|canAdd|hidden',
                     'price' => 'name:Cena bez DPH|type:decimal|default:0|component:PriceField|positivePriceIfRequired:variants|required_unless:product_type,'.implode(',', Store::orderableProductTypes()),
-                ])->width(8),
+                ])->width(8)->id('price'),
                 'Zľava' => Group::fields([
                     'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
                     'discount' => 'name:Výška zľavy|type:decimal|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
-                ])->width(4),
+                ])->width(4)->id('discount'),
             ])->icon('fa-money'),
             'Sklad' => Group::tab([
                 'warehouse_quantity' => 'name:Počet na sklade|type:integer|default:0',

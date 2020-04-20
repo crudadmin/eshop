@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Gogol\Invoices\Model\Invoice;
 
 class OrderPaid extends Notification
 {
@@ -19,7 +20,7 @@ class OrderPaid extends Notification
      *
      * @return void
      */
-    public function __construct($order, $invoice)
+    public function __construct($order, Invoice $invoice = null)
     {
         $this->order = $order;
         $this->invoice = $invoice;
@@ -44,16 +45,21 @@ class OrderPaid extends Notification
      */
     public function toMail($notifiable)
     {
-        $pdf = $this->invoice->getPdf();
-
-        return (new MailMessage)
-                    ->subject(_('Doklad k objednávke č. '). $this->order->number)
+        $mail = (new MailMessage)
+                    ->subject(_('Potvrdenie platby k objednávke č. '). $this->order->number)
                     ->greeting('Dobrý deň, '. $this->order->username)
-                    ->line(_('Vaša objednávka bola úspešne dokončená a zaplatená. Ďakujeme!'))
-                    ->action(_('Stiahnuť doklad'), $pdf->url)
-                    ->attach($pdf->path, [
-                        'as' => $pdf->filename
-                    ]);
+                    ->line(_('Vaša objednávka bola úspešne dokončená a zaplatená. Ďakujeme!'));
+
+        if ( $this->invoice ) {
+            $pdf = $this->invoice->getPdf();
+
+            $mail->action(_('Stiahnuť doklad'), $pdf->url)
+                 ->attach($pdf->path, [
+                     'as' => $pdf->filename
+                 ]);
+        }
+
+        return $mail;
     }
 
     /**

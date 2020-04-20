@@ -16,4 +16,16 @@ return [
             'orderableVariants' => true
         ]
     ],
+
+    /*
+     * Enable invoices support
+     */
+    'invoices' => false,
+
+    /*
+     * Available payment methods
+     */
+    'payment_providers' => [
+        1 => AdminEshop\Contracts\Payments\GopayPayment::class,
+    ],
 ];

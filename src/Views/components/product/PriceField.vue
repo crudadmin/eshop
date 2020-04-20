@@ -62,10 +62,12 @@ export default {
             return fieldPrefix ? fieldPrefix+'_' : '';
         },
         hasStaticFieldTax(){
-            return this.model.fields[this.getFieldPrefix()+'tax_id'] ? false : true;
+            return this.model.fields[this.getFieldPrefix()+'tax'] ? true : false;
         },
         getTaxFieldKey(){
-            return this.getFieldPrefix()+(this.hasStaticFieldTax() ? 'tax' : 'tax_id');
+            var field = this.getFieldPrefix()+(this.hasStaticFieldTax() ? 'tax' : 'tax_id');
+
+            return this.model.fields[field] ? field : 'tax_id';
         },
         onChange(e){
             this.field.value = e.target.value;
@@ -81,7 +83,6 @@ export default {
         },
         changeTaxValue(taxValue){
             if ( this.hasStaticFieldTax() ) {
-
                 this.tax = taxValue;
             } else {
                 var options = this.model.fields['tax_id'].options;

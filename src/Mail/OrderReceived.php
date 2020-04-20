@@ -3,7 +3,7 @@
 namespace AdminEshop\Mail;
 
 use AdminEshop\Models\Orders\Order;
-use App\Model\Invoice\Invoice;
+use Gogol\Invoices\Model\Invoice;
 use Cart;
 use Discounts;
 use Illuminate\Bus\Queueable;

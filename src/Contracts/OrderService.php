@@ -13,6 +13,7 @@ use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
+use Gogol\Invoices\Model\Invoice;
 use Cart;
 use Discounts;
 use Mail;
@@ -42,6 +43,14 @@ class OrderService
         DeliveryMutator::class,
         PaymentMethodMutator::class,
     ];
+
+    /*
+     * Returns if invoices support is allowed
+     */
+    public function hasInvoices()
+    {
+        return config('admineshop.invoices', false) === true;
+    }
 
     /**
      * Store order int osession
@@ -232,17 +241,30 @@ class OrderService
     }
 
     /**
+     * Generate invoice for order
+     *
+     * @return  Invoice|null
+     */
+    public function makeInvoice($type = 'proform')
+    {
+        if ( ! $this->hasInvoices() ) {
+            return;
+        }
+
+        //Generate proform
+        return $this->getOrder()->makeInvoice($type);
+    }
+
+    /**
      * Send email to client
      *
      * @return  void
      */
-    public function sentClientEmail()
+    public function sentClientEmail(Invoice $invoice = null)
     {
         $order = $this->getOrder();
 
         $message = sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne prijatá.'), $order->number, $order->created_at->format('d.m.Y'));
-
-        $invoice = $order->makeInvoice('proform');
 
         Mail::to($order->email)->send(new OrderReceived($order, $message, $invoice));
     }

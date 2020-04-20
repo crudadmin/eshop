@@ -6,12 +6,19 @@ use AdminEshop\Contracts\Payments\GopayPayment;
 
 trait HasPayments
 {
-    protected $paymentMethods = [
-        1 => GopayPayment::class
-    ];
-
     protected $onPaymentSuccessCallback = null;
     protected $onPaymentErrorCallback = null;
+
+    /**
+     * Return all registred payment providers. Key in array belongs to id in table payments_methods and value is represented
+     * as payment provider
+     *
+     * @return  array
+     */
+    public function getPaymentProviders()
+    {
+        return config('admineshop.payment_providers', []);
+    }
 
     public function setOnPaymentSuccess(callable $callback)
     {
@@ -41,11 +48,6 @@ trait HasPayments
         }
     }
 
-    public function setPaymentMethods($methods)
-    {
-        $this->paymentMethods = $methods;
-    }
-
     public function hasOnlinePayment()
     {
         return $this->getPaymentClass() ? true : false;
@@ -53,15 +55,17 @@ trait HasPayments
 
     public function getPaymentClass($paymentMethodId = null)
     {
+        $providers = $this->getPaymentProviders();
+
         $order = $this->getOrder();
 
         $paymentMethodId = $paymentMethodId ?: $order->payment_method_id;
 
-        if ( array_key_exists($paymentMethodId, $this->paymentMethods) ) {
-            $paymentClass = new $this->paymentMethods[$paymentMethodId];
+        if ( array_key_exists($paymentMethodId, $providers) ) {
+            $paymentClass = new $providers[$paymentMethodId];
 
-            return $paymentClass->setOrder($this->getOrder())
-                                ->setPaymentMethod($this->getOrder()->payment_method);
+            return $paymentClass->setOrder($order)
+                                ->setPaymentMethod($order->payment_method);
         }
     }
 
@@ -81,7 +85,7 @@ trait HasPayments
 
     public function getPaymentRedirect($paymentMethodId = null)
     {
-        $payment = $this->makePayment();
+        $payment = $this->makePayment($paymentMethodId);
 
         $paymentClass = $this->getPaymentClass($paymentMethodId);
         $paymentClass->setPayment($payment);

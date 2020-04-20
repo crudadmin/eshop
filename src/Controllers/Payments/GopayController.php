@@ -36,7 +36,7 @@ class GopayController extends Controller
                 ]);
 
                 //Generate invoice
-                $invoice = $order->makeInvoice('invoice');
+                $invoice = OrderService::makeInvoice('invoice');
 
                 //Send invoice email
                 $order->notify( new OrderPaid($order, $invoice) );
