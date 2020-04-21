@@ -101,10 +101,22 @@ class CartController extends Controller
     public function setDelivery()
     {
         $deliveryId = request('delivery_id');
+        $locationId = request('location_id');
 
-        $delivery = Delivery::findOrFail($deliveryId);
+        //Find by delivery id
+        if ( $deliveryId ) {
+            $delivery = Delivery::findOrFail($deliveryId);
 
-        DeliveryMutator::saveDelivery($delivery->getKey());
+            //Find by location under given delivery
+            if ( $locationId ) {
+                $location = $delivery->locations()->findOrFail($locationId);
+            }
+        }
+
+        DeliveryMutator::saveDelivery(
+            isset($delivery) ? $delivery->getKey() : null,
+            isset($location) ? $location->getKey() : null,
+        );
 
         //If no payment method is present, reset payment method to null
         //Because payment method may be selected, but will be unavailable

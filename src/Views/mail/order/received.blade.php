@@ -26,7 +26,7 @@
 | {{ _('Informácie o objednávke') }} | |
 | :------------- | ----------:|
 | {{ _('Spôsob platby') }}: | {{ $payment_method->name }} |
-| {{ _('Doprava') }}: | {{ $delivery->name }} |
+| {{ _('Doprava') }}: | {{ $delivery->name }} {{ $location ? '('.$location->name.')' : '' }} |
 | {{ _('Tel. číslo') }}: | {{ $order->phone }} |
 | {{ _('Vytvorená dňa') }}:  | {{ $order->created_at->format('d.m.Y H:i') }} |
 @endcomponent

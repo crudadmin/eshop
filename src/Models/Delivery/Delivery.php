@@ -31,7 +31,7 @@ class Delivery extends AdminModel
 
     protected $reversed = true;
 
-    protected $visible = ['id', 'name', 'title', 'description', 'thumbnail', 'priceWithoutTax', 'priceWithTax', 'clientPrice'];
+    protected $visible = ['id', 'name', 'title', 'description', 'thumbnail', 'priceWithoutTax', 'priceWithTax', 'clientPrice', 'locations'];
 
     protected $appends = ['thumbnail', 'priceWithoutTax', 'priceWithTax', 'clientPrice'];
 
@@ -53,6 +53,7 @@ class Delivery extends AdminModel
 
             'Obmedzenia' => Group::tab([
                 'payments' => 'name:Dostupné platobné metódy|belongsToMany:payments_methods,name|title:Pri žiadnej vybranej platia všetký|canAdd',
+                'multiple_locations' => 'name:Viacej predajni|type:checkbox|default:0',
             ])->icon('fa-gear'),
         ];
     }
@@ -62,6 +63,10 @@ class Delivery extends AdminModel
         'title.insert' => 'Nová doprava',
         'title.update' => ':name',
         'columns.id.hidden' => true,
+    ];
+
+    protected $layouts = [
+        'form-top' => 'DeliveryGroups',
     ];
 
     /**

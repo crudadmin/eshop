@@ -22,7 +22,7 @@ export default {
         }
     },
 
-    ready(){
+    mounted(){
         this.setRequestData();
     },
 

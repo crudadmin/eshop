@@ -76,7 +76,7 @@ class Order extends AdminModel
                     'is_company' => 'name:Nákup na firmu|type:checkbox|default:0',
                     Group::fields([
                         'company_name' => 'name:Názov firmy|required_with:is_company',
-                        'company_id' => 'name:IČ|required_with:is_company|numeric',
+                        'company_id' => 'name:IČ|required_with:is_company',
                         'company_tax_id' => 'name:DIČ|required_with:is_company',
                         'company_vat_id' => 'name:IČ DPH',
                     ])->add('hideFieldIfNot:is_company,1')
@@ -91,6 +91,7 @@ class Order extends AdminModel
             'Doprava' => Group::fields([
                 Group::fields([
                     'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
+                    'delivery_location' => 'name:Predajňa|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:deliveries_locations,name',
                     'delivery_tax' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.tax|required|hidden|type:select|default:'.Store::getDefaultTax(),
                     'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
                 ])->inline(),
@@ -178,7 +179,7 @@ class Order extends AdminModel
     public function getDeliveries()
     {
         return Delivery::leftJoin('taxes', 'deliveries.tax_id', '=', 'taxes.id')
-                        ->select(['deliveries.id', 'deliveries.name', 'deliveries.price', 'taxes.tax'])
+                        ->select(['deliveries.id', 'deliveries.name', 'deliveries.price', 'deliveries.multiple_locations', 'taxes.tax'])
                         ->get();
     }
 

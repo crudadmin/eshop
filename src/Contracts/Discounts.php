@@ -47,11 +47,13 @@ class Discounts
     /**
      * Add discount class
      *
-     * @param  string  $discountClass
+     * @param  string|array  $discountClass
      */
     public function addDiscount($discountClass)
     {
-        $this->discounts[] = $discountClass;
+        foreach (array_wrap($discountClass) as $class) {
+            $this->discounts[] = $class;
+        }
     }
 
     /**

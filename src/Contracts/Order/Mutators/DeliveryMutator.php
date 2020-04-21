@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Order\Mutators;
 
 use Admin;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
+use AdminEshop\Contracts\Order\Validation\DeliveryLocationValidator;
 use AdminEshop\Contracts\Order\Validation\DeliveryValidator;
 use AdminEshop\Models\Orders\Order;
 use Cart;
@@ -18,12 +19,18 @@ class DeliveryMutator extends Mutator
      */
     protected $validators = [
         DeliveryValidator::class,
+        DeliveryLocationValidator::class,
     ];
 
     /*
      * Session key for delivery
      */
     private $sessionKey = 'cart.delivery';
+
+    /*
+     * Session location key
+     */
+    private $sessionLocationKey = 'cart.delivery_location';
 
     /**
      * Returns if mutators is active
@@ -60,10 +67,13 @@ class DeliveryMutator extends Mutator
         //We can fill order with delivery only if is creating new order.
         //Or if manual delivery is turned off.
         if ( $this->canGenerateDelivery($order) ) {
+            $location = $this->getSelectedLocation();
+
             $order->fill([
                 'delivery_tax' => Store::getTaxValueById($delivery->tax_id),
                 'delivery_price' => $delivery->priceWithoutTax,
                 'delivery_id' => $delivery->getKey(),
+                'delivery_location_id' => $location ? $location->getKey() : null,
             ]);
         }
     }
@@ -118,6 +128,7 @@ class DeliveryMutator extends Mutator
         return array_merge($response, [
             'deliveries' => Cart::addCartDiscountsIntoModel($this->getDeliveries()),
             'selectedDelivery' => $this->getSelectedDelivery(),
+            'selectedLocation' => $this->getSelectedLocation(),
         ]);
     }
 
@@ -127,12 +138,12 @@ class DeliveryMutator extends Mutator
     public function getDeliveries()
     {
         return $this->cache('deliveries', function(){
-            return Admin::getModel('Delivery')->get();
+            return Admin::getModel('Delivery')->with('locations')->get();
         });
     }
 
     /*
-     * Save delivery into session
+     * Get delivery from session
      */
     public function getSelectedDelivery()
     {
@@ -143,15 +154,33 @@ class DeliveryMutator extends Mutator
         });
     }
 
+    /*
+     * Get location under delivery from session
+     */
+    public function getSelectedLocation()
+    {
+        $id = session()->get($this->sessionLocationKey);
+
+        return $this->cache('selectedLocation'.$id, function() use ($id) {
+            if ( !($delivery = $this->getSelectedDelivery()) ) {
+                return;
+            }
+
+            return $delivery->locations()->where('id', $id)->first();
+        });
+    }
+
     /**
      * Save delivery into session
      *
      * @param  int|null  $id
+     * @param  int|null  $locationId
      * @return  this
      */
-    public function saveDelivery($id = null)
+    public function saveDelivery($id = null, $locationId = null)
     {
         session()->put($this->sessionKey, $id);
+        session()->put($this->sessionLocationKey, $locationId);
         session()->save();
 
         return $this;
@@ -166,6 +195,7 @@ class DeliveryMutator extends Mutator
     public function onCartForget()
     {
         session()->forget($this->sessionKey);
+        session()->forget($this->sessionLocationKey);
     }
 }
 

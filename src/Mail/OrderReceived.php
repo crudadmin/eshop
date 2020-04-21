@@ -54,6 +54,7 @@ class OrderReceived extends Mailable
                         'message' => $this->message,
                         'order' => $this->order,
                         'delivery' => $this->order->delivery,
+                        'location' => $this->order->delivery_location,
                         'payment_method' => $this->order->payment_method,
                         'items' => $this->cartItems,
                         'summary' => $this->cartSummary,
