@@ -10,10 +10,10 @@
 | {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ _('Cena bez dph') }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
 @foreach( $items as $item )
-| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ Store::priceFormat($item->getItemModel()->priceWithoutTax * $item->quantity) }} | {{ Store::priceFormat($item->getItemModel()->priceWithTax * $item->quantity) }} |
+| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ Store::priceFormat($item->getItemModel()->priceWithoutTax * $item->quantity) }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithTax($item->quantity)) }} |
 @endforeach
-| {{ $delivery->name }} | - | {{ Store::priceFormat($order->delivery_price) }} | {{ Store::priceFormat($order->delivery_price_tax) }} |
-| {{ $payment_method->name }} | - | {{ Store::priceFormat($order->payment_method_price) }} | {{ Store::priceFormat($order->payment_method_price_tax) }} |
+| {{ $delivery->name }} | - | {{ Store::priceFormat($order->delivery_price) }} | {{ Store::priceFormat($order->delivery_price_with_tax) }} |
+| {{ $payment_method->name }} | - | {{ Store::priceFormat($order->payment_method_price) }} | {{ Store::priceFormat($order->payment_method_price_with_tax) }} |
 @foreach($discounts as $discount)
 @if ( $discount->message && $discount->canShowInEmail() )
 | {{ $discount->getName() }} | - |  | {{ is_array($discount->message) ? $discount->message['withTax'] : $discount->message }} |

@@ -132,7 +132,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['total'] = Store::priceFormat($this->price_tax * $this->quantity);
+        $attributes['total'] = Store::priceFormat($this->totalPriceWithTax($this->quantity));
         $attributes['product_name'] = $this->productName;
 
         return $attributes;

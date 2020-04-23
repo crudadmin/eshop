@@ -211,6 +211,16 @@ trait PriceMutator
         return $this->calculateTaxPrice($this->priceWithoutTax);
     }
 
+    /*
+     * Return price with tax & discounts
+     */
+    public function totalPriceWithTax(int $quantity)
+    {
+        $round = Store::hasSummaryRounding();
+
+        return Store::roundNumber($this->calculateTaxPrice($this->priceWithoutTax, $round) * $quantity);
+    }
+
     /**
      * Return B2B or B2C initial product price by client settings
      *
@@ -256,9 +266,12 @@ trait PriceMutator
     /**
      * Calculation of tax price for given price
      *
+     * @var $price int/float
+     * @var $round bool
+     *
      * @return  float/int
      */
-    private function calculateTaxPrice($price)
+    private function calculateTaxPrice($price, $round = true)
     {
         $tax = $this->taxValue;
 
@@ -267,7 +280,9 @@ trait PriceMutator
             $tax = $this->getRewritedTaxValue();
         }
 
-        return Store::roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
+        $price = $price * ($tax ? (1 + ($tax / 100)) : 1);
+
+        return $round ? Store::roundNumber($price) : $price;
     }
 
     /**
@@ -277,6 +292,11 @@ trait PriceMutator
      */
     public function getTaxValueAttribute()
     {
+        //If exists tax attribute
+        if ( $this->tax_id === null && $this->tax !== null ) {
+            return $this->tax;
+        }
+
         return Store::getTaxValueById($this->tax_id);
     }
 

@@ -140,6 +140,11 @@ class CartCollection extends Collection
      */
     public function getDefaultSummary($discounts)
     {
+        //If we need turn off rounding in summary. We can switch this feature
+        if ( Store::hasSummaryRounding() === false ) {
+            Store::setRounding(false);
+        }
+
         $sum = [];
 
         foreach ($this as $item) {
@@ -153,6 +158,8 @@ class CartCollection extends Collection
                 $sum[$key] += ($item->quantity * $array[$key]);
             }
         }
+
+        Store::setRounding(true);
 
         return $sum;
     }
@@ -196,7 +203,7 @@ class CartCollection extends Collection
             //Check if we can apply sum modifications into this key
             $isTax = $this->isDiscountableTaxSummaryKey($key);
 
-            //Add statics discount int osummary
+            //Add statics discount into summary
             $sum[$key] = $this->addDiscountsIntoFinalSum($sum[$key], $discounts, $isTax);
 
             //Add delivery, payment method prices etc...

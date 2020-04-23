@@ -21,6 +21,11 @@ class Store
     private $hasB2B = false;
 
     /*
+     * Custom number roundings
+     */
+    private $rounding = null;
+
+    /*
      * Return all taxes
      */
     public function getTaxes()
@@ -79,9 +84,33 @@ class Store
         return '€';
     }
 
+    public function hasSummaryRounding()
+    {
+        return config('admineshop.round_summary', true);
+    }
+
     public function getRounding()
     {
-        return $this->getSettings()->rounding;
+        if ( $this->rounding === false ){
+            return false;
+        }
+
+        return $this->rounding ?: $this->getSettings()->rounding;
+    }
+
+    /**
+     * Set custom number roundings
+     *
+     * @param  int|bool  $rounding
+     */
+    public function setRounding($rounding)
+    {
+        //If we want set default rounding set by eshop
+        if ( $rounding === true ) {
+            $rounding = null;
+        }
+
+        $this->rounding = $rounding;
     }
 
     /*
@@ -89,7 +118,14 @@ class Store
      */
     public function roundNumber($number, $rounding = null)
     {
-        return round($number, $rounding ?: $this->getRounding());
+        $rounding = $rounding ?: $this->getRounding();
+
+        //If we does not want rounding
+        if ( $rounding === false ) {
+            return $number;
+        }
+
+        return round($number, $rounding);
     }
 
     /*
