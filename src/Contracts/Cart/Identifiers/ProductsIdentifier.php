@@ -53,6 +53,22 @@ class ProductsIdentifier extends Identifier
     }
 
     /**
+     * Boot identifier from given model
+     *
+     * @param  AdminModel  $model
+     * @return  ProductsIdentifier
+     */
+    public function bootFromModel($model)
+    {
+        $isVariant = $model instanceof ProductsVariant;
+
+        return $this->bindInKeysOrder(
+            $isVariant ? $model->product_id : $model->getKey(),
+            $isVariant ? $model->getKey() : null
+        );
+    }
+
+    /**
      * Get model by given cart type
      * If this method returns false instead of null
      * item without model will be valid and

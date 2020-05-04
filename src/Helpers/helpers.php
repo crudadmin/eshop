@@ -7,6 +7,7 @@ function operator_types($except = [])
         '+' => '+ Pripočítať k cene',
         '-' => '- Odčítať z ceny',
         '*' => '* Vynásobit cenu',
+        'abs' => 'Nová hodnota',
     ];
 
     return array_diff_key($operators, array_flip($except));

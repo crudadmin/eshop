@@ -30,7 +30,7 @@ class Discount implements Discountable
     /**
      * Discount value
      *
-     * @var  float/int
+     * @var  float|int|callable
      */
     public $value = null;
 

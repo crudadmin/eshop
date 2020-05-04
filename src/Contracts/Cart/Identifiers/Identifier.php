@@ -19,15 +19,30 @@ class Identifier
     /**
      * Identifiers will be binded in same order as keys in getIdentifyKeys() method
      *
-     * @param  [type]  $args
+     * @param  array  $args
      */
     public function __construct(...$args)
+    {
+        if ( count($args) > 0 ) {
+            $this->bindInKeysOrder(...$args);
+        }
+    }
+
+    /**
+     * Bind values of given keys from identifier configuration
+     *
+     * @param  array  $args
+     * @return  [type]
+     */
+    public function bindInKeysOrder(...$args)
     {
         $i = 0;
         foreach ($this->getIdentifyKeys() as $key => $options) {
             $this->setIdentifier($key, array_key_exists($i, $args) ? $args[$i] : null);
             $i++;
         }
+
+        return $this;
     }
 
     /**

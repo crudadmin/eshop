@@ -129,7 +129,7 @@ class ProductsVariant extends AdminModel implements CanBeInCart
      * This items will be selected frm db for cart items
      */
     protected $cartSelect = [
-        'id', 'name', 'image', 'price', 'tax_id',
+        'id', 'product_id', 'name', 'image', 'price', 'tax_id',
         'discount_operator', 'discount', 'warehouse_quantity',
     ];
 }

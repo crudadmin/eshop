@@ -10,4 +10,18 @@ interface CanBeInCart
      * @return  string
      */
     public function getModelIdentifier();
+
+    /**
+     * Return booted identifier
+     *
+     * @return  AdminEshop\Contracts\Cart\Identifiers\Identifier
+     */
+    public function getIdentifier();
+
+    /**
+     * Returns cart item by given product
+     *
+     * @return  AdminEshop\Contracts\CartItem|null
+     */
+    public function getCartItem();
 }

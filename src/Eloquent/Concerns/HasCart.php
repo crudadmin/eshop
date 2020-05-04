@@ -3,6 +3,7 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
+use Cart;
 
 trait HasCart
 {
@@ -24,5 +25,29 @@ trait HasCart
     public function getModelIdentifier()
     {
         return ProductsIdentifier::class;
+    }
+
+    /**
+     * Get initialized model identifier
+     *
+     * @return  AdminEshop\Contracts\Cart\Identifiers\Identifier
+     */
+    public function getIdentifier()
+    {
+        $identifierClass = $this->getModelIdentifier();
+
+        return (new $identifierClass)->bootFromModel($this);
+    }
+
+    /**
+     * Returns cart item
+     *
+     * @return  AdminEshop\Contracts\CartItema
+     */
+    public function getCartItem()
+    {
+        $identifier = $this->getIdentifier();
+
+        return Cart::getItem($identifier);
     }
 }

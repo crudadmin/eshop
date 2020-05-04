@@ -7,6 +7,7 @@ use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
+use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use Admin\Core\Contracts\DataStore;
 use Discounts;
 use OrderService;
@@ -47,7 +48,7 @@ class Cart
     public function addOrUpdate(Identifier $identifier, int $quantity = 1)
     {
         //If items does not exists in cart
-        if ( $item = $this->getItemFromCart($identifier) ) {
+        if ( $item = $this->getItem($identifier) ) {
             $this->updateQuantity($identifier, $item->quantity + $quantity);
 
             $this->pushToAdded($item);
@@ -69,7 +70,7 @@ class Cart
      */
     public function updateQuantity(Identifier $identifier, $quantity)
     {
-        if ( ! ($item = $this->getItemFromCart($identifier)) ) {
+        if ( ! ($item = $this->getItem($identifier)) ) {
             autoAjax()->message(_('Produkt nebol nájdeny v košíku.'))->code(422)->throw();
         }
 
@@ -142,11 +143,20 @@ class Cart
     /**
      * Returns item from cart
      *
-     * @param  Identifier  $identifier
-     * @return null|object
+     * @param  AdminEshop\Contracts\Cart\Identifiers|Identifier|AdminEshop\Eloquent\Concerns\CanBeInCart  $identifier
      */
-    public function getItemFromCart(Identifier $identifier)
+    public function getItem($identifier)
     {
+        //If we want cart item by given model. We need receive identifier from this model
+        if ( $identifier instanceof CanBeInCart ) {
+            $identifier = $identifier->getIdentifier();
+        }
+
+        //If we want cart item by given identifier
+        if ( !($identifier instanceof Identifier) ) {
+            abort(500, 'Unknown identifier type.');
+        }
+
         //All identifiers must match
         $items = $this->items->filter(function($item) use ($identifier) {
             return $identifier->hasThisItem($item);

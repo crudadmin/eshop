@@ -135,7 +135,7 @@ trait PriceMutator
         foreach ($this->registredDiscounts as $discount) {
             //Skip non allowed discounts
             if ( $discounts === null || in_array($discount->getKey(), $allowedDiscounts) ) {
-                $value = is_callable($discount->value) ? $discount->value() : $discount->value;
+                $value = is_callable($callback = $discount->value) ? $callback($this) : $discount->value;
 
                 //If discount operator is set
                 if ( $discount->operator && is_numeric($value) ) {

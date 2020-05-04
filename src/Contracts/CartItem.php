@@ -57,6 +57,16 @@ class CartItem implements UsesIdentifier
     }
 
     /**
+     * Returns quantity
+     *
+     * @return  int
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
      * Get value from cart
      *
      * @param  strin  $key
