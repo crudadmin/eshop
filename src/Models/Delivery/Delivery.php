@@ -27,7 +27,7 @@ class Delivery extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'store.settings';
+    protected $group = 'settings.store';
 
     protected $reversed = true;
 

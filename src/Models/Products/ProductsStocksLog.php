@@ -23,7 +23,7 @@ class ProductsStocksLog extends AdminModel
 
     protected $deletable = false;
 
-    protected $group = 'store.settings';
+    protected $group = 'settings.store';
 
     /*
      * Automatic form and database generation

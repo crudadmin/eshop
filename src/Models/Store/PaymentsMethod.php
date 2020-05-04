@@ -21,7 +21,7 @@ class PaymentsMethod extends AdminModel
      */
     protected $name = 'Platobné metódy';
 
-    protected $group = 'store.settings';
+    protected $group = 'settings.store';
 
     protected $publishable = false;
 

@@ -18,7 +18,7 @@ class Tax extends AdminModel
      */
     protected $name = 'Sadzby DPH';
 
-    protected $group = 'store.settings';
+    protected $group = 'settings.store';
 
     protected $sortable = false;
 
