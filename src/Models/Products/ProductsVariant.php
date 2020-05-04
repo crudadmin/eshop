@@ -68,14 +68,14 @@ class ProductsVariant extends AdminModel implements CanBeInCart
             'Nastavenie varianty' => Group::tab([
                 'product_type' => 'type:imaginary|component:AddTypeFieldIntoRequest',
                 Group::fields([
-                    'name' => 'name:Názov varianty|required',
+                    'name' => 'name:Názov varianty|limit:40|required',
                     'image' => 'name:Obrázok varianty|image',
                 ])->inline(),
                 Group::fields([
                     'ean' => 'name:EAN varianty',
                     'code' => 'name:Kód varianty',
                 ])->inline(),
-            ])->grid(5)->icon('fa-pencil'),
+            ])->grid(5)->icon('fa-pencil')->id('default'),
             'Popis' => Group::tab([
                 'description' => 'name:Popis varianty|type:editor|hidden',
             ])->icon('fa-file-text-o'),

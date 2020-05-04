@@ -5,6 +5,7 @@ namespace AdminEshop\Eloquent\Concerns;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsStocksLog;
 use AdminEshop\Models\Products\ProductsVariant;
+use Store;
 
 trait HasWarehouse
 {
@@ -35,6 +36,32 @@ trait HasWarehouse
     public function addStockAttribute($attribute)
     {
         $this->stockAttributes = array_merge($this->stockAttributes, array_wrap($attribute));
+    }
+
+    /*
+     * Get product warehouse type or value from global settings
+     */
+    public function getWarehouseTypeAttribute($value)
+    {
+        //Overide default value by global settings
+        if ( $value === 'default' ) {
+            return Store::getSettings()->warehouse_type;
+        }
+
+        return $value;
+    }
+
+    /*
+     * Get product value or value from global settings
+     */
+    public function getWarehouseSoldAttribute($value)
+    {
+        //Overide default value by global settings
+        if ( ! $value ) {
+            return Store::getSettings()->warehouse_sold;
+        }
+
+        return $value;
     }
 
     public function getHasStockAttribute()

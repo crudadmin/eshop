@@ -104,6 +104,7 @@ class Product extends AdminModel implements CanBeInCart
             'product_type' => config('admineshop.product_types', []),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
             'warehouse_type' => [
+                'default' => 'Preberať z globalných nastavení eshopu',
                 'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
                 'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
                 'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
