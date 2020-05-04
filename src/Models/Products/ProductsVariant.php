@@ -132,4 +132,15 @@ class ProductsVariant extends AdminModel implements CanBeInCart
         'id', 'product_id', 'name', 'image', 'price', 'tax_id',
         'discount_operator', 'discount', 'warehouse_quantity',
     ];
+
+    /**
+     * Variant product is all the time regular type
+     *
+     * @param  bool  $type
+     * @return  bool
+     */
+    public function isType($type)
+    {
+        return 'regular' == $type;
+    }
 }
