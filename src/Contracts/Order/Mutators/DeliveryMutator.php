@@ -70,8 +70,8 @@ class DeliveryMutator extends Mutator
             $location = $this->getSelectedLocation();
 
             $order->fill([
-                'delivery_tax' => Store::getTaxValueById($delivery->tax_id),
-                'delivery_price' => $delivery->priceWithoutTax,
+                'delivery_vat' => Store::getVatValueById($delivery->vat_id),
+                'delivery_price' => $delivery->priceWithoutVat,
                 'delivery_id' => $delivery->getKey(),
                 'delivery_location_id' => $location ? $location->getKey() : null,
             ]);
@@ -94,21 +94,21 @@ class DeliveryMutator extends Mutator
      *
      * @param  AdminEshop\Models\Delivery\Delivery|null  $delivery
      * @param  float  $price
-     * @param  bool  $withTax
+     * @param  bool  $withVat
      * @param  Order  $order
      * @return  void
      */
-    public function mutatePrice($delivery, $price, bool $withTax, Order $order)
+    public function mutatePrice($delivery, $price, bool $withVat, Order $order)
     {
         //Add delivery price automatically
         if ( $this->canGenerateDelivery($order) ) {
-            $price += $delivery->{$withTax ? 'priceWithTax' : 'priceWithoutTax'};
+            $price += $delivery->{$withVat ? 'priceWithVat' : 'priceWithoutVat'};
         }
 
         //Add manually typed delivery price into order price sum
         else {
-            if ( $withTax ) {
-                $price += Store::addTax($order->delivery_price, $order->delivery_tax);
+            if ( $withVat ) {
+                $price += Store::addVat($order->delivery_price, $order->delivery_vat);
             } else {
                 $price += $order->delivery_price;
             }

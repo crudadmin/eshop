@@ -62,11 +62,11 @@ class Mutator
      *
      * @param  AdminEshop\Models\Delivery\Delivery|null  $delivery
      * @param  float  $price
-     * @param  bool  $withTax
+     * @param  bool  $withVat
      *
      * @return  void
      */
-    public function mutatePrice($activeResponse, $price, bool $withTax, Order $order)
+    public function mutatePrice($activeResponse, $price, bool $withVat, Order $order)
     {
         return $price;
     }

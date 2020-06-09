@@ -7,8 +7,8 @@ export default {
     },
 
     computed: {
-        isPriceWithTaxAndWithoutSame(){
-            return this.changeTax(this.row.price||0) == parseFloat(this.row.price_tax).toFixed(2);
+        isPriceWithVatAndWithoutSame(){
+            return this.changeVat(this.row.price||0) == parseFloat(this.row.price_vat).toFixed(2);
         },
     },
 
@@ -20,37 +20,37 @@ export default {
                     return;
                 }
 
-                if ( ! this.isPriceWithTaxAndWithoutSame ) {
-                    this.row.price_tax = this.changeTax(price);
+                if ( ! this.isPriceWithVatAndWithoutSame ) {
+                    this.row.price_vat = this.changeVat(price);
                 }
             });
 
-            this.$watch('row.price_tax', price => {
+            this.$watch('row.price_vat', price => {
                 if ( this.row.manual_price == false ) {
                     return;
                 }
 
-                if ( ! this.isPriceWithTaxAndWithoutSame ) {
-                    this.row.price = this.changeTax(price, true);
+                if ( ! this.isPriceWithVatAndWithoutSame ) {
+                    this.row.price = this.changeVat(price, true);
                 }
             })
 
-            this.$watch('row.tax', tax => {
+            this.$watch('row.vat', vat => {
                 if ( this.row.manual_price == false ) {
                     return;
                 }
 
-                this.row.price_tax = this.changeTax(this.row.price);
+                this.row.price_vat = this.changeVat(this.row.price);
             })
         },
-        changeTax(price, remove){
-            var tax = (this.row.tax||0);
+        changeVat(price, remove){
+            var vat = (this.row.vat||0);
 
             if ( remove === true ) {
-                return parseFloat(price / (1 + (tax / 100))).toFixed(2);
+                return parseFloat(price / (1 + (vat / 100))).toFixed(2);
             }
 
-            return parseFloat(price * (1 + (tax / 100))).toFixed(2);
+            return parseFloat(price * (1 + (vat / 100))).toFixed(2);
         },
     }
 }

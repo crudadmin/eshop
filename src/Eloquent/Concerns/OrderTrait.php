@@ -23,7 +23,7 @@ trait OrderTrait
     public function calculatePrices(OrdersItem $mutatingItem = null)
     {
         $price = 0;
-        $priceWithTax = 0;
+        $priceWithVat = 0;
 
         //Set order into discounts factory
         OrderService::setOrder($this);
@@ -56,15 +56,15 @@ trait OrderTrait
 
             $hasChanges = false;
 
-            //If price without tax has been changed
-            if ( $item->price != $item->priceWithoutTax ) {
-                $item->price = $item->priceWithoutTax;
+            //If price without vat has been changed
+            if ( $item->price != $item->priceWithoutVat ) {
+                $item->price = $item->priceWithoutVat;
                 $hasChanges = true;
             }
 
-            //If price with tax has been changed
-            if ( $item->price_tax != $item->priceWithTax ) {
-                $item->price_tax = $item->priceWithTax;
+            //If price with vat has been changed
+            if ( $item->price_vat != $item->priceWithVat ) {
+                $item->price_vat = $item->priceWithVat;
                 $hasChanges = true;
             }
 
@@ -132,7 +132,7 @@ trait OrderTrait
 
             'note' => $this->note,
             'price' => $this->price,
-            'price_vat' => $this->price_tax,
+            'price_vat' => $this->price_vat,
             'payment_method_id' => $this->payment_method_id,
             'vs' => $this->number,
             'payment_date' => $this->created_at->addDays(getInvoiceSettings()->payment_term),
@@ -179,9 +179,9 @@ trait OrderTrait
             $invoice->items()->create([
                 'name' => $item->productName,
                 'quantity' => $item->quantity,
-                'vat' => $item->tax,
+                'vat' => $item->vat,
                 'price' => $item->price,
-                'price_vat' => $item->price_tax
+                'price_vat' => $item->price_vat
             ]);
         }
 
@@ -190,9 +190,9 @@ trait OrderTrait
             $invoice->items()->create([
                 'name' => $this->delivery->name,
                 'quantity' => 1,
-                'vat' => $this->delivery_tax,
+                'vat' => $this->delivery_vat,
                 'price' => $this->delivery_price,
-                'price_vat' => $this->deliveryPriceWithTax,
+                'price_vat' => $this->deliveryPriceWithVat,
             ]);
         }
 
@@ -201,9 +201,9 @@ trait OrderTrait
             $invoice->items()->create([
                 'name' => $this->payment_method->name,
                 'quantity' => 1,
-                'vat' => $this->payment_method_tax,
+                'vat' => $this->payment_method_vat,
                 'price' => $this->payment_method_price,
-                'price_vat' => $this->paymentMethodPriceWithTax,
+                'price_vat' => $this->paymentMethodPriceWithVat,
             ]);
         }
     }

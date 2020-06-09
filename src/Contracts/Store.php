@@ -7,7 +7,7 @@ use AdminEshop\Models\Orders\OrdersProduct;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\Store as StoreModel;
-use AdminEshop\Models\Store\Tax;
+use AdminEshop\Models\Store\Vat;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 
@@ -26,12 +26,12 @@ class Store
     private $rounding = null;
 
     /*
-     * Return all taxes
+     * Return all vats
      */
-    public function getTaxes()
+    public function getVats()
     {
-        return $this->cache('taxes', function(){
-            return (Admin::getModel('Tax') ?: new Tax)->get();
+        return $this->cache('vats', function(){
+            return (Admin::getModel('Vat') ?: new Vat)->get();
         });
     }
 
@@ -46,29 +46,29 @@ class Store
     }
 
     /*
-     * Returns default tax value
+     * Returns default vat value
      */
-    public function getDefaultTax()
+    public function getDefaultVat()
     {
-        return $this->cache('tax.default', function(){
-            $tax = $this->getTaxes()->where('default', true)->first();
+        return $this->cache('vat.default', function(){
+            $vat = $this->getVats()->where('default', true)->first();
 
-            return $tax ? $tax->tax : 0;
+            return $vat ? $vat->vat : 0;
         });
     }
 
     /**
-     * Returns default tax value
+     * Returns default vat value
      *
-     * @param  int  $taxId
+     * @param  int  $vatId
      * @return int/float
      */
-    public function getTaxValueById($taxId)
+    public function getVatValueById($vatId)
     {
-        return $this->cache('tax.'.$taxId, function() use ($taxId) {
-            $tax = $this->getTaxes()->where('id', $taxId)->first();
+        return $this->cache('vat.'.$vatId, function() use ($vatId) {
+            $vat = $this->getVats()->where('id', $vatId)->first();
 
-            return $tax ? $tax->tax : 0;
+            return $vat ? $vat->vat : 0;
         });
     }
 
@@ -140,7 +140,7 @@ class Store
      * Returns prices in correct number format
      * For cart we want fixed 2 decimals
      */
-    public function numberFormatWithoutTax($number)
+    public function numberFormatWithoutVat($number)
     {
         return number_format($this->roundNumber($number, 2), 2, '.', ' ');
     }
@@ -154,34 +154,32 @@ class Store
     }
 
     /**
-     * Add tax to given price
+     * Add vat to given price
      *
      * @param  float/int  $price
-     * @param  int/null  $taxId
+     * @param  int/null  $vatId
      * @return float/int
      */
-    public function priceWithTax($price, $taxId = null)
+    public function priceWithVat($price, $vatId = null)
     {
-        $taxes = $this->getTaxes();
+        $vat = $vatId === null ? $this->getDefaultVat() : $this->getVatValueById($vatId);
 
-        $tax = $taxId === null ? $this->getDefaultTax() : $this->getTaxValueById($taxId);
-
-        return $this->addTax($price, $tax);
+        return $this->addVat($price, $vat);
     }
 
     /**
-     * Add given tax value into number
+     * Add given vat value into number
      *
      * @param  float  $price
-     * @param  float  $taxValue
+     * @param  float  $vatValue
      */
-    public function addTax($price, $tax)
+    public function addVat($price, $vat)
     {
-        return $this->roundNumber($price * ($tax ? (1 + ($tax / 100)) : 1));
+        return $this->roundNumber($price * ($vat ? (1 + ($vat / 100)) : 1));
     }
 
     /*
-     * Show tax prices for B2b
+     * Show vat prices for B2b
      */
     public function hasB2B()
     {
@@ -191,12 +189,12 @@ class Store
     /*
      * Set b2b prices
      */
-    public function setB2B($tax = false)
+    public function setB2B($vat = false)
     {
-        session()->put('b2b', $tax);
+        session()->put('b2b', $vat);
         session()->save();
 
-        $this->hasB2B = $tax;
+        $this->hasB2B = $vat;
     }
 
     /**

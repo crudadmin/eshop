@@ -165,20 +165,20 @@ class CartCollection extends Collection
     }
 
     /**
-     * Check if given key is with tax
+     * Check if given key is with vat
      *
      * @param  string  $key
      * @return  bool
      */
-    private function isDiscountableTaxSummaryKey($key)
+    private function isDiscountableVatSummaryKey($key)
     {
-        if ( strpos($key, 'WithTax') !== false )
+        if ( strpos($key, 'WithVat') !== false )
             return true;
 
-        if ( strpos($key, 'WithoutTax') !== false )
+        if ( strpos($key, 'WithoutVat') !== false )
             return false;
 
-        return Discounts::getDiscountableAttributeTaxValue($key);
+        return Discounts::getDiscountableAttributeVatValue($key);
     }
 
     /**
@@ -201,14 +201,14 @@ class CartCollection extends Collection
 
         foreach ($sum as $key => $value) {
             //Check if we can apply sum modifications into this key
-            $isTax = $this->isDiscountableTaxSummaryKey($key);
+            $isVat = $this->isDiscountableVatSummaryKey($key);
 
             //Add statics discount into summary
-            $sum[$key] = $this->addDiscountsIntoFinalSum($sum[$key], $discounts, $isTax);
+            $sum[$key] = $this->addDiscountsIntoFinalSum($sum[$key], $discounts, $isVat);
 
             //Add delivery, payment method prices etc...
-            if ( $fullCartResponse === true && $isTax !== null ) {
-                $sum[$key] = OrderService::addAdditionalPaymentsIntoSum($sum[$key], $isTax);
+            if ( $fullCartResponse === true && $isVat !== null ) {
+                $sum[$key] = OrderService::addAdditionalPaymentsIntoSum($sum[$key], $isVat);
             }
 
             //Round numbers, and make sure all numbers are positive
@@ -224,23 +224,23 @@ class CartCollection extends Collection
      *
      * @param  int/float  $price
      * @param  array  $discounts
-     * @param  bool/null  $isTax
+     * @param  bool/null  $isVat
      *
      * @return int/float
      */
-    public function addDiscountsIntoFinalSum($price, $discounts, $isTax = null)
+    public function addDiscountsIntoFinalSum($price, $discounts, $isVat = null)
     {
         foreach ($discounts as $discount) {
             //If this discount is not applied on whole cart,
-            //Or is not discountableTax attribute
-            if ( $discount->applyOnWholeCart() !== true || $isTax === null ) {
+            //Or is not discountableVat attribute
+            if ( $discount->applyOnWholeCart() !== true || $isVat === null ) {
                 continue;
             }
 
-            //If is tax attribute, and discount value is with + or - operator
-            //Then we need to apply tax to this discount
-            $discountValue = $isTax === true && $discount->hasSumPriceOperator()
-                                ? Store::priceWithTax($discount->value)
+            //If is vat attribute, and discount value is with + or - operator
+            //Then we need to apply vat to this discount
+            $discountValue = $isVat === true && $discount->hasSumPriceOperator()
+                                ? Store::priceWithVat($discount->value)
                                 : $discount->value;
 
             //Apply given discount

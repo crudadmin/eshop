@@ -10,16 +10,16 @@
 | {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ _('Cena bez dph') }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
 @foreach( $items as $item )
-| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ Store::priceFormat($item->getItemModel()->priceWithoutTax * $item->quantity) }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithTax($item->quantity)) }} |
+| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
 @endforeach
-| {{ $delivery->name }} | - | {{ Store::priceFormat($order->delivery_price) }} | {{ Store::priceFormat($order->delivery_price_with_tax) }} |
-| {{ $payment_method->name }} | - | {{ Store::priceFormat($order->payment_method_price) }} | {{ Store::priceFormat($order->payment_method_price_with_tax) }} |
+| {{ $delivery->name }} | - | {{ Store::priceFormat($order->delivery_price) }} | {{ Store::priceFormat($order->delivery_price_with_vat) }} |
+| {{ $payment_method->name }} | - | {{ Store::priceFormat($order->payment_method_price) }} | {{ Store::priceFormat($order->payment_method_price_with_vat) }} |
 @foreach($discounts as $discount)
 @if ( $discount->message && $discount->canShowInEmail() )
-| {{ $discount->getName() }} | - |  | {{ is_array($discount->message) ? $discount->message['withTax'] : $discount->message }} |
+| {{ $discount->getName() }} | - |  | {{ is_array($discount->message) ? $discount->message['withVat'] : $discount->message }} |
 @endif
 @endforeach
-| <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ Store::priceFormat($summary['priceWithoutTax']) }} | {{ Store::priceFormat($summary['priceWithTax']) }} |
+| <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ Store::priceFormat($summary['priceWithoutVat']) }} | {{ Store::priceFormat($summary['priceWithVat']) }} |
 @endcomponent
 
 @component('mail::panel')

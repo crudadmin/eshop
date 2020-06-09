@@ -26,11 +26,11 @@ trait PriceMutator
     protected $applyDiscountsInAdmin = false;
 
     /**
-     * We can rewrite tax value of model
+     * We can rewrite vat value of model
      *
      * @var  int/float
      */
-    protected $rewritedTaxValue;
+    protected $rewritedVatValue;
 
     /**
      * We can rewrite default price of model
@@ -52,9 +52,9 @@ trait PriceMutator
      * @var  array
      */
     protected $priceAttributes = [
-        'initialPriceWithTax', 'initialPriceWithoutTax', //initial price without any discount
-        'defaultPriceWithTax', 'defaultPriceWithoutTax', //initial price with product discount
-        'priceWithTax', 'priceWithoutTax', 'clientPrice', //price with all prossible discounts
+        'initialPriceWithVat', 'initialPriceWithoutVat', //initial price without any discount
+        'defaultPriceWithVat', 'defaultPriceWithoutVat', //initial price with product discount
+        'priceWithVat', 'priceWithoutVat', 'clientPrice', //price with all prossible discounts
     ];
 
     /**
@@ -148,9 +148,9 @@ trait PriceMutator
     }
 
     /*
-     * Has product price with Tax?
+     * Has product price with Vat?
      */
-    public function showTaxPrices()
+    public function showVatPrices()
     {
         return Store::hasB2B() ? false : true;
     }
@@ -158,7 +158,7 @@ trait PriceMutator
     /*
      * Return pure default product price without all discounts and without TAX
      */
-    public function getInitialPriceWithoutTaxAttribute()
+    public function getInitialPriceWithoutVatAttribute()
     {
         return Store::roundNumber($this->price);
     }
@@ -166,21 +166,21 @@ trait PriceMutator
     /*
      * Return pure default product price without all discounts, with TAX
      */
-    public function getInitialPriceWithTaxAttribute($value)
+    public function getInitialPriceWithVatAttribute($value)
     {
-        return $this->calculateTaxPrice($this->initialPriceWithoutTax);
+        return $this->calculateVatPrice($this->initialPriceWithoutVat);
     }
 
     /*
      * Price without TAX after initial product discounts
      */
-    public function getDefaultPriceWithoutTaxAttribute()
+    public function getDefaultPriceWithoutVatAttribute()
     {
         if ( $defaultPrice = $this->getRewritedDefaultPrice() ) {
             return Store::roundNumber($defaultPrice);
         }
 
-        $price = operator_modifier($this->initialPriceWithoutTax, $this->discount_operator, $this->discount);
+        $price = operator_modifier($this->initialPriceWithoutVat, $this->discount_operator, $this->discount);
 
         return Store::roundNumber($price);
     }
@@ -188,37 +188,37 @@ trait PriceMutator
     /*
      * Price without TAX after discounts
      */
-    public function getDefaultPriceWithTaxAttribute()
+    public function getDefaultPriceWithVatAttribute()
     {
-        return $this->calculateTaxPrice($this->defaultPriceWithoutTax);
+        return $this->calculateVatPrice($this->defaultPriceWithoutVat);
     }
 
     /*
-     * Returns price with discounts but without tax
+     * Returns price with discounts but without vat
      */
-    public function getPriceWithoutTaxAttribute()
+    public function getPriceWithoutVatAttribute()
     {
-        $price = $this->applyDiscounts($this->defaultPriceWithoutTax, $this->toCartArrayDiscounts);
+        $price = $this->applyDiscounts($this->defaultPriceWithoutVat, $this->toCartArrayDiscounts);
 
         return Store::roundNumber($price);
     }
 
     /*
-     * Return price with tax & discounts
+     * Return price with vat & discounts
      */
-    public function getPriceWithTaxAttribute()
+    public function getPriceWithVatAttribute()
     {
-        return $this->calculateTaxPrice($this->priceWithoutTax);
+        return $this->calculateVatPrice($this->priceWithoutVat);
     }
 
     /*
-     * Return price with tax & discounts
+     * Return price with vat & discounts
      */
-    public function totalPriceWithTax(int $quantity)
+    public function totalPriceWithVat(int $quantity)
     {
         $round = Store::hasSummaryRounding();
 
-        return Store::roundNumber($this->calculateTaxPrice($this->priceWithoutTax, $round) * $quantity);
+        return Store::roundNumber($this->calculateVatPrice($this->priceWithoutVat, $round) * $quantity);
     }
 
     /**
@@ -228,11 +228,11 @@ trait PriceMutator
      */
     public function getInitialClientPriceAttribute()
     {
-        if ( $this->showTaxPrices() ) {
-            return $this->initialPriceWithTax;
+        if ( $this->showVatPrices() ) {
+            return $this->initialPriceWithVat;
         }
 
-        return $this->initialPriceWithoutTax;
+        return $this->initialPriceWithoutVat;
     }
 
     /**
@@ -242,11 +242,11 @@ trait PriceMutator
      */
     public function getDefaultClientPriceAttribute()
     {
-        if ( $this->showTaxPrices() ) {
-            return $this->defaultPriceWithTax;
+        if ( $this->showVatPrices() ) {
+            return $this->defaultPriceWithVat;
         }
 
-        return $this->defaultPriceWithoutTax;
+        return $this->defaultPriceWithoutVat;
     }
 
     /**
@@ -256,48 +256,48 @@ trait PriceMutator
      */
     public function getClientPriceAttribute()
     {
-        if ( $this->showTaxPrices() ) {
-            return $this->priceWithTax;
+        if ( $this->showVatPrices() ) {
+            return $this->priceWithVat;
         }
 
-        return $this->priceWithoutTax;
+        return $this->priceWithoutVat;
     }
 
     /**
-     * Calculation of tax price for given price
+     * Calculation of vat price for given price
      *
      * @var $price int/float
      * @var $round bool
      *
      * @return  float/int
      */
-    private function calculateTaxPrice($price, $round = true)
+    private function calculateVatPrice($price, $round = true)
     {
-        $tax = $this->taxValue;
+        $vat = $this->vatValue;
 
-        //If model has rewriten tax value
-        if ( ! is_null($this->getRewritedTaxValue()) ) {
-            $tax = $this->getRewritedTaxValue();
+        //If model has rewriten vat value
+        if ( ! is_null($this->getRewritedVatValue()) ) {
+            $vat = $this->getRewritedVatValue();
         }
 
-        $price = $price * ($tax ? (1 + ($tax / 100)) : 1);
+        $price = $price * ($vat ? (1 + ($vat / 100)) : 1);
 
         return $round ? Store::roundNumber($price) : $price;
     }
 
     /**
-     * Returns tax value attribute
+     * Returns vat value attribute
      *
      * @return  int/float
      */
-    public function getTaxValueAttribute()
+    public function getVatValueAttribute()
     {
-        //If exists tax attribute
-        if ( $this->tax_id === null && $this->tax !== null ) {
-            return $this->tax;
+        //If exists vat attribute
+        if ( $this->vat_id === null && $this->vat !== null ) {
+            return $this->vat;
         }
 
-        return Store::getTaxValueById($this->tax_id);
+        return Store::getVatValueById($this->vat_id);
     }
 
     /**
@@ -345,20 +345,20 @@ trait PriceMutator
      * @param  int/float  $price
      * @return
      */
-    public function rewriteTaxValue($taxValue)
+    public function rewriteVatValue($vatValue)
     {
-        $this->rewritedTaxValue = $taxValue;
+        $this->rewritedVatValue = $vatValue;
 
         return $this;
     }
 
     /**
-     * Rewrited default tax value
+     * Rewrited default vat value
      *
      * @return  float/int
      */
-    public function getRewritedTaxValue()
+    public function getRewritedVatValue()
     {
-        return $this->rewritedTaxValue;
+        return $this->rewritedVatValue;
     }
 }

@@ -24,7 +24,7 @@ class Discounts
     /*
      * Which model attributes are discountable
      * 'myOtherParam' => true/false
-     * (true = withTax / false = withoutTax / auto = 'by client type')
+     * (true = withVat / false = withoutVat / auto = 'by client type')
      */
     private $discountableAttributes = [
         'clientPrice' => 'auto',
@@ -206,20 +206,20 @@ class Discounts
     }
 
     /**
-     * Returns value of tax for given parameter
+     * Returns value of vat for given parameter
      *
      * @return  bool|null
      */
-    public function getDiscountableAttributeTaxValue($key)
+    public function getDiscountableAttributeVatValue($key)
     {
         $discountableAttributes = $this->getDiscountableAttributes();
 
-        //If is not discountable attribute by withTax/WithouTax
+        //If is not discountable attribute by withVat/WithouVat
         //try other dynamic fields from discounts settings
         if ( array_key_exists($key, $discountableAttributes) ) {
-            $taxValue = $discountableAttributes[$key];
+            $vatValue = $discountableAttributes[$key];
 
-            return $taxValue == 'auto' ? !Store::hasB2B() : $taxValue;
+            return $vatValue == 'auto' ? !Store::hasB2B() : $vatValue;
         }
     }
 

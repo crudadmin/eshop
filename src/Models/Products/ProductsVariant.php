@@ -81,7 +81,7 @@ class ProductsVariant extends AdminModel implements CanBeInCart
             ])->icon('fa-file-text-o'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
-                    'tax' => 'name:Sazba DPH|belongsTo:taxes,:name (:tax%)|defaultByOption:default,1|required|canAdd|hidden',
+                    'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|required|canAdd|hidden',
                     'price' => 'name:Cena bez DPH|type:decimal|default:0|component:PriceField|positivePriceIfRequired:variants|required_unless:product_type,'.implode(',', Store::orderableProductTypes()),
                 ])->width(8)->id('price'),
                 'Zľava' => Group::fields([
@@ -120,7 +120,7 @@ class ProductsVariant extends AdminModel implements CanBeInCart
     public function options()
     {
         return [
-            'tax_id' => Store::getTaxes(),
+            'vat_id' => Store::getVats(),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
         ];
     }
@@ -129,7 +129,7 @@ class ProductsVariant extends AdminModel implements CanBeInCart
      * This items will be selected frm db for cart items
      */
     protected $cartSelect = [
-        'id', 'product_id', 'name', 'image', 'price', 'tax_id',
+        'id', 'product_id', 'name', 'image', 'price', 'vat_id',
         'discount_operator', 'discount', 'warehouse_quantity',
     ];
 

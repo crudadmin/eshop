@@ -12,7 +12,7 @@ class BindDefaultPrice extends AdminRule
     {
         //Bind default price into order item with related product
         if ( $model = $row->getProduct() ) {
-            $row->default_price = $model->defaultPriceWithoutTax;
+            $row->default_price = $model->defaultPriceWithoutVat;
         }
     }
 }

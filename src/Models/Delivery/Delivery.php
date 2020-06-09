@@ -31,9 +31,9 @@ class Delivery extends AdminModel
 
     protected $reversed = true;
 
-    protected $visible = ['id', 'name', 'title', 'description', 'thumbnail', 'priceWithoutTax', 'priceWithTax', 'clientPrice', 'locations'];
+    protected $visible = ['id', 'name', 'title', 'description', 'thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice', 'locations'];
 
-    protected $appends = ['thumbnail', 'priceWithoutTax', 'priceWithTax', 'clientPrice'];
+    protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 
     /*
      * Automatic form and database generation
@@ -46,7 +46,7 @@ class Delivery extends AdminModel
     {
         return [
             'name' => 'name:Názov dopravy|placeholder:Zadejte názov dopravy|required|max:90',
-            'tax' => 'name:Sadza DPH|belongsTo:taxes,:name (:tax%)|required|defaultByOption:default,1|canAdd',
+            'vat' => 'name:Sadza DPH|belongsTo:vats,:name (:vat%)|required|defaultByOption:default,1|canAdd',
             'price' => 'name:Základná cena bez DPH|type:decimal|component:priceField|required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis dopravy|hidden',
@@ -82,7 +82,7 @@ class Delivery extends AdminModel
     public function options()
     {
         return [
-            'tax_id' => Store::getTaxes(),
+            'vat_id' => Store::getVats(),
         ];
     }
 

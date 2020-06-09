@@ -50,7 +50,7 @@ class GopayPayment extends PaymentHelper
             $items[] = [
                 "name" => $item->productName,
                 "count" => $item->quantity,
-                "amount" => round($item->price_tax * $item->quantity * 100),
+                "amount" => round($item->price_vat * $item->quantity * 100),
             ];
         }
 
@@ -58,7 +58,7 @@ class GopayPayment extends PaymentHelper
             $items[] = [
                 "name" => $order->delivery->name,
                 "count" => 1,
-                "amount" => round($order->deliveryPriceWithTax * 100),
+                "amount" => round($order->deliveryPriceWithVat * 100),
             ];
         }
 
@@ -66,7 +66,7 @@ class GopayPayment extends PaymentHelper
             $items[] = [
                 "name" => $order->payment_method->name,
                 "count" => 1,
-                "amount" => round($order->paymentMethodPriceWithTax * 100),
+                "amount" => round($order->paymentMethodPriceWithVat * 100),
             ];
         }
 
@@ -82,7 +82,7 @@ class GopayPayment extends PaymentHelper
                 "default_payment_instrument" => $this->getDefaultPayment(),
                 "allowed_payment_instruments" => ["PAYMENT_CARD", "PAYPAL"],
             ],
-            "amount" => round($order->price_tax * 100),
+            "amount" => round($order->price_vat * 100),
             "currency" => "EUR",
             "order_number" => $order->getKey(),
             "order_description" => sprintf(_('Platba %s'), env('APP_NAME')),

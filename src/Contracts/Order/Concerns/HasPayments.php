@@ -77,7 +77,7 @@ trait HasPayments
         $order = $this->getOrder();
 
         return $order->payments()->create([
-            'price' => $order->price_tax,
+            'price' => $order->price_vat,
             'payment_method_id' => $paymentMethodId ?: $order->payment_method_id,
             'uniqid' => uniqid().str_random(10),
         ]);

@@ -92,7 +92,7 @@ class Order extends AdminModel
                 Group::fields([
                     'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
                     'delivery_location' => 'name:Predajňa|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:deliveries_locations,name',
-                    'delivery_tax' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.tax|required|hidden|type:select|default:'.Store::getDefaultTax(),
+                    'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
                     'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
                 ])->inline(),
                 'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
@@ -100,7 +100,7 @@ class Order extends AdminModel
             'Platobná metóda' => Group::fields([
                 Group::fields([
                     'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
-                    'payment_method_tax' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.tax|hidden|required|type:select|default:'.Store::getDefaultTax(),
+                    'payment_method_vat' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.vat|hidden|required|type:select|default:'.Store::getDefaultVat(),
                     'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
                 ])->inline(),
                 'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
@@ -113,7 +113,7 @@ class Order extends AdminModel
                     ])->inline(),
                     Group::fields([
                         'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                        'price_tax' => 'name:Cena s DPH|disabled|type:decimal',
+                        'price_vat' => 'name:Cena s DPH|disabled|type:decimal',
                     ])->inline(),
                 ])->width(6),
                 'Zľavy' => Group::fields([
@@ -133,7 +133,7 @@ class Order extends AdminModel
             'grid.enabled' => false,
             'grid.default' => 'full',
             'columns.price.add_after' => ' '.Store::getCurrency(),
-            'columns.price_tax.add_after' => ' '.Store::getCurrency(),
+            'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
             'columns.client_name' => [
                 'after' => 'id',
@@ -154,14 +154,14 @@ class Order extends AdminModel
     {
         $countries = Country::all();
 
-        $taxOptions = Store::getTaxes()->map(function($item){
-            $item->taxValue = $item->tax.'%';
+        $vatOptions = Store::getVats()->map(function($item){
+            $item->vatValue = $item->vat.'%';
             return $item;
-        })->pluck('taxValue', 'tax');
+        })->pluck('vatValue', 'vat');
 
         return [
-            'delivery_tax' => $taxOptions,
-            'payment_method_tax' => $taxOptions,
+            'delivery_vat' => $vatOptions,
+            'payment_method_vat' => $vatOptions,
             'country_id' => $countries,
             'delivery_country_id' => $countries,
             'delivery_id' => $this->getDeliveries(),
@@ -178,15 +178,15 @@ class Order extends AdminModel
 
     public function getDeliveries()
     {
-        return Delivery::leftJoin('taxes', 'deliveries.tax_id', '=', 'taxes.id')
-                        ->select(['deliveries.id', 'deliveries.name', 'deliveries.price', 'deliveries.multiple_locations', 'taxes.tax'])
+        return Delivery::leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
+                        ->select(['deliveries.id', 'deliveries.name', 'deliveries.price', 'deliveries.multiple_locations', 'vats.vat'])
                         ->get();
     }
 
     public function getPaymentMethods()
     {
-        return PaymentsMethod::leftJoin('taxes', 'payments_methods.tax_id', '=', 'taxes.id')
-                        ->select(['payments_methods.id', 'payments_methods.name', 'payments_methods.price', 'taxes.tax'])
+        return PaymentsMethod::leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
+                        ->select(['payments_methods.id', 'payments_methods.name', 'payments_methods.price', 'vats.vat'])
                         ->get();
     }
 
@@ -209,14 +209,14 @@ class Order extends AdminModel
         return str_pad($this->getKey(), 6, '0', STR_PAD_LEFT);
     }
 
-    public function getPaymentMethodPriceWithTaxAttribute()
+    public function getPaymentMethodPriceWithVatAttribute()
     {
-        return Store::roundNumber($this->payment_method_price * (1 + ($this->payment_method_tax/100)));
+        return Store::roundNumber($this->payment_method_price * (1 + ($this->payment_method_vat/100)));
     }
 
-    public function getDeliveryPriceWithTaxAttribute()
+    public function getDeliveryPriceWithVatAttribute()
     {
-        return Store::roundNumber($this->delivery_price * (1 + ($this->delivery_tax/100)));
+        return Store::roundNumber($this->delivery_price * (1 + ($this->delivery_vat/100)));
     }
 
     public function getHash()

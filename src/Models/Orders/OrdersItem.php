@@ -72,8 +72,8 @@ class OrdersItem extends AdminModel implements UsesIdentifier
             Group::fields([
                 'default_price' => 'name:Pôvodna cena bez DPH|invisible|type:decimal|title:Cena produktu v čase objednania.|disabled',
                 'price' => 'name:Cena/j bez DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
-                'tax' => 'name:DPH %|type:select|default:'.Store::getDefaultTax().'|required_if:manual_price,1|disabledIf:manual_price,0',
-                'price_tax' => 'name:Cena/j s DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
+                'vat' => 'name:DPH %|type:select|default:'.Store::getDefaultVat().'|required_if:manual_price,1|disabledIf:manual_price,0',
+                'price_vat' => 'name:Cena/j s DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
                 'manual_price' => 'name:Manuálna cena|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
             ])->inline()
         ];
@@ -82,10 +82,10 @@ class OrdersItem extends AdminModel implements UsesIdentifier
     public function options()
     {
         return [
-            'tax' => Store::getTaxes()->map(function($item){
-                $item->taxValue = $item->tax.'%';
+            'vat' => Store::getVats()->map(function($item){
+                $item->vatValue = $item->vat.'%';
                 return $item;
-            })->pluck('taxValue', 'tax'),
+            })->pluck('vatValue', 'vat'),
             'product_id' => $this->getAvailableProducts(),
             'variant_id' => $this->getAvailableVariants(),
         ];
@@ -93,7 +93,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
 
     protected $layouts = [
         'form-top' => [
-            'recalculateTaxPrices',
+            'recalculateVatPrices',
             'setPricesFromProduct'
         ],
     ];
@@ -120,11 +120,11 @@ class OrdersItem extends AdminModel implements UsesIdentifier
             'columns.quantity.after' => 'name',
             'columns.total' => [
                 'title' => 'Cena spolu',
-                'after' => 'price_tax',
+                'after' => 'price_vat',
             ],
 
             //Add currency after columns
-            'columns.price_tax.add_after' => ' '.Store::getCurrency(),
+            'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'reloadOnUpdate' => true,
             'refresh_interval' => 5000,
         ];
@@ -132,7 +132,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['total'] = Store::priceFormat($this->totalPriceWithTax($this->quantity));
+        $attributes['total'] = Store::priceFormat($this->totalPriceWithVat($this->quantity));
         $attributes['product_name'] = $this->productName;
 
         return $attributes;
@@ -146,12 +146,12 @@ class OrdersItem extends AdminModel implements UsesIdentifier
      */
     public function getAvailableVariants()
     {
-        return ProductsVariant::select(['id', 'product_id', 'name', 'price', 'tax_id', 'discount_operator', 'discount'])
+        return ProductsVariant::select(['id', 'product_id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'])
                 ->whereHas('product', function($query){
                     $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
                 })->get()->map(function($item){
-                    $item->setVisible(['id', 'product_id', 'name', 'priceWithTax', 'priceWithoutTax', 'taxValue'])
-                         ->setAppends(['priceWithTax', 'priceWithoutTax', 'taxValue']);
+                    $item->setVisible(['id', 'product_id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
+                         ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
 
                     return $item;
                 });
@@ -164,10 +164,10 @@ class OrdersItem extends AdminModel implements UsesIdentifier
      */
     public function getAvailableProducts()
     {
-        return Product::select(['id', 'name', 'price', 'tax_id', 'discount_operator', 'discount'])
+        return Product::select(['id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'])
                 ->get()->map(function($item){
-                    $item->setVisible(['id', 'name', 'priceWithTax', 'priceWithoutTax', 'taxValue'])
-                         ->setAppends(['priceWithTax', 'priceWithoutTax', 'taxValue']);
+                    $item->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
+                         ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
 
                     return $item;
                 });
@@ -200,7 +200,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier
     /*
      * Set initial price for discounts
      */
-    public function getInitialPriceWithoutTaxAttribute()
+    public function getInitialPriceWithoutVatAttribute()
     {
         //If is manualy typed price, we need return order item price.
         //We also need return default price, if item does not have identifier with

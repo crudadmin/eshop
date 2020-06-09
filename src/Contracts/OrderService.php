@@ -143,10 +143,10 @@ class OrderService
                 'product_id' => $item->id,
                 'variant_id' => $item->variant_id,
                 'quantity' => $item->quantity,
-                'default_price' => $product->defaultPriceWithoutTax,
-                'price' => $product->priceWithoutTax,
-                'tax' => Store::getTaxValueById($product->tax_id),
-                'price_tax' => $product->priceWithTax,
+                'default_price' => $product->defaultPriceWithoutVat,
+                'price' => $product->priceWithoutVat,
+                'vat' => Store::getVatValueById($product->vat_id),
+                'price_vat' => $product->priceWithVat,
             ]);
         }
 
@@ -174,8 +174,8 @@ class OrderService
                 'name' => $discount->getName() ?: _('Zľava'),
                 'quantity' => 1,
                 'price' => $discount->value * ($discount->operator == '-' ? -1 : 1),
-                'tax' => Store::getDefaultTax(),
-                'price_tax' => Store::priceWithTax($discount->value) * ($discount->operator == '-' ? -1 : 1),
+                'vat' => Store::getDefaultVat(),
+                'price_vat' => Store::priceWithVat($discount->value) * ($discount->operator == '-' ? -1 : 1),
             ]);
         }
     }
@@ -184,13 +184,13 @@ class OrderService
      * Add additional prices into order sum.
      *
      * @param  int/float  $price
-     * @param  bool  $withTax
+     * @param  bool  $withVat
      */
-    public function addAdditionalPaymentsIntoSum($price, bool $withTax)
+    public function addAdditionalPaymentsIntoSum($price, bool $withVat)
     {
         foreach ($this->getActiveMutators() as $mutator) {
             if ( method_exists($mutator, 'mutatePrice') ) {
-                $price = $mutator->mutatePrice($mutator->getActiveResponse(), $price, $withTax, $this->getOrder() ?: new Order);
+                $price = $mutator->mutatePrice($mutator->getActiveResponse(), $price, $withVat, $this->getOrder() ?: new Order);
             }
         }
 
@@ -209,8 +209,8 @@ class OrderService
 
         $summary = $items->getSummary(true);
 
-        $order->price = $items->count() == 0 ? 0 : $summary['priceWithoutTax'];
-        $order->price_tax = $items->count() == 0 ? 0 : $summary['priceWithTax'];
+        $order->price = $items->count() == 0 ? 0 : $summary['priceWithoutVat'];
+        $order->price_vat = $items->count() == 0 ? 0 : $summary['priceWithVat'];
 
         return $this;
     }

@@ -19,11 +19,11 @@ class OrderItemsCollection extends CartCollection
         return $this->map(function($item) {
             //If OrderItem price is typed manually, we also need reset product price of item
             //to this manualy typed price. And turn off discounts on this price.
-            //We also need rewrite tax value for calculating prices for given product
+            //We also need rewrite vat value for calculating prices for given product
             if ( $item->hasManualPrice ) {
                 if ( $model = $item->getItemModel() ) {
                     $model->rewriteDefaultPrice($item->price);
-                    $model->rewriteTaxValue($item->tax);
+                    $model->rewriteVatValue($item->vat);
                 }
             }
 
@@ -44,9 +44,9 @@ class OrderItemsCollection extends CartCollection
                 $this->allowItemDiscountsInAdmin($item);
             }
 
-            //We also need to set tax for cart item.
+            //We also need to set vat for cart item.
             //Because prices calculation will be applied also for this items.
-            $item->rewriteTaxValue($item->tax);
+            $item->rewriteVatValue($item->vat);
 
             return $item;
         });

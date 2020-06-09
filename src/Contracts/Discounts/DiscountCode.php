@@ -118,7 +118,7 @@ class DiscountCode extends Discount implements Discountable
         //If is only discount from order sum
         if (!is_null($code->discount_price)) {
             $value = Store::priceFormat($code->discount_price);
-            $valueWithTax = Store::priceFormat(Store::priceWithTax($code->discount_price));
+            $valueWithVat = Store::priceFormat(Store::priceWithVat($code->discount_price));
         }
 
         //If is percentual discount
@@ -133,8 +133,8 @@ class DiscountCode extends Discount implements Discountable
         }
 
         return [
-            'withTax' => (@$valueWithTax ?: $value) . $freeDeliveryText,
-            'withoutTax' => $value . $freeDeliveryText,
+            'withVat' => (@$valueWithVat ?: $value) . $freeDeliveryText,
+            'withoutVat' => $value . $freeDeliveryText,
         ];
     }
 

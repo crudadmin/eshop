@@ -60,8 +60,8 @@ class PaymentMethodMutator extends Mutator
     {
         if ( $this->canGeneratePaymentMethod($order) ) {
             $order->fill([
-                'payment_method_tax' => Store::getTaxValueById($paymentMethod->tax_id),
-                'payment_method_price' => $paymentMethod->priceWithoutTax,
+                'payment_method_vat' => Store::getVatValueById($paymentMethod->vat_id),
+                'payment_method_price' => $paymentMethod->priceWithoutVat,
                 'payment_method_id' => $paymentMethod->getKey(),
             ]);
         }
@@ -83,17 +83,17 @@ class PaymentMethodMutator extends Mutator
      *
      * @param  AdminEshop\Models\Delivery\Delivery|null  $delivery
      * @param  float  $price
-     * @param  bool  $withTax
+     * @param  bool  $withVat
      * @return  void
      */
-    public function mutatePrice($paymentMethod, $price, bool $withTax, Order $order)
+    public function mutatePrice($paymentMethod, $price, bool $withVat, Order $order)
     {
         //Add payment method price
         if ( $this->canGeneratePaymentMethod($order) ) {
-            $price += $paymentMethod->{$withTax ? 'priceWithTax' : 'priceWithoutTax'};
+            $price += $paymentMethod->{$withVat ? 'priceWithVat' : 'priceWithoutVat'};
         } else {
-            if ( $withTax ) {
-                $price += Store::addTax($order->payment_method_price, $order->payment_method_tax);
+            if ( $withVat ) {
+                $price += Store::addVat($order->payment_method_price, $order->payment_method_vat);
             } else {
                 $price += $order->payment_method_price;
             }

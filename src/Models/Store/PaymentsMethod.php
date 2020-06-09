@@ -13,12 +13,12 @@ class PaymentsMethod extends BasePaymentsMethod
 
     protected $group = 'settings.store';
 
-    protected $appends = ['thumbnail', 'priceWithoutTax', 'priceWithTax', 'clientPrice'];
+    protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 
     public function mutateFields($fields)
     {
         $fields->push([
-            'tax' => 'name:Sadza DPH|belongsTo:taxes,:name (:tax%)|required|defaultByOption:default,1|canAdd',
+            'vat' => 'name:Sadza DPH|belongsTo:vats,:name (:vat%)|required|defaultByOption:default,1|canAdd',
             'price' => 'name:Základna cena bez DPH|type:decimal|component:PriceField||required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis platby|type:text',
@@ -40,7 +40,7 @@ class PaymentsMethod extends BasePaymentsMethod
     public function options()
     {
         return [
-            'tax_id' => Store::getTaxes(),
+            'vat_id' => Store::getVats(),
         ];
     }
 

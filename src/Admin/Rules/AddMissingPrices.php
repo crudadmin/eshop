@@ -17,21 +17,21 @@ class AddMissingPrices extends AdminRule
             return Ajax::error('Nie je možné upravovať produkty v už zrušenej objednávke.');
         }
 
-        //Set default tax
-        if ( ! $row->tax && ($product = $row->getProduct()) && $product->tax_id ) {
-            $row->tax = Store::getTaxValueById($product->tax_id);
+        //Set default vat
+        if ( ! $row->vat && ($product = $row->getProduct()) && $product->vat_id ) {
+            $row->vat = Store::getVatValueById($product->vat_id);
         }
 
         //Automatically fill product price if is empty
-        if ( $row->price !== 0 && ! $row->price && ! $row->price_tax && ($product = $row->getProduct()) ) {
-            $row->price = $product->priceWithoutTax;
+        if ( $row->price !== 0 && ! $row->price && ! $row->price_vat && ($product = $row->getProduct()) ) {
+            $row->price = $product->priceWithoutVat;
         }
 
         //If one price is missing, calculate others... vat/novat
         if ( ! $row->price ) {
-            $row->price = Store::roundNumber($row->price_tax / (1 + ($row->tax / 100)));
-        }  else if ( ! $row->price_tax ) {
-            $row->price_tax = Store::roundNumber($row->price * (1 + ($row->tax / 100)));
+            $row->price = Store::roundNumber($row->price_vat / (1 + ($row->vat / 100)));
+        }  else if ( ! $row->price_vat ) {
+            $row->price_vat = Store::roundNumber($row->price * (1 + ($row->vat / 100)));
         }
     }
 }

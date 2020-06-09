@@ -7,11 +7,11 @@
             </div>
             <div class="col-md-4">
                 <label>DPH</label>
-                <input type="number" step=".01" :value="taxSize" disabled class="form-control">
+                <input type="number" step=".01" :value="vatSize" disabled class="form-control">
             </div>
             <div class="col-md-4">
                 <label>Cena s DPH</label>
-                <input type="number" step=".01" :value="taxPrice" @keyup="changePrice" @change="recalculateWithoutTaxPrice" class="form-control" :readonly="disabled || readonly">
+                <input type="number" step=".01" :value="vatPrice" @keyup="changePrice" @change="recalculateWithoutVatPrice" class="form-control" :readonly="disabled || readonly">
             </div>
         </div>
     </div>
@@ -23,16 +23,16 @@ export default {
 
     data(){
         return {
-            tax : 0,
+            vat : 0,
         }
     },
 
     mounted(){
-        //On tax value change
-        this.onTaxChange();
+        //On vat value change
+        this.onVatChange();
 
-        //Bind default tax value
-        this.changeTaxValue(this.row[this.getTaxFieldKey()]);
+        //Bind default vat value
+        this.changeVatValue(this.row[this.getVatFieldKey()]);
     },
 
     computed: {
@@ -44,11 +44,11 @@ export default {
 
             return this.field.value;
         },
-        taxSize(){
-            return (this.field.value * (this.tax / 100)).toFixed(2);
+        vatSize(){
+            return (this.field.value * (this.vat / 100)).toFixed(2);
         },
-        taxPrice(){
-            return (this.field.value * (1 + (this.tax / 100))).toFixed(2);
+        vatPrice(){
+            return (this.field.value * (1 + (this.vat / 100))).toFixed(2);
         },
         value(){
             return this.field.value || this.field.default || 0;
@@ -61,35 +61,35 @@ export default {
 
             return fieldPrefix ? fieldPrefix+'_' : '';
         },
-        hasStaticFieldTax(){
-            return this.model.fields[this.getFieldPrefix()+'tax'] ? true : false;
+        hasStaticFieldVat(){
+            return this.model.fields[this.getFieldPrefix()+'vat'] ? true : false;
         },
-        getTaxFieldKey(){
-            var field = this.getFieldPrefix()+(this.hasStaticFieldTax() ? 'tax' : 'tax_id');
+        getVatFieldKey(){
+            var field = this.getFieldPrefix()+(this.hasStaticFieldVat() ? 'vat' : 'vat_id');
 
-            return this.model.fields[field] ? field : 'tax_id';
+            return this.model.fields[field] ? field : 'vat_id';
         },
         onChange(e){
             this.field.value = e.target.value;
         },
         changePrice : _.debounce(function(e){
-            this.recalculateWithoutTaxPrice(e);
+            this.recalculateWithoutVatPrice(e);
         }, 1500),
-        recalculateWithoutTaxPrice(e){
-            this.field.value = (e.target.value / (1 + (this.tax / 100))).toFixed(2);
+        recalculateWithoutVatPrice(e){
+            this.field.value = (e.target.value / (1 + (this.vat / 100))).toFixed(2);
         },
-        onTaxChange(){
-            this.$watch('row.'+this.getTaxFieldKey(), this.changeTaxValue);
+        onVatChange(){
+            this.$watch('row.'+this.getVatFieldKey(), this.changeVatValue);
         },
-        changeTaxValue(taxValue){
-            if ( this.hasStaticFieldTax() ) {
-                this.tax = taxValue;
+        changeVatValue(vatValue){
+            if ( this.hasStaticFieldVat() ) {
+                this.vat = vatValue;
             } else {
-                var options = this.model.fields['tax_id'].options;
+                var options = this.model.fields['vat_id'].options;
 
                 for ( var i = 0; i < options.length; i++ ) {
-                    if ( options[i][0] == taxValue ) {
-                        this.tax = options[i][1].tax;
+                    if ( options[i][0] == vatValue ) {
+                        this.vat = options[i][1].vat;
                     }
                 }
             }

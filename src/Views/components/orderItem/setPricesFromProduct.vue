@@ -43,17 +43,17 @@ export default {
                 });
 
             //If product does not have variants
-            this.row.price = product && availableVariants.length == 0 ? product.priceWithoutTax : null;
-            this.row.price_tax = product && availableVariants.length == 0 ? product.priceWithTax : null;
-            this.row.tax = product && availableVariants.length == 0 ? product.taxValue : null;
+            this.row.price = product && availableVariants.length == 0 ? product.priceWithoutVat : null;
+            this.row.price_vat = product && availableVariants.length == 0 ? product.priceWithVat : null;
+            this.row.vat = product && availableVariants.length == 0 ? product.vatValue : null;
         },
         updateVariantPrices(id){
             var product = this.model.getOptionValue('variant_id', id);
 
             //If product does not have variants
-            this.row.price = product ? product.priceWithoutTax : null;
-            this.row.price_tax = product ? product.priceWithTax : null;
-            this.row.tax = product ? product.taxValue : null;
+            this.row.price = product ? product.priceWithoutVat : null;
+            this.row.price_vat = product ? product.priceWithVat : null;
+            this.row.vat = product ? product.vatValue : null;
         },
     }
 }

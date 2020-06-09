@@ -115,7 +115,7 @@ class CartController extends Controller
 
         DeliveryMutator::saveDelivery(
             isset($delivery) ? $delivery->getKey() : null,
-            isset($location) ? $location->getKey() : null,
+            isset($location) ? $location->getKey() : null
         );
 
         //If no payment method is present, reset payment method to null
