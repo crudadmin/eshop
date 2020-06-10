@@ -87,7 +87,7 @@ class Product extends AdminModel implements CanBeInCart
             ])->icon('fa-file-text-o'),
             'Sklad' => Group::tab([
                 'warehouse_quantity' => 'name:Sklad|type:integer|default:0',
-                'warehouse_type' => 'name:Možnosti skladu|default:show|type:select|index',
+                'warehouse_type' => 'name:Možnosti skladu|default:default|type:select|index',
                 'warehouse_sold' => 'name:Text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:warehouse_type,everytime'
             ])->icon('fa-bars')->add('hidden'),
             'Ostatné nastavenia' => Group::tab([
