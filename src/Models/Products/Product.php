@@ -126,7 +126,8 @@ class Product extends AdminModel implements CanBeInCart
      * This items will be selected from db for cart items
      */
     protected $cartSelect = [
-        'id', 'slug', 'name', 'price', 'vat_id', 'code', 'warehouse_quantity', 'warehouse_type', 'warehouse_sold',
+        'id', 'slug', 'name', 'image', 'price', 'vat_id', 'code',
+        'warehouse_quantity', 'warehouse_type', 'warehouse_sold',
         'discount_operator', 'discount',
     ];
 
