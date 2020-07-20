@@ -22,9 +22,6 @@ trait OrderTrait
      */
     public function calculatePrices(OrdersItem $mutatingItem = null)
     {
-        $price = 0;
-        $priceWithVat = 0;
-
         //Set order into discounts factory
         OrderService::setOrder($this);
 

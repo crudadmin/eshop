@@ -2,12 +2,13 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Admin;
 use AdminEshop\Contracts\Discounts\Discount;
+use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Discounts;
 use Store;
-use Admin;
 
 trait PriceMutator
 {
@@ -135,7 +136,7 @@ trait PriceMutator
         foreach ($this->registredDiscounts as $discount) {
             //Skip non allowed discounts
             if ( $discounts === null || in_array($discount->getKey(), $allowedDiscounts) ) {
-                $value = is_callable($callback = $discount->value) ? $callback($this) : $discount->value;
+                $value = is_callable($callback = $discount->value) ? $this->runCallback($callback, $this) : $discount->value;
 
                 //If discount operator is set
                 if ( $discount->operator && is_numeric($value) ) {
@@ -145,6 +146,11 @@ trait PriceMutator
         }
 
         return $price;
+    }
+
+    private function runCallback(callable $callback, DiscountSupport $item)
+    {
+        return $callback($item);
     }
 
     /*

@@ -3,7 +3,6 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
@@ -226,9 +225,9 @@ class Discount implements Discountable
      * Return all cart items without actual discount
      * If actual discount would be applied, intifity loop will throw and error
      *
-     * @return  Collection
+     * @return  CartCollection
      */
-    public function getCartItems()
+    public function getCartItems() : CartCollection
     {
         $exceptAcutal = Discounts::getDiscounts([ $this->getKey() ]);
 
@@ -262,11 +261,7 @@ class Discount implements Discountable
         $order = Discounts::getOrder();
 
         $items = $order->items->map(function($item) use ($discounts) {
-            $identifier = Cart::getIdentifierByName($item->identifier) ?: new DefaultIdentifier;
-
-            $identifier = $identifier->cloneFormItem($item);
-
-            return new CartItem($identifier, $item->quantity, $item);
+            return $item->getCartItem();
         });
 
         $collection = new CartCollection($items);

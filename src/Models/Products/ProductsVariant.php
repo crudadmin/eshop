@@ -2,23 +2,19 @@
 
 namespace AdminEshop\Models\Products;
 
-use AdminEshop\Eloquent\Concerns\CanBeInCart;
-use AdminEshop\Eloquent\Concerns\HasCart;
+use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasWarehouse;
-use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class ProductsVariant extends AdminModel implements CanBeInCart
+class ProductsVariant extends CartEloquent
 {
     use HasProductAttributes,
         HasWarehouse,
-        HasProductImage,
-        PriceMutator,
-        HasCart;
+        HasProductImage;
 
     /**
      * Model constructor

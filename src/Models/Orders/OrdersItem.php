@@ -8,8 +8,11 @@ use AdminEshop\Admin\Rules\BindDefaultPrice;
 use AdminEshop\Admin\Rules\BindIdentifierName;
 use AdminEshop\Admin\Rules\RebuildOrderOnItemChange;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
+use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
+use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
@@ -17,7 +20,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class OrdersItem extends AdminModel implements UsesIdentifier
+class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 {
     use PriceMutator,
         IdentifierSupport;
@@ -232,5 +235,17 @@ class OrdersItem extends AdminModel implements UsesIdentifier
         ];
 
         return implode(' - ', array_filter($items));
+    }
+
+    /**
+     * Returns cart item
+     *
+     * @return  AdminEshop\Contracts\CartItem|null
+     */
+    public function getCartItem()
+    {
+        $identifier = $this->getIdentifierClass();
+
+        return new CartItem($identifier, $this->quantity, $this);
     }
 }
