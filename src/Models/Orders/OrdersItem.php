@@ -12,6 +12,7 @@ use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
+use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Models\Products\Product;
@@ -23,7 +24,8 @@ use Store;
 class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 {
     use PriceMutator,
-        IdentifierSupport;
+        IdentifierSupport,
+        DiscountHelper;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -112,7 +114,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     public function settings()
     {
         return [
-            'increments' => false,
+            // 'increments' => false,
             'buttons.insert' => 'Nová položka do objednávky',
             'title.insert' => 'Pridajte položku do objednávky',
             'title.update' => 'Upravujete položku v objednávke',
@@ -129,7 +131,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             //Add currency after columns
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'reloadOnUpdate' => true,
-            'refresh_interval' => 5000,
         ];
     }
 
@@ -242,7 +243,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
      *
      * @return  AdminEshop\Contracts\CartItem|null
      */
-    public function getCartItem()
+    public function buildCartItem()
     {
         $identifier = $this->getIdentifierClass();
 

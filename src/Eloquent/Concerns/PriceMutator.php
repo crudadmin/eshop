@@ -48,6 +48,14 @@ trait PriceMutator
     protected $toCartArrayDiscounts = null;
 
     /**
+     * Log applied discounts on given model
+     * for debug puposes
+     *
+     * @var  array
+     */
+    protected $debugAppliedDiscounts = [];
+
+    /**
      * All available price levels
      *
      * @var  array
@@ -135,12 +143,27 @@ trait PriceMutator
         //Apply all discounts into final price
         foreach ($this->registredDiscounts as $discount) {
             //Skip non allowed discounts
-            if ( $discounts === null || in_array($discount->getKey(), $allowedDiscounts) ) {
+            if (
+                $discounts === null
+                || in_array($discount->getKey(), $allowedDiscounts)
+            ) {
                 $value = is_callable($callback = $discount->value) ? $this->runCallback($callback, $this) : $discount->value;
 
                 //If discount operator is set
                 if ( $discount->operator && is_numeric($value) ) {
+                    $originalPrice = $price;
+
                     $price = operator_modifier($price, $discount->operator, $value);
+
+                    //Debug mode
+                    if ( env('APP_ENV') == 'local' ) {
+                        $this->debugAppliedDiscounts[$discount->getKey()] = [
+                            'operator' => $discount->operator,
+                            'operator_value' => $discount->value,
+                            'old_price' => $originalPrice,
+                            'new_price' => $price,
+                        ];
+                    }
                 }
             }
         }
@@ -366,5 +389,15 @@ trait PriceMutator
     public function getRewritedVatValue()
     {
         return $this->rewritedVatValue;
+    }
+
+    /**
+     * Return applied discounts on given property
+     *
+     * @return  array
+     */
+    public function getDebugAppliedDiscounts()
+    {
+        return $this->debugAppliedDiscounts;
     }
 }

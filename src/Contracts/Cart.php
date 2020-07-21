@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts;
 use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
+use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
@@ -37,7 +38,15 @@ class Cart
 
     public function __construct()
     {
-        $this->items = $this->fetchItemsFromSession();
+        //We does not want fetch items from session in admin interface
+        if ( Admin::isAdmin() == true ) {
+            $this->items = new CartCollection;
+        }
+
+        //In every other environment than admin, we want fetch items from session
+        else {
+            $this->items = $this->fetchItemsFromSession();
+        }
     }
 
     /**
@@ -141,7 +150,7 @@ class Cart
     }
 
     /**
-     * Returns item from cart
+     * Returns item from cart session
      *
      * @param  AdminEshop\Contracts\Cart\Identifiers|Identifier|AdminEshop\Eloquent\Concerns\CanBeInCart  $identifier
      */

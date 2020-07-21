@@ -231,8 +231,8 @@ class Discount implements Discountable
     {
         $exceptAcutal = Discounts::getDiscounts([ $this->getKey() ]);
 
-        if ( Discounts::getOrder() ) {
-            return $this->buildCartFromOrder($exceptAcutal);
+        if ( $order = Discounts::getOrder() ) {
+            return self::buildCartFromOrderItems($order->items, $exceptAcutal);
         }
 
         return Cart::all($exceptAcutal);
@@ -256,15 +256,11 @@ class Discount implements Discountable
      * @param  array  $discounts
      * @return  Collection
      */
-    public function buildCartFromOrder($discounts)
+    public static function buildCartFromOrderItems($items, $discounts = null)
     {
-        $order = Discounts::getOrder();
-
-        $items = $order->items->map(function($item) use ($discounts) {
+        $collection = new CartCollection($items->map(function($item) {
             return $item->getCartItem();
-        });
-
-        $collection = new CartCollection($items);
+        }));
 
         return $collection->toCartFormat($discounts);
     }

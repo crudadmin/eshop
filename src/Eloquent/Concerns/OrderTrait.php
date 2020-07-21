@@ -35,33 +35,47 @@ trait OrderTrait
 
         $this->save();
 
+        //We want sync discounts in every other items in order
         $this->syncOrderItemsWithCartDiscounts($items, $mutatingItem);
 
         //Remove and add again all discounts
         $this->items()->where('identifier', 'discount')->delete();
+
         OrderService::addDiscountableItemsIntoOrder();
     }
 
+    /**
+     * We need update prices of every other item in order
+     * because discoints may change prices in every order item
+     *
+     * @param  AdminEshop\Contracts\Collections\CartCollection  $items
+     * @param  OrdersItem|null  $mutatingItem If is beign update state, we need update this item for correct rendering in table
+     * @return  void
+     */
     public function syncOrderItemsWithCartDiscounts($items, OrdersItem $mutatingItem = null)
     {
         foreach ($items as $item) {
             //If order item has setted manual price,
             //we does not want to modify this item.
-            if ( $item->hasManualPrice ) {
+            if ( $item->hasManualPrice == true ) {
                 continue;
             }
+
+            //Receive item model of given OrderItem
+            //If identifier is missing, OrderItem itself will be returned
+            $itemModel = $item->getItemModel();
 
             $hasChanges = false;
 
             //If price without vat has been changed
-            if ( $item->price != $item->priceWithoutVat ) {
-                $item->price = $item->priceWithoutVat;
+            if ( $item->price != $itemModel->priceWithoutVat ) {
+                $item->price = $itemModel->priceWithoutVat;
                 $hasChanges = true;
             }
 
             //If price with vat has been changed
-            if ( $item->price_vat != $item->priceWithVat ) {
-                $item->price_vat = $item->priceWithVat;
+            if ( $item->price_vat != $itemModel->priceWithVat ) {
+                $item->price_vat = $itemModel->priceWithVat;
                 $hasChanges = true;
             }
 

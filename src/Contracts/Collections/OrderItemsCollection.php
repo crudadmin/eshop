@@ -9,6 +9,7 @@ class OrderItemsCollection extends CartCollection
 {
     /**
      * Clone default prices from Item into assigned model in this item
+     * And allow discounts on given models
      *
      * @var  string $key
      *
@@ -34,10 +35,10 @@ class OrderItemsCollection extends CartCollection
             //this suppor may change, id identifier will be missing.
             else if ( $item->getIdentifierClass()->hasDiscounts() ) {
                 if (
-                    $model = $item->getItemModel()
+                    ($model = $item->getItemModel())
                     && !is_null($price = $item->default_price)
                 ) {
-                    $item->getItemModel()->rewriteDefaultPrice($price);
+                    $model->rewriteDefaultPrice($price);
                 }
 
                 //If price is dynamic, we need allow discounts on this item

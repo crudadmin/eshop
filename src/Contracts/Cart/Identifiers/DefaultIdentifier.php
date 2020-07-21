@@ -29,7 +29,8 @@ class DefaultIdentifier extends Identifier
     {
         $originalObject = $item->getOriginalObject();
 
-        //If item has set original object if eloquent is missing.
+        //If item has set original object when if eloquent identifier is missing.
+        //Also original object needs to be also with discountable support
         if ( Discounts::hasDiscountableTrait($originalObject) ) {
             return $originalObject;
         }

@@ -4,6 +4,7 @@ namespace AdminEshop\Eloquent;
 
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
+use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
@@ -11,7 +12,8 @@ use Cart;
 
 class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
 {
-    use PriceMutator;
+    use PriceMutator,
+        DiscountHelper;
 
     /**
      * Returns cart identifier of actual eloquent
@@ -50,7 +52,7 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
      *
      * @return  AdminEshop\Contracts\CartItem|null
      */
-    public function getCartItem()
+    public function buildCartItem()
     {
         $identifier = $this->getIdentifier();
 

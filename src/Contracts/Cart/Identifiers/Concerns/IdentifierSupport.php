@@ -22,6 +22,11 @@ trait IdentifierSupport
      */
     private $originalObject;
 
+    /*
+     * Cached item model for given class instance
+     */
+    private $classItemModel = [];
+
     /**
      * Set eloquent of cart item
      *
@@ -44,15 +49,55 @@ trait IdentifierSupport
      */
     public function getItemModel($type = null)
     {
-        $identifier = $this->getIdentifierClass();
+        //We need cache item model of given cart,
+        //because we need return cloned instance of given property/eloquent.
+        //If returned model would not be cloned, it may rewrite prices in multiple
+        //places. Also if product is in cart multiple times, we need manipulate only with instance
+        //under this given cart item.
+        return $this->cacheItemModel($type, function() use ($type) {
+            $identifier = $this->getIdentifierClass();
 
-        //Return given type
-        if ( $type ) {
-            return @$this->itemModels[$type];
+            //Return given type
+            if ( $type ) {
+                $model = @$this->itemModels[$type];
+            } else {
+                //Return default
+                $model = $identifier->getItemModel($this, $this->itemModels);
+            }
+
+            if ( $model ){
+                //We need set actual cart item into model.
+                //Because we can not retrieve item from cart in this case.
+                //In admin cart is not available, so we need bing cart item into model.
+                if ( method_exists($this, 'getCartItem') ){
+                    $model->setCartItem($this->getCartItem());
+                } else {
+                    $model->setCartItem($this);
+                }
+            }
+
+            return $model;
+        });
+    }
+
+    /**
+     * Return cachable item model of given class instance
+     *
+     * @param  string|null  $type
+     * @param  callable  $callback
+     * @return  mixed
+     */
+    private function cacheItemModel($type = null, callable $callback)
+    {
+        $type = $type ?: '-';
+
+        if ( array_key_exists($type, $this->classItemModel) ) {
+            return $this->classItemModel[$type];
         }
 
-        //Return default
-        return $identifier->getItemModel($this, $this->itemModels);
+        if ( $data = $callback() ) {
+            return $this->classItemModel[$type] = clone $data;
+        }
     }
 
     /**

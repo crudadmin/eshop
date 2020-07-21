@@ -249,4 +249,15 @@ class CartCollection extends Collection
 
         return $price;
     }
+
+    public function getAppliedItemsDiscounts()
+    {
+        return $this->map(function($item){
+            return [
+                'id' => $item->getKey(),
+                'class' => get_class($item),
+                'discounts' => $item->getDebugAppliedDiscounts(),
+            ];
+        });
+    }
 }
