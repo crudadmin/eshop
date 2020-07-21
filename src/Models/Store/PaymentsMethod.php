@@ -48,4 +48,14 @@ class PaymentsMethod extends BasePaymentsMethod
     {
         return $this->image ? $this->image->resize(null, 180)->url : null;
     }
+
+    /**
+     * We may filter available payment methods
+     *
+     * @param  Builder  $query
+     */
+    public function scopeOnlyAvailable($query)
+    {
+
+    }
 }

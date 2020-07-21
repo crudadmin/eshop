@@ -90,4 +90,14 @@ class Delivery extends AdminModel
     {
         return $this->image ? $this->image->resize(null, 180)->url : null;
     }
+
+    /**
+     * We may filter available deliveries
+     *
+     * @param  Builder  $query
+     */
+    public function scopeOnlyAvailable($query)
+    {
+
+    }
 }

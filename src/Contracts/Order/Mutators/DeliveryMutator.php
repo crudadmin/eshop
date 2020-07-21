@@ -138,7 +138,7 @@ class DeliveryMutator extends Mutator
     public function getDeliveries()
     {
         return $this->cache('deliveries', function(){
-            return Admin::getModel('Delivery')->with('locations')->get();
+            return Admin::getModel('Delivery')->onlyAvailable()->with('locations')->get();
         });
     }
 
