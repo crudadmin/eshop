@@ -27,6 +27,7 @@ trait IdentifierSupport
      * Cached item model for given class instance
      */
     private $classItemModel = [];
+    private $classItemModelCloned = [];
 
     /**
      * Set eloquent of cart item
@@ -54,11 +55,12 @@ trait IdentifierSupport
     /**
      * Get eloquent of cart item by assigned identifier
      *
-     * @var string $type
+     * @param string $type
+     * @param bool $cloned
      *
      * @return  mixed
      */
-    public function getItemModel($type = null)
+    public function getItemModel($type = null, $cloned = true)
     {
         $identifier = $this->getIdentifierClass();
 
@@ -67,9 +69,9 @@ trait IdentifierSupport
         //We need cache item model of given cart,
         //because we need return cloned instance of given property/eloquent.
         //If returned model would not be cloned, it may rewrite prices in multiple
-        //places. Also if product is in cart multiple times, we need manipulate only with instance
+        //order item eloquent places. Also if product is in cart multiple times, we need manipulate only with instance
         //under this given cart item.
-        return $this->cacheItemModel($identifierHash, $type, function() use ($type, $identifier, $identifierHash) {
+        return $this->cacheItemModel($identifierHash, $type, $cloned, function() use ($type, $identifier, $identifierHash) {
             //Item models has not been mounted yet
             if ( !array_key_exists($identifierHash, $this->itemModels) ) {
                 $this->fetchSingleItemModel();
@@ -101,6 +103,18 @@ trait IdentifierSupport
         });
     }
 
+    /**
+     * Return non cloned item model
+     *
+     * @param  string|null  $type
+     *
+     * @return  AdminModel|null
+     */
+    public function getOriginalitemModel($type = null)
+    {
+        return $this->getItemModel($type, false);
+    }
+
     public function fetchSingleItemModel()
     {
         //Set then itemModels has been set already
@@ -117,19 +131,25 @@ trait IdentifierSupport
      *
      * @param  string  $identifierHash
      * @param  string|null  $type
+     * @param  bool  $cloned
      * @param  callable  $callback
      * @return  mixed
      */
-    private function cacheItemModel(string $identifierHash, $type = null, callable $callback)
+    private function cacheItemModel(string $identifierHash, $type = null, bool $cloned = true, callable $callback)
     {
         $type = $identifierHash.'_'.($type ?: '-');
 
+        $cacheKey = $cloned == true ? 'classItemModelCloned' : 'classItemModel';
+
         if ( array_key_exists($type, $this->classItemModel) ) {
-            return $this->classItemModel[$type];
+            return $this->{$cacheKey}[$type];
         }
 
         if ( $data = $callback() ) {
-            return $this->classItemModel[$type] = clone $data;
+            $this->classItemModel[$type] = $data;
+            $this->classItemModelCloned[$type] = clone $data;
+
+            return $this->{$cacheKey}[$type];
         }
     }
 

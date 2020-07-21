@@ -105,14 +105,18 @@ class CartItem implements UsesIdentifier
     {
         $identifier = $this->getIdentifierClass();
 
+        $identifierHash = $identifier->getIdentifierHash();
+
         //Modify cartItem from identifier
         if ( method_exists($identifier, 'onRender') ) {
             $identifier->onRender($this);
         }
 
         //Bind items models into cart object
-        foreach ($this->itemModels as $key => $model) {
-            $this->{$key} = $model;
+        if ( isset($this->itemModels[$identifierHash]) ) {
+            foreach ($this->itemModels[$identifierHash] as $key => $model) {
+                $this->{$key} = $model;
+            }
         }
 
         return $this;

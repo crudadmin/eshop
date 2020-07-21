@@ -55,8 +55,10 @@ class CartCollection extends Collection
             //If item would have discountable trait, cart discounts will be applied
             Cart::addCartDiscountsIntoModel($item, $discounts);
 
-            //We also want apply discounts on item eloquent
+            //We also want apply discounts on item eloquent.
+            //Also on on cached eloquent. Because this will be in cart summary in frontend.
             Cart::addCartDiscountsIntoModel($item->getItemModel(), $discounts);
+            Cart::addCartDiscountsIntoModel($item->getOriginalitemModel(), $discounts);
 
             return $item;
         });
