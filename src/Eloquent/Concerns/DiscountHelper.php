@@ -41,4 +41,14 @@ trait DiscountHelper
 
         return $this->cartItem = $this->buildCartItem();
     }
+
+    /**
+     * Return model key of order item instance
+     *
+     * @return  string
+     */
+    public function getCartItemModelKey()
+    {
+        return $this->getTable().'-'.$this->getKey();
+    }
 }

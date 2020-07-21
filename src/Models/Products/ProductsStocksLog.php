@@ -49,6 +49,8 @@ class ProductsStocksLog extends AdminModel
             'order.deleted' => 'Zmazaná objednávka',
             'item.add' => 'Produkt pridaný do objednávky',
             'item.update' => 'Zmeneny počet ks v objednávke',
+            'item.changed.new' => 'Tento produkt nahradil iný tovar v objednávke',
+            'item.changed.old' => 'Tento produkt v objednávke bol nahradený iným tovarom',
             'item.remove' => 'Produkt zmazaný z objednávky',
         ],
     ];

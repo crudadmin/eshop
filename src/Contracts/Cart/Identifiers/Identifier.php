@@ -217,6 +217,22 @@ class Identifier
     {
         return $query;
     }
+
+    /**
+     * Returns identifier hash key
+     *
+     * @return  string
+     */
+    public function getIdentifierHash()
+    {
+        $string = [];
+
+        foreach ($this->identifiers as $key => $value) {
+            $string[] = $key.'_'.$value;
+        }
+
+        return 'identifier_'.implode(';', $string);
+    }
 }
 
 ?>

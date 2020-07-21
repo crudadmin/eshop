@@ -6,23 +6,51 @@ use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
 use Ajax;
 
-class ReloadProductQuantity  extends AdminRule
+class ReloadProductQuantity extends AdminRule
 {
-    public function create($row)
+    public function creating(AdminModel $row)
     {
         if ( $order = $row->order ) {
             $this->checkQuantity($row, $row->quantity, 'item.add');
         }
     }
 
-    public function update($row)
+    public function updating(AdminModel $row)
     {
         if ( $order = $row->order ) {
-            $this->checkQuantity($row, $row->quantity - $row->getOriginal('quantity'), 'item.update');
+            //We also need update quantity when product will be changed
+            if ( $this->hasBeenChangedProduct($row) ) {
+                $previousModel = $this->getPreviousRowItemModel($row);
+
+                //We need subtract quantity to new item
+                $this->checkQuantity($row, $row->quantity, 'item.changed.new');
+
+                //We need commit previousModel quantity change
+                $previousModel->commitWarehouseChange('+', $row->quantity, $row->order_id, 'item.changed.old');
+            }
+
+            //Update existing model item
+            else {
+                $this->checkQuantity($row, $row->quantity - $row->getOriginal('quantity'), 'item.update');
+            }
         }
     }
 
-    public function delete($row)
+    private function getPreviousRowItemModel($row)
+    {
+        return (clone $row)->forceFill($row->getRawOriginal())->getItemModel();
+    }
+
+    private function hasBeenChangedProduct(AdminModel $row)
+    {
+        $previousModel = $this->getPreviousRowItemModel($row);
+        $actualModel = $row->getItemModel();
+
+        return ($previousModel && $actualModel)
+                && $previousModel->getCartItemModelKey() != $actualModel->getCartItemModelKey();
+    }
+
+    public function deleting(AdminModel $row)
     {
         if ( $order = $row->order ) {
             $this->checkQuantity($row, -$row->quantity, 'item.remove');

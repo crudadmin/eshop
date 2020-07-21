@@ -27,7 +27,7 @@ class DefaultIdentifier extends Identifier
      */
     public function getItemModel($item, $cache)
     {
-        $originalObject = $item->getOriginalObject();
+        $originalObject = $item->getOriginalObject() ?: $item;
 
         //If item has set original object when if eloquent identifier is missing.
         //Also original object needs to be also with discountable support
