@@ -50,6 +50,10 @@ class Store
      */
     public function getDefaultVat()
     {
+        if ( app()->runningInconsole() === true ) {
+            return 0;
+        }
+
         return $this->cache('vat.default', function(){
             $vat = $this->getVats()->where('default', true)->first();
 
@@ -75,7 +79,7 @@ class Store
     public function getSettings()
     {
         return $this->cache('storeSettings', function(){
-            return (Admin::getModel('Store') ?: new StoreModel)->first();
+            return (Admin::getModel('Store') ?: new StoreModel)->first() ?: new StoreModel;
         });
     }
 
