@@ -27,7 +27,7 @@ export default {
 
             this.model.setTabVisibility('products_variants', hasVariants);
             this.model.setTabVisibility('price', !hasOrderableVariants);
-            this.model.hideFromForm('warehouse_quantity', hasOrderableVariants);
+            this.model.hideFromForm('stock_quantity', hasOrderableVariants);
             this.model.hideFromForm('ean', hasOrderableVariants);
             this.model.hideFromForm('code', hasOrderableVariants);
         }

@@ -26,7 +26,7 @@ class ReloadProductQuantity extends AdminRule
                 $this->checkQuantity($row, $row->quantity, 'item.changed.new');
 
                 //We need commit previousModel quantity change
-                $previousModel->commitWarehouseChange('+', $row->quantity, $row->order_id, 'item.changed.old');
+                $previousModel->commitStockChange('+', $row->quantity, $row->order_id, 'item.changed.old');
             }
 
             //Update existing model item
@@ -75,10 +75,10 @@ class ReloadProductQuantity extends AdminRule
         }
 
         //If is no enought items on stock to subtract from product quantity
-        if ( $row->product->canOrderEverytime() == false && ($product->warehouse_quantity - $quantity) < 0 ) {
+        if ( $row->product->canOrderEverytime() == false && ($product->stock_quantity - $quantity) < 0 ) {
             return Ajax::error('Pre pridanie daného produktu do objednávky <strong>nie je</strong> dostatočný počet produktov na sklade.');
         }
 
-        $product->commitWarehouseChange('-', $quantity, $row->order_id, $message);
+        $product->commitStockChange('-', $quantity, $row->order_id, $message);
     }
 }

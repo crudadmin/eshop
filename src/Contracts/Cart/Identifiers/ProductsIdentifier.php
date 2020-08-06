@@ -106,7 +106,7 @@ class ProductsIdentifier extends Identifier
         }
 
         //Check if quantity in cart is lower that quantity on stock
-        return $item->quantity <= $item->getItemModel()->warehouse_quantity;
+        return $item->quantity <= $item->getItemModel()->stock_quantity;
     }
 
     /**

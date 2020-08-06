@@ -6,7 +6,7 @@ use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
-use AdminEshop\Eloquent\Concerns\HasWarehouse;
+use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
@@ -15,7 +15,7 @@ use Store;
 class Product extends CartEloquent
 {
     use HasProductImage,
-        HasWarehouse;
+        HasStock;
 
     /**
      * Model constructor
@@ -70,7 +70,7 @@ class Product extends CartEloquent
                     'ean' => 'name:EAN|hidden',
                     'code' => 'name:Kód produktu',
                 ])->inline(),
-            ])->icon('fa-pencil'),
+            ])->icon('fa-pencil')->id('general'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
                     'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|required|canAdd|hidden',
@@ -85,9 +85,9 @@ class Product extends CartEloquent
                 'description' => 'name:Popis produktu|type:editor|hidden',
             ])->icon('fa-file-text-o'),
             'Sklad' => Group::tab([
-                'warehouse_quantity' => 'name:Sklad|type:integer|default:0',
-                'warehouse_type' => 'name:Možnosti skladu|default:default|type:select|index',
-                'warehouse_sold' => 'name:Text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:warehouse_type,everytime'
+                'stock_quantity' => 'name:Sklad|type:integer|default:0',
+                'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
+                'stock_sold' => 'name:Text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:stock_type,everytime'
             ])->icon('fa-bars')->add('hidden'),
             'Ostatné nastavenia' => Group::tab([
                 'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
@@ -102,7 +102,7 @@ class Product extends CartEloquent
             'vat_id' => Store::getVats(),
             'product_type' => config('admineshop.product_types', []),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
-            'warehouse_type' => [
+            'stock_type' => [
                 'default' => 'Preberať z globalných nastavení eshopu',
                 'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
                 'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
@@ -126,7 +126,7 @@ class Product extends CartEloquent
      */
     protected $cartSelect = [
         'id', 'slug', 'name', 'image', 'price', 'vat_id', 'code',
-        'warehouse_quantity', 'warehouse_type', 'warehouse_sold',
+        'stock_quantity', 'stock_type', 'stock_sold',
         'discount_operator', 'discount',
     ];
 

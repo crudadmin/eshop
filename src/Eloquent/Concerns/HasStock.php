@@ -7,7 +7,7 @@ use AdminEshop\Models\Products\ProductsStocksLog;
 use AdminEshop\Models\Products\ProductsVariant;
 use Store;
 
-trait HasWarehouse
+trait HasStock
 {
     /**
      * Avaiable stock attributes
@@ -39,13 +39,13 @@ trait HasWarehouse
     }
 
     /*
-     * Get product warehouse type or value from global settings
+     * Get product stock type or value from global settings
      */
-    public function getWarehouseTypeAttribute($value)
+    public function getStockTypeAttribute($value)
     {
         //Overide default value by global settings
         if ( $value === 'default' ) {
-            return Store::getSettings()->warehouse_type;
+            return Store::getSettings()->stock_type;
         }
 
         return $value;
@@ -54,11 +54,11 @@ trait HasWarehouse
     /*
      * Get product value or value from global settings
      */
-    public function getWarehouseSoldAttribute($value)
+    public function getStockSoldAttribute($value)
     {
         //Overide default value by global settings
         if ( ! $value ) {
-            return Store::getSettings()->warehouse_sold;
+            return Store::getSettings()->stock_sold;
         }
 
         return $value;
@@ -66,20 +66,20 @@ trait HasWarehouse
 
     public function getHasStockAttribute()
     {
-        return $this->warehouse_quantity > 0;
+        return $this->stock_quantity > 0;
     }
 
     public function getIsAvailableAttribute()
     {
-        return $this->warehouse_quantity > 0 || $this->canOrderEverytime();
+        return $this->stock_quantity > 0 || $this->canOrderEverytime();
     }
 
     /*
-     * Check if order can be ordered with zero quantity on warehouse
+     * Check if order can be ordered with zero quantity on stock
      */
     public function canOrderEverytime()
     {
-        return $this->warehouse_type == 'everytime';
+        return $this->stock_type == 'everytime';
     }
 
     /*
@@ -102,10 +102,10 @@ trait HasWarehouse
     {
         if ( $this->hasStock ) {
             if ( $this->canOrderEverytime() == false ) {
-                $stockText = $this->warehouse_quantity;
+                $stockText = $this->stock_quantity;
 
                 foreach ([100, 50, 20, 10] as $onStock) {
-                    if ( $this->warehouse_quantity > $onStock ){
+                    if ( $this->stock_quantity > $onStock ){
                         return sprintf(_('Skladom >%sks'), $stockText);
                     }
                 }
@@ -117,8 +117,8 @@ trait HasWarehouse
         }
 
         //If is custom message
-        if ( $this->canOrderEverytime() && $this->warehouse_sold ) {
-            return $this->warehouse_sold;
+        if ( $this->canOrderEverytime() && $this->stock_sold ) {
+            return $this->stock_sold;
         }
 
         return _('Nie je skladom');
@@ -130,8 +130,8 @@ trait HasWarehouse
          * Limit stocks on variants
          */
         if ( $this instanceof ProductsVariant ) {
-            $query->where('products.warehouse_type', '!=', 'hide')
-                  ->orWhere('products_variants.warehouse_quantity', '>', 0);
+            $query->where('products.stock_type', '!=', 'hide')
+                  ->orWhere('products_variants.stock_quantity', '>', 0);
         }
 
         /*
@@ -139,38 +139,38 @@ trait HasWarehouse
          */
         else if ( $this instanceof Product ) {
             $query
-                ->where('products.warehouse_type', '!=', 'hide')
+                ->where('products.stock_type', '!=', 'hide')
 
                 ->orWhere(function($query){
                     $query
                         ->whereHas('variants', function($query){
-                            $query->where('products_variants.warehouse_quantity', '>', 0);
+                            $query->where('products_variants.stock_quantity', '>', 0);
                         })
 
                         ->orWhere(function($query){
                             $query
                                 ->doesntHave('variants')
-                                ->where('products.warehouse_quantity', '>', 0);
+                                ->where('products.stock_quantity', '>', 0);
                         });
                 });
         }
     }
 
     /**
-     * Commit product warehouse change
+     * Commit product stock change
      *
      * @param  int  $sub
      * @param  int  $orderId
      * @return void
      */
-    public function commitWarehouseChange($type = '-', int $sub, $orderId, $message = null)
+    public function commitStockChange($type = '-', int $sub, $orderId, $message = null)
     {
         //Set sub on product type
         $sub = ($type == '-' ? $sub * -1 : $sub);
 
-        $updatedStock = $this->warehouse_quantity + $sub;
+        $updatedStock = $this->stock_quantity + $sub;
 
-        $this->warehouse_quantity = $updatedStock < 0 ? 0 : $updatedStock;
+        $this->stock_quantity = $updatedStock < 0 ? 0 : $updatedStock;
         $this->save();
 
         ProductsStocksLog::create([
@@ -178,7 +178,7 @@ trait HasWarehouse
             'product_id' => $this instanceof Product ? $this->getKey() : $this->product_id,
             'variant_id' => $this instanceof ProductsVariant ? $this->getKey() : null,
             'sub' => $sub,
-            'stock' => $this->warehouse_quantity,
+            'stock' => $this->stock_quantity,
             'message' => $message,
         ]);
     }

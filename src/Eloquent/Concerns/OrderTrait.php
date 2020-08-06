@@ -108,12 +108,12 @@ trait OrderTrait
     }
 
     /**
-     * Count down products from order in warehouse counts
+     * Count down products from order in stock counts
      *
      * @param  string  $type '-' or '+'
      * @return  void
      */
-    public function syncWarehouse($type, $message)
+    public function syncStock($type, $message)
     {
         //Uncount quantity
         foreach ($this->items as $item) {
@@ -122,7 +122,7 @@ trait OrderTrait
                 continue;
             }
 
-            $product->commitWarehouseChange($type, $item->quantity, $this->getKey(), $message);
+            $product->commitStockChange($type, $item->quantity, $this->getKey(), $message);
         }
     }
 

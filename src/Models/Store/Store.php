@@ -41,8 +41,8 @@ class Store extends AdminModel
             'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
             'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
             'Nastavenia skladu' => Group::tab([
-                'warehouse_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',
-                'warehouse_sold' => 'name:Globálny text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:warehouse_type,everytime'
+                'stock_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',
+                'stock_sold' => 'name:Globálny text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:stock_type,everytime'
             ])->icon('fa-bars')->add('hidden'),
         ];
     }
@@ -53,7 +53,7 @@ class Store extends AdminModel
             1 => 'na 1 desetinné miesto',
             0 => 'na celé čísla',
         ],
-        'warehouse_type' => [
+        'stock_type' => [
             'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
             'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
             'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',

@@ -5,7 +5,7 @@ namespace AdminEshop\Contracts;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
-use AdminEshop\Eloquent\Concerns\HasWarehouse;
+use AdminEshop\Eloquent\Concerns\HasStock;
 use Cart;
 
 class CartItem implements UsesIdentifier

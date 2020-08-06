@@ -153,7 +153,7 @@ class OrderService
         //Add all order items into order
         $this->addDiscountableItemsIntoOrder();
 
-        $this->order->syncWarehouse('-', 'order.new');
+        $this->order->syncStock('-', 'order.new');
 
         return $this;
     }

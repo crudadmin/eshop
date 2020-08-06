@@ -5,7 +5,7 @@ namespace AdminEshop\Models\Products;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
-use AdminEshop\Eloquent\Concerns\HasWarehouse;
+use AdminEshop\Eloquent\Concerns\HasStock;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
@@ -13,7 +13,7 @@ use Store;
 class ProductsVariant extends CartEloquent
 {
     use HasProductAttributes,
-        HasWarehouse,
+        HasStock,
         HasProductImage;
 
     /**
@@ -86,7 +86,7 @@ class ProductsVariant extends CartEloquent
                 ])->width(4)->id('discount'),
             ])->icon('fa-money'),
             'Sklad' => Group::tab([
-                'warehouse_quantity' => 'name:Počet na sklade|type:integer|default:0',
+                'stock_quantity' => 'name:Počet na sklade|type:integer|default:0',
             ])->grid(7)->icon('fa-gear'),
             Group::tab( ProductsAttribute::class ),
         ];
@@ -126,7 +126,7 @@ class ProductsVariant extends CartEloquent
      */
     protected $cartSelect = [
         'id', 'product_id', 'name', 'image', 'price', 'vat_id',
-        'discount_operator', 'discount', 'warehouse_quantity',
+        'discount_operator', 'discount', 'stock_quantity',
     ];
 
     /**
