@@ -99,7 +99,7 @@ class Store
             return false;
         }
 
-        return $this->rounding ?: $this->getSettings()->rounding;
+        return $this->rounding ?: (int)$this->getSettings()->rounding;
     }
 
     /**

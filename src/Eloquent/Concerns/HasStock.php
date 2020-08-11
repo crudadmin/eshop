@@ -15,7 +15,7 @@ trait HasStock
      * @var  array
      */
     protected $stockAttributes = [
-        'stockText', 'hasStock',
+        'stockText', 'hasStock', 'stockNumber',
     ];
 
     /**
@@ -101,16 +101,8 @@ trait HasStock
     public function getStockTextAttribute()
     {
         if ( $this->hasStock ) {
-            if ( $this->canOrderEverytime() == false ) {
-                $stockText = $this->stock_quantity;
-
-                foreach ([100, 50, 20, 10] as $onStock) {
-                    if ( $this->stock_quantity > $onStock ){
-                        return sprintf(_('Skladom >%sks'), $stockText);
-                    }
-                }
-
-                return sprintf(_('Skladom %sks'), $stockText);
+            if ( $this->canOrderEverytime() == false && config('admineshop.stock.status_with_quantity') === true ) {
+                return sprintf(_('Skladom %sks'), $this->stockNumber);
             }
 
             return _('Skladom');
@@ -122,6 +114,19 @@ trait HasStock
         }
 
         return _('Nie je skladom');
+    }
+
+    public function getStockNumberAttribute()
+    {
+        $stockText = $this->stock_quantity;
+
+        foreach (config('admineshop.stock.rounding', []) as $onStock) {
+            if ( $this->stock_quantity > $onStock ){
+                return '+'.$onStock;
+            }
+        }
+
+        return $stockText;
     }
 
     public function scopeOnStock($query)

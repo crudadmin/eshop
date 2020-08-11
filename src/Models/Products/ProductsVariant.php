@@ -52,6 +52,14 @@ class ProductsVariant extends CartEloquent
     protected $belongsToModel = Product::class;
 
     /*
+     * This items will be selected frm db for cart items
+     */
+    protected $cartSelect = [
+        'id', 'product_id', 'name', 'image', 'price', 'vat_id',
+        'discount_operator', 'discount', 'stock_quantity',
+    ];
+
+    /*
      * Automatic form and database generation
      * @name - field name
      * @placeholder - field placeholder
@@ -88,30 +96,34 @@ class ProductsVariant extends CartEloquent
             'Sklad' => Group::tab([
                 'stock_quantity' => 'name:Počet na sklade|type:integer|default:0',
             ])->grid(7)->icon('fa-gear'),
-            Group::tab( ProductsAttribute::class ),
+            config('admineshop.attributes.variants') ? Group::tab( ProductsAttribute::class ) : [],
         ];
     }
 
-    protected $settings = [
-        'increments' => false,
-        'title.insert' => 'Nová varianta',
-        'title.update' => 'Úprava varianty :name',
-        'title.rows' => 'Zoznam variant',
-        'grid' => [
-            'default' =>'full',
-            'disabled' => true,
-        ],
-        'columns.attributes' => [
-            'name' => 'Atribúty',
-            'before' => 'code',
-        ],
-        'buttons' => [
-            'insert' => 'Nová varianta',
-            'update' => 'Uložiť variantu',
-            'create' => 'Pridať variantu',
-        ],
-        'autoreset' => false,
-    ];
+    public function settings()
+    {
+        return [
+            'increments' => false,
+            'title.insert' => 'Nová varianta',
+            'title.update' => 'Úprava varianty :name',
+            'title.rows' => 'Zoznam variant',
+            'grid' => [
+                'default' =>'full',
+                'disabled' => true,
+            ],
+            'columns.attributes' => [
+                'hidden' => config('admineshop.attributes.variants') ? false : true,
+                'name' => 'Atribúty',
+                'before' => 'code',
+            ],
+            'buttons' => [
+                'insert' => 'Nová varianta',
+                'update' => 'Uložiť variantu',
+                'create' => 'Pridať variantu',
+            ],
+            'autoreset' => false,
+        ];
+    }
 
     public function options()
     {
@@ -121,13 +133,13 @@ class ProductsVariant extends CartEloquent
         ];
     }
 
-    /*
-     * This items will be selected frm db for cart items
-     */
-    protected $cartSelect = [
-        'id', 'product_id', 'name', 'image', 'price', 'vat_id',
-        'discount_operator', 'discount', 'stock_quantity',
-    ];
+    public function scopeAdminRows($query)
+    {
+        //Load all attributes data
+        if ( config('admineshop.attributes.variants') == true ) {
+            $query->with('attributesItems');
+        }
+    }
 
     /**
      * Variant product is all the time regular type

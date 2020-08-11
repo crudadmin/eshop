@@ -31,7 +31,7 @@ class Delivery extends AdminModel
 
     protected $reversed = true;
 
-    protected $visible = ['id', 'name', 'title', 'description', 'thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice', 'locations'];
+    protected $hidden = ['created_at', 'published_at', 'deleted_at', 'updated_at'];
 
     protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 
@@ -50,12 +50,33 @@ class Delivery extends AdminModel
             'price' => 'name:Základná cena bez DPH|type:decimal|component:priceField|required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis dopravy|hidden',
-
-            'Obmedzenia' => Group::tab([
-                'payments' => 'name:Dostupné platobné metódy|belongsToMany:payments_methods,name|title:Pri žiadnej vybranej platia všetký|canAdd',
-                'multiple_locations' => 'name:Viacej predajni|type:checkbox|default:0',
-            ])->icon('fa-gear'),
         ];
+    }
+
+    public function mutateFields($fields)
+    {
+        $restrictionFields = [];
+
+        //Add multiple locations model
+        if ( config('admineshop.delivery.multiple_locations') == true ) {
+            $restrictionFields['multiple_locations'] = 'name:Viacero doručovacích adries/predajní|type:checkbox|default:0';
+        }
+
+        //Add payments rules
+        if ( config('admineshop.delivery.payments') == true ) {
+            $restrictionFields['payments'] = 'name:Dostupné platobné metódy|belongsToMany:payments_methods,name|title:Pri žiadnej vybranej platia všetký|canAdd';
+        }
+
+        //Add payments rules
+        if ( config('admineshop.delivery.countries') == true ) {
+            $restrictionFields['countries'] = 'name:Dostupné krajiny|belongsToMany:countries,name|title:Pri žiadnej vybranej platia všetký|canAdd';
+        }
+
+        if ( count($restrictionFields) > 0 ) {
+            $fields->push(
+                Group::tab($restrictionFields)->name('Obmedzenia')->icon('fa-gear')->id('restrictions')
+            );
+        }
     }
 
     protected $settings = [
@@ -89,6 +110,11 @@ class Delivery extends AdminModel
     public function getThumbnailAttribute()
     {
         return $this->image ? $this->image->resize(null, 180)->url : null;
+    }
+
+    public function getCountriesIdsAttribute()
+    {
+        return $this->countries->pluck('id');
     }
 
     /**

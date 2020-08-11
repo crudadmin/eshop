@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use \AdminEshop\Models\Store\AttributesItem;
@@ -24,12 +25,28 @@ class ProductsAttribute extends AdminModel
      */
     protected $title = '';
 
+    protected $icon = 'fa-tint';
+
     protected $inTab = true;
+
     protected $withoutParent = true;
 
-    protected $belongsToModel = ProductsVariant::class;
-
     protected $publishable = false;
+
+    public function belongsToModel()
+    {
+        $relations = [];
+
+        if ( config('admineshop.attributes.products') ) {
+            $relations[] = Product::class;
+        }
+
+        if ( config('admineshop.attributes.variants') ) {
+            $relations[] = ProductsVariant::class;
+        }
+
+        return $relations;
+    }
 
     /*
      * Automatic form and database generation
@@ -42,7 +59,7 @@ class ProductsAttribute extends AdminModel
     {
         return [
             'attribute' => 'name:Atribút|belongsTo:attributes,name|canAdd|required',
-            'item' => 'name:Hodnota atribútu|belongsTo:attributes_items,:name:unit|filterBy:attribute|canAdd|required',
+            'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name:unit|filterBy:attribute|canAdd|required',
         ];
     }
 
@@ -59,12 +76,12 @@ class ProductsAttribute extends AdminModel
     public function options()
     {
         return [
-            'item' => $this->getVariantItemsOptions(),
+            'items' => $this->getVariantItemsOptions(),
         ];
     }
 
     protected $settings = [
-        'title.insert' => 'Nový atribut k variante',
+        'title.insert' => 'Nový atribut',
         'title.update' => 'Upravujete atribút',
         'title.rows' => 'Zoznam atribútov kombinacie',
         'columns.id.hidden' => true,
@@ -80,4 +97,9 @@ class ProductsAttribute extends AdminModel
     protected $layouts = [
         'form-top' => 'setProductAttributes',
     ];
+
+    public function getAttributesTextItems()
+    {
+        return $this->items;
+    }
 }

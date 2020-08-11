@@ -33,5 +33,17 @@ return [
     'components' => [
         __DIR__.'/../Views/components',
     ],
+
+    /*
+     * Add eshop translates resources
+     */
+    'gettext_source_paths' => [
+        __DIR__.'/../Models',
+        __DIR__.'/../Contracts',
+        __DIR__.'/../Eloquent',
+        __DIR__.'/../Helpers',
+        __DIR__.'/../Notifications',
+        __DIR__.'/../Views',
+    ],
 ];
 ?>

@@ -18,6 +18,32 @@ return [
     ],
 
     /*
+     * Enable attributes
+     */
+    'attributes' => [
+        'products' => false,
+        'variants' => false,
+        'separator' => [
+            'item' => ', ',
+            'attribute' => ', ',
+        ],
+    ],
+
+    /*
+     * Product stocks properties
+     */
+    'stock' => [
+        'status_with_quantity' => true, //Show detailed stock status with quantity text: Skladom 5ks, Skladom 10+ks
+        'rounding' => [100, 50, 20, 10], //10+, 50+ items...
+    ],
+
+    'delivery' => [
+        'multiple_locations' => false, //Multiple locations for one delivery method
+        'payments' => false, //Payment rules for each delivery method
+        'countries' => false, //Country rules for delivery
+    ],
+
+    /*
      * Enable invoices support
      */
     'invoices' => false,

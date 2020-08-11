@@ -6,14 +6,17 @@
 export default {
     props : ['model', 'row', 'rows'],
 
-    mounted(){
+    created(){
         this.removeUsedAttributes();
     },
 
     methods: {
         removeUsedAttributes(){
-            this.model.optionsFilter('item_id', (key, value) => {
-                return this.rows.map(item => item.item_id).indexOf(key) == -1;
+            this.model.optionsFilter('attribute_id', (key, value) => {
+                var used = this.rows.map(attribute => attribute.attribute_id).indexOf(key),
+                    isSelected = this.row.attribute_id == key;
+
+                return used == -1 || isSelected;
             });
         },
     }

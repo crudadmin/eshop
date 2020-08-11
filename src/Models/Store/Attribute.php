@@ -59,5 +59,4 @@ class Attribute extends AdminModel
         'title.update' => ':name',
         'columns.id.hidden' => true,
     ];
-
 }

@@ -27,6 +27,10 @@ class DeliveriesLocation extends AdminModel
 
     protected $hidden = ['created_at', 'updated_at', 'published_at', 'deleted_at', '_order'];
 
+    public function active() {
+        return config('admineshop.delivery.multiple_locations') === true;
+    }
+
     /*
      * Automatic form and database generator by fields list
      * :name - field name

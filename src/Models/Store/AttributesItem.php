@@ -32,6 +32,8 @@ class AttributesItem extends AdminModel
 
     protected $sluggable = 'name';
 
+    protected $hidden = ['pivot'];
+
     /*
      * Automatic form and database generation
      * @name - field name

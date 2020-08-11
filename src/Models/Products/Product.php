@@ -5,6 +5,7 @@ namespace AdminEshop\Models\Products;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\HasCart;
+use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
@@ -15,6 +16,7 @@ use Store;
 class Product extends CartEloquent
 {
     use HasProductImage,
+        HasProductAttributes,
         HasStock;
 
     /**
@@ -63,7 +65,7 @@ class Product extends CartEloquent
             Group::tab([
                 Group::fields([
                     'name' => 'name:Názov produktu|index|limit:30|required',
-                    'product_type' => 'name:Typ produktu|type:select|option:name|required',
+                    'product_type' => 'name:Typ produktu|type:select|option:name|default:regular|required',
                 ])->inline(),
                 'image' => 'name:Obrázok|type:file|image',
                 Group::fields([
@@ -89,6 +91,7 @@ class Product extends CartEloquent
                 'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
                 'stock_sold' => 'name:Text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:stock_type,everytime'
             ])->icon('fa-bars')->add('hidden'),
+            config('admineshop.attributes.products') ? Group::tab( ProductsAttribute::class ) : [],
             'Ostatné nastavenia' => Group::tab([
                 'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
                 'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
@@ -111,11 +114,19 @@ class Product extends CartEloquent
         ];
     }
 
-    protected $settings = [
-        'title.insert' => 'Nový produkt',
-        'title.update' => ':name',
-        'grid.default' => 'full',
-    ];
+    public function settings()
+    {
+        return [
+            'title.insert' => 'Nový produkt',
+            'title.update' => ':name',
+            'grid.default' => 'full',
+            'columns.attributes' => [
+                'hidden' => config('admineshop.attributes.products') ? false : true,
+                'name' => 'Atribúty',
+                'before' => 'code',
+            ],
+        ];
+    }
 
     protected $layouts = [
         'form-top' => 'setProductTabs',
@@ -129,6 +140,14 @@ class Product extends CartEloquent
         'stock_quantity', 'stock_type', 'stock_sold',
         'discount_operator', 'discount',
     ];
+
+    public function scopeAdminRows($query)
+    {
+        //Load all attributes data
+        if ( config('admineshop.attributes.products') == true ) {
+            $query->with('attributesItems');
+        }
+    }
 
     public function scopeNonVariantProducts($query)
     {
@@ -158,5 +177,14 @@ class Product extends CartEloquent
         }
 
         return $this->product_type == $type;
+    }
+
+    public function setAdminAttributes($attributes)
+    {
+        if ( config('admineshop.attributes.products') === true ) {
+            $attributes['attributes'] = $this->attributesText;
+        }
+
+        return $attributes;
     }
 }
