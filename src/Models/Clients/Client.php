@@ -3,8 +3,8 @@
 namespace AdminEshop\Models\Clients;
 
 use Admin\Eloquent\Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Admin\Fields\Group;
+use Illuminate\Notifications\Notifiable;
 
 class Client extends Authenticatable
 {

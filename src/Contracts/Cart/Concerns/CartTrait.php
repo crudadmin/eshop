@@ -104,9 +104,9 @@ trait CartTrait
     /*
      * Fetch items from session
      */
-    private function fetchItemsFromSession()
+    public function fetchItemsFromDriver() : CartCollection
     {
-        $items = session($this->key, []);
+        $items = $this->getDriver()->get('items');
 
         if ( ! is_array($items) ) {
             return new CartCollection;
@@ -133,10 +133,11 @@ trait CartTrait
     /**
      * Check quantity type
      */
-    private function checkQuantity($quantity)
+    public function checkQuantity($quantity)
     {
-        if ( ! is_numeric($quantity) || $quantity < 0 )
+        if ( ! is_numeric($quantity) || $quantity < 0 ) {
             return 1;
+        }
 
         return (int)$quantity;
     }
@@ -259,6 +260,23 @@ trait CartTrait
         $this->fetchedModels[$table] = $this->fetchedModels[$table]->merge($items);
 
         return $this;
+    }
+
+    /**
+     * Save items from cart into session
+     *
+     * @param  CartCollection  $items
+     * @return void
+     */
+    public function saveItems(CartCollection $items)
+    {
+        $items = $items->toArray();
+
+        foreach ($items as $key => $item) {
+            $items[$key] = (array)$items[$key];
+        }
+
+        $this->getDriver()->set('items', $items);
     }
 }
 

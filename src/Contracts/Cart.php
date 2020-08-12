@@ -31,13 +31,20 @@ class Cart
      */
     private $fullCartResponse = false;
 
-    /*
-     * Session key for basket items
+    /**
+     * Cart Driver
+     * session/token
+     *
+     * @var  void
      */
-    private $key = 'cart.items';
+    protected $driver;
 
     public function __construct()
     {
+        $driver = config('admineshop.cart.driver');
+
+        $this->driver = new $driver;
+
         //We does not want fetch items from session in admin interface
         if ( Admin::isAdmin() == true ) {
             $this->items = new CartCollection;
@@ -45,8 +52,18 @@ class Cart
 
         //In every other environment than admin, we want fetch items from session
         else {
-            $this->items = $this->fetchItemsFromSession();
+            $this->items = $this->fetchItemsFromDriver();
         }
+    }
+
+    /**
+     * Returns driver
+     *
+     * @return  AdminEshop\Contracts\Cart\Drivers\DriverInterface
+     */
+    public function getDriver()
+    {
+        return $this->driver;
     }
 
     /**
@@ -83,9 +100,11 @@ class Cart
             autoAjax()->message(_('Produkt nebol nájdeny v košíku.'))->code(422)->throw();
         }
 
-        $item->setQuantity($this->checkQuantity($quantity));
+        $item->setQuantity(
+            $this->checkQuantity($quantity)
+        );
 
-        $this->save();
+        $this->saveItems();
 
         $this->pushToUpdated($item);
 
@@ -104,7 +123,7 @@ class Cart
             return $identifier->hasThisItem($item);
         })->values();
 
-        $this->save();
+        $this->saveItems();
 
         return $this;
     }
@@ -186,26 +205,11 @@ class Cart
 
         $this->items[] = $item;
 
-        $this->save();
+        $this->saveItems();
 
         $this->pushToAdded($item);
 
         return $this;
-    }
-
-    /*
-     * Save items from cart into session
-     */
-    public function save()
-    {
-        $items = ($this->items)->toArray();
-
-        foreach ($items as $key => $item) {
-            $items[$key] = (array)$items[$key];
-        }
-
-        session()->put($this->key, $items);
-        session()->save();
     }
 
     /**
@@ -232,7 +236,7 @@ class Cart
     {
         //On local environment does not flush data
         if ( ! app()->environment('local') ) {
-            session()->forget($this->key);
+            $this->driver->forgetItems();
 
             //Remove all order mutators from session
             foreach (OrderService::getMutators() as $mutator) {

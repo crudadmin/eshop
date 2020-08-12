@@ -61,4 +61,10 @@ return [
      * false => (1.11*1.2 => 1.33)*6=>7.98 in total
      */
     'round_summary' => true,
+
+    'cart' => [
+        //AdminEshop\Contracts\Drivers\SessionDriver::class
+        //AdminEshop\Contracts\Drivers\RESTDriver::class
+        'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
+    ],
 ];

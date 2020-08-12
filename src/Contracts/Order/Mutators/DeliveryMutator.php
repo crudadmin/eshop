@@ -23,14 +23,14 @@ class DeliveryMutator extends Mutator
     ];
 
     /*
-     * Session key for delivery
+     * driver key for delivery
      */
-    private $sessionKey = 'cart.delivery';
+    private $deliveryKey = 'delivery';
 
     /*
-     * Session location key
+     * driver location key
      */
-    private $sessionLocationKey = 'cart.delivery_location';
+    private $deliveryLocationKey = 'delivery_location';
 
     /**
      * Returns if mutators is active
@@ -143,11 +143,11 @@ class DeliveryMutator extends Mutator
     }
 
     /*
-     * Get delivery from session
+     * Get delivery from driver
      */
     public function getSelectedDelivery()
     {
-        $id = session()->get($this->sessionKey);
+        $id = Cart::getDriver()->get($this->deliveryKey);
 
         return $this->cache('selectedDelivery'.$id, function() use ($id) {
             return Cart::addCartDiscountsIntoModel($this->getDeliveries()->where('id', $id)->first());
@@ -155,11 +155,11 @@ class DeliveryMutator extends Mutator
     }
 
     /*
-     * Get location under delivery from session
+     * Get location under delivery from driver
      */
     public function getSelectedLocation()
     {
-        $id = session()->get($this->sessionLocationKey);
+        $id = Cart::getDriver()->get($this->deliveryLocationKey);
 
         return $this->cache('selectedLocation'.$id, function() use ($id) {
             if ( !($delivery = $this->getSelectedDelivery()) ) {
@@ -171,7 +171,7 @@ class DeliveryMutator extends Mutator
     }
 
     /**
-     * Save delivery into session
+     * Save delivery into driver
      *
      * @param  int|null  $id
      * @param  int|null  $locationId
@@ -179,23 +179,22 @@ class DeliveryMutator extends Mutator
      */
     public function saveDelivery($id = null, $locationId = null)
     {
-        session()->put($this->sessionKey, $id);
-        session()->put($this->sessionLocationKey, $locationId);
-        session()->save();
+        Cart::getDriver()->set($this->deliveryKey, $id);
+        Cart::getDriver()->set($this->deliveryLocationKey, $locationId);
 
         return $this;
     }
 
     /**
-     * When cart is being forget state, we can flush session here
+     * When cart is being forget state, we can flush driver here
      * for this mutator.
      *
      * @return  void
      */
     public function onCartForget()
     {
-        session()->forget($this->sessionKey);
-        session()->forget($this->sessionLocationKey);
+        Cart::getDriver()->set($this->deliveryKey, null);
+        Cart::getDriver()->set($this->deliveryLocationKey, null);
     }
 }
 

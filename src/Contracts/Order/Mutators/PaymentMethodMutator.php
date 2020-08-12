@@ -22,9 +22,9 @@ class PaymentMethodMutator extends Mutator
     ];
 
     /*
-     * Session key for payment method
+     * driver key for payment method
      */
-    private $sessionKey = 'cart.paymentMethod';
+    private $paymentKey = 'paymentMethod';
 
     /**
      * Returns if mutators is active
@@ -128,11 +128,11 @@ class PaymentMethodMutator extends Mutator
     }
 
     /*
-     * Save delivery into session
+     * Save delivery into driver
      */
     public function getSelectedPaymentMethod()
     {
-        $id = session()->get($this->sessionKey);
+        $id = Cart::getDriver()->get($this->paymentKey);
 
         //We need to save also delivery key into cacheKey,
         //because if delivery would change, paymentMethod can dissapear
@@ -166,28 +166,27 @@ class PaymentMethodMutator extends Mutator
     }
 
     /**
-     * Save payment method into session
+     * Save payment method into driver
      *
      * @param  int|null  $id
      * @return  this
      */
     public function savePaymentMethod($id = null)
     {
-        session()->put($this->sessionKey, $id);
-        session()->save();
+        Cart::getDriver()->set($this->paymentKey, $id);
 
         return $this;
     }
 
     /**
-     * When cart is being forget state, we can flush session here
+     * When cart is being forget state, we can flush driver here
      * for this mutator.
      *
      * @return  void
      */
     public function onCartForget()
     {
-        session()->forget($this->sessionKey);
+        Cart::getDriver()->forget($this->paymentKey);
     }
 }
 

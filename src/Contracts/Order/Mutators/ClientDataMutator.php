@@ -6,6 +6,7 @@ use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\ClientDataValidator;
 use AdminEshop\Models\Orders\Order;
 use OrderService;
+use Cart;
 
 class ClientDataMutator extends Mutator
 {
@@ -23,7 +24,7 @@ class ClientDataMutator extends Mutator
      *
      * @var  string
      */
-    protected $sessionKey = 'cart.orderData';
+    protected $clientKey = 'cart.orderData';
 
     /**
      * Returns if mutators is active
@@ -80,8 +81,7 @@ class ClientDataMutator extends Mutator
      */
     public function setClientData($row = null)
     {
-        session()->put($this->sessionKey, $row);
-        session()->save();
+        Cart::getDriver()->set($this->clientKey, $row);
     }
 
     /**
@@ -91,7 +91,7 @@ class ClientDataMutator extends Mutator
      */
     public function getClientData()
     {
-        return session($this->sessionKey, null);
+        return Cart::getDriver()->get($this->clientKey, null);
     }
 
     /**
@@ -102,7 +102,7 @@ class ClientDataMutator extends Mutator
      */
     public function onCartForget()
     {
-        session()->forget($this->sessionKey);
+        Cart::getDriver()->forget($this->clientKey);
     }
 }
 

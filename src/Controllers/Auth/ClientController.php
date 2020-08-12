@@ -10,5 +10,8 @@ use \AdminEshop\Admin\Orders\Order;
 
 class ClientController extends Controller
 {
+    public function update()
+    {
 
+    }
 }
