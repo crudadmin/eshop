@@ -177,17 +177,6 @@ class PaymentMethodMutator extends Mutator
 
         return $this;
     }
-
-    /**
-     * When cart is being forget state, we can flush driver here
-     * for this mutator.
-     *
-     * @return  void
-     */
-    public function onCartForget()
-    {
-        Cart::getDriver()->forget($this->paymentKey);
-    }
 }
 
 ?>

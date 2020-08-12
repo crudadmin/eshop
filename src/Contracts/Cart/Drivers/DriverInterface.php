@@ -22,11 +22,18 @@ interface DriverInterface
     public function get($key, $default = null);
 
     /**
-     * Flush item from session
+     * Flush item from driver
      *
      * @param string $key
      *
      * @return  void
      */
     public function forget($key = null);
+
+    /**
+     * Destroy whole cart instance
+     *
+     * @return  void
+     */
+    public function destroy();
 }

@@ -187,7 +187,7 @@ class Store
      */
     public function hasB2B()
     {
-        return session('b2b', $this->hasB2B);
+        return Cart::getDriver()->get('b2b', $this->hasB2B);
     }
 
     /*
@@ -195,8 +195,7 @@ class Store
      */
     public function setB2B($vat = false)
     {
-        session()->put('b2b', $vat);
-        session()->save();
+        Cart::getDriver()->set('b2b', $vat);
 
         $this->hasB2B = $vat;
     }

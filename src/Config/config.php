@@ -63,8 +63,14 @@ return [
     'round_summary' => true,
 
     'cart' => [
-        //AdminEshop\Contracts\Drivers\SessionDriver::class
-        //AdminEshop\Contracts\Drivers\RESTDriver::class
+        //For REST authorization
+        'header_key' => 'cart-token',
+
         'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
+        // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,
+
+        //For session (NonRest) authorization with MySqlDriver..
+        //If we want use header_key (REST), we need turn off session
+        'session' => true,
     ],
 ];

@@ -121,6 +121,27 @@ class CartItem implements UsesIdentifier
 
         return $this;
     }
+
+    /**
+     * This data will be stored into session/mysql
+     *
+     * @return  array
+     */
+    public function toArray() : array
+    {
+        $identifier = $this->getIdentifierClass();
+
+        $array = [];
+
+        foreach ($identifier->getIdentifyKeys() as $key => $data) {
+            $array[$key] = $identifier->getIdentifier($key);
+        }
+
+        return array_merge($array, [
+            'identifier' => $this->identifier,
+            'quantity' => $this->quantity,
+        ]);
+    }
 }
 
 ?>

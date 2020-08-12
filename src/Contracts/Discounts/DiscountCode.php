@@ -8,13 +8,14 @@ use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
 use Store;
+use Cart;
 
 class DiscountCode extends Discount implements Discountable
 {
     /*
      * Discount code key in session
      */
-    private static $sessionKey = 'cart.discount';
+    private static $discountCodeKey = 'discount';
 
     /**
      * Discount code can't be applied outside cart
@@ -162,7 +163,7 @@ class DiscountCode extends Discount implements Discountable
     {
         //If code is not present, use code from session
         if ( $code === null ) {
-            $code = session(self::$sessionKey);
+            $code = Cart::getDriver()->get(self::$discountCodeKey);
         }
 
         //If any code is present
@@ -186,8 +187,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function saveDiscountCode(string $code)
     {
-        session()->put(self::$sessionKey, $code);
-        session()->save();
+        Cart::getDriver()->set(self::$discountCodeKey, $code);
     }
 
     /**
@@ -197,8 +197,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function removeDiscountCode()
     {
-        session()->forget(self::$sessionKey);
-        session()->save();
+        Cart::getDriver()->forget(self::$discountCodeKey);
     }
 }
 

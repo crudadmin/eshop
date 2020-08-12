@@ -236,17 +236,16 @@ class Cart
     {
         //On local environment does not flush data
         if ( ! app()->environment('local') ) {
-            $this->driver->forgetItems();
-
             //Remove all order mutators from session
             foreach (OrderService::getMutators() as $mutator) {
                 if ( method_exists($mutator, 'onCartForget') ) {
                     $response = $mutator->onCartForget();
                 }
             }
-        }
 
-        session()->save();
+            //Destory cart session
+            $this->driver->destroy();
+        }
 
         return $this;
     }

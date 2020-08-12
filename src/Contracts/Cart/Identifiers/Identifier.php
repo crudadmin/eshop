@@ -177,10 +177,10 @@ class Identifier
      * Try if given key has order_items_column
      *
      * @param  string  $key
-     * @param  object  $item
+     * @param  arrat  $item
      * @return string
      */
-    public function tryOrderItemsColumn($key, object $item = null)
+    public function tryOrderItemsColumn($key, $item = null)
     {
         if ( $item instanceof OrdersItem ) {
             $options = @$this->getIdentifyKeys()[$key] ?: [];

@@ -265,18 +265,20 @@ trait CartTrait
     /**
      * Save items from cart into session
      *
-     * @param  CartCollection  $items
      * @return void
      */
-    public function saveItems(CartCollection $items)
+    public function saveItems()
     {
-        $items = $items->toArray();
+        $items = $this->items->toArray();
+
+        $arrayItems = [];
 
         foreach ($items as $key => $item) {
-            $items[$key] = (array)$items[$key];
+            $arrayItems[] = $item->toArray();
+            // $arrayItems[] = (array)$item;
         }
 
-        $this->getDriver()->set('items', $items);
+        $this->getDriver()->set('items', $arrayItems);
     }
 }
 

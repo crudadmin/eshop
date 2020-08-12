@@ -2,10 +2,8 @@
 
 namespace AdminEshop\Contracts\Cart\Drivers;
 
-use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Drivers\CartDriver;
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
-use AdminEshop\Contracts\Collections\CartCollection;
 
 class SessionDriver extends CartDriver implements DriverInterface
 {
@@ -48,6 +46,17 @@ class SessionDriver extends CartDriver implements DriverInterface
     public function forget($key = null)
     {
         session()->forget($this->key.($key ? ('.'.$key) : ''));
+        session()->save();
+    }
+
+    /**
+     * Delete data from
+     *
+     * @return  void
+     */
+    public function destroy()
+    {
+        session()->forget($this->key);
         session()->save();
     }
 }

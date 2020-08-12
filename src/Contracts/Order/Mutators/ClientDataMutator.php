@@ -24,7 +24,7 @@ class ClientDataMutator extends Mutator
      *
      * @var  string
      */
-    protected $clientKey = 'cart.orderData';
+    protected $clientKey = 'clientData';
 
     /**
      * Returns if mutators is active
@@ -92,17 +92,6 @@ class ClientDataMutator extends Mutator
     public function getClientData()
     {
         return Cart::getDriver()->get($this->clientKey, null);
-    }
-
-    /**
-     * When cart is being forget state, we can flush session here
-     * for this mutator.
-     *
-     * @return  void
-     */
-    public function onCartForget()
-    {
-        Cart::getDriver()->forget($this->clientKey);
     }
 }
 

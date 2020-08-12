@@ -15,11 +15,11 @@ trait HasProductAttributes
             'products_attributes.attribute_id',
         ];
 
-        if ( config('admineshop.attributes.variants') ){
+        if ( config('admineshop.attributes.variants') === true ){
             $columns[] = 'products_attributes.products_variant_id';
         }
 
-        if ( config('admineshop.attributes.products') ){
+        if ( config('admineshop.attributes.products') === true ){
             $columns[] = 'products_attributes.product_id';
         }
 
