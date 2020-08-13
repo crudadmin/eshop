@@ -64,7 +64,7 @@ return [
 
     'cart' => [
         //For REST authorization
-        'header_key' => 'cart-token',
+        'header_key' => 'Cart-Token',
 
         'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
         // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,

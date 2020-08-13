@@ -4,7 +4,7 @@ namespace AdminEshop\Contracts\Cart\Drivers;
 
 use AdminEshop\Contracts\Cart\Drivers\CartDriver;
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
-use AdminEshop\Models\Store\CartSession;
+use AdminEshop\Models\Store\CartToken;
 use Arr;
 use Str;
 
@@ -15,7 +15,7 @@ class MySqlDriver extends CartDriver implements DriverInterface
      *
      * @var  string
      */
-    private $sessionIdentifierKey = 'cart_key';
+    private $sessionIdentifierKey = 'cart_token';
 
     /**
      * CartRow
@@ -35,7 +35,7 @@ class MySqlDriver extends CartDriver implements DriverInterface
     /*
      * Get customer key
      */
-    private function getKey()
+    public function getToken()
     {
         //Return key based on session
         if ( config('admineshop.cart.session') == true ) {
@@ -51,7 +51,7 @@ class MySqlDriver extends CartDriver implements DriverInterface
         }
 
         //Return key based on REST API header
-        return request()->header(config('admineshop.cart.header_key')) ?: $this->regenerateKey();
+        return request()->header(config('admineshop.cart.header_token')) ?: $this->regenerateKey();
     }
 
     /**
@@ -59,16 +59,16 @@ class MySqlDriver extends CartDriver implements DriverInterface
      *
      * @return  CartSesion||null
      */
-    private function getCartSession()
+    public function getCartSession()
     {
         if ( $this->cartRow ){
             return $this->cartRow;
         }
 
-        $cartKey = $this->getKey();
+        $cartKey = $this->getToken();
 
-        if ( !($cartRow = CartSession::where('key', $cartKey)->first()) ){
-            $cartRow = CartSession::create([ 'key' => $cartKey ]);
+        if ( !($cartRow = CartToken::where('token', $cartKey)->first()) ){
+            $cartRow = CartToken::create([ 'token' => $cartKey ]);
         }
 
         return $this->cartRow = $cartRow;

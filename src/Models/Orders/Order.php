@@ -54,17 +54,17 @@ class Order extends AdminModel
             'Fakturačné údaje' => Group::fields([
                 'username' => 'name:Meno a priezvisko|required|hidden',
                 'email' => 'name:Email|email|required',
-                'phone' => 'name:Telefón',
+                'phone' => 'name:Telefón|'.phoneValidatorRule(),
                 'street' => 'name:Ulica a č.p.|column_name:Ulica|required',
                 'city' => 'name:Mesto|required',
-                'zipcode' => 'name:PSČ|required',
+                'zipcode' => 'name:PSČ|max:6|zipcode|required',
                 'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|exists:countries,id',
             ])->grid(4),
             'Dodacie údaje' => Group::fields([
                 'delivery_different' => 'name:Doručiť na inú adresu|type:checkbox|default:0',
                 Group::fields([
                     'delivery_username' => 'name:Meno a priezvisko / Firma|required_with:delivery_different',
-                    'delivery_phone' => 'name:Telefón|required_with:delivery_different',
+                    'delivery_phone' => 'name:Telefón|'.phoneValidatorRule().'|required_with:delivery_different',
                     'delivery_street' => 'name:Ulica a č.p.|required_with:delivery_different',
                     'delivery_city' => 'name:Mesto|required_with:delivery_different',
                     'delivery_zipcode' => 'name:PSČ|required_with:delivery_different',

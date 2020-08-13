@@ -21,8 +21,7 @@ class RulesServiceProvider extends ServiceProvider
 
     public function addProductsValidators()
     {
-        Validator::extend('positivePriceIfRequired', function ($attribute, $value, $parameters, $validator)
-        {
+        Validator::extend('positivePriceIfRequired', function ($attribute, $value, $parameters, $validator) {
             $type = $parameters[0];
 
             //If is non orderable product type, just continue...
@@ -41,6 +40,12 @@ class RulesServiceProvider extends ServiceProvider
             }
 
             return true;
-        }, 'Cena produktu musí byť kladná.');
+        }, _('Cena produktu musí byť kladná.'));
+
+        Validator::extend('zipcode', function ($attribute, $value, $parameters, $validator) {
+            $value = str_replace(' ', '', $value);
+
+            return is_numeric($value) && strlen($value) === 5;
+        }, _('PSČ musí byť zadané v tvare 000 00.'));
     }
 }

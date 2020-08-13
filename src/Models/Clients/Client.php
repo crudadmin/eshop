@@ -39,7 +39,7 @@ class Client extends Authenticatable
                 ])->inline(),
                 'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                 'username' => 'name:Meno a priezvisko',
-                'phone' => 'name:Telefon',
+                'phone' => 'name:Telefon|'.phoneValidatorRule(),
                 'groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd',
             ]),
             'Fakturačné údaje' => Group::half([

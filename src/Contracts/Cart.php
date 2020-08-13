@@ -73,6 +73,11 @@ class Cart
      */
     public function addOrUpdate(Identifier $identifier, int $quantity = 1)
     {
+        //Cannot add negative quantity
+        if ( !is_numeric($quantity) || $quantity <= 0 ){
+            $quantity = 1;
+        }
+
         //If items does not exists in cart
         if ( $item = $this->getItem($identifier) ) {
             $this->updateQuantity($identifier, $item->quantity + $quantity);

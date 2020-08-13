@@ -49,4 +49,12 @@ function client()
 
     return $guard->user();
 }
+
+if ( !function_exists('phoneValidatorRule') )
+{
+    function phoneValidatorRule()
+    {
+        return 'phone:SK';
+    }
+}
 ?>

@@ -5,7 +5,7 @@ namespace AdminEshop\Models\Store;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
-class CartSession extends AdminModel
+class CartToken extends AdminModel
 {
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -32,7 +32,7 @@ class CartSession extends AdminModel
     public function fields()
     {
         return [
-            'key' => 'name:Customer key|max:255|index',
+            'token' => 'name:Customer token|max:255|index',
             'client_id' => 'name:Client id|belongsTo:clients,id',
             'data' => 'name:Data|type:json',
         ];
