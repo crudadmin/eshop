@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Products;
 
 use AdminEshop\Eloquent\CartEloquent;
+use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasStock;
@@ -10,7 +11,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class ProductsVariant extends CartEloquent
+class ProductsVariant extends CartEloquent implements HasAttributesSupport
 {
     use HasProductAttributes,
         HasStock,

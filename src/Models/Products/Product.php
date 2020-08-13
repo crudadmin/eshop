@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Products;
 
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
+use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
@@ -13,7 +14,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class Product extends CartEloquent
+class Product extends CartEloquent implements HasAttributesSupport
 {
     use HasProductImage,
         HasProductAttributes,

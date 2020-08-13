@@ -6,8 +6,9 @@ use AdminEshop\Contracts\CartItem;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
+use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
+use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
-use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
 use Admin\Eloquent\AdminModel;
 use Cart;
 
@@ -33,7 +34,7 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
         //Add attributes support into cart
         if (
             config('admineshop.attributes.load_in_cart') === true
-            && $this instanceof ProductAttributesSupport
+            && $query->getModel() instanceof HasAttributesSupport
             && $query->getModel()->hasAttributesEnabled()
         ) {
             $query->with(['attributesItems']);
