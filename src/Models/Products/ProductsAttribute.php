@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Models\Products;
 
-use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use \AdminEshop\Models\Store\AttributesItem;
@@ -33,19 +32,14 @@ class ProductsAttribute extends AdminModel
 
     protected $publishable = false;
 
+    public function active()
+    {
+        return count($this->belongsToModel()) > 0;
+    }
+
     public function belongsToModel()
     {
-        $relations = [];
-
-        if ( config('admineshop.attributes.products') ) {
-            $relations[] = Product::class;
-        }
-
-        if ( config('admineshop.attributes.variants') ) {
-            $relations[] = ProductsVariant::class;
-        }
-
-        return $relations;
+        return config('admineshop.attributes.eloquents', []);
     }
 
     /*

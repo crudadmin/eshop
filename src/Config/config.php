@@ -21,8 +21,11 @@ return [
      * Enable attributes
      */
     'attributes' => [
-        'products' => false, //Allow attributes in products
-        'variants' => false, //Allow attributes in products variants
+        //Allowed models with attributes
+        'eloquents' => [
+            AdminEshop\Models\Products\Product::class,
+            AdminEshop\Models\Products\ProductsVariant::class,
+        ],
         'load_in_cart' => true, //Load attributes data in cart responses
         'separator' => [
             'item' => ', ',

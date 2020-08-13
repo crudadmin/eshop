@@ -3,7 +3,7 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
-use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
+use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsAttribute;
 use AdminEshop\Models\Store\AttributesItem;
 
@@ -16,11 +16,11 @@ trait HasProductAttributes
             'products_attributes.attribute_id',
         ];
 
-        if ( config('admineshop.attributes.variants') === true ){
+        if ( $this->hasAttributesEnabled(ProductsVariant::class) ){
             $columns[] = 'products_attributes.products_variant_id';
         }
 
-        if ( config('admineshop.attributes.products') === true ){
+        if ( $this->hasAttributesEnabled(Product::class) ){
             $columns[] = 'products_attributes.product_id';
         }
 
@@ -63,7 +63,7 @@ trait HasProductAttributes
     public function getAttributesTextAttribute()
     {
         //If attributes for given model are not enabled
-        if ( $this instanceof ProductAttributesSupport && $this->hasAttributesEnabled() !== true ){
+        if ( $this->hasAttributesEnabled() == false ){
             return;
         }
 
@@ -78,5 +78,26 @@ trait HasProductAttributes
         }
 
         return implode(config('admineshop.attributes.separator.attribute', ', '), $attributes);
+    }
+
+    /**
+     * Check if given class is enabled
+     *
+     * @param  string|null  $classname
+     *
+     * @return  bool
+     */
+    public function hasAttributesEnabled(string $classname = null)
+    {
+        $classname = $classname ?: get_class($this);
+
+        $enabledClasses = Admin::cache('store.enabledAttributes', function(){
+            return array_map(function($classname){
+                return class_basename($classname);
+            }, config('admineshop.attributes.eloquents', []));
+        });
+
+        //Check if given class has enabled attributes support
+        return in_array(class_basename($classname), $enabledClasses);
     }
 }

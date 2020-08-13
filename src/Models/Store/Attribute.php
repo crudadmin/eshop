@@ -29,6 +29,11 @@ class Attribute extends AdminModel
 
     protected $sluggable = 'name';
 
+    public function active()
+    {
+        return count(config('admineshop.attributes.eloquents', [])) > 0;
+    }
+
     /*
      * Automatic form and database generation
      * @name - field name

@@ -9,12 +9,11 @@ use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
-use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class Product extends CartEloquent implements ProductAttributesSupport
+class Product extends CartEloquent
 {
     use HasProductImage,
         HasProductAttributes,
@@ -186,15 +185,5 @@ class Product extends CartEloquent implements ProductAttributesSupport
         if ( $this->hasAttributesEnabled() === true )  {
             return parent::getAttributesTextAttribute();
         }
-    }
-
-    /**
-     * Set if given model has allowed attributes
-     *
-     * @return  bool
-     */
-    public function hasAttributesEnabled()
-    {
-        return config('admineshop.attributes.products') === true;
     }
 }

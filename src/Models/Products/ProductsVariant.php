@@ -6,12 +6,11 @@ use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasStock;
-use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class ProductsVariant extends CartEloquent implements ProductAttributesSupport
+class ProductsVariant extends CartEloquent
 {
     use HasProductAttributes,
         HasStock,
@@ -151,15 +150,5 @@ class ProductsVariant extends CartEloquent implements ProductAttributesSupport
     public function isType($type)
     {
         return 'regular' == $type;
-    }
-
-    /**
-     * Set if given model has allowed attributes
-     *
-     * @return  bool
-     */
-    public function hasAttributesEnabled()
-    {
-        return config('admineshop.attributes.variants') === true;
     }
 }
