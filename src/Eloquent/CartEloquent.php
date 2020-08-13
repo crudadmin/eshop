@@ -7,6 +7,7 @@ use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
 use Admin\Eloquent\AdminModel;
 use Cart;
 
@@ -28,6 +29,17 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
     public function scopeCartSelect($query)
     {
         $query->select($this->fixAmbiguousColumn($this->cartSelect ?: []));
+
+        //Add attributes support into cart
+        if (
+            config('admineshop.attributes.load_in_cart') === true
+            && $this instanceof ProductAttributesSupport
+            && $query->getModel()->hasAttributesEnabled()
+        ) {
+            $query->with(['attributesItems']);
+        }
+
+        return $query;
     }
 
     public function addCartSelect(array $columns = [])
@@ -57,5 +69,15 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
         $identifier = $this->getIdentifier();
 
         return Cart::getItem($identifier);
+    }
+
+    /**
+     * We can set cart response... we can append() or make hidden fields in this method here
+     *
+     * void
+     */
+    public function setCartResponse()
+    {
+
     }
 }

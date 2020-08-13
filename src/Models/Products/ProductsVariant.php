@@ -6,11 +6,12 @@ use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasStock;
+use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class ProductsVariant extends CartEloquent
+class ProductsVariant extends CartEloquent implements ProductAttributesSupport
 {
     use HasProductAttributes,
         HasStock,
@@ -96,7 +97,7 @@ class ProductsVariant extends CartEloquent
             'Sklad' => Group::tab([
                 'stock_quantity' => 'name:Počet na sklade|type:integer|default:0',
             ])->grid(7)->icon('fa-gear'),
-            config('admineshop.attributes.variants') ? Group::tab( ProductsAttribute::class ) : [],
+            $this->hasAttributesEnabled() ? Group::tab( ProductsAttribute::class ) : [],
         ];
     }
 
@@ -112,7 +113,7 @@ class ProductsVariant extends CartEloquent
                 'disabled' => true,
             ],
             'columns.attributes' => [
-                'hidden' => config('admineshop.attributes.variants') ? false : true,
+                'hidden' => $this->hasAttributesEnabled() ? false : true,
                 'name' => 'Atribúty',
                 'before' => 'code',
             ],
@@ -136,7 +137,7 @@ class ProductsVariant extends CartEloquent
     public function scopeAdminRows($query)
     {
         //Load all attributes data
-        if ( config('admineshop.attributes.variants') == true ) {
+        if ( $this->hasAttributesEnabled() == true ) {
             $query->with('attributesItems');
         }
     }
@@ -150,5 +151,15 @@ class ProductsVariant extends CartEloquent
     public function isType($type)
     {
         return 'regular' == $type;
+    }
+
+    /**
+     * Set if given model has allowed attributes
+     *
+     * @return  bool
+     */
+    public function hasAttributesEnabled()
+    {
+        return config('admineshop.attributes.variants') === true;
     }
 }

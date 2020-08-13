@@ -115,6 +115,11 @@ class CartItem implements UsesIdentifier
         //Bind items models into cart object
         if ( isset($this->itemModels[$identifierHash]) ) {
             foreach ($this->itemModels[$identifierHash] as $key => $model) {
+                //We can make hidden fields here, or append additional attributes...
+                if ( method_exists($model, 'setCartResponse') ){
+                    $model->setCartResponse();
+                }
+
                 $this->{$key} = $model;
             }
         }

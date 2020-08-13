@@ -21,8 +21,9 @@ return [
      * Enable attributes
      */
     'attributes' => [
-        'products' => false,
-        'variants' => false,
+        'products' => false, //Allow attributes in products
+        'variants' => false, //Allow attributes in products variants
+        'load_in_cart' => true, //Load attributes data in cart responses
         'separator' => [
             'item' => ', ',
             'attribute' => ', ',

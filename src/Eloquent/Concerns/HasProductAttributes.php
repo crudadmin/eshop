@@ -2,9 +2,10 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Admin;
+use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
 use AdminEshop\Models\Products\ProductsAttribute;
 use AdminEshop\Models\Store\AttributesItem;
-use Admin;
 
 trait HasProductAttributes
 {
@@ -61,6 +62,11 @@ trait HasProductAttributes
 
     public function getAttributesTextAttribute()
     {
+        //If attributes for given model are not enabled
+        if ( $this instanceof ProductAttributesSupport && $this->hasAttributesEnabled() !== true ){
+            return;
+        }
+
         $attributes = [];
 
         foreach ($this->getValue('attributesItems') as $attribute) {

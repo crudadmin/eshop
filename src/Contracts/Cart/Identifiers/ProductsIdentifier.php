@@ -46,7 +46,7 @@ class ProductsIdentifier extends Identifier
                 'table' => 'products_variants',
                 'modelKey' => 'variant',
                 'scope' => function($query){
-                    return $query->cartSelect()->with(['attributesItems']);
+                    return $query->cartSelect();
                 },
             ],
         ];

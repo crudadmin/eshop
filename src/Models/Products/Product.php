@@ -9,11 +9,12 @@ use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Eloquent\Concerns\ProductAttributesSupport;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class Product extends CartEloquent
+class Product extends CartEloquent implements ProductAttributesSupport
 {
     use HasProductImage,
         HasProductAttributes,
@@ -91,7 +92,7 @@ class Product extends CartEloquent
                 'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
                 'stock_sold' => 'name:Text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:stock_type,everytime'
             ])->icon('fa-bars')->add('hidden'),
-            config('admineshop.attributes.products') ? Group::tab( ProductsAttribute::class ) : [],
+            $this->hasAttributesEnabled() ? Group::tab( ProductsAttribute::class ) : [],
             'Ostatné nastavenia' => Group::tab([
                 'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
                 'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
@@ -121,7 +122,7 @@ class Product extends CartEloquent
             'title.update' => ':name',
             'grid.default' => 'full',
             'columns.attributes' => [
-                'hidden' => config('admineshop.attributes.products') ? false : true,
+                'hidden' => $this->hasAttributesEnabled() ? false : true,
                 'name' => 'Atribúty',
                 'before' => 'code',
             ],
@@ -144,7 +145,7 @@ class Product extends CartEloquent
     public function scopeAdminRows($query)
     {
         //Load all attributes data
-        if ( config('admineshop.attributes.products') == true ) {
+        if ( $this->hasAttributesEnabled() == true ) {
             $query->with('attributesItems');
         }
     }
@@ -179,12 +180,21 @@ class Product extends CartEloquent
         return $this->product_type == $type;
     }
 
-    public function setAdminAttributes($attributes)
+    public function getAttributesTextAttribute()
     {
-        if ( config('admineshop.attributes.products') === true ) {
-            $attributes['attributes'] = $this->attributesText;
+        //Return product attributes only if attributes for products has been allowed
+        if ( $this->hasAttributesEnabled() === true )  {
+            return parent::getAttributesTextAttribute();
         }
+    }
 
-        return $attributes;
+    /**
+     * Set if given model has allowed attributes
+     *
+     * @return  bool
+     */
+    public function hasAttributesEnabled()
+    {
+        return config('admineshop.attributes.products') === true;
     }
 }
