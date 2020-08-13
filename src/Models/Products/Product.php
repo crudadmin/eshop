@@ -179,12 +179,4 @@ class Product extends CartEloquent implements HasAttributesSupport
 
         return $this->product_type == $type;
     }
-
-    public function getAttributesTextAttribute()
-    {
-        //Return product attributes only if attributes for products has been allowed
-        if ( $this->hasAttributesEnabled() === true )  {
-            return parent::getAttributesTextAttribute();
-        }
-    }
 }

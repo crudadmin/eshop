@@ -24,13 +24,10 @@ trait HasProductAttributes
             $columns[] = 'products_attributes.product_id';
         }
 
-        return array_merge(
-            [
-                'attributes.name',
-                'attributes.unit',
-            ],
-            $columns
-        );
+        return array_merge([
+            'attributes.name',
+            'attributes.unit',
+        ], $columns);
     }
 
     public function getAttributesItemsSelect($query)
