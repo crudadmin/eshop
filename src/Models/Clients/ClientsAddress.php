@@ -46,7 +46,7 @@ class ClientsAddress extends AdminModel
             'Adresa' => Group::half([
                 'street' => 'name:Ulica a č.p.|required',
                 'city' => 'name:Mesto|required',
-                'zipcode' => 'name:PSČ|required',
+                'zipcode' => 'name:PSČ|required|zipcode',
                 'country' => 'name:Krajina|belongsTo:countries,name|required|exists:countries,id',
             ])->grid(6),
 
