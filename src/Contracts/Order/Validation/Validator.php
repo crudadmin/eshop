@@ -12,6 +12,16 @@ class Validator
     protected $message;
 
     /**
+     * Set if given validator is active
+     *
+     * @return  bool
+     */
+    public function isActive()
+    {
+        return true;
+    }
+
+    /**
      * Define if order validation passes
      *
      * @return  bool

@@ -5,6 +5,7 @@ namespace AdminEshop\Controllers\Cart;
 use Admin;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Discounts\DiscountCode;
+use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Controllers\Controller;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
@@ -14,6 +15,26 @@ use Facades\AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 
 class CartController extends Controller
 {
+    /**
+     * Basic cart summary with products data...
+     *
+     * @return  arrat
+     */
+    public function getSummary()
+    {
+        return Cart::response();
+    }
+
+    /**
+     * Full cart summary with delivery data, client data etc...
+     *
+     * @return  arrat
+     */
+    public function getFullSummary()
+    {
+        return Cart::fullCartResponse();
+    }
+
     /*
      * Verify if row exists in db and return row key
      */
@@ -135,6 +156,15 @@ class CartController extends Controller
         $paymentMethod = PaymentsMethod::findOrFail($paymentMethodId);
 
         PaymentMethodMutator::savePaymentMethod($paymentMethod->getKey());
+
+        return Cart::fullCartResponse();
+    }
+
+    public function setCountry()
+    {
+        $countryId = request('country_id');
+
+        (new CountryMutator)->setCountry($countryId);
 
         return Cart::fullCartResponse();
     }

@@ -12,7 +12,7 @@ class DeliveryValidator extends Validator
      */
     public function pass()
     {
-        return DeliveryMutator::isActive() ?: false;
+        return DeliveryMutator::getSelectedDelivery() ?: false;
     }
 
     /**

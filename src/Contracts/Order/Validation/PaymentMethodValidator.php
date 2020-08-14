@@ -12,7 +12,7 @@ class PaymentMethodValidator extends Validator
      */
     public function pass()
     {
-        return PaymentMethodMutator::isActive() ?: false;
+        return PaymentMethodMutator::getSelectedPaymentMethod() ?: false;
     }
 
     /**

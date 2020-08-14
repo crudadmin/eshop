@@ -4,18 +4,17 @@ namespace AdminEshop\Contracts;
 
 use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
+use AdminEshop\Contracts\Order\Concerns\HasMutators;
 use AdminEshop\Contracts\Order\Concerns\HasPayments;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
-use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
-use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
-use Gogol\Invoices\Model\Invoice;
 use Cart;
 use Discounts;
+use Gogol\Invoices\Model\Invoice;
 use Mail;
 use Store;
 
@@ -24,7 +23,8 @@ class OrderService
     use DataStore,
         HasRequest,
         HasPayments,
-        HasValidation;
+        HasValidation,
+        HasMutators;
 
     /**
      * Order row
@@ -32,17 +32,6 @@ class OrderService
      * @var  Admin\Eloquent\AdminModel|null
      */
     protected $order;
-
-    /**
-     * Available order mutators
-     *
-     * @var  array
-     */
-    protected $mutators = [
-        ClientDataMutator::class,
-        DeliveryMutator::class,
-        PaymentMethodMutator::class,
-    ];
 
     /*
      * Returns if invoices support is allowed
@@ -286,66 +275,6 @@ class OrderService
     }
 
     /**
-     * Fire all registered mutators and apply them on order
-     *
-     * @return  this
-     */
-    public function fireMutators()
-    {
-        foreach ($this->getActiveMutators() as $mutator) {
-            if ( method_exists($mutator, 'mutateOrder') ) {
-                $mutator->mutateOrder($this->getOrder(), $mutator->getActiveResponse());
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Returns all available order mutators
-     *
-     * @return  array
-     */
-    public function getMutators()
-    {
-        return $this->cache('orderMutators', function(){
-            return array_map(function($item){
-                return new $item;
-            }, $this->mutators);
-        });
-    }
-
-    /**
-     * Returns active mutators for given order
-     *
-     * @return  array
-     */
-    public function getActiveMutators()
-    {
-        return array_filter(array_map(function($mutator){
-            if ( Admin::isAdmin() ) {
-                $response = $mutator->isActiveInAdmin($this->getOrder());
-            } else {
-                $response = $mutator->isActive($this->getOrder());
-            }
-
-            //Apply all discounts on given reponse if is correct type
-            //Sometimes mutator may return Discountable admin model.
-            //So we need apply discounts to this model
-            Cart::addCartDiscountsIntoModel($response);
-
-            //If no response has been given, skip this mutator
-            if ( ! $response ) {
-                return;
-            }
-
-            $mutator->setActiveResponse($response);
-
-            return $mutator;
-        }, $this->getMutators()));
-    }
-
-    /**
      * Add discounts additional fields
      *
      * @param  CartCollection  $items
@@ -374,16 +303,6 @@ class OrderService
             'orderErrors' => $this->getErrorMessages(),
             'cart' => Cart::fullCartResponse(),
         ], 422);
-    }
-
-    /**
-     * Register new order mutator
-     *
-     * @param  string  $namespace
-     */
-    public function addMutator($namespace)
-    {
-        $this->mutators[] = $namespace;
     }
 }
 

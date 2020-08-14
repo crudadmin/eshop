@@ -59,6 +59,11 @@ trait HasValidation
         foreach ($validators as $validation) {
             $validation = new $validation;
 
+            //Skip non active validator
+            if ( $validation->isActive() === false ){
+                continue;
+            }
+
             if ( $validation->pass() === false )  {
                 $this->errorMessages[] = $validation->getMessage();
             }

@@ -153,7 +153,10 @@ class PaymentMethodMutator extends Mutator
     {
         $delivery = DeliveryMutator::getSelectedDelivery();
 
-        $allowedPaymentMethods = !$delivery ? [] : $delivery->payments()->pluck('payments_methods.id')->toArray();
+        //If delivery is selected and payments rules are enabled, we can receive filter
+        $allowedPaymentMethods = $delivery && config('admineshop.delivery.payments') == true
+                                        ? $delivery->payments->pluck('payments_methods.id')->toArray()
+                                        : [];
 
         //If any rule is present, allow all payment methods
         if ( count($allowedPaymentMethods) == 0 ) {

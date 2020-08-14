@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Order\Mutators;
 
 use Admin;
+use Facades\AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\DeliveryLocationValidator;
 use AdminEshop\Contracts\Order\Validation\DeliveryValidator;
@@ -126,10 +127,35 @@ class DeliveryMutator extends Mutator
     public function mutateCartResponse($response) : array
     {
         return array_merge($response, [
-            'deliveries' => Cart::addCartDiscountsIntoModel($this->getDeliveries()),
+            'deliveries' => $this->getFilteredDeliveriesWithDiscounts(),
             'selectedDelivery' => $this->getSelectedDelivery(),
             'selectedLocation' => $this->getSelectedLocation(),
         ]);
+    }
+
+    private function getFilteredDeliveriesWithDiscounts()
+    {
+        $deliveries = $this->getDeliveries();
+
+        //If countries filter support is enabled,
+        //and country has been selected
+        if (
+            config('admineshop.delivery.countries') == true
+            && $selectedCountry = CountryMutator::getSelectedCountry()
+        ) {
+            $deliveries = $deliveries->filter(function($delivery) use ($selectedCountry) {
+                $allowedCountries = $delivery->countries->pluck('id')->toArray();
+
+                //No countries has been specified, allowed is all
+                if ( count($allowedCountries) == 0 ){
+                    return true;
+                }
+
+                return in_array($selectedCountry->getKey(), $allowedCountries);
+            });
+        }
+
+        return Cart::addCartDiscountsIntoModel($deliveries);
     }
 
     /*
@@ -138,7 +164,24 @@ class DeliveryMutator extends Mutator
     public function getDeliveries()
     {
         return $this->cache('deliveries', function(){
-            return Admin::getModel('Delivery')->onlyAvailable()->with('locations')->get();
+            $with = [];
+
+            if ( config('admineshop.delivery.multiple_locations') == true ) {
+                $with[] = 'locations';
+            }
+
+            if ( config('admineshop.delivery.countries') == true ) {
+                $with[] = 'countries';
+            }
+
+            if ( config('admineshop.delivery.payments') == true ) {
+                $with[] = 'payments';
+            }
+
+            return Admin::getModel('Delivery')
+                        ->onlyAvailable()
+                        ->with($with)
+                        ->get();
         });
     }
 
