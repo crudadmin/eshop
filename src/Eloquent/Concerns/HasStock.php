@@ -122,7 +122,7 @@ trait HasStock
 
         foreach (config('admineshop.stock.rounding', []) as $onStock) {
             if ( $this->stock_quantity > $onStock ){
-                return '+'.$onStock;
+                return config('admineshop.stock.rounding_more_than_char', '<').$onStock;
             }
         }
 
