@@ -10,6 +10,7 @@ use AdminEshop\Eloquent\Concerns\HasStock;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
+use Admin;
 
 class ProductsVariant extends CartEloquent implements HasAttributesSupport
 {
@@ -50,7 +51,7 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
 
     protected $withoutParent = true;
 
-    protected $belongsToModel = Product::class;
+    protected $sluggable = 'name';
 
     /*
      * This items will be selected frm db for cart items
@@ -59,6 +60,11 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
         'id', 'product_id', 'name', 'image', 'price', 'vat_id',
         'discount_operator', 'discount', 'stock_quantity',
     ];
+
+    public function belongsToModel()
+    {
+        return get_class(Admin::getModel('Product'));
+    }
 
     /*
      * Automatic form and database generation
