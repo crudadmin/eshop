@@ -5,6 +5,13 @@ namespace AdminEshop\Contracts\Cart\Drivers;
 interface DriverInterface
 {
     /**
+     * On create session driver. We need define default params
+     *
+     * @return  void
+     */
+    public function onCreate(array $initialData = []);
+
+    /**
      * Set data into cart session
      *
      * @param  string  $key

@@ -2,14 +2,17 @@
 
 namespace AdminEshop\Models\Delivery;
 
+use AdminEshop\Eloquent\Concerns\DiscountHelper;
+use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
-class Delivery extends AdminModel
+class Delivery extends AdminModel implements DiscountSupport
 {
-    use PriceMutator;
+    use PriceMutator,
+        DiscountHelper;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -123,6 +126,16 @@ class Delivery extends AdminModel
      * @param  Builder  $query
      */
     public function scopeOnlyAvailable($query)
+    {
+
+    }
+
+    /**
+     * We need build cart item for discounts
+     * but delivery is not assigned to cartItem, so we does not need
+     * response in this method
+     */
+    public function buildCartItem()
     {
 
     }

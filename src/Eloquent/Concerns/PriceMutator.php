@@ -53,7 +53,7 @@ trait PriceMutator
      *
      * @var  array
      */
-    protected $debugAppliedDiscounts = [];
+    protected $appliedDiscounts = [];
 
     /**
      * All available price levels
@@ -155,15 +155,13 @@ trait PriceMutator
 
                     $price = operator_modifier($price, $discount->operator, $value);
 
-                    //Debug mode
-                    if ( env('APP_ENV') == 'local' ) {
-                        $this->debugAppliedDiscounts[$discount->getKey()] = [
-                            'operator' => $discount->operator,
-                            'operator_value' => $discount->value,
-                            'old_price' => $originalPrice,
-                            'new_price' => $price,
-                        ];
-                    }
+                    //Save all discounts applied on given model
+                    $this->appliedDiscounts[$discount->getKey()] = [
+                        'operator' => $discount->operator,
+                        'operator_value' => $discount->value,
+                        'old_price' => $originalPrice,
+                        'new_price' => $price,
+                    ];
                 }
             }
         }
@@ -393,11 +391,23 @@ trait PriceMutator
 
     /**
      * Return applied discounts on given property
+     * with keys and applied discounts data
      *
      * @return  array
      */
-    public function getDebugAppliedDiscounts()
+    public function getAppliedDiscountsAttribute()
     {
-        return $this->debugAppliedDiscounts;
+        return $this->appliedDiscounts;
+    }
+
+    /**
+     * Return applied discounts on given property
+     * but only keys
+     *
+     * @return  array
+     */
+    public function getAppliedDiscountsKeysAttribute()
+    {
+        return array_keys($this->appliedDiscounts);
     }
 }

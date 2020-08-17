@@ -13,10 +13,24 @@ class SessionDriver extends CartDriver implements DriverInterface
     private $key = 'cart';
 
     /**
+     * On create session driver. We need define default params
+     *
+     * @return  void
+     */
+    public function onCreate(array $initialData = [])
+    {
+        //Boot session driver with default values
+        if ( session()->has($this->key) === false ){
+            session()->put($this->key, $this->getInitialData());
+            session()->save();
+        }
+    }
+
+    /**
      * Set data into cart session
      *
-     * @param  [type]  $key
-     * @param  [type]  $value
+     * @param  string  $key
+     * @param  mixed  $value
      */
     public function set($key, $value)
     {

@@ -8,21 +8,23 @@ use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
 use Store;
 
-class FreeDelivery extends Discount implements Discountable
+class FreeDeliveryFromPrice extends Discount implements Discountable
 {
     /**
      * Discount can be applied on those models
      *
      * @var  array
      */
-    public $applyOnModels = [ Delivery::class ];
+    public $applyOnModels = [
+        Delivery::class
+    ];
 
     /**
      * Free delivery discount can't be applied outside cart
      *
      * @var  bool
      */
-    public $canApplyOutsideCart = false;
+    public $canApplyOutsideCart = true;
 
     /**
      * Can be this discount shown in email?
@@ -47,9 +49,7 @@ class FreeDelivery extends Discount implements Discountable
      */
     public function isActive()
     {
-        $code = DiscountCode::getDiscountCode();
-
-        return $this->hasCodeFreeDelivery($code);
+        return true;
     }
 
     /*
@@ -57,26 +57,7 @@ class FreeDelivery extends Discount implements Discountable
      */
     public function isActiveInAdmin(Order $order)
     {
-        //Get discount code in order, if exists..
-        if ( $order->discount_code_id && $order->discountCode ) {
-            return $this->hasCodeFreeDelivery($order->discountCode);
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if code has free delivery
-     *
-     * @param  AdminEshop\Contracts\Discounts\DiscountCode  $code
-     * @return  bool
-     */
-    private function hasCodeFreeDelivery($code)
-    {
-        if ( ! $code || $code->free_delivery != true )
-            return false;
-
-        return $code;
+        return true;
     }
 
     /**
@@ -87,9 +68,13 @@ class FreeDelivery extends Discount implements Discountable
      */
     public function boot($code)
     {
-        $this->operator = '*';
+        $this->operator = 'abs';
 
-        $this->value = 0;
+        $this->value = function($item){
+            $summaryWithVat = @$this->getCartSummary()['priceWithVat'] ?: 0;
+
+            return $summaryWithVat >= $item->free_from ? 0 : null;
+        };
     }
 }
 

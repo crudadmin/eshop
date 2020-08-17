@@ -24,6 +24,17 @@ class MySqlDriver extends CartDriver implements DriverInterface
      */
     private $cartRow = null;
 
+    /**
+     * On create session driver. We need define default params
+     *
+     * @return  void
+     */
+    public function onCreate(array $initialData = [])
+    {
+        //Create and save cart session with default initial data
+        $this->getCartSession();
+    }
+
     /*
      * Generate cart id
      */
@@ -42,7 +53,10 @@ class MySqlDriver extends CartDriver implements DriverInterface
             //If cart key does exists in session
             if ( session()->has($this->sessionIdentifierKey) === true ) {
                 $key = session()->get($this->sessionIdentifierKey);
-            } else {
+            }
+
+            //Save cart key into session, for next request...
+            else {
                 session()->put($this->sessionIdentifierKey, $key = $this->regenerateKey());
                 session()->save();
             }
@@ -68,7 +82,10 @@ class MySqlDriver extends CartDriver implements DriverInterface
         $cartKey = $this->getToken();
 
         if ( !($cartRow = CartToken::where('token', $cartKey)->first()) ){
-            $cartRow = CartToken::create([ 'token' => $cartKey ]);
+            $cartRow = CartToken::create([
+                'token' => $cartKey,
+                'data' => $this->getInitialData() ?: [],
+            ]);
         }
 
         return $this->cartRow = $cartRow;

@@ -13,13 +13,12 @@ class Discounts
 {
     use DataStore;
 
-    /*
-     * All registered discounts applied on cart items and whole store
+    /**
+     * @see config admineshop.php in admineshop.discounts.classes
+     *
+     * All registered discounts applied on cart items and whole store...
      */
-    private $discounts = [
-        DiscountCode::class,
-        FreeDelivery::class,
-    ];
+    private $discounts = [];
 
     /*
      * Which model attributes are discountable
@@ -43,6 +42,19 @@ class Discounts
      * @var  bool
      */
     private $discountsCache = [];
+
+    /**
+     * Consturct Discount class
+     */
+    public function __construct()
+    {
+        //Register discount classes from config
+        foreach (config('admineshop.discounts.classes', []) as $discountClass) {
+            if ( class_exists($discountClass) ) {
+                $this->discounts[] = $discountClass;
+            }
+        }
+    }
 
     /**
      * Add discount class

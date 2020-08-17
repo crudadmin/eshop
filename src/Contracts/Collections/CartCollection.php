@@ -258,7 +258,7 @@ class CartCollection extends Collection
             return [
                 'id' => $item->getKey(),
                 'class' => get_class($item),
-                'discounts' => $item->getDebugAppliedDiscounts(),
+                'discounts' => $item->appliedDiscounts,
             ];
         });
     }

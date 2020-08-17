@@ -22,7 +22,7 @@ class CartController extends Controller
      */
     public function getSummary()
     {
-        return Cart::response();
+        return Cart::defaultResponse();
     }
 
     /**
@@ -74,7 +74,7 @@ class CartController extends Controller
 
         Cart::addOrUpdate($identifier, request('quantity'));
 
-        return Cart::response();
+        return Cart::defaultResponse();
     }
 
     public function updateQuantity()
@@ -83,7 +83,7 @@ class CartController extends Controller
 
         Cart::updateQuantity($identifier, request('quantity'));
 
-        return Cart::response();
+        return Cart::defaultResponse();
     }
 
     public function removeItem()
@@ -92,7 +92,7 @@ class CartController extends Controller
 
         Cart::remove($identifier);
 
-        return Cart::response();
+        return Cart::defaultResponse();
     }
 
     public function addDiscountCode()
@@ -109,14 +109,14 @@ class CartController extends Controller
 
         DiscountCode::saveDiscountCode($code->code);
 
-        return Cart::response();
+        return Cart::defaultResponse();
     }
 
     public function removeDiscountCode()
     {
         DiscountCode::removeDiscountCode();
 
-        return Cart::response();
+        return Cart::defaultResponse();
     }
 
     public function setDelivery()

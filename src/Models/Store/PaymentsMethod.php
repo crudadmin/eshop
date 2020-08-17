@@ -3,8 +3,8 @@
 namespace AdminEshop\Models\Store;
 
 use AdminEshop\Eloquent\Concerns\PriceMutator;
-use Gogol\Invoices\Model\PaymentsMethod as BasePaymentsMethod;
 use Admin\Fields\Group;
+use Gogol\Invoices\Model\PaymentsMethod as BasePaymentsMethod;
 use Store;
 
 class PaymentsMethod extends BasePaymentsMethod
@@ -17,6 +17,8 @@ class PaymentsMethod extends BasePaymentsMethod
 
     public function mutateFields($fields)
     {
+        parent::mutateFields($fields);
+
         $fields->push([
             'vat' => 'name:Sadza DPH|belongsTo:vats,:name (:vat%)|required|defaultByOption:default,1|canAdd',
             'price' => 'name:Základna cena bez DPH|type:decimal|component:PriceField||required',

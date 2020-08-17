@@ -2,6 +2,11 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+
+/**
+ * @see  AdminEshop\Eloquent\Concerns\DiscountHelper for implementing this methods
+ * You only need create buildCartItem, if your model is not assigned to cart
+ */
 interface DiscountSupport
 {
     /**

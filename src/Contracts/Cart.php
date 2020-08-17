@@ -39,11 +39,28 @@ class Cart
      */
     protected $driver;
 
+    /**
+     * Cart initialization data.
+     * You can set initialization data via onCreate function
+     *
+        \AdminEshop\Contracts\CartCart::onCreate(function(){
+            return [
+                'my_initial_data' => 123
+            ];
+        });
+     *
+     * @var  array
+     */
+    protected static $onCreate = [];
+
+    /**
+     * Cart constructor
+     */
     public function __construct()
     {
         $driver = config('admineshop.cart.driver');
 
-        $this->driver = new $driver;
+        $this->driver = new $driver(self::$onCreate);
 
         //We does not want fetch items from session in admin interface
         if ( Admin::isAdmin() == true ) {
@@ -54,6 +71,14 @@ class Cart
         else {
             $this->items = $this->fetchItemsFromDriver();
         }
+    }
+
+    /*
+     * On cart create
+     */
+    public static function onCreate(callable $onCreate)
+    {
+        self::$onCreate = $onCreate();
     }
 
     /**
@@ -161,6 +186,16 @@ class Cart
         }
 
         return $response;
+    }
+
+    /**
+     * Return default cart response by configuration
+     *
+     * @return  array
+     */
+    public function defaultResponse()
+    {
+        return $this->response(config('admineshop.cart.default_full_response', false));
     }
 
     /**

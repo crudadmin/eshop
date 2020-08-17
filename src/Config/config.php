@@ -41,10 +41,24 @@ return [
         'rounding' => [100, 50, 20, 10], //10+, 50+ items...
     ],
 
+    /*
+     * Delivery settings
+     */
     'delivery' => [
         'multiple_locations' => false, //Multiple locations for one delivery method
         'payments' => false, //Payment rules for each delivery method
         'countries' => false, //Country rules for delivery
+    ],
+
+    /*
+     * Discount settings
+     */
+    'discounts' => [
+        'classes' => [
+            // AdminEshop\Contracts\Discounts\DiscountCode::class,
+            // AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice::class,
+            // AdminEshop\Contracts\Discounts\FreeDeliveryByCode::class,
+        ],
     ],
 
     /*
@@ -67,6 +81,11 @@ return [
     'round_summary' => true,
 
     'cart' => [
+        //Return full cart response with all deliveries, payment methods etc,,, in every cart request
+        //add/update/delete items, manage discount codes, etc... By default those data are returned only on cart page.
+        //But we can turn it on everywere
+        'default_full_response' => false,
+
         //For REST authorization
         'header_key' => 'Cart-Token',
 
