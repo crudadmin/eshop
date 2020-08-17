@@ -69,6 +69,17 @@ class Discounts
     }
 
     /**
+     * Check if given discount has been registred
+     *
+     * @param  string  $discountClass
+     * @return  bool
+     */
+    public function isRegistredDiscount($discountClass)
+    {
+        return in_array($discountClass, $this->discounts);
+    }
+
+    /**
      * Set order where, from which will be loaded items to discounts
      *
      * @param  AdminModel  $order

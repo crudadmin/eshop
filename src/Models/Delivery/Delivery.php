@@ -2,11 +2,13 @@
 
 namespace AdminEshop\Models\Delivery;
 
+use AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Discounts;
 use Store;
 
 class Delivery extends AdminModel implements DiscountSupport
@@ -58,6 +60,12 @@ class Delivery extends AdminModel implements DiscountSupport
 
     public function mutateFields($fields)
     {
+        $this->addRestrictionTab($fields);
+        $this->addDiscountsTab($fields);
+    }
+
+    private function addRestrictionTab($fields)
+    {
         $restrictionFields = [];
 
         //Add multiple locations model
@@ -78,6 +86,22 @@ class Delivery extends AdminModel implements DiscountSupport
         if ( count($restrictionFields) > 0 ) {
             $fields->push(
                 Group::tab($restrictionFields)->name('Obmedzenia')->icon('fa-gear')->id('restrictions')
+            );
+        }
+    }
+
+    private function addDiscountsTab($fields)
+    {
+        $discountFields = [];
+
+        //Add multiple locations model
+        if ( Discounts::isRegistredDiscount(FreeDeliveryFromPrice::class) ) {
+            $discountFields['free_from'] = 'name:Zdarma od (€)|title:Platí od sumy s DPH|type:decimal';
+        }
+
+        if ( count($discountFields) > 0 ) {
+            $fields->push(
+                Group::tab($discountFields)->name('Zľavy dopravy')->icon('fa-percentage')->add('hidden')
             );
         }
     }
