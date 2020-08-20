@@ -27,7 +27,7 @@ class CountryValidator extends Validator
      */
     public function getMessage()
     {
-        return _('Nevybrali ste krajinu do ktorej si prajete doručiť tovar., prekontrolujte prosím predchádzajúce kroky vášho košíka.');
+        return _('Nevybrali ste krajinu do ktorej si prajete doručiť tovar. Prekontrolujte prosím predchádzajúce kroky vášho košíka.');
     }
 }
 

@@ -46,7 +46,7 @@ class StockValidator extends Validator
      */
     public function getMessage()
     {
-        return _('Váš obsah košíku obsahuje produkty s nedostatočným množstvom na sklade. Prosíme, prekontrolujte obsah Vášho košíku.');
+        return _('Váš košík obsahuje produkty s nedostatočným množstvom na sklade. Prosíme, prekontrolujte obsah Vášho košíku.');
     }
 }
 

@@ -7,7 +7,8 @@ use AdminEshop\Contracts\Order\Validation\StockValidator;
 trait HasValidation
 {
     /**
-     * Which validators will be applied on order validation
+     * Which global validators will be applied on order validation
+     * in every validation process
      *
      * @var  array
      */
@@ -45,14 +46,22 @@ trait HasValidation
     /**
      * Validate order
      *
+     * @param  array|null mutators
+     *
      * @return  void
      */
-    public function validate()
+    public function validate(array $mutators = null)
     {
         $validators = $this->orderValidators;
 
+        $mutators = $mutators ?: $this->getMutators();
+
         //Register validators from all mutators
-        foreach ($this->getMutators() as $mutator) {
+        foreach ($mutators as $mutator) {
+            if ( is_string($mutator) ){
+                $mutator = new $mutator;
+            }
+
             $validators = array_merge($validators, $mutator->getValidators());
         }
 
@@ -75,11 +84,13 @@ trait HasValidation
     /**
      * Check all order errors
      *
+     * @param  array|null mutators
+     *
      * @return  array|null
      */
-    public function passesValidation()
+    public function passesValidation(array $mutators = null)
     {
-        $this->validate();
+        $this->validate($mutators);
 
         return count($this->getErrorMessages()) === 0;
     }
