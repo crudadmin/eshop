@@ -3,9 +3,13 @@
 namespace AdminEshop\Models\Store;
 
 use AdminEshop\Admin\Rules\GenerateDiscountCode;
+use AdminEshop\Contracts\Discounts\DiscountCode;
+use AdminEshop\Contracts\Discounts\FreeDeliveryByCode;
+use AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Carbon\Carbon;
+use Discounts;
 use Store;
 
 class DiscountsCode extends AdminModel
@@ -32,6 +36,11 @@ class DiscountsCode extends AdminModel
 
     protected $visible = ['id', 'code'];
 
+    public function active()
+    {
+        return Discounts::isRegistredDiscount(DiscountCode::class);
+    }
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -45,18 +54,18 @@ class DiscountsCode extends AdminModel
             'Nastavenia kódu' => Group::half([
                 'code' => 'name:Kód|min:5|max:30|index|title:Ak pole bude obsahovať prázdnu hodnotu, kód sa vygeneruje automatický.|placeholder:Zadajte kód zľavu|unique:discounts_codes,code,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
                 Group::inline([
-                    'price_limit' => 'name:Minimálna cena objednávky (€)|title:Bez DPH|type:decimal',
+                    'min_order_price' => 'name:Minimálna cena objednávky (€)|title:S DPH|type:decimal',
                     'expiration_date' => 'name:Platný do dátumu|type:date|title:Pri neuvedenom dátume platí neobmedzene',
                 ]),
                 Group::inline([
                     'usage' => 'name:Maximálny počet využia (ks)|title:Limit počtu použitia kupónu|type:integer|default:1',
-                    'used' => 'name:Počet využitia kupónu|title:Koľko krát bol kupón využitý a použitý pri objednávke|type:integer|default:0',
+                    'used' => 'name:Počet využitia kupónu|disabled|title:Koľko krát bol kupón využitý a použitý pri objednávke|type:integer|default:0',
                 ]),
             ])->id('settings'),
 
             'Vyberte jednu alebo viac zliav' => Group::half([
-                'discount_percentage' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|type:decimal|disabledIfNot:discount_price,|required_without_all:discount_price,free_delivery',
-                'discount_price' => 'name:Zľava v €|title:Z celkovej ceny objednávky, bez DPH.|min:0|type:decimal|disabledIfNot:discount_percentage,|required_without_all:discount_percentage,free_delivery',
+                'discount_percentage' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|type:decimal|readonlyIfNot:discount_price,|required_without_all:discount_price,free_delivery',
+                'discount_price' => 'name:Zľava v €|title:Z celkovej ceny objednávky, bez DPH.|min:0|type:decimal|readonlyIfNot:discount_percentage,|required_without_all:discount_percentage,free_delivery',
                 'free_delivery' => 'name:Doprava zdarma|type:checkbox|default:0',
             ])->inline(),
         ];
@@ -70,6 +79,18 @@ class DiscountsCode extends AdminModel
     protected $rules = [
         GenerateDiscountCode::class
     ];
+
+    public function mutateFields($fields)
+    {
+        parent::mutateFields($fields);
+
+        //If free delivery by discount code is not registred, we want hide this fields for discount codes
+        if ( Discounts::isRegistredDiscount(FreeDeliveryByCode::class) == false ){
+            $fields->field('free_delivery', function($field){
+                $field->invisible = true;
+            });
+        }
+    }
 
     /**
      * Returns array of dicount names for given discount code

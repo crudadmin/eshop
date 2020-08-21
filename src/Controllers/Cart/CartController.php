@@ -103,9 +103,12 @@ class CartController extends Controller
 
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
-        if ( !($code = DiscountCode::getDiscountCode($code)) ) {
+        $code = DiscountCode::getDiscountCode($code);
+
+        //Validate code and throw error
+        if ( $errorMessage = (new DiscountCode)->getCodeError($code) ){
             throw ValidationException::withMessages([
-                'code' => _('Zadaný kód nie je platný.'),
+                'code' => $errorMessage,
             ]);
         }
 

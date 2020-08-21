@@ -37,7 +37,9 @@ class DiscountCode extends Discount implements Discountable
      */
     public function isActive()
     {
-        return self::getDiscountCode() ?: false;
+        $code = self::getDiscountCode();
+
+        return $code && !$this->getCodeError($code) ? $code : false;
     }
 
     /*
@@ -46,8 +48,8 @@ class DiscountCode extends Discount implements Discountable
     public function isActiveInAdmin(Order $order)
     {
         //Get discount code in order, if exists..
-        if ( $order->discount_code_id && $order->discountCode ) {
-            return $order->discountCode;
+        if ( $order->discount_code_id && $code = $order->discountCode ) {
+            return $code && !$this->getCodeError($code) ? $code : false;
         }
 
         return false;
@@ -68,6 +70,43 @@ class DiscountCode extends Discount implements Discountable
         $this->freeDelivery = $code->free_delivery ? true : false;
 
         $this->code = $code;
+    }
+
+    /**
+     * Returns validation error for given discount code
+     *
+     * @param  AdminEshop\Models\Store\DiscountsCode|null  $code
+     *
+     * @return  string
+     */
+    public function getCodeError($code = null)
+    {
+        if ( $code ) {
+            //This rules cannot be applied in administration
+            if ( Admin::isAdmin() === false ) {
+                //Has been used order price
+                if ( $code->isUsed ){
+                    return _('Zadaný kód už bol použitý.');
+                }
+
+                //Expiration order price
+                if ( $code->isExpired ){
+                    return _('Zadaný kód expiroval.');
+                }
+            }
+
+            //Minimum order price, can be applied also in administration
+            $priceWithVat = @$this->getCartSummary()['priceWithVat'] ?: 0;
+            if ( $code->min_order_price > 0 && $priceWithVat < $code->min_order_price ) {
+                return sprintf(_('Minimálna suma objednávky pre tento kód je %s'), Store::priceFormat($code->min_order_price));
+            }
+        }
+
+        else if ( !$code || $code->isActive == false ){
+            return _('Zadaný kód nie je platný.');
+        }
+
+        return false;
     }
 
     /**
@@ -152,7 +191,7 @@ class DiscountCode extends Discount implements Discountable
         return Admin::cache('code.'.$code, function() use ($code) {
             $model = Admin::getModelByTable('discounts_codes');
 
-            return $model->where('code', $code)->whereRaw('`usage` > `used`')->first();
+            return $model->where('code', $code)->first();
         });
     }
 

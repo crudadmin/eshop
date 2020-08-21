@@ -195,9 +195,7 @@ class CartCollection extends Collection
     {
         //Set discounts if are missing
         //Sometimes we may want discounts without specific discount...
-        if ( $discounts === null ) {
-            $discounts = Discounts::getDiscounts();
-        }
+        $discounts = $discounts === null ? Discounts::getDiscounts() : $discounts;
 
         $sum = $this->getDefaultSummary($discounts);
 

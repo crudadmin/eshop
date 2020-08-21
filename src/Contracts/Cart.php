@@ -173,6 +173,7 @@ class Cart
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
             'summary' => $items->getSummary($fullCartResponse),
+            'summary_without_mutators' => $items->getSummary(),
         ];
 
         //Mutate cart response
