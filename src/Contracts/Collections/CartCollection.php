@@ -16,7 +16,7 @@ class CartCollection extends Collection
      * Convert cart items into cart format
      * This function is suitable only for carItem
      *
-     * @param  array  $discounts
+     * @param  array|bool|null  $discounts (if is bool, discounts will be disabled)
      * @param  callable|null  $onItemRejected
      *
      * @return  CartCollection
@@ -31,7 +31,7 @@ class CartCollection extends Collection
     /**
      * Convert given items into cart format with order items
      *
-     * @param  array|null  $discounts
+     * @param  array|bool|null  $discounts
      *
      * @return  CartCollection
      */
@@ -44,12 +44,16 @@ class CartCollection extends Collection
     /**
      * Convert given items into cart format with order items
      *
-     * @param  array  $discounts
+     * @param  array|bool|null  $discounts
      *
      * @return  CartCollection
      */
     public function applyCartDiscounts($discounts = null)
     {
+        if ( $discounts === false ){
+            return $this;
+        }
+
         return $this->map(function($item) use ($discounts) {
             //We would try apply discounts on cart item also.
             //If item would have discountable trait, cart discounts will be applied

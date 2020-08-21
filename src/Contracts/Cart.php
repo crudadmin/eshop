@@ -197,7 +197,7 @@ class Cart
      *
      * @return  array
      */
-    public function defaultResponse()
+    public function baseResponse()
     {
         return $this->response(config('admineshop.cart.default_full_response', false));
     }

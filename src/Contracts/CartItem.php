@@ -24,7 +24,7 @@ class CartItem implements UsesIdentifier
      *
      * @var  int
      */
-    public $quantity = 0;
+    public $quantity = 1;
 
     /**
      * Identifier
@@ -33,7 +33,7 @@ class CartItem implements UsesIdentifier
      * @param  int  $quantity
      * @param  mixed  $originalObject
      */
-    public function __construct(Identifier $identifier, $quantity = 0, $originalObject = null)
+    public function __construct(Identifier $identifier, $quantity = 1, $originalObject = null)
     {
         $this->identifier = $identifier->getName();
 

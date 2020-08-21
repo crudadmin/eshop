@@ -178,8 +178,24 @@ class OrderService
     public function addAdditionalPaymentsIntoSum($price, bool $withVat)
     {
         foreach ($this->getActiveMutators() as $mutator) {
+            //Mutate price by anonymous price mutators
             if ( method_exists($mutator, 'mutatePrice') ) {
-                $price = $mutator->mutatePrice($mutator->getActiveResponse(), $price, $withVat, $this->getOrder() ?: new Order);
+                $price = $mutator->mutatePrice(
+                    $mutator->getActiveResponse(),
+                    $price,
+                    $withVat,
+                    $this->getOrder() ?: new Order
+                );
+            }
+
+            //Add price from additional cart items from mutators which will be inserted into order
+            if ( method_exists($mutator, 'addCartItems') ) {
+                $addItems = $mutator->addCartItems($mutator->getActiveResponse())
+                                    ->toCartFormat(false);
+
+                $addItemsSummary = $addItems->getSummary();
+
+                $price += (@$addItemsSummary[$withVat ? 'priceWithVat' : 'priceWithoutVat'] ?: 0);
             }
         }
 
