@@ -95,5 +95,13 @@ return [
         //For session (NonRest) authorization with MySqlDriver..
         //If we want use header_key (REST), we need turn off session
         'session' => true,
+
+        //Cart and order mutators
+        'mutators' => [
+            AdminEshop\Contracts\Order\Mutators\ClientDataMutator::class,
+            AdminEshop\Contracts\Order\Mutators\CountryMutator::class,
+            AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
+            AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
+        ],
     ],
 ];

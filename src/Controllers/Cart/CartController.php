@@ -7,11 +7,13 @@ use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Controllers\Controller;
+use AdminEshop\Events\DiscountCodeAdded;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Cart;
 use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use Facades\AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
+use Illuminate\Validation\ValidationException;
 
 class CartController extends Controller
 {
@@ -102,12 +104,15 @@ class CartController extends Controller
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
         if ( !($code = DiscountCode::getDiscountCode($code)) ) {
-            autoAjax()->throwValidation([
-                'code' => _('Zadaný kod nie je platný'),
+            throw ValidationException::withMessages([
+                'code' => _('Zadaný kód nie je platný.'),
             ]);
         }
 
         DiscountCode::saveDiscountCode($code->code);
+
+        //Event for added discount code
+        event(new DiscountCodeAdded($code));
 
         return Cart::defaultResponse();
     }

@@ -16,12 +16,7 @@ trait HasMutators
      *
      * @var  array
      */
-    protected $mutators = [
-        ClientDataMutator::class,
-        CountryMutator::class,
-        DeliveryMutator::class,
-        PaymentMethodMutator::class,
-    ];
+    protected $mutators = [];
 
     /**
      * Register new order mutator
@@ -44,10 +39,12 @@ trait HasMutators
      */
     public function getMutators()
     {
-        return $this->cache('orderMutators', function(){
-            return array_map(function($item){
+        $mutators = array_merge($this->mutators, config('admineshop.cart.mutators'));
+
+        return $this->cache('orderMutators', function() use ($mutators) {
+            return array_map(function($item) {
                 return new $item;
-            }, $this->mutators);
+            }, $mutators);
         });
     }
 

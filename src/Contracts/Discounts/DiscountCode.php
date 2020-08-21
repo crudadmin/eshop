@@ -113,30 +113,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public function getMessage($code)
     {
-        $value = '';
-        $freeDeliveryText = '';
-
-        //If is only discount from order sum
-        if (!is_null($code->discount_price)) {
-            $value = Store::priceFormat($code->discount_price);
-            $valueWithVat = Store::priceFormat(Store::priceWithVat($code->discount_price));
-        }
-
-        //If is percentual discount
-        else if (!is_null($code->discount_percentage)) {
-            $value .= $code->discount_percentage.' %';
-        }
-
-        //If has free delivery
-        if ( $code->free_delivery ) {
-            $freeDeliveryText = (!is_null($code->discount_percentage) || !is_null($code->discount_price)) > 0 ? ' + ' : '';
-            $freeDeliveryText .= _('Doprava zdarma');
-        }
-
-        return [
-            'withVat' => (@$valueWithVat ?: $value) . $freeDeliveryText,
-            'withoutVat' => $value . $freeDeliveryText,
-        ];
+        return $code->nameArray;
     }
 
     /**

@@ -109,7 +109,7 @@ class PaymentMethodMutator extends Mutator
      *
      * @return  array
      */
-    public function mutateCartResponse($response) : array
+    public function mutateFullCartResponse($response) : array
     {
         return array_merge($response, [
             'paymentMethods' => Cart::addCartDiscountsIntoModel($this->getPaymentMethodsByDelivery()),

@@ -65,7 +65,7 @@ class ClientDataMutator extends Mutator
      * @param  $response
      * @return  array
      */
-    public function mutateCartResponse($response) : array
+    public function mutateFullCartResponse($response) : array
     {
         return array_merge($response, [
             'clientData' => $this->getClientData(),

@@ -5,6 +5,8 @@ namespace AdminEshop\Models\Store;
 use AdminEshop\Admin\Rules\GenerateDiscountCode;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Carbon\Carbon;
+use Store;
 
 class DiscountsCode extends AdminModel
 {
@@ -42,16 +44,19 @@ class DiscountsCode extends AdminModel
         return [
             'Nastavenia kódu' => Group::half([
                 'code' => 'name:Kód|min:5|max:30|index|title:Ak pole bude obsahovať prázdnu hodnotu, kód sa vygeneruje automatický.|placeholder:Zadajte kód zľavu|unique:discounts_codes,code,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
-                Group::fields([
+                Group::inline([
                     'price_limit' => 'name:Minimálna cena objednávky (€)|title:Bez DPH|type:decimal',
+                    'expiration_date' => 'name:Platný do dátumu|type:date|title:Pri neuvedenom dátume platí neobmedzene',
+                ]),
+                Group::inline([
                     'usage' => 'name:Maximálny počet využia (ks)|title:Limit počtu použitia kupónu|type:integer|default:1',
-                    'used' => 'name:Využitý|title:Koľko krát bol kupón využitý a použitý pri objednávke|type:integer|default:0',
-                ])->inline(),
-            ]),
+                    'used' => 'name:Počet využitia kupónu|title:Koľko krát bol kupón využitý a použitý pri objednávke|type:integer|default:0',
+                ]),
+            ])->id('settings'),
 
             'Vyberte jednu alebo viac zliav' => Group::half([
-                'discount_percentage' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|type:decimal|hideFieldIfNot:discount_price,|required_without_all:discount_price,free_delivery',
-                'discount_price' => 'name:Zľava v €|title:Z celkovej ceny objednávky, bez DPH.|min:0|type:decimal|hideFieldIfNot:discount_percentage,|required_without_all:discount_percentage,free_delivery',
+                'discount_percentage' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|type:decimal|disabledIfNot:discount_price,|required_without_all:discount_price,free_delivery',
+                'discount_price' => 'name:Zľava v €|title:Z celkovej ceny objednávky, bez DPH.|min:0|type:decimal|disabledIfNot:discount_percentage,|required_without_all:discount_percentage,free_delivery',
                 'free_delivery' => 'name:Doprava zdarma|type:checkbox|default:0',
             ])->inline(),
         ];
@@ -65,4 +70,117 @@ class DiscountsCode extends AdminModel
     protected $rules = [
         GenerateDiscountCode::class
     ];
+
+    /**
+     * Returns array of dicount names for given discount code
+     *
+     * => text with vat
+     * => text without vat
+     *
+     * @return  [type]
+     */
+    public function getNameArrayAttribute()
+    {
+        $value = '';
+        $freeDeliveryText = '';
+
+        //If is only discount from order sum
+        if (!is_null($this->discount_price)) {
+            $value = Store::priceFormat($this->discount_price);
+            $valueWithVat = Store::priceFormat(Store::priceWithVat($this->discount_price));
+        }
+
+        //If is percentual discount
+        else if (!is_null($this->discount_percentage)) {
+            $value .= $this->discount_percentage.' %';
+        }
+
+        //If has free delivery
+        if ( $this->free_delivery ) {
+            $freeDeliveryText .= _('Doprava zdarma');
+        }
+
+        return [
+            'withVat' => $this->buildName(@$valueWithVat ?: $value, $freeDeliveryText),
+            'withoutVat' => $this->buildName($value, $freeDeliveryText),
+        ];
+    }
+
+    /**
+     * You can modify here text for € or % values
+     * for example from "10%" you can make "Zľava 10%"
+     * Zla
+     *
+     * @param  string  $text
+     * @return  string
+     */
+    public function buildName($value, $freeDeliveryText = null)
+    {
+        $separator = $value && $freeDeliveryText ? ' + ' : '';
+
+        return $value.$separator.$freeDeliveryText;
+    }
+
+    /**
+     * Returns discount name by given client settings
+     * with vat, or without vat
+     *
+     * @return  string
+     */
+    public function getNameAttribute()
+    {
+        return Store::hasB2B() ? $this->nameWithVat : $this->nameWithoutVat;
+    }
+
+    /**
+     * Returns discount text value indicator without vat
+     * "10% + Doprava zdarma" or "10€ + Doprava zdarma"
+     *
+     * @return  string
+     */
+    public function getNameWithoutVatAttribute()
+    {
+        return @$this->nameArray['withoutVat'];
+    }
+
+    /**
+     * Returns discount text value indicator with vat
+     * "10% + Doprava zdarma" or "10€ + Doprava zdarma"
+     *
+     * @return  string
+     */
+    public function getNameWithVatAttribute()
+    {
+        return @$this->nameArray['withVat'];
+    }
+
+    /**
+     * Check if coupon is active
+     *
+     * @return  bool
+     */
+    public function getIsActiveAttribute()
+    {
+        return $this->isExpired === false && $this->isUsed === false;
+    }
+
+    /**
+     * Check if coupon has been used over limit
+     *
+     * @return  bool
+     */
+    public function getIsUsedAttribute()
+    {
+        return $this->used >= $this->usage;
+    }
+
+    /**
+     * Check if coupon has been expired
+     *
+     * @return  bool
+     */
+    public function getIsExpiredAttribute()
+    {
+        return $this->expiration_date && Carbon::now()->setTime(0, 0, 0) > $this->expiration_date ? true : false;
+    }
 }

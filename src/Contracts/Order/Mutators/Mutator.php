@@ -80,7 +80,19 @@ class Mutator
      */
     public function mutateCartResponse($response) : array
     {
-        return [];
+        return $response;
+    }
+
+    /**
+     * Mutation of full cart response request
+     *
+     * @param  $response
+     *
+     * @return  array
+     */
+    public function mutateFullCartResponse($response) : array
+    {
+        return $response;
     }
 
     /**

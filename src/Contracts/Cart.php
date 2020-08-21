@@ -6,8 +6,6 @@ use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
-use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
-use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use Admin\Core\Contracts\DataStore;
 use Discounts;
@@ -177,11 +175,16 @@ class Cart
             'summary' => $items->getSummary($fullCartResponse),
         ];
 
-        if ( $fullCartResponse == true ){
-            foreach (OrderService::getMutators() as $mutator) {
-                if ( method_exists($mutator, 'mutateCartResponse') ) {
-                    $response = $mutator->mutateCartResponse($response);
-                }
+        //Mutate cart response
+        foreach (OrderService::getMutators() as $mutator) {
+            //Mutate basic response
+            if ( method_exists($mutator, 'mutateCartResponse') ) {
+                $response = $mutator->mutateCartResponse($response);
+            }
+
+            //Mutate response with all additional data
+            if ( $fullCartResponse == true && method_exists($mutator, 'mutateFullCartResponse') ) {
+                $response = $mutator->mutateFullCartResponse($response);
             }
         }
 

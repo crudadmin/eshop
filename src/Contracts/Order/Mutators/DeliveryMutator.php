@@ -124,7 +124,7 @@ class DeliveryMutator extends Mutator
      * @param  $response
      * @return  array
      */
-    public function mutateCartResponse($response) : array
+    public function mutateFullCartResponse($response) : array
     {
         return array_merge($response, [
             'deliveries' => $this->getFilteredDeliveriesWithDiscounts(),

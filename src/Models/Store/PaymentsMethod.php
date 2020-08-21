@@ -27,7 +27,7 @@ class PaymentsMethod extends BasePaymentsMethod
         ]);
     }
 
-    protected $hidden = ['created_at', 'deleted_at', 'updated_at', 'description'];
+    protected $hidden = ['created_at', 'deleted_at', 'updated_at'];
 
     /**
      * We need allow applying discoints in administration for this model all the time
