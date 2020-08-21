@@ -40,6 +40,14 @@ class Order extends AdminModel
 
     protected $sortable = false;
 
+    protected $buttons = [
+        GenerateInvoice::class,
+    ];
+
+    protected $rules = [
+        RebuildOrder::class,
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -123,6 +131,16 @@ class Order extends AdminModel
         ];
     }
 
+    public function mutateFields($fields)
+    {
+        parent::mutateFields($fields);
+
+        //Remove delivery location if multiple delivery locations are disabled
+        if ( config('admineshop.delivery.multiple_locations') !== true ){
+            $fields->remove(['delivery_location']);
+        }
+    }
+
     public function settings()
     {
         return [
@@ -141,14 +159,6 @@ class Order extends AdminModel
             ],
         ];
     }
-
-    protected $buttons = [
-        GenerateInvoice::class,
-    ];
-
-    protected $rules = [
-        RebuildOrder::class,
-    ];
 
     public function options()
     {
@@ -179,14 +189,25 @@ class Order extends AdminModel
     public function getDeliveries()
     {
         return Delivery::leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
-                        ->select(['deliveries.id', 'deliveries.name', 'deliveries.price', 'deliveries.multiple_locations', 'vats.vat'])
+                        ->select(array_filter([
+                            'deliveries.id',
+                            'deliveries.name',
+                            'deliveries.price',
+                            config('admineshop.delivery.multiple_locations') ? 'deliveries.multiple_locations' : null,
+                            'vats.vat'
+                        ]))
                         ->get();
     }
 
     public function getPaymentMethods()
     {
         return PaymentsMethod::leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
-                        ->select(['payments_methods.id', 'payments_methods.name', 'payments_methods.price', 'vats.vat'])
+                        ->select([
+                            'payments_methods.id',
+                            'payments_methods.name',
+                            'payments_methods.price',
+                            'vats.vat'
+                        ])
                         ->get();
     }
 
