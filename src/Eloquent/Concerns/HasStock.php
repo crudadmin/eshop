@@ -120,10 +120,27 @@ trait HasStock
     {
         $stockText = $this->stock_quantity;
 
-        foreach (config('admineshop.stock.rounding', []) as $onStock) {
+        $roundings = config('admineshop.stock.rounding', []);
+
+        arsort($roundings);
+
+        $roundings = array_values($roundings);
+
+        $prevStock = null;
+        foreach ($roundings as $onStock) {
             if ( $this->stock_quantity > $onStock ){
-                return config('admineshop.stock.rounding_more_than_char', '<').$onStock;
+                if ( ! $prevStock ){
+                    break;
+                }
+
+                return config('admineshop.stock.rounding_less_than_char', '<').$prevStock;
             }
+
+            $prevStock = $onStock;
+        }
+
+        if ( count($roundings) > 0 ){
+            return config('admineshop.stock.rounding_more_than_char', '>').$roundings[0];
         }
 
         return $stockText;
