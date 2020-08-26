@@ -44,6 +44,13 @@ class Discounts
     private $discountsCache = [];
 
     /**
+     * Which discounts are in boot state
+     *
+     * @var  array
+     */
+    private $bootingDiscounts = [];
+
+    /**
      * Consturct Discount class
      */
     public function __construct()
@@ -110,7 +117,7 @@ class Discounts
      */
     public function getDiscounts($exceps = [])
     {
-        $exceps = array_wrap($exceps);
+        $exceps = array_merge(array_wrap($exceps), $this->bootingDiscounts);
 
         $discounts = $this->cache('store_discounts', function(){
             return array_map(function($className){
@@ -125,8 +132,17 @@ class Discounts
             }
 
             return $this->cache('discounts.'.$discount->getKey(), function() use ($discount) {
+                //This discount is now under "boot" state. We need save this state
+                //because in isActive method may be needed cartSummary. In this case
+                //summary with all discounts except booting one will be retrieved. But if other discount
+                //also requires cart summary, where will be infinity loop. So in this case we need
+                //skip actual booting discount from all other discounts which requires cart summary.
+                $this->bootingDiscounts[] = $discount->getKey();
+
                 //If is in except mode
                 if ( !($response = $this->isActiveDiscount($discount)) ) {
+                    $this->removeDiscountFromBootState($discount);
+
                     return false;
                 }
 
@@ -135,9 +151,23 @@ class Discounts
                 $discount->boot($response);
                 $discount->setMessage($discount->getMessage($response));
 
+                $this->removeDiscountFromBootState($discount);
+
                 return true;
             });
         }));
+    }
+
+    private function removeDiscountFromBootState($discount)
+    {
+        //Remove discounts from boot state
+        if ( !in_array($discount->getKey(), $this->bootingDiscounts) ) {
+            return;
+        }
+
+        unset($this->bootingDiscounts[
+            array_search($discount->getKey(), $this->bootingDiscounts)
+        ]);
     }
 
     private function isActiveDiscount($discount)
