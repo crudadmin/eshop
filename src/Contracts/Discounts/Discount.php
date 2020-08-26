@@ -91,6 +91,16 @@ class Discount implements Discountable
     }
 
     /**
+     * Returns cache key for given discount
+     *
+     * @return  string
+     */
+    public function getCacheKey()
+    {
+        return $this->getKey();
+    }
+
+    /**
      * Returns discount name
      *
      * @return  string

@@ -32,6 +32,19 @@ class DiscountCode extends Discount implements Discountable
         return __('Zľavový kód');
     }
 
+    /**
+     * Returns cache key for given discount
+     *
+     * We need set specific cache key, because if code will change in runtime,
+     * we need reload this discount.
+     *
+     * @return  string
+     */
+    public function getCacheKey()
+    {
+        return $this->getKey().(self::getCodeName()?:'');
+    }
+
     /*
      * Check if is discount active
      */
@@ -170,6 +183,16 @@ class DiscountCode extends Discount implements Discountable
     }
 
     /**
+     * Retreive discount code name from driver
+     *
+     * @return  string|null
+     */
+    public static function getCodeName()
+    {
+        return Cart::getDriver()->get(self::$discountCodeKey);
+    }
+
+    /**
      * Check if discount code does exists
      *
      * @param  string|null  $code
@@ -179,7 +202,7 @@ class DiscountCode extends Discount implements Discountable
     {
         //If code is not present, use code from session
         if ( $code === null ) {
-            $code = Cart::getDriver()->get(self::$discountCodeKey);
+            $code = self::getCodeName();
         }
 
         //If any code is present

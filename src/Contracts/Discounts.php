@@ -131,7 +131,7 @@ class Discounts
                 return false;
             }
 
-            return $this->cache('discounts.'.$discount->getKey(), function() use ($discount) {
+            return $this->cache('discounts.'.$discount->getCacheKey(), function() use ($discount) {
                 //This discount is now under "boot" state. We need save this state
                 //because in isActive method may be needed cartSummary. In this case
                 //summary with all discounts except booting one will be retrieved. But if other discount
