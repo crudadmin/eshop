@@ -61,6 +61,17 @@
 @endcomponent
 @endif
 
+@if ( ($additionalFields = config('admineshop.cart.order.additional_email_fields', [])) && count($additionalFields) > 0 )
+@component('mail::panel')
+| {{ _('Ďalšie údaje') }} | |
+| :------------- | ----------:|
+@foreach($additionalFields as $fieldKey)
+@continue(!($field = $order->getField($fieldKey)) || is_null($order->{$fieldKey}))
+| {{ @$field['name'] }}: | {{ $order->{$fieldKey} }} |
+@endforeach
+@endcomponent
+@endif
+
 @if ( $order->note )
 @component('mail::panel')
 <small><strong>{{ _('Poznámka') }}: </strong></small> {{ $order->note }}

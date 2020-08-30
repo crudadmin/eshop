@@ -74,7 +74,7 @@ class Order extends AdminModel
                 'delivery_different' => 'name:Doručiť na inú adresu|type:checkbox|default:0',
                 Group::fields([
                     'delivery_username' => 'name:Meno a priezvisko / Firma|required_with:delivery_different',
-                    'delivery_phone' => 'name:Telefón|'.phoneValidatorRule().'|required_with:delivery_different',
+                    'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
                     'delivery_street' => 'name:Ulica a č.p.|required_with:delivery_different',
                     'delivery_city' => 'name:Mesto|required_with:delivery_different',
                     'delivery_zipcode' => 'name:PSČ|required_with:delivery_different',
@@ -238,6 +238,8 @@ class Order extends AdminModel
             'delivery',
             config('admineshop.delivery.multiple_locations') ? 'delivery_location' : null,
             'payment_method',
+            'country',
+            'delivery_country',
             'items.product' => $withAll,
             'items.variant' => $withAll,
         ]));

@@ -124,9 +124,7 @@ class OrderService
      */
     public function addItemsIntoOrder()
     {
-        $items = Cart::all();
-
-        $items = $this->pushAdditionalItemsFromMutators($items);
+        $items = Cart::allWithMutators();
 
         foreach ($items as $item) {
             $product = $item->getItemModel();
@@ -173,22 +171,6 @@ class OrderService
                 'price_vat' => Store::priceWithVat($discount->value) * ($discount->operator == '-' ? -1 : 1),
             ]);
         }
-    }
-
-    private function pushAdditionalItemsFromMutators($items)
-    {
-        foreach ( $this->getActiveMutators() as $mutator ) {
-            if ( ! method_exists($mutator, 'addCartItems') ) {
-                continue;
-            }
-
-            $addItems = $mutator->addCartItems($mutator->getActiveResponse())
-                                ->toCartFormat();
-
-            $items = $items->merge($addItems);
-        }
-
-        return $items;
     }
 
     /**
@@ -262,7 +244,7 @@ class OrderService
 
     private function addClientIntoOrder()
     {
-        if ( client() ) {
+        if ( Admin::isFrontend() && client() && !$this->getOrder()->client_id ) {
             $this->getOrder()->client_id = client()->getKey();
         }
     }

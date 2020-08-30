@@ -229,6 +229,24 @@ class Cart
                     });
     }
 
+    public function allWithMutators($discounts = null)
+    {
+        $items = $this->all($discounts);
+
+        foreach ( OrderService::getActiveMutators() as $mutator ) {
+            if ( ! method_exists($mutator, 'addCartItems') ) {
+                continue;
+            }
+
+            $addItems = $mutator->addCartItems($mutator->getActiveResponse())
+                                ->toCartFormat($discounts);
+
+            $items = $items->merge($addItems);
+        }
+
+        return $items;
+    }
+
     /**
      * Forget all saved cart and order details
      *

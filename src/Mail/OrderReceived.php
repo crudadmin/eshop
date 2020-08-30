@@ -36,9 +36,9 @@ class OrderReceived extends Mailable
 
         $this->invoice = $invoice;
 
-        $this->cartItems = Cart::all();
+        $this->cartItems = Cart::allWithMutators();
 
-        $this->cartSummary = $this->cartItems->getSummary(true);
+        $this->cartSummary = Cart::all()->getSummary(true);
 
         $this->discounts = Discounts::getDiscounts();
     }

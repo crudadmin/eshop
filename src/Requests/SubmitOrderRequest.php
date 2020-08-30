@@ -14,11 +14,12 @@ class SubmitOrderRequest extends AdminModelRequest
             'street', 'zipcode', 'city', 'country_id',
 
             //Company fields
-            'is_company', 'company_name', 'company_id', 'company_tax_id',
+            'is_company', 'company_name', 'company_id', 'company_tax_id', 'company_vat_id',
 
             //Delivery fields
             'delivery_different',
             'delivery_username',
+            'delivery_phone',
             'delivery_street',
             'delivery_zipcode', 'delivery_city',
             'delivery_country_id',
