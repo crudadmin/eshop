@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use AdminEshop\Contracts\CartItem;
+use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
@@ -16,7 +17,8 @@ use Store;
 
 class Discount implements Discountable
 {
-    use DataStore;
+    use DataStore,
+        DriverSupport;
 
     /**
      * Discount operator for managing price values

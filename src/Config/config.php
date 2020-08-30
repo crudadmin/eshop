@@ -104,5 +104,15 @@ return [
             AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
             AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
         ],
+
+        'order' => [
+            //Submit order validato request
+            'validator' => AdminEshop\Requests\SubmitOrderRequest::class,
+
+            //Which additional validation rules need to be applied
+            'validator_rules' => [
+                'license_terms' => 'required',
+            ],
+        ],
     ],
 ];

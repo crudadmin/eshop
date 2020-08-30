@@ -275,7 +275,6 @@ trait CartTrait
 
         foreach ($items as $key => $item) {
             $arrayItems[] = $item->toArray();
-            // $arrayItems[] = (array)$item;
         }
 
         $this->getDriver()->set('items', $arrayItems);

@@ -16,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected $facades = [
         'Cart' => \AdminEshop\Facades\CartFacade::class,
+        'CartDriver' => \AdminEshop\Facades\CartDriverFacade::class,
         'Store' => \AdminEshop\Facades\StoreFacade::class,
         'Discounts' => \AdminEshop\Facades\Discounts::class,
         'OrderService' => \AdminEshop\Facades\OrderServiceFacade::class,

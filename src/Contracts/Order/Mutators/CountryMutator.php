@@ -27,6 +27,18 @@ class CountryMutator extends Mutator
     private $countryKey = 'country_id';
 
     /**
+     * Flush driver data on order successfully completed
+     * We does not want to flush country data on order completed
+     * we want save previous selected country
+     *
+     * @var  bool
+     */
+    public function flushOnComplete()
+    {
+        return false;
+    }
+
+    /**
      * Returns if mutators is active
      * And sends state to other methods
      *
@@ -55,7 +67,7 @@ class CountryMutator extends Mutator
      */
     public function getSelectedCountry($id = null)
     {
-        $id = $id ?: Cart::getDriver()->get($this->countryKey);
+        $id = $id ?: $this->getDriver()->get($this->countryKey);
 
         if ( ! $id ){
             return;
@@ -89,7 +101,7 @@ class CountryMutator extends Mutator
             }
         }
 
-        Cart::getDriver()->set($this->countryKey, $id);
+        $this->getDriver()->set($this->countryKey, $id);
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace AdminEshop\Controllers\Cart;
 
 use Admin;
+use Cart;
+use OrderService;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Order\Mutators\CountryMutator;
@@ -10,7 +12,6 @@ use AdminEshop\Controllers\Controller;
 use AdminEshop\Events\DiscountCodeAdded;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
-use Cart;
 use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use Facades\AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use Illuminate\Validation\ValidationException;
@@ -175,5 +176,34 @@ class CartController extends Controller
         (new CountryMutator)->setCountry($countryId);
 
         return Cart::fullCartResponse();
+    }
+
+    public function submitOrder()
+    {
+        if ( $errorResponse = OrderService::validateOrder() ){
+            return $errorResponse;
+        }
+
+        //Create order
+        OrderService::store();
+
+        //Add items into order
+        OrderService::addItemsIntoOrder();
+
+        //Generate default invoice document
+        $proform = OrderService::makeInvoice('proform');
+
+        //Send email to client
+        // OrderService::sentClientEmail($proform);
+
+        // //Sent store email
+        // OrderService::sentStoreEmail();
+
+        //Forget whole cart
+        Cart::forget();
+
+        return autoAjax()->success(_('Objednávka bola úspešne odoslaná.'))->data([
+            'order' => OrderService::getOrder()
+        ]);
     }
 }

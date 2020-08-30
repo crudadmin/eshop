@@ -190,7 +190,7 @@ class DeliveryMutator extends Mutator
      */
     public function getSelectedDelivery()
     {
-        $id = Cart::getDriver()->get($this->deliveryKey);
+        $id = $this->getDriver()->get($this->deliveryKey);
 
         return $this->cache('selectedDelivery'.$id, function() use ($id) {
             return Cart::addCartDiscountsIntoModel($this->getDeliveries()->where('id', $id)->first());
@@ -202,7 +202,7 @@ class DeliveryMutator extends Mutator
      */
     public function getSelectedLocation()
     {
-        $id = Cart::getDriver()->get($this->deliveryLocationKey);
+        $id = $this->getDriver()->get($this->deliveryLocationKey);
 
         return $this->cache('selectedLocation'.$id, function() use ($id) {
             if ( !($delivery = $this->getSelectedDelivery()) ) {
@@ -222,8 +222,8 @@ class DeliveryMutator extends Mutator
      */
     public function saveDelivery($id = null, $locationId = null)
     {
-        Cart::getDriver()->set($this->deliveryKey, $id);
-        Cart::getDriver()->set($this->deliveryLocationKey, $locationId);
+        $this->getDriver()->set($this->deliveryKey, $id);
+        $this->getDriver()->set($this->deliveryLocationKey, $locationId);
 
         return $this;
     }

@@ -2,13 +2,12 @@
 
 namespace AdminEshop\Contracts\Cart\Drivers;
 
-use AdminEshop\Contracts\Cart\Drivers\CartDriver;
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
 use AdminEshop\Models\Store\CartToken;
 use Arr;
 use Str;
 
-class MySqlDriver extends CartDriver implements DriverInterface
+class MySqlDriver implements DriverInterface
 {
     /**
      * Session identifier for stored key
@@ -29,10 +28,10 @@ class MySqlDriver extends CartDriver implements DriverInterface
      *
      * @return  void
      */
-    public function onCreate(array $initialData = [])
+    public function __construct(array $initialData = [])
     {
         //Create and save cart session with default initial data
-        $this->getCartSession();
+        $this->getCartSession($initialData);
     }
 
     /*
@@ -71,9 +70,11 @@ class MySqlDriver extends CartDriver implements DriverInterface
     /**
      * Return cart row model row
      *
+     * @param array|null $initialData
+     *
      * @return  CartSesion||null
      */
-    public function getCartSession()
+    public function getCartSession($initialData = [])
     {
         if ( $this->cartRow ){
             return $this->cartRow;
@@ -84,7 +85,7 @@ class MySqlDriver extends CartDriver implements DriverInterface
         if ( !($cartRow = CartToken::where('token', $cartKey)->first()) ){
             $cartRow = CartToken::create([
                 'token' => $cartKey,
-                'data' => $this->getInitialData() ?: [],
+                'data' => $initialData ?: [],
             ]);
         }
 
@@ -94,15 +95,19 @@ class MySqlDriver extends CartDriver implements DriverInterface
     /**
      * Set data into cart session
      *
-     * @param  [type]  $key
-     * @param  [type]  $value
+     * @param  string|null  $key
+     * @param  mixed  $value
      */
     public function set($key, $value)
     {
         //Merge existing data with new data set
-        $data = array_merge($this->getCartSession()->data ?: [], [
-            $key => $value,
-        ]);
+        if ( $key === null ){
+            $data = $value;
+        } else {
+            $data = array_merge($this->getCartSession()->data ?: [], [
+                $key => $value,
+            ]);
+        }
 
         //If empty values has been given, we want remove key
         if ( $value === null ) {
@@ -140,20 +145,5 @@ class MySqlDriver extends CartDriver implements DriverInterface
     public function forget($key = null)
     {
         $this->set($key, null);
-    }
-
-    /**
-     * Delete data from
-     *
-     * @return  void
-     */
-    public function destroy()
-    {
-        $this->getCartSession()->delete();
-
-        if ( config('admineshop.cart.session') == true ) {
-            session()->forget($this->sessionIdentifierKey);
-            session()->save();
-        }
     }
 }

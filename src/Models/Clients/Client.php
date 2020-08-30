@@ -50,7 +50,7 @@ class Client extends Authenticatable
             ]),
             'Firemné údaje' => Group::half([
                 'company_name' => 'name:Názov firmy|required_with:is_company',
-                'company_id' => 'name:IČO|required_with:is_company',
+                'company_id' => 'name:IČO|company_id|required_with:is_company',
                 'company_tax_id' => 'name:DIČ|required_with:is_company',
                 'company_vat_id' => 'name:IČ DPH',
             ])->add('hidden'),

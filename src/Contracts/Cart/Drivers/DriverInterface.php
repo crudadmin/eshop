@@ -9,12 +9,13 @@ interface DriverInterface
      *
      * @return  void
      */
-    public function onCreate(array $initialData = []);
+    public function __construct(array $initialData = []);
 
     /**
      * Set data into cart session
+     * If key is present as null, we want replace whole object data with given value
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $value
      */
     public function set($key, $value);
@@ -36,11 +37,4 @@ interface DriverInterface
      * @return  void
      */
     public function forget($key = null);
-
-    /**
-     * Destroy whole cart instance
-     *
-     * @return  void
-     */
-    public function destroy();
 }

@@ -81,7 +81,7 @@ class ClientDataMutator extends Mutator
      */
     public function setClientData($row = null)
     {
-        Cart::getDriver()->set($this->clientKey, $row);
+        $this->getDriver()->set($this->clientKey, $row);
     }
 
     /**
@@ -91,7 +91,7 @@ class ClientDataMutator extends Mutator
      */
     public function getClientData()
     {
-        return Cart::getDriver()->get($this->clientKey, null);
+        return $this->getDriver()->get($this->clientKey, null);
     }
 }
 

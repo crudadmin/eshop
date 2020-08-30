@@ -15,6 +15,7 @@ class StoreServiceProvider extends ServiceProvider {
         $this->app->bind('store', \AdminEshop\Contracts\Store::class);
         $this->app->bind('store.discounts', \AdminEshop\Contracts\Discounts::class);
         $this->app->bind('cart', \AdminEshop\Contracts\Cart::class);
+        $this->app->bind('cart.driver', \AdminEshop\Contracts\Cart\Drivers\CartDriver::class);
         $this->app->bind('order.service', \AdminEshop\Contracts\OrderService::class);
     }
 }

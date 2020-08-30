@@ -8,7 +8,6 @@ use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
 use Store;
-use Cart;
 
 class DiscountCode extends Discount implements Discountable
 {
@@ -189,7 +188,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function getCodeName()
     {
-        return Cart::getDriver()->get(self::$discountCodeKey);
+        return (new static)->getDriver()->get(self::$discountCodeKey);
     }
 
     /**
@@ -226,7 +225,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function saveDiscountCode(string $code)
     {
-        Cart::getDriver()->set(self::$discountCodeKey, $code);
+        (new static)->getDriver()->set(self::$discountCodeKey, $code);
     }
 
     /**
@@ -236,7 +235,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function removeDiscountCode()
     {
-        Cart::getDriver()->forget(self::$discountCodeKey);
+        (new static)->getDriver()->forget(self::$discountCodeKey);
     }
 }
 

@@ -66,7 +66,7 @@ class Order extends AdminModel
                 'street' => 'name:Ulica a č.p.|column_name:Ulica|required',
                 'city' => 'name:Mesto|required',
                 'zipcode' => 'name:PSČ|max:6|zipcode|required',
-                'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|exists:countries,id',
+                'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|exists:countries,id|required',
             ])->grid(4),
             'Dodacie údaje' => Group::fields([
                 'delivery_different' => 'name:Doručiť na inú adresu|type:checkbox|default:0',
@@ -84,7 +84,7 @@ class Order extends AdminModel
                     'is_company' => 'name:Nákup na firmu|type:checkbox|default:0',
                     Group::fields([
                         'company_name' => 'name:Názov firmy|required_with:is_company',
-                        'company_id' => 'name:IČ|required_with:is_company',
+                        'company_id' => 'name:IČ|company_id|required_with:is_company',
                         'company_tax_id' => 'name:DIČ|required_with:is_company',
                         'company_vat_id' => 'name:IČ DPH',
                     ])->add('hideFieldIfNot:is_company,1')

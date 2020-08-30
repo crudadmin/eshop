@@ -4,10 +4,12 @@ namespace AdminEshop\Contracts;
 
 use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
+use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use Admin\Core\Contracts\DataStore;
+use CartDriver;
 use Discounts;
 use OrderService;
 use Store;
@@ -15,7 +17,8 @@ use Store;
 class Cart
 {
     use CartTrait,
-        DataStore;
+        DataStore,
+        DriverSupport;
 
     /*
      * Items in cart
@@ -30,36 +33,10 @@ class Cart
     private $fullCartResponse = false;
 
     /**
-     * Cart Driver
-     * session/token
-     *
-     * @var  void
-     */
-    protected $driver;
-
-    /**
-     * Cart initialization data.
-     * You can set initialization data via onCreate function
-     *
-        \AdminEshop\Contracts\CartCart::onCreate(function(){
-            return [
-                'my_initial_data' => 123
-            ];
-        });
-     *
-     * @var  array
-     */
-    protected static $onCreate = [];
-
-    /**
      * Cart constructor
      */
     public function __construct()
     {
-        $driver = config('admineshop.cart.driver');
-
-        $this->driver = new $driver(self::$onCreate);
-
         //We does not want fetch items from session in admin interface
         if ( Admin::isAdmin() == true ) {
             $this->items = new CartCollection;
@@ -69,24 +46,6 @@ class Cart
         else {
             $this->items = $this->fetchItemsFromDriver();
         }
-    }
-
-    /*
-     * On cart create
-     */
-    public static function onCreate(callable $onCreate)
-    {
-        self::$onCreate = $onCreate();
-    }
-
-    /**
-     * Returns driver
-     *
-     * @return  AdminEshop\Contracts\Cart\Drivers\DriverInterface
-     */
-    public function getDriver()
-    {
-        return $this->driver;
     }
 
     /**
@@ -287,8 +246,7 @@ class Cart
                 }
             }
 
-            //Destory cart session
-            $this->driver->destroy();
+            CartDriver::flushAllExceptWhitespaced();
         }
 
         return $this;

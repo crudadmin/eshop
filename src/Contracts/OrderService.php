@@ -11,6 +11,7 @@ use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
+use AdminEshop\contracts\Order\Concerns\HasOrderProcess;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
@@ -24,7 +25,8 @@ class OrderService
         HasRequest,
         HasPayments,
         HasValidation,
-        HasMutators;
+        HasMutators,
+        HasOrderProcess;
 
     /**
      * Order row

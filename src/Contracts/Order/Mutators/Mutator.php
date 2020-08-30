@@ -2,12 +2,14 @@
 
 namespace AdminEshop\Contracts\Order\Mutators;
 
+use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
 
 class Mutator
 {
-    use DataStore;
+    use DataStore,
+        DriverSupport;
 
     /**
      * Register order validator with this mutators

@@ -132,7 +132,7 @@ class PaymentMethodMutator extends Mutator
      */
     public function getSelectedPaymentMethod()
     {
-        $id = Cart::getDriver()->get($this->paymentKey);
+        $id = $this->getDriver()->get($this->paymentKey);
 
         //We need to save also delivery key into cacheKey,
         //because if delivery would change, paymentMethod can dissapear
@@ -176,7 +176,7 @@ class PaymentMethodMutator extends Mutator
      */
     public function savePaymentMethod($id = null)
     {
-        Cart::getDriver()->set($this->paymentKey, $id);
+        $this->getDriver()->set($this->paymentKey, $id);
 
         return $this;
     }

@@ -2,10 +2,9 @@
 
 namespace AdminEshop\Contracts\Cart\Drivers;
 
-use AdminEshop\Contracts\Cart\Drivers\CartDriver;
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
 
-class SessionDriver extends CartDriver implements DriverInterface
+class SessionDriver implements DriverInterface
 {
     /*
      * Session key for basket items
@@ -17,11 +16,11 @@ class SessionDriver extends CartDriver implements DriverInterface
      *
      * @return  void
      */
-    public function onCreate(array $initialData = [])
+    public function __construct(array $initialData = [])
     {
         //Boot session driver with default values
         if ( session()->has($this->key) === false ){
-            session()->put($this->key, $this->getInitialData());
+            session()->put($this->key, $initialData);
             session()->save();
         }
     }
@@ -29,12 +28,12 @@ class SessionDriver extends CartDriver implements DriverInterface
     /**
      * Set data into cart session
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $value
      */
     public function set($key, $value)
     {
-        session()->put($this->key.'.'.$key, $value);
+        session()->put($this->key.($key ? '.'.$key : ''), $value);
         session()->save();
     }
 
@@ -60,17 +59,6 @@ class SessionDriver extends CartDriver implements DriverInterface
     public function forget($key = null)
     {
         session()->forget($this->key.($key ? ('.'.$key) : ''));
-        session()->save();
-    }
-
-    /**
-     * Delete data from
-     *
-     * @return  void
-     */
-    public function destroy()
-    {
-        session()->forget($this->key);
         session()->save();
     }
 }
