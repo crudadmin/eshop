@@ -221,6 +221,9 @@ class CartController extends Controller
             'items' => $order->items->map(function($item){
                 return $item->toResponseFormat();
             }),
+            'invoice_pdf' => OrderService::hasInvoices() ? (
+                ($invoice = $order->invoice->last()) ? $invoice->getPdf()->url : null
+            ) : null,
         ];
     }
 }

@@ -222,6 +222,11 @@ class Order extends AdminModel
         return Store::roundNumber($this->delivery_price * (1 + ($this->delivery_vat/100)));
     }
 
+    public function getStatusTextAttribute()
+    {
+        return $this->getOptionValue('status', $this->status);
+    }
+
     /**
      * This scope will be applied in order detail
      *
@@ -265,6 +270,7 @@ class Order extends AdminModel
         return $this->append([
             'number',
             'hasCompany',
+            'statusText',
             'deliveryPriceWithVat',
             'paymentMethodPriceWithVat',
         ]);
