@@ -5,7 +5,9 @@ namespace AdminEshop\Eloquent\Concerns;
 use Admin;
 use AdminEshop\Contracts\Collections\OrderItemsCollection;
 use AdminEshop\Contracts\Discounts\DiscountCode;
+use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\OrdersItem;
+use AdminEshop\Models\Store\PaymentsMethod;
 use Ajax;
 use Cart;
 use Discounts;
@@ -217,6 +219,36 @@ trait OrderTrait
                 'price_vat' => $this->paymentMethodPriceWithVat,
             ]);
         }
+    }
+
+    public function getDeliveries()
+    {
+        return Delivery::leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
+                        ->select(array_filter([
+                            'deliveries.id',
+                            'deliveries.name',
+                            'deliveries.price',
+                            config('admineshop.delivery.multiple_locations') ? 'deliveries.multiple_locations' : null,
+                            'vats.vat'
+                        ]))
+                        ->get();
+    }
+
+    public function getPaymentMethods()
+    {
+        return PaymentsMethod::leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
+                        ->select([
+                            'payments_methods.id',
+                            'payments_methods.name',
+                            'payments_methods.price',
+                            'vats.vat'
+                        ])
+                        ->get();
+    }
+
+    public function getHash()
+    {
+        return sha1(env('APP_KEY').$this->getKey().'XL');
     }
 }
 

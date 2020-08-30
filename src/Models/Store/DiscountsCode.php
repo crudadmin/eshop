@@ -34,7 +34,9 @@ class DiscountsCode extends AdminModel
 
     protected $icon = 'fa-percent';
 
-    protected $visible = ['id', 'code'];
+    protected $visible = ['id', 'code', 'name', 'isActive'];
+
+    protected $append = ['isActive', 'name'];
 
     public function active()
     {

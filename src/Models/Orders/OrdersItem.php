@@ -8,15 +8,13 @@ use AdminEshop\Admin\Rules\BindDefaultPrice;
 use AdminEshop\Admin\Rules\BindIdentifierName;
 use AdminEshop\Admin\Rules\RebuildOrderOnItemChange;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
-use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
+use AdminEshop\Eloquent\Concerns\OrderItemTrait;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
-use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
@@ -25,7 +23,8 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 {
     use PriceMutator,
         IdentifierSupport,
-        DiscountHelper;
+        DiscountHelper,
+        OrderItemTrait;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -143,66 +142,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     }
 
     /*
-     * Skip variants non orderable variants
-     * Product can also have variants, bud this variants may not be orderable. We want skip this variants.
-     *
-     * @return Collection
-     */
-    public function getAvailableVariants()
-    {
-        return ProductsVariant::select(['id', 'product_id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'])
-                ->whereHas('product', function($query){
-                    $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
-                })->get()->map(function($item){
-                    $item->setVisible(['id', 'product_id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
-                         ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
-
-                    return $item;
-                });
-    }
-
-    /**
-     * Return products with needed attributes
-     *
-     * @return  Collection
-     */
-    public function getAvailableProducts()
-    {
-        return Product::select(['id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'])
-                ->get()->map(function($item){
-                    $item->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
-                         ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
-
-                    return $item;
-                });
-    }
-
-    /*
-     * Get product/attribute relationship
-     */
-    public function getProduct()
-    {
-        return Admin::cache('ordersItems.'.$this->getKey(), function(){
-            //Bind product or variant for uncounting from stock
-            if ( $this->variant_id )
-                return $this->variant;
-
-            return $this->product;
-        });
-    }
-
-    /**
-     * Returns if cart item has manual price
-     *
-     * @return  bool
-     */
-    public function getHasManualPriceAttribute()
-    {
-        return $this->manual_price === true;
-    }
-
-    /*
-     * Set initial price for discounts
+     * Rewrite initial price for discounts from saved initial value
      */
     public function getInitialPriceWithoutVatAttribute()
     {
@@ -227,6 +167,25 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         return Store::roundNumber($this->default_price);
     }
 
+    /*
+     * Get product/attribute relationship
+     */
+    public function getProduct()
+    {
+        return Admin::cache('ordersItems.'.$this->getKey(), function(){
+            //Bind product or variant for uncounting from stock
+            if ( $this->variant_id )
+                return $this->variant;
+
+            return $this->product;
+        });
+    }
+
+    /**
+     * Returns product name attribute
+     *
+     * @return  string
+     */
     public function getProductNameAttribute()
     {
         $items = [
@@ -239,14 +198,12 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     }
 
     /**
-     * Returns cart item
+     * Order response format
      *
-     * @return  AdminEshop\Contracts\CartItem|null
+     * @return  array
      */
-    public function buildCartItem()
+    public function toResponseFormat()
     {
-        $identifier = $this->getIdentifierClass();
-
-        return new CartItem($identifier, $this->quantity, $this);
+        return $this;
     }
 }

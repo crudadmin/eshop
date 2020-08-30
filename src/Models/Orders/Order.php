@@ -4,12 +4,14 @@ namespace AdminEshop\Models\Orders;
 
 use AdminEshop\Admin\Buttons\GenerateInvoice;
 use AdminEshop\Admin\Rules\RebuildOrder;
+use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Discounts;
 use Illuminate\Notifications\Notifiable;
 use Store;
 
@@ -139,6 +141,11 @@ class Order extends AdminModel
         if ( config('admineshop.delivery.multiple_locations') !== true ){
             $fields->remove(['delivery_location']);
         }
+
+        //If discount code is not registred, we can remove it from order
+        if ( Discounts::isRegistredDiscount(DiscountCode::class) === false ){
+            $fields->remove(['discount_code']);
+        }
     }
 
     public function settings()
@@ -186,31 +193,6 @@ class Order extends AdminModel
         ];
     }
 
-    public function getDeliveries()
-    {
-        return Delivery::leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
-                        ->select(array_filter([
-                            'deliveries.id',
-                            'deliveries.name',
-                            'deliveries.price',
-                            config('admineshop.delivery.multiple_locations') ? 'deliveries.multiple_locations' : null,
-                            'vats.vat'
-                        ]))
-                        ->get();
-    }
-
-    public function getPaymentMethods()
-    {
-        return PaymentsMethod::leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
-                        ->select([
-                            'payments_methods.id',
-                            'payments_methods.name',
-                            'payments_methods.price',
-                            'vats.vat'
-                        ])
-                        ->get();
-    }
-
     public function setAdminAttributes($attributes)
     {
         $attributes['client_name'] = $this->client ? $this->client->clientName : '';
@@ -220,7 +202,7 @@ class Order extends AdminModel
         return $attributes;
     }
 
-    public function isCompany()
+    public function getHasCompanyAttribute()
     {
         return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
@@ -240,8 +222,49 @@ class Order extends AdminModel
         return Store::roundNumber($this->delivery_price * (1 + ($this->delivery_vat/100)));
     }
 
-    public function getHash()
+    /**
+     * This scope will be applied in order detail
+     *
+     * @param  Builder  $query
+     */
+    public function scopeOrderDetail($query)
     {
-        return sha1(env('APP_KEY').$this->getKey().'XL');
+        $withAll = function($query){
+            $query->withTrashed()->withUnpublished();
+        };
+
+        $query->with(array_filter([
+            'discount_code',
+            'delivery',
+            config('admineshop.delivery.multiple_locations') ? 'delivery_location' : null,
+            'payment_method',
+            'items.product' => $withAll,
+            'items.variant' => $withAll,
+        ]));
+    }
+
+    /**
+     * This scope will be applied in success order page request
+     *
+     * @param  Builder  $query
+     */
+    public function scopeOrderCreated($query)
+    {
+
+    }
+
+    /**
+     * Order response format
+     *
+     * @return  array
+     */
+    public function toResponseFormat()
+    {
+        return $this->append([
+            'number',
+            'hasCompany',
+            'deliveryPriceWithVat',
+            'paymentMethodPriceWithVat',
+        ]);
     }
 }

@@ -84,7 +84,7 @@ class ProxyDriver
      */
     public function forget($key = null)
     {
-        return $this->driver->forget(implode('.', array_filter([$this->driverKey, $key])), $default);
+        return $this->driver->forget(implode('.', array_filter([$this->driverKey, $key])));
     }
 
     /**

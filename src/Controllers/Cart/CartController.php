@@ -3,8 +3,6 @@
 namespace AdminEshop\Controllers\Cart;
 
 use Admin;
-use Cart;
-use OrderService;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Order\Mutators\CountryMutator;
@@ -12,9 +10,11 @@ use AdminEshop\Controllers\Controller;
 use AdminEshop\Events\DiscountCodeAdded;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
+use Cart;
 use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use Facades\AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use Illuminate\Validation\ValidationException;
+use OrderService;
 
 class CartController extends Controller
 {
@@ -205,5 +205,22 @@ class CartController extends Controller
         return autoAjax()->success(_('Objednávka bola úspešne odoslaná.'))->data([
             'order' => OrderService::getOrder()
         ]);
+    }
+
+    public function success()
+    {
+        $orderId = Cart::getDriver()->get('order_id');
+
+        $order = Admin::getModelByTable('orders')
+                    ->orderDetail()
+                    ->orderCreated()
+                    ->find($orderId);
+
+        return [
+            'order' => $order->makeHidden(['items'])->toResponseFormat(),
+            'items' => $order->items->map(function($item){
+                return $item->toResponseFormat();
+            }),
+        ];
     }
 }

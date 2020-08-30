@@ -247,7 +247,11 @@ class Cart
             }
 
             CartDriver::flushAllExceptWhitespaced();
+
         }
+
+        //Set created order id into cart
+        Cart::getDriver()->set('order_id', OrderService::getOrder()->getKey());
 
         return $this;
     }
