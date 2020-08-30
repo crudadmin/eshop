@@ -243,9 +243,9 @@ trait PriceMutator
      */
     public function totalPriceWithVat(int $quantity)
     {
-        $round = Store::hasSummaryRounding();
-
-        return Store::roundNumber($this->calculateVatPrice($this->priceWithoutVat, $round) * $quantity);
+        return Store::roundNumber(
+            $this->calculateVatPrice($this->priceWithoutVat, null) * $quantity
+        );
     }
 
     /**
@@ -294,12 +294,17 @@ trait PriceMutator
      * Calculation of vat price for given price
      *
      * @var $price int/float
-     * @var $round bool
+     * @var $round bool/null
      *
      * @return  float/int
      */
     private function calculateVatPrice($price, $round = true)
     {
+        //Set by configuration settings
+        if ( $round === null ){
+            $round = Store::hasSummaryRounding();
+        }
+
         $vat = $this->vatValue;
 
         //If model has rewriten vat value

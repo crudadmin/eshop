@@ -2,15 +2,17 @@
 
 namespace AdminEshop\Contracts;
 
-use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
+use AdminEshop\Contracts\Cart\Concerns\HasOptionableDiscounts;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
+use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use Cart;
 
 class CartItem implements UsesIdentifier
 {
-    use IdentifierSupport;
+    use IdentifierSupport,
+        HasOptionableDiscounts;
 
     /**
      * Cart item identififer
@@ -32,8 +34,9 @@ class CartItem implements UsesIdentifier
      * @param  Identifier  $identifier
      * @param  int  $quantity
      * @param  mixed  $originalObject
+     * @param  bool  $discounts
      */
-    public function __construct(Identifier $identifier, $quantity = 1, $originalObject = null)
+    public function __construct(Identifier $identifier, $quantity = 1, $originalObject = null, bool $discounts = true)
     {
         $this->identifier = $identifier->getName();
 
@@ -42,6 +45,8 @@ class CartItem implements UsesIdentifier
         $this->loadIdentifier($identifier);
 
         $this->setOriginalObject($originalObject);
+
+        $this->discountableSupport = $discounts;
     }
 
     /**

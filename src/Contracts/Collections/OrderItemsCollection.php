@@ -8,6 +8,20 @@ use Discounts;
 class OrderItemsCollection extends CartCollection
 {
     /**
+     * Allow discounts by discount checkbox from orders_items table
+     *
+     * @return  this
+     */
+    public function setDiscountable()
+    {
+        return $this->map(function($item) {
+            $item->setDiscounts($item->discountable);
+
+            return $item;
+        });
+    }
+
+    /**
      * Clone default prices from Item into assigned model in this item
      * And allow discounts on given models
      *
@@ -19,7 +33,7 @@ class OrderItemsCollection extends CartCollection
     {
         return $this->map(function($item) {
             //If OrderItem price is typed manually, we also need reset product price of item
-            //to this manualy typed price. And turn off discounts on this price.
+            //to manualy typed price. And turn off discounts for this price.
             //We also need rewrite vat value for calculating prices for given product
             if ( $item->hasManualPrice ) {
                 if ( $model = $item->getItemModel() ) {
@@ -30,9 +44,9 @@ class OrderItemsCollection extends CartCollection
 
             //We need to remember default price of OrdersItem property,
             //because when price of product will be changed, order may be modifier
-            //by this new price. This is wrong.
-            //We also need check if given identifier has discounts support. Because
-            //this suppor may change, id identifier will be missing.
+            //by new price. This is wrong.
+            //We also need check, if given identifier has discounts support. Because
+            //this support may change, if identifier will be missing.
             else if ( $item->getIdentifierClass()->hasDiscounts() ) {
                 if (
                     ($model = $item->getItemModel())

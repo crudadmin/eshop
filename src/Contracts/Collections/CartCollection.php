@@ -55,6 +55,11 @@ class CartCollection extends Collection
         }
 
         return $this->map(function($item) use ($discounts) {
+            //If cart item does not have enabled discounts
+            if ( $item->hasDiscounts() == false ){
+                return $item;
+            }
+
             //We would try apply discounts on cart item also.
             //If item would have discountable trait, cart discounts will be applied
             Cart::addCartDiscountsIntoModel($item, $discounts);

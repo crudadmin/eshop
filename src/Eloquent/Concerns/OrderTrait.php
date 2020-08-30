@@ -29,6 +29,7 @@ trait OrderTrait
 
         $items = (new OrderItemsCollection($this->items))
                     ->fetchModels()
+                    ->setDiscountable()
                     ->addOriginalObjects()
                     ->rewritePricesInModels()
                     ->applyOnOrderCart();

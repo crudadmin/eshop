@@ -2,8 +2,15 @@
 export default {
     props : ['row', 'model'],
 
+    data(){
+        return {
+            priceBeforeManual : null,
+        };
+    },
+
     mounted(){
         this.reloadPricesOnType();
+        this.revertDefaultPriceOnManualTurnedOff();
     },
 
     computed: {
@@ -13,6 +20,16 @@ export default {
     },
 
     methods: {
+        revertDefaultPriceOnManualTurnedOff(){
+            this.$watch('row.manual_price', state => {
+                if ( state === true ){
+                    this.priceBeforeManual = this.row.price;
+                } else if ( state === false && this.priceBeforeManual ) {
+                    this.row.price = this.priceBeforeManual;
+                    this.row.price_vat = this.changeVat(this.priceBeforeManual);
+                }
+            })
+        },
         reloadPricesOnType(){
             //On price changed
             this.$watch('row.price', price => {

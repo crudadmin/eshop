@@ -8,6 +8,7 @@ use AdminEshop\Admin\Rules\BindDefaultPrice;
 use AdminEshop\Admin\Rules\BindIdentifierName;
 use AdminEshop\Admin\Rules\RebuildOrderOnItemChange;
 use AdminEshop\Admin\Rules\ReloadProductQuantity;
+use AdminEshop\Contracts\Cart\Concerns\HasOptionableDiscounts;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
@@ -24,6 +25,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     use PriceMutator,
         IdentifierSupport,
         DiscountHelper,
+        HasOptionableDiscounts,
         OrderItemTrait;
 
     /*
@@ -54,6 +56,8 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
     protected $sortable = false;
 
+    protected $reversed = true;
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -78,7 +82,8 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
                 'price' => 'name:Cena/j bez DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
                 'vat' => 'name:DPH %|type:select|default:'.Store::getDefaultVat().'|required_if:manual_price,1|disabledIf:manual_price,0',
                 'price_vat' => 'name:Cena/j s DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
-                'manual_price' => 'name:Manuálna cena|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
+                'manual_price' => 'name:Manuálna cena|default:0|hidden|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
+                'discountable' => 'name:Povoliť zľavy|type:checkbox|default:0|invisible',
             ])->inline()
         ];
     }
@@ -135,7 +140,10 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['total'] = Store::priceFormat($this->totalPriceWithVat($this->quantity));
+        $attributes['total'] = Store::priceFormat(
+            $this->calculateVatPrice($this->price, null) * $this->quantity
+        );
+
         $attributes['product_name'] = $this->productName;
 
         return $attributes;

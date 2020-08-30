@@ -124,13 +124,16 @@ class OrderService
      */
     public function addItemsIntoOrder()
     {
-        $cart = Cart::all();
+        $items = Cart::all();
 
-        foreach ($cart as $item) {
+        $items = $this->pushAdditionalItemsFromMutators($items);
+
+        foreach ($items as $item) {
             $product = $item->getItemModel();
 
             $this->order->items()->create([
                 'identifier' => $item->getIdentifierClass()->getName(),
+                'discountable' => $item->hasDiscounts(),
                 'product_id' => $item->id,
                 'variant_id' => $item->variant_id,
                 'quantity' => $item->quantity,
@@ -162,6 +165,7 @@ class OrderService
 
             $order->items()->create([
                 'identifier' => 'discount',
+                'discountable' => false,
                 'name' => $discount->getName() ?: _('Zľava'),
                 'quantity' => 1,
                 'price' => $discount->value * ($discount->operator == '-' ? -1 : 1),
@@ -169,6 +173,22 @@ class OrderService
                 'price_vat' => Store::priceWithVat($discount->value) * ($discount->operator == '-' ? -1 : 1),
             ]);
         }
+    }
+
+    private function pushAdditionalItemsFromMutators($items)
+    {
+        foreach ( $this->getActiveMutators() as $mutator ) {
+            if ( ! method_exists($mutator, 'addCartItems') ) {
+                continue;
+            }
+
+            $addItems = $mutator->addCartItems($mutator->getActiveResponse())
+                                ->toCartFormat();
+
+            $items = $items->merge($addItems);
+        }
+
+        return $items;
     }
 
     /**
@@ -193,7 +213,7 @@ class OrderService
             //Add price from additional cart items from mutators which will be inserted into order
             if ( method_exists($mutator, 'addCartItems') ) {
                 $addItems = $mutator->addCartItems($mutator->getActiveResponse())
-                                    ->toCartFormat(false);
+                                    ->toCartFormat();
 
                 $addItemsSummary = $addItems->getSummary();
 

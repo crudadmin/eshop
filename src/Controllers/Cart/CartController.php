@@ -194,10 +194,10 @@ class CartController extends Controller
         $proform = OrderService::makeInvoice('proform');
 
         //Send email to client
-        // OrderService::sentClientEmail($proform);
+        OrderService::sentClientEmail($proform);
 
         // //Sent store email
-        // OrderService::sentStoreEmail();
+        OrderService::sentStoreEmail();
 
         //Forget whole cart
         Cart::forget();
