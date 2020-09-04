@@ -20,13 +20,13 @@ class AddressController extends Controller
     public function get()
     {
         return [
-            'addresses' => auth()->user()->addresses,
+            'addresses' => client()->addresses,
         ];
     }
 
     public function store()
     {
-        $client = auth()->user();
+        $client = client();
 
         $validator = (new ClientsAddress)->validator()->only(
             $this->rules()
@@ -41,7 +41,7 @@ class AddressController extends Controller
 
     public function update()
     {
-        $client = auth()->user();
+        $client = client();
 
         $address = $client->addresses()->findOrFail(request('id'));
 
@@ -58,7 +58,7 @@ class AddressController extends Controller
 
     public function delete()
     {
-        $client = auth()->user();
+        $client = client();
 
         $address = $client->addresses()->findOrFail(request('id'));
         $address->delete();
