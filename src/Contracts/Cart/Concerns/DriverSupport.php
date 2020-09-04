@@ -53,15 +53,27 @@ trait DriverSupport
         //then flush all classes with true param...
         // dump(get_class($this));
 
-        $driverKey = property_exists($this, 'driverKey')
-                        ? $this->driverKey
-                        : class_basename(get_class($this));
-
-        $this->driver = new ProxyDriver(
-            $driver,
-            $driverKey
-        );
+        $this->driver = new ProxyDriver($driver, $this->getDriverKey());
 
         return $this->driver;
+    }
+
+    public function getDriverKey()
+    {
+        return property_exists($this, 'driverKey')
+                    ? $this->driverKey
+                    : class_basename(get_class($this));
+    }
+
+    /**
+     * Build storage key name by driver key
+     *
+     * @param  string  $key
+     *
+     * @return  string
+     */
+    public function keyName($key)
+    {
+        return implode('.', array_filter([$this->getDriverKey(), $key]));
     }
 }

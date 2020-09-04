@@ -58,7 +58,7 @@ class ProxyDriver
      */
     public function set($key, $value)
     {
-        $this->driver->set(implode('.', array_filter([$this->driverKey, $key])) ?: null, $value);
+        $this->driver->set($this->keyName($key) ?: null, $value);
 
         return $this;
     }
@@ -72,7 +72,7 @@ class ProxyDriver
      */
     public function get($key = '', $default = null)
     {
-        return $this->driver->get(implode('.', array_filter([$this->driverKey, $key])), $default);
+        return $this->driver->get($this->keyName($key), $default);
     }
 
     /**
@@ -84,7 +84,7 @@ class ProxyDriver
      */
     public function forget($key = null)
     {
-        return $this->driver->forget(implode('.', array_filter([$this->driverKey, $key])));
+        return $this->driver->forget($this->keyName($key));
     }
 
     /**
@@ -95,5 +95,17 @@ class ProxyDriver
     public function getDriverKey()
     {
         return $this->driverKey;
+    }
+
+    /**
+     * Build storage key name by driver key
+     *
+     * @param  string  $key
+     *
+     * @return  string
+     */
+    private function keyName($key)
+    {
+        return implode('.', array_filter([$this->driverKey, $key]));
     }
 }

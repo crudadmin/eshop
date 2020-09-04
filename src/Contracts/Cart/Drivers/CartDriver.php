@@ -18,13 +18,6 @@ class CartDriver
     protected $driverKey = null;
 
     /**
-     * Initial data for new cart session instance
-     *
-     * @var  array
-     */
-    protected $initialData = [];
-
-    /**
      * Cart initialization data.
      * You can set initialization data via onCreate function
      *
