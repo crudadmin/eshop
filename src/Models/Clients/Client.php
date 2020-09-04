@@ -22,6 +22,8 @@ class Client extends Authenticatable
 
     protected $publishable = true;
 
+    protected $appends = ['is_company', 'thumbnail'];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -45,7 +47,7 @@ class Client extends Authenticatable
             'Fakturačné údaje' => Group::half([
                 'street' => 'name:Ulica a č.p.',
                 'city' => 'name:Mesto',
-                'zipcode' => 'name:PSČ',
+                'zipcode' => 'name:PSČ|zipcode',
                 'country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id',
             ]),
             'Firemné údaje' => Group::half([
@@ -77,9 +79,9 @@ class Client extends Authenticatable
         return $this->username;
     }
 
-    public function isCompany()
+    public function getIsCompanyAttribute()
     {
-        return $this->company_name || $this->company_id || $this->company_tax_id;
+        return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
 
     public function setAdminAttributes($attributes)
@@ -88,5 +90,12 @@ class Client extends Authenticatable
         $attributes['last_order'] = ($order = $this->orders()->first()) ? $order->created_at->format('d.m.Y') : '';
 
         return $attributes;
+    }
+
+    public function getThumbnailAttribute()
+    {
+        if ( $this->photo ){
+            return $this->photo->resize(300, 300)->url;
+        }
     }
 }

@@ -39,7 +39,7 @@ class ClientsAddress extends AdminModel
             'name' => 'name:Názov adresy|required',
             'Osobné údaje' => Group::fields([
                 'username' => 'name:Meno a priezvisko / Firma|required',
-                'phone' => 'name:Tel. číslo|required',
+                'phone' => 'name:Tel. číslo|required|'.phoneValidatorRule(),
                 'default' => 'name:Predvolené|default:0|type:checkbox',
             ]),
 
@@ -51,10 +51,10 @@ class ClientsAddress extends AdminModel
             ])->grid(6),
 
             'Firemné údaje' => Group::fields([
-                'company_name' => 'name:Názov firmy',
-                'company_id' => 'name:IČO|numeric',
-                'tax_id' => 'name:DIČ|dic',
-                'vat_id' => 'name:IČ DPH|dic',
+                'company_name' => 'name:Názov firmy|required_with:is_company',
+                'company_id' => 'name:IČO|company_id|required_with:is_company',
+                'company_tax_id' => 'name:DIČ|required_with:is_company',
+                'company_vat_id' => 'name:IČ DPH',
             ])->grid(6)->add('hidden|removeFromFormIf:type,delivery'),
         ];
     }
@@ -80,7 +80,7 @@ class ClientsAddress extends AdminModel
         if ( $this->type == 'delivery' )
             return false;
 
-        return $this->company_name || $this->company_id || $this->company_tax_id;
+        return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
 
     protected $rules = [
