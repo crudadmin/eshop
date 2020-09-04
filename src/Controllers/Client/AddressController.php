@@ -19,7 +19,9 @@ class AddressController extends Controller
 
     public function get()
     {
-        return auth()->user()->addresses;
+        return [
+            'addresses' => auth()->user()->addresses,
+        ];
     }
 
     public function store()

@@ -42,10 +42,11 @@ function operator_modifier($number, $operator, $value)
 
 function client()
 {
-    $guard = auth()->guard('client');
+    $guard = auth()->guard(config('auth.defaults.guard'));
 
-    if ( ! $guard->check() )
+    if ( ! $guard->check() ) {
         return null;
+    }
 
     return $guard->user();
 }

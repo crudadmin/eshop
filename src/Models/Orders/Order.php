@@ -9,10 +9,11 @@ use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
+use Illuminate\Notifications\Notifiable;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use OrderService;
 use Discounts;
-use Illuminate\Notifications\Notifiable;
 use Store;
 
 class Order extends AdminModel
@@ -227,6 +228,17 @@ class Order extends AdminModel
         return $this->getOptionValue('status', $this->status);
     }
 
+    public function getInvoiceUrlAttribute()
+    {
+        if ( OrderService::hasInvoices() == false ){
+            return;
+        }
+
+        return ($invoice = $this->invoice->last())
+                ? $invoice->getPdf()->url
+                : null;
+    }
+
     /**
      * This scope will be applied in order detail
      *
@@ -273,6 +285,7 @@ class Order extends AdminModel
             'statusText',
             'deliveryPriceWithVat',
             'paymentMethodPriceWithVat',
+            'invoiceUrl',
         ]);
     }
 }
