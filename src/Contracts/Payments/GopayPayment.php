@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Payments;
 
 use AdminEshop\Contracts\Payments\PaymentHelper;
 use Gopay;
+use Log;
 
 class GopayPayment extends PaymentHelper
 {
@@ -12,6 +13,8 @@ class GopayPayment extends PaymentHelper
     public function __construct()
     {
         if ( !is_array($config = config('gopay')) ) {
+            abort(500, 'Gopay configuration does not exists');
+
             return;
         }
 
@@ -75,6 +78,10 @@ class GopayPayment extends PaymentHelper
 
     public function getPaymentUrl()
     {
+        if ( !$this->gopay ){
+            return false;
+        }
+
         $order = $this->getOrder();
 
         $response = $this->gopay->createPayment([
@@ -106,7 +113,7 @@ class GopayPayment extends PaymentHelper
 
     public function isPaid($id = null)
     {
-        if ( !($id = ($id ?: request('id'))) ) {
+        if ( !$this->gopay || !($id = ($id ?: request('id'))) ) {
             return false;
         }
 

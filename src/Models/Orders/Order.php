@@ -5,21 +5,23 @@ namespace AdminEshop\Models\Orders;
 use AdminEshop\Admin\Buttons\GenerateInvoice;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Contracts\Discounts\DiscountCode;
+use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
-use Illuminate\Notifications\Notifiable;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use OrderService;
 use Discounts;
+use Illuminate\Notifications\Notifiable;
+use OrderService;
 use Store;
 
 class Order extends AdminModel
 {
     use Notifiable,
-        OrderTrait;
+        OrderTrait,
+        HasOrderHashes;
 
     /*
      * Model created date, for ordering tables in database and in user interface

@@ -203,18 +203,26 @@ class CartController extends Controller
         Cart::forget();
 
         return autoAjax()->success(_('Objednávka bola úspešne odoslaná.'))->data([
-            'order' => OrderService::getOrder()
+            'order' => OrderService::getOrder(),
+            'order_hash' => OrderService::getOrder()->getHash(),
+            'payment' => OrderService::hasOnlinePayment() ? [
+                'url' => OrderService::getPaymentRedirect(),
+                'provider' => class_basename(get_class(OrderService::getPaymentClass())),
+            ] : [],
         ]);
     }
 
-    public function success()
+    public function success($orderId = null, $orderHash = null)
     {
-        $orderId = Cart::getDriver()->get('order_id');
-
         $order = Admin::getModelByTable('orders')
                     ->orderDetail()
                     ->orderCreated()
-                    ->find($orderId);
+                    ->findOrFail($orderId ?: Cart::getDriver()->get('order_id'));
+
+        //If hash of given order id in GET request is not correct. We cannot show items of given order
+        if ( $orderId && $order->getHash() !== $orderHash ){
+            abort(401);
+        }
 
         return [
             'order' => $order->makeHidden(['items'])->toResponseFormat(),

@@ -246,11 +246,6 @@ trait OrderTrait
                         ])
                         ->get();
     }
-
-    public function getHash()
-    {
-        return sha1(env('APP_KEY').$this->getKey().'XL');
-    }
 }
 
 ?>

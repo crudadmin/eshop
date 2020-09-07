@@ -51,9 +51,7 @@ class PaymentHelper
      */
     public function getOrderHash($type = null)
     {
-        $order = $this->getOrder();
-
-        return sha1(md5(sha1(md5(env('APP_KEY').$order->payment_method_id.$order->getKey().$type))));
+        return $this->getOrder()->makePaymentHash($type);
     }
 }
 
