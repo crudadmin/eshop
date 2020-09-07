@@ -39,7 +39,45 @@ class GopayPayment extends PaymentHelper
 
     private function getDefaultPayment()
     {
-        return 'PAYMENT_CARD';
+        $payment = $this->getPayment();
+
+        $defaultPayment = env('GOPAY_DEFAULT_PAYMENT', 'PAYMENT_CARD');
+
+        //Set default payment by card, if limit is not over
+        if ( $payment->price <= $this->getPaymentLimits($defaultPayment) ) {
+            return $defaultPayment;
+        }
+    }
+
+    private function getAllowedPayments()
+    {
+        return array_values(array_filter([
+            $this->isPaymentInLimit('PAYMENT_CARD') ? "PAYMENT_CARD" : null,
+            $this->isPaymentInLimit('PAYPAL') ? "PAYPAL" : null,
+            $this->isPaymentInLimit('BANK_ACCOUNT') ? "BANK_ACCOUNT" : null,
+        ]));
+    }
+
+    private function getPaymentLimits($key = null)
+    {
+        $limits = [
+            'PAYMENT_CARD' => env('GOPAY_PAYMENT_CARD_LIMIT', 2000),
+            'BANK_ACCOUNT' => env('GOPAY_BANK_ACCOUNT_LIMIT', 4000),
+            'PAYPAL' => env('GOPAY_PAYPAL_LIMIT', 1000),
+            'BITCOIN' => env('GOPAY_BITCOIN_LIMIT', 1000),
+            'PRSMS' => env('GOPAY_PRSMS_LIMIT', 20),
+        ];
+
+        return $key === null ? $limits : @$limits[$key];
+    }
+
+    public function isPaymentInLimit($key)
+    {
+        $payment = $this->getPayment();
+
+        if ( $payment->price <= $this->getPaymentLimits($key) ) {
+            return $key;
+        }
     }
 
     private function getItems()
@@ -76,6 +114,27 @@ class GopayPayment extends PaymentHelper
         return $items;
     }
 
+    private function getPayer()
+    {
+        $payment = $this->getPayment();
+        $order = $this->getOrder();
+
+        if ( count($this->getAllowedPayments()) == 0 ){
+            return false;
+        }
+
+        return array_filter([
+            "default_payment_instrument" => $this->getDefaultPayment(),
+            "allowed_payment_instruments" => $this->getAllowedPayments(),
+            "contact" => array_filter([
+                "first_name" => $order->firstname,
+                "last_name" => $order->lastname,
+                "email" => $order->email,
+                "phone_number" => $order->phone,
+            ]),
+        ]);
+    }
+
     public function getPaymentUrl()
     {
         if ( !$this->gopay ){
@@ -84,12 +143,16 @@ class GopayPayment extends PaymentHelper
 
         $order = $this->getOrder();
 
+        $payment = $this->getPayment();
+
+        //If payer data are not available
+        if ( !($payer = $this->getPayer()) ){
+            return false;
+        }
+
         $response = $this->gopay->createPayment([
-            "payer" => [
-                "default_payment_instrument" => $this->getDefaultPayment(),
-                "allowed_payment_instruments" => ["PAYMENT_CARD", "PAYPAL"],
-            ],
-            "amount" => round($order->price_vat * 100),
+            "payer" => $payer,
+            "amount" => round($payment->price * 100),
             "currency" => "EUR",
             "order_number" => $order->getKey(),
             "order_description" => sprintf(_('Platba %s'), env('APP_NAME')),
@@ -98,7 +161,7 @@ class GopayPayment extends PaymentHelper
                 "return_url" => $this->getResponseUrl('status'),
                 "notification_url" => $this->getResponseUrl('notification')
             ],
-            "lang" => "sk"
+            "lang" => app()->getLocale()
         ]);
 
         //Ak je vykonana poziadavka v poriadku
