@@ -275,7 +275,9 @@ class OrderService
 
         $message = sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne prijatá.'), $order->number, $order->created_at->format('d.m.Y'));
 
-        Mail::to($order->email)->send(new OrderReceived($order, $message, $invoice));
+        Mail::to($order->email)->send(
+            new OrderReceived($order, $message, $invoice)
+        );
     }
 
     /**
@@ -290,7 +292,9 @@ class OrderService
 
             $message = sprintf(_('Gratulujeme! Obržali ste objednávku č. %s.'), $order->number);
 
-            Mail::to($email)->send(new OrderReceived($order, $message));
+            Mail::to($email)->send(
+                (new OrderReceived($order, $message))->setOwner(true)
+            );
         }
     }
 

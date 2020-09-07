@@ -12,7 +12,7 @@
         "php": ">=5.6.4",
         "laravel/framework": "^6.0|^7.0",
         "crudadmin/crudadmin": "^3.0|dev-3.0-dev",
-        "marekgogol/invoices": "^3.0",
+        "marekgogol/invoices": "^3.0|dev-3.0-dev",
         "propaganistas/laravel-phone": "^4.2",
         "gopay/payments-sdk-php": "^1.4"
     },

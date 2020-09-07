@@ -196,17 +196,19 @@ class CartController extends Controller
         //Send email to client
         OrderService::sentClientEmail($proform);
 
-        // //Sent store email
+        //Sent store email
         OrderService::sentStoreEmail();
 
         //Forget whole cart
         Cart::forget();
 
+        $order = OrderService::getOrder();
+
         return autoAjax()->success(_('Objednávka bola úspešne odoslaná.'))->data([
-            'order' => OrderService::getOrder(),
-            'order_hash' => OrderService::getOrder()->getHash(),
-            'payment' => OrderService::hasOnlinePayment() ? [
-                'url' => OrderService::getPaymentRedirect(),
+            'order' => $order,
+            'order_hash' => $order->getHash(),
+            'payment' => ($paymentUrl = $order->getPaymentUrl()) ? [
+                'url' => $paymentUrl,
                 'provider' => class_basename(get_class(OrderService::getPaymentClass())),
             ] : [],
         ]);

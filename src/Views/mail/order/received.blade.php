@@ -61,12 +61,17 @@
 @endcomponent
 @endif
 
-@if ( ($additionalFields = config('admineshop.cart.order.additional_email_fields', [])) && count($additionalFields) > 0 )
+<?php
+$additionalFields = config('admineshop.cart.order.additional_email_fields', []);
+$existingAdditionalFields = array_filter($additionalFields, function($fieldKey) use ($order) {
+    return $order->getField($fieldKey) && !is_null($order->{$fieldKey});
+});
+?>
+@if ( count($existingAdditionalFields) > 0 )
 @component('mail::panel')
 | {{ _('Ďalšie údaje') }} | |
 | :------------- | ----------:|
-@foreach($additionalFields as $fieldKey)
-@continue(!($field = $order->getField($fieldKey)) || is_null($order->{$fieldKey}))
+@foreach($existingAdditionalFields as $fieldKey)
 | {{ @$field['name'] }}: | {{ $order->{$fieldKey} }} |
 @endforeach
 @endcomponent
@@ -78,9 +83,17 @@
 @endcomponent
 @endif
 
+@if ( $owner == false && $redirect = $order->getPaymentUrl() )
+{{ _('Ak ste platbu nevykonali po vytvorení objednávky, môžete ju zaplatiť aj z tohto e-mailu.') }}
+
+@component('mail::button', ['url' => $redirect])
+{{ _('Zaplatiť platbu online') }}
+@endcomponent
+@else
 @component('mail::button', ['url' => url('/')])
     {{ _('Pokračovať na eshop') }}
 @endcomponent
+@endif
 
 {{ _('S pozdravom') }},<br>
 {{ config('app.name') }}

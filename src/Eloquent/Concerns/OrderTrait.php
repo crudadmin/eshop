@@ -246,6 +246,24 @@ trait OrderTrait
                         ])
                         ->get();
     }
+
+    public function getPaymentUrl($paymentMethodId = null)
+    {
+        $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
+
+        return Admin::cache('payment.link.'.$this->getKey().'.'.$paymentMethodId, function() use ($paymentMethodId) {
+            $order = OrderService::getOrder();
+
+            //If order in payment helper is not set already
+            if ( !$order || $order->getKey() != $this->getKey() ){
+                OrderService::setOrder($this);
+            }
+
+            if ( OrderService::hasOnlinePayment() ) {
+                return OrderService::getPaymentRedirect($paymentMethodId);
+            }
+        });
+    }
 }
 
 ?>

@@ -23,6 +23,8 @@ class OrderReceived extends Mailable
 
     private $discounts;
 
+    private $owner = false;
+
     /**
      * Create a new message instance.
      *
@@ -43,6 +45,11 @@ class OrderReceived extends Mailable
         $this->discounts = Discounts::getDiscounts();
     }
 
+    public function setOwner($state)
+    {
+        $this->owner = $state;
+    }
+
     /**
      * Build the message.
      *
@@ -59,6 +66,7 @@ class OrderReceived extends Mailable
                         'items' => $this->cartItems,
                         'summary' => $this->cartSummary,
                         'discounts' => $this->discounts,
+                        'owner' => $this->owner,
                     ])
                     ->subject(_('Objednávka č. ') . $this->order->number);
 
