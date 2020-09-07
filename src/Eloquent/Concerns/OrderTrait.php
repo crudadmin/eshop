@@ -259,7 +259,7 @@ trait OrderTrait
                 OrderService::setOrder($this);
             }
 
-            if ( OrderService::hasOnlinePayment() ) {
+            if ( OrderService::hasOnlinePayment($paymentMethodId) ) {
                 return OrderService::getPaymentRedirect($paymentMethodId);
             }
         });

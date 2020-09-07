@@ -48,9 +48,9 @@ trait HasPayments
         }
     }
 
-    public function hasOnlinePayment()
+    public function hasOnlinePayment($paymentMethodId = null)
     {
-        return $this->getPaymentClass() ? true : false;
+        return $this->getPaymentClass($paymentMethodId) ? true : false;
     }
 
     public function getPaymentClass($paymentMethodId = null)
