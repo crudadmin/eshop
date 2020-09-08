@@ -42,7 +42,7 @@ function operator_modifier($number, $operator, $value)
 
 function client()
 {
-    $guard = auth()->guard();
+    $guard = auth()->guard(config('admineshop.auth.guard'));
 
     if ( ! $guard->check() ) {
         return null;
