@@ -34,6 +34,11 @@ class ClientsFavourite extends AdminModel
     protected $insertable = false;
     protected $editable = false;
 
+    protected $settings = [
+        'dates' => true,
+        'increments' => false,
+    ];
+
     /*
      * Automatic form and database generator by fields list
      * :name - field name
@@ -46,6 +51,16 @@ class ClientsFavourite extends AdminModel
             'product' => 'name:Produkt|belongsTo:products,name',
             'variant' => 'name:Varianta|belongsTo:products_variants,name',
         ];
+    }
+
+    public function mutateFields($fields)
+    {
+        //If variants are not defined in eshop
+        if ( !config('admineshop.product_types.variants') ){
+            $fields->field('variant_id', function($field){
+                $field->invisible = true;
+            });
+        }
     }
 
     public function scopeResponseQuery($query)

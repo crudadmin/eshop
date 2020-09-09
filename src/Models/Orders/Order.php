@@ -164,6 +164,7 @@ class Order extends AdminModel
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
             'columns.client_name' => [
+                'encode' => false,
                 'after' => 'id',
                 'name' => 'Zákazník',
             ],
@@ -198,7 +199,7 @@ class Order extends AdminModel
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['client_name'] = $this->client ? $this->client->clientName : '';
+        $attributes['client_name'] = $this->getClientName();
 
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d. M \o H:i') : '';
 

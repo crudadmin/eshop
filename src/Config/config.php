@@ -109,10 +109,13 @@ return [
             //Submit order validato request
             'validator' => AdminEshop\Requests\SubmitOrderRequest::class,
 
-            //Which additional validation rules need to be applied
+            //Which additional validation rules needs to be applied
             'validator_rules' => [
                 'license_terms' => 'required',
             ],
+
+            //Which field should be displayed in email template in section "Additional fields"
+            'additional_email_fields' => [],
         ],
     ],
 ];

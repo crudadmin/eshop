@@ -66,7 +66,7 @@ class Client extends Authenticatable
             'default' => 'full',
             'enabled' => false,
         ],
-        'columns.orders.name' => 'Objednávka',
+        'columns.orders.name' => 'Počet obj.',
         'columns.orders.before' => 'last_logged_at',
         'columns.last_order.name' => 'Posledná objednávka',
     ];
