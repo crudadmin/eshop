@@ -265,7 +265,7 @@ trait OrderTrait
         });
     }
 
-    public function getClientName()
+    private function getClientName()
     {
         $clientName = str_limit(htmlentities(strip_tags($this->is_company ? $this->company_name : $this->username)), 20);
 
@@ -274,6 +274,18 @@ trait OrderTrait
         }
 
         return $clientName;
+    }
+
+    private function getDeliveryAddress()
+    {
+        $prefix = $this->delivery_different ? 'delivery_' : '';
+
+        return implode(', ', array_filter([
+            $this->{$prefix.'street'},
+            $this->{$prefix.'city'},
+            $this->{$prefix.'zipcode'},
+            $this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null,
+        ]));
     }
 }
 

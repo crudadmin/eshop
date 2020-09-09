@@ -67,10 +67,10 @@ class Order extends AdminModel
             'Fakturačné údaje' => Group::fields([
                 'username' => 'name:Meno a priezvisko|required|hidden',
                 'email' => 'name:Email|email|required',
-                'phone' => 'name:Telefón|'.phoneValidatorRule(),
-                'street' => 'name:Ulica a č.p.|column_name:Ulica|required',
-                'city' => 'name:Mesto|required',
-                'zipcode' => 'name:PSČ|max:6|zipcode|required',
+                'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
+                'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
+                'city' => 'name:Mesto|required|hidden',
+                'zipcode' => 'name:PSČ|max:6|zipcode|required|hidden',
                 'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|exists:countries,id|required',
             ])->grid(4),
             'Dodacie údaje' => Group::fields([
@@ -130,7 +130,7 @@ class Order extends AdminModel
                     ])->inline(),
                 ])->width(6),
                 'Zľavy' => Group::fields([
-                    'discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|canAdd',
+                    'discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|hidden|canAdd',
                 ])->width(6),
             ])
         ];
@@ -168,6 +168,10 @@ class Order extends AdminModel
                 'after' => 'id',
                 'name' => 'Zákazník',
             ],
+            'columns.delivery_address' => [
+                'name' => 'Dodacia adresa',
+                'after' => 'email',
+            ],
         ];
     }
 
@@ -201,7 +205,9 @@ class Order extends AdminModel
     {
         $attributes['client_name'] = $this->getClientName();
 
-        $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d. M \o H:i') : '';
+        $attributes['delivery_address'] = $this->getDeliveryAddress();
+
+        $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
 
         return $attributes;
     }
