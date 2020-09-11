@@ -298,7 +298,7 @@ trait PriceMutator
      *
      * @return  float/int
      */
-    private function calculateVatPrice($price, $round = true)
+    public function calculateVatPrice($price, $round = true)
     {
         //Set by configuration settings
         if ( $round === null ){

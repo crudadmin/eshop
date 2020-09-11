@@ -36,7 +36,9 @@ class DiscountsCode extends AdminModel
 
     protected $visible = ['id', 'code', 'name', 'isActive'];
 
-    protected $append = ['isActive', 'name'];
+    protected $appends = ['isActive', 'name'];
+
+    protected $sortable = false;
 
     public function active()
     {
