@@ -158,6 +158,15 @@ class Discounts
         }));
     }
 
+    public function get(string $discountClass)
+    {
+        return $this->cache('discount_class.'.$discountClass, function() use ($discountClass) {
+            return @array_filter($this->getDiscounts(), function($class) use ($discountClass) {
+                return class_basename(get_class($class)) == $discountClass;
+            })[0];
+        });
+    }
+
     private function removeDiscountFromBootState($discount)
     {
         //Remove discounts from boot state

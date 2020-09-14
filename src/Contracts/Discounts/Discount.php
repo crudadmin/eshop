@@ -308,6 +308,20 @@ class Discount implements Discountable
     }
 
     /**
+     * Returns client of order
+     *
+     * @return  AdminEshop\Models\Clients\Client|null
+     */
+    public function getClient()
+    {
+        if ( $order = $this->getOrder() ){
+            return $order->client;
+        }
+
+        return client();
+    }
+
+    /**
      * Set discount message
      *
      * @param  mixed  $message

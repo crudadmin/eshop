@@ -147,7 +147,7 @@ trait PriceMutator
                 $discounts === null
                 || in_array($discount->getKey(), $allowedDiscounts)
             ) {
-                $value = is_callable($callback = $discount->value) ? $this->runCallback($callback, $this) : $discount->value;
+                $value = is_callable($callback = $discount->value) ? $this->runCallback($callback, $this, $price) : $discount->value;
 
                 //If discount operator is set
                 if ( $discount->operator && is_numeric($value) ) {
@@ -169,9 +169,9 @@ trait PriceMutator
         return $price;
     }
 
-    private function runCallback(callable $callback, DiscountSupport $item)
+    private function runCallback(callable $callback, DiscountSupport $item, $price)
     {
-        return $callback($item);
+        return $callback($item, $price);
     }
 
     /*
