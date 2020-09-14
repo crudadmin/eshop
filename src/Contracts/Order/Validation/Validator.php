@@ -2,6 +2,8 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
+use AdminEshop\Contracts\Order\Mutators\Mutator;
+
 class Validator
 {
     /**
@@ -10,6 +12,28 @@ class Validator
      * @var  string|null
      */
     protected $message;
+
+    private $mutator;
+
+    /**
+     * Set mutator
+     *
+     * @param  Mutator  $mutator
+     */
+    public function setMutator(Mutator $mutator)
+    {
+        $this->mutator = $mutator;
+    }
+
+    /**
+     * Return mutator
+     *
+     * @return  AdminEshop\Contracts\Order\Mutators\Mutator
+     */
+    public function getMutator()
+    {
+        return $this->mutator;
+    }
 
     /**
      * Set if given validator is active

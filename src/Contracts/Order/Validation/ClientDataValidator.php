@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
-use Facades\AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Contracts\Order\Validation\Validation;
 
 class ClientDataValidator extends Validator
@@ -12,7 +11,7 @@ class ClientDataValidator extends Validator
      */
     public function pass()
     {
-        return ClientDataMutator::isActive() ?: false;
+        return $this->getMutator()->isActive() ?: false;
     }
 
     /**

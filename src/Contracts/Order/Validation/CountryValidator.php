@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
-use Facades\AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Contracts\Order\Validation\Validation;
 
 class CountryValidator extends Validator
@@ -17,7 +16,7 @@ class CountryValidator extends Validator
      */
     public function pass()
     {
-        return CountryMutator::getSelectedCountry() ? true : false;
+        return $this->getMutator()->getSelectedCountry() ? true : false;
     }
 
     /**

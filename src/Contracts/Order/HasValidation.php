@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Order;
 
+use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\StockValidator;
 
 trait HasValidation
@@ -52,7 +53,12 @@ trait HasValidation
      */
     public function validate(array $mutators = null)
     {
-        $validators = $this->orderValidators;
+        $toValidate = [
+            [
+                'mutator' => null,
+                'validators' => $this->orderValidators,
+            ],
+        ];
 
         $mutators = $mutators ?: $this->getMutators();
 
@@ -62,19 +68,29 @@ trait HasValidation
                 $mutator = new $mutator;
             }
 
-            $validators = array_merge($validators, $mutator->getValidators());
+            $toValidate[] = [
+                'mutator' => $mutator,
+                'validators' => $mutator->getValidators(),
+            ];
         }
 
-        foreach ($validators as $validation) {
-            $validation = new $validation;
+        foreach ($toValidate as $row) {
+            foreach ($row['validators'] as $validator) {
+                $validator = new $validator;
 
-            //Skip non active validator
-            if ( $validation->isActive() === false ){
-                continue;
-            }
+                //Pass mutator into validator
+                if ( isset($row['mutator']) && $row['mutator'] instanceof Mutator ){
+                    $validator->setMutator($row['mutator']);
+                }
 
-            if ( $validation->pass() === false )  {
-                $this->errorMessages[] = $validation->getMessage();
+                //Skip non active validator
+                if ( $validator->isActive() === false ){
+                    continue;
+                }
+
+                if ( $validator->pass() === false )  {
+                    $this->errorMessages[] = $validator->getMessage();
+                }
             }
         }
 

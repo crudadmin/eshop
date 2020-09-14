@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
-use Facades\AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use AdminEshop\Contracts\Order\Validation\Validation;
 
 class PaymentMethodValidator extends Validator
@@ -12,7 +11,7 @@ class PaymentMethodValidator extends Validator
      */
     public function pass()
     {
-        return PaymentMethodMutator::getSelectedPaymentMethod() ?: false;
+        return $this->getMutator()->getSelectedPaymentMethod() ?: false;
     }
 
     /**

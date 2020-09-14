@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
-use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Validation\Validation;
 
 class DeliveryValidator extends Validator
@@ -12,7 +11,7 @@ class DeliveryValidator extends Validator
      */
     public function pass()
     {
-        return DeliveryMutator::getSelectedDelivery() ?: false;
+        return $this->getMutator()->getSelectedDelivery() ?: false;
     }
 
     /**

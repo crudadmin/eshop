@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
-use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Validation\Validation;
 
 class DeliveryLocationValidator extends Validator
@@ -12,12 +11,14 @@ class DeliveryLocationValidator extends Validator
      */
     public function pass()
     {
+        $mutator = $this->getMutator();
+
         //If delivery has multiple locations
-        if ( ! DeliveryMutator::isActive() || !($delivery = DeliveryMutator::getSelectedDelivery())->multiple_locations ) {
+        if ( ! $mutator->isActive() || !($delivery = $mutator->getSelectedDelivery())->multiple_locations ) {
             return true;
         }
 
-        return DeliveryMutator::getSelectedLocation();
+        return $mutator->getSelectedLocation();
     }
 
     /**
