@@ -287,6 +287,56 @@ trait OrderTrait
             $this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null,
         ]));
     }
+
+    /**
+     * Add timestamp and message into delivery messages
+     *
+     * @param  string|array  $messages
+     */
+    public function addDeliveryMessage($messages)
+    {
+        $msg = $this->delivery_message ?: '';
+        $msg .= "\n".date('d.m.Y H:i').' - '.implode(' ', array_wrap($messages));
+        $msg = trim(trim($msg, "\n"));
+
+        $this->delivery_message = $msg;
+
+        return $this;
+    }
+
+    protected function getDeliveryStatusText()
+    {
+        $icon = '';
+        $color = '';
+        $tooltip = '';
+
+        if ( $this->delivery_status == 'ok' ){
+            $color = 'green';
+            $tooltip = 'Objednávka bola úspešne odoslaná do systému dopravnej služby.';
+            $message = $this->getSelectOption('delivery_status');
+        }
+
+        else if ( $this->delivery_status == 'error' ){
+            $color = 'red';
+            $tooltip = 'Objednávka nebola odoslaná do systému dopravnej služby.';
+            $message = $this->getSelectOption('delivery_status');
+        }
+
+        else {
+            $tooltip = $this->getSelectOption('delivery_status');
+            $message = 'Čaká';
+        }
+
+        if ( $icon || $message ) {
+            return '
+            <span style="'.($color ? ('color: '.$color) : '' ).'">
+                '.($this->delivery_message ? ('<i class="fa fa-info-circle mr-1" data-toggle="tooltip" title="'.e($this->delivery_message).'"></i>') : '').'
+                <span data-toggle="tooltip" title="'.e($tooltip).'">
+                    '.e($message).'
+                </span>
+            </span>';
+        }
+    }
 }
 
 ?>

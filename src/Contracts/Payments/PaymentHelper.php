@@ -2,25 +2,11 @@
 
 namespace AdminEshop\Contracts\Payments;
 
-class PaymentHelper
+use AdminEshop\Contracts\Order\OrderProvider;
+
+class PaymentHelper extends OrderProvider
 {
     private $payment;
-
-    private $paymentMethod;
-
-    private $order;
-
-    public function getPaymentMethod()
-    {
-        return $this->paymentMethod;
-    }
-
-    public function setPaymentMethod($method)
-    {
-        $this->paymentMethod = $method;
-
-        return $this;
-    }
 
     public function getPayment()
     {
@@ -30,18 +16,6 @@ class PaymentHelper
     public function setPayment($payment)
     {
         $this->payment = $payment;
-
-        return $this;
-    }
-
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    public function setOrder($order)
-    {
-        $this->order = $order;
 
         return $this;
     }

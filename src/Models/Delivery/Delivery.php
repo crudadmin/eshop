@@ -110,7 +110,6 @@ class Delivery extends AdminModel implements DiscountSupport
         'grid.default' => 'medium',
         'title.insert' => 'Nová doprava',
         'title.update' => ':name',
-        'columns.id.hidden' => true,
     ];
 
     protected $layouts = [

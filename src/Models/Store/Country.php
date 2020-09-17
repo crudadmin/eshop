@@ -8,4 +8,13 @@ use Admin\Fields\Group;
 class Country extends BaseCountry
 {
     protected $group = 'settings.store';
+
+    public function mutateFields($fields)
+    {
+        parent::mutateFields($fields);
+
+        $fields->push([
+            'iso3166' => 'name:Číselný kód krajiny (ISO 3166)|title:https://sk.wikipedia.org/wiki/ISO_3166-1 - Potrebné pre DPD'
+        ]);
+    }
 }

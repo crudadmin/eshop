@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Orders;
 
 use AdminEshop\Admin\Buttons\GenerateInvoice;
+use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
@@ -47,6 +48,7 @@ class Order extends AdminModel
 
     protected $buttons = [
         GenerateInvoice::class,
+        SendShippmentButton::class,
     ];
 
     protected $rules = [
@@ -122,11 +124,14 @@ class Order extends AdminModel
                 'Cena objednávky' => Group::fields([
                     Group::fields([
                         'status' => 'name:Stav objednávky|column_name:Stav|type:select|required|default:new',
-                        'paid_at' => 'name:Zaplatené dňa|type:datetime',
+                        'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
+                        'delivery_message' => 'name:Hlásenie z dopravnej služby|invisible',
+                        'delivery_identifier' => 'name:Identifikátor zvozu dopravy|invisible',
                     ])->inline(),
                     Group::fields([
                         'price' => 'name:Cena bez DPH|disabled|type:decimal',
                         'price_vat' => 'name:Cena s DPH|disabled|type:decimal',
+                        'paid_at' => 'name:Zaplatené dňa|type:datetime',
                     ])->inline(),
                 ])->width(6),
                 'Zľavy' => Group::fields([
@@ -172,6 +177,11 @@ class Order extends AdminModel
                 'name' => 'Dodacia adresa',
                 'after' => 'email',
             ],
+            'columns.delivery_status_text' => [
+                'encode' => false,
+                'name' => 'Status dopravy',
+                'after' => 'status',
+            ],
         ];
     }
 
@@ -198,6 +208,11 @@ class Order extends AdminModel
                 'ok' => 'Vybavená',
                 'canceled' => 'Zrušená',
             ],
+            'delivery_status' => [
+                'new' => 'Čaká za objednanim dopravy',
+                'ok' => 'Prijatá',
+                'error' => 'Neprijatá (chyba)',
+            ],
         ];
     }
 
@@ -208,6 +223,8 @@ class Order extends AdminModel
         $attributes['delivery_address'] = $this->getDeliveryAddress();
 
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
+
+        $attributes['delivery_status_text'] = $this->getDeliveryStatusText();
 
         return $attributes;
     }

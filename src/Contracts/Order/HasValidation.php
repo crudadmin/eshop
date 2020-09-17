@@ -88,7 +88,7 @@ trait HasValidation
                     continue;
                 }
 
-                if ( $validator->pass() === false )  {
+                if ( ! $validator->pass() )  {
                     $this->errorMessages[] = $validator->getMessage();
                 }
             }

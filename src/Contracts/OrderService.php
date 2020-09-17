@@ -6,6 +6,8 @@ use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutators;
 use AdminEshop\Contracts\Order\Concerns\HasPayments;
+use AdminEshop\Contracts\Order\Concerns\HasProviders;
+use AdminEshop\Contracts\Order\Concerns\HasShipping;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
@@ -22,11 +24,13 @@ use Store;
 class OrderService
 {
     use DataStore,
+        HasProviders,
         HasRequest,
         HasPayments,
         HasValidation,
         HasMutators,
-        HasOrderProcess;
+        HasOrderProcess,
+        HasShipping;
 
     /**
      * Order row

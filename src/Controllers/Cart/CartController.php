@@ -190,6 +190,9 @@ class CartController extends Controller
         //Add items into order
         OrderService::addItemsIntoOrder();
 
+        //Send shipping
+        OrderService::sendShipping();
+
         //Generate default invoice document
         $proform = OrderService::makeInvoice('proform');
 

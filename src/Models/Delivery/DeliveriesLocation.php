@@ -41,6 +41,8 @@ class DeliveriesLocation extends AdminModel
     {
         return [
             'name' => 'name:Názov pobočky|placeholder:Zadajte názov článku|required|max:90',
+            'identifier' => 'name:ID Pobočky|index|invisible',
+            'data' => 'name:Data Pobočky|type:json|invisible',
         ];
     }
 

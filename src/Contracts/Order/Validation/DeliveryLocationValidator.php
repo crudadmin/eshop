@@ -13,8 +13,10 @@ class DeliveryLocationValidator extends Validator
     {
         $mutator = $this->getMutator();
 
+        $delivery = $mutator->isActive();
+
         //If delivery has multiple locations
-        if ( ! $mutator->isActive() || !($delivery = $mutator->getSelectedDelivery())->multiple_locations ) {
+        if ( ! ($delivery = $mutator->isActive()) || !$delivery->multiple_locations ) {
             return true;
         }
 

@@ -167,7 +167,7 @@ class DeliveryMutator extends Mutator
             $with = [];
 
             if ( config('admineshop.delivery.multiple_locations') == true ) {
-                $with[] = 'locations';
+                $with[] = 'locations:id,delivery_id,name';
             }
 
             if ( config('admineshop.delivery.countries') == true ) {

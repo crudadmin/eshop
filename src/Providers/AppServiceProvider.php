@@ -1,10 +1,11 @@
 <?php
 namespace AdminEshop\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Http\Kernel;
-use Carbon\Carbon;
 use Admin;
+use AdminEshop\Commands\ImportPickupPoints;
+use Carbon\Carbon;
+use Illuminate\Foundation\Http\Kernel;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -44,6 +45,10 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Carbon::setLocale(config('admin.locale', 'sk'));
+
+        $this->commands([
+            ImportPickupPoints::class,
+        ]);
     }
 
     /**
