@@ -67,6 +67,7 @@ class OrderReceived extends Mailable
                         'summary' => $this->cartSummary,
                         'discounts' => $this->discounts,
                         'owner' => $this->owner,
+                        'showNoVat' => config('admineshop.mail.show_no_vat', false)
                     ])
                     ->subject(_('Objednávka č. ') . $this->order->number);
 

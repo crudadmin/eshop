@@ -80,24 +80,18 @@ class DeliveryLocationsImporter
 
     private function updateOrCreateLocation($existingLocations, $deliveryId, $location)
     {
-        $data = [
-            'name' => $location['name'],
-            'identifier' => $location['identifier'],
-            'data' => $location['data'],
-        ];
-
         //If locations does exists, just update and publish it.
         if ( $dbLocation = $existingLocations->where('identifier', $location['identifier'])->first() ){
             if ( ! $dbLocation->published_at ){
                 $dbLocation->published_at = Carbon::now();
             }
 
-            $dbLocation->update($data);
+            $dbLocation->update($location);
         }
 
         //Create new location if is missing
         else {
-            $dbLocation = DeliveriesLocation::create($data + [
+            $dbLocation = DeliveriesLocation::create($location + [
                 'delivery_id' => $deliveryId
             ]);
         }

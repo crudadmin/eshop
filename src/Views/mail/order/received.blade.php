@@ -7,19 +7,19 @@
 
 ## {{ _('Objednaný tovar') }}
 @component('mail::table')
-| {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ _('Cena bez dph') }} | {{ _('Cena s dph') }} |
+| {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? _('Cena bez dph') : '' }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
 @foreach( $items as $item )
-| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
+| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
 @endforeach
-| {{ $delivery->name }} | - | {{ Store::priceFormat($order->delivery_price) }} | {{ Store::priceFormat($order->delivery_price_with_vat) }} |
-| {{ $payment_method->name }} | - | {{ Store::priceFormat($order->payment_method_price) }} | {{ Store::priceFormat($order->payment_method_price_with_vat) }} |
+| {{ $delivery->name }} | - | {{ $showNoVat ? Store::priceFormat($order->delivery_price) : '' }} | {{ Store::priceFormat($order->delivery_price_with_vat) }} |
+| {{ $payment_method->name }} | - | {{ $showNoVat ? Store::priceFormat($order->payment_method_price) : '' }} | {{ Store::priceFormat($order->payment_method_price_with_vat) }} |
 @foreach($discounts as $discount)
 @if ( $discount->message && $discount->canShowInEmail() )
 | {{ $discount->getName() }} | - |  | {{ is_array($discount->message) ? $discount->message['withVat'] : $discount->message }} |
 @endif
 @endforeach
-| <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ Store::priceFormat($summary['priceWithoutVat']) }} | {{ Store::priceFormat($summary['priceWithVat']) }} |
+| <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ $showNoVat ? Store::priceFormat($summary['priceWithoutVat']) : '' }} | {{ Store::priceFormat($summary['priceWithVat']) }} |
 @endcomponent
 
 @component('mail::panel')
@@ -27,6 +27,9 @@
 | :------------- | ----------:|
 | {{ _('Spôsob platby') }}: | {{ $payment_method->name }} |
 | {{ _('Doprava') }}: | {{ $delivery->name }} {{ $location ? '('.$location->name.')' : '' }} |
+@if ( $location && $location->address )
+| {{ _('Adresa zvolenej dopravy') }}: | {{ $location->address }} |
+@endif
 | {{ _('Tel. číslo') }}: | {{ $order->phone }} |
 | {{ _('Vytvorená dňa') }}:  | {{ $order->created_at->format('d.m.Y H:i') }} |
 @endcomponent

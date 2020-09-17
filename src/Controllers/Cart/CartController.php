@@ -121,6 +121,15 @@ class CartController extends Controller
         return Cart::baseResponse();
     }
 
+    public function getDeliveryLocations($id)
+    {
+        $delivery = Delivery::findOrFail($id);
+
+        return [
+            'locations' => $delivery->locations,
+        ];
+    }
+
     public function removeDiscountCode()
     {
         DiscountCode::removeDiscountCode();

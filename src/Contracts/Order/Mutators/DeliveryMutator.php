@@ -166,7 +166,10 @@ class DeliveryMutator extends Mutator
         return $this->cache('deliveries', function(){
             $with = [];
 
-            if ( config('admineshop.delivery.multiple_locations') == true ) {
+            if (
+                config('admineshop.delivery.multiple_locations') == true
+                && config('admineshop.delivery.multiple_locations_autoload', false) == true
+            ) {
                 $with[] = 'locations:id,delivery_id,name';
             }
 

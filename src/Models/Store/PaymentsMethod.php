@@ -15,6 +15,13 @@ class PaymentsMethod extends BasePaymentsMethod
 
     protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 
+    public function reserved()
+    {
+        return array_filter([
+            (int)ENV('PAYMENT_WITH_CASH_ON_DELIVERY_ID')
+        ]);
+    }
+
     public function mutateFields($fields)
     {
         parent::mutateFields($fields);
@@ -49,6 +56,14 @@ class PaymentsMethod extends BasePaymentsMethod
     public function getThumbnailAttribute()
     {
         return $this->image ? $this->image->resize(null, 180)->url : null;
+    }
+
+    /*
+     * Definy if is cash delivery
+     */
+    public function isCashDelivery()
+    {
+        return $this->getKey() == ENV('PAYMENT_WITH_CASH_ON_DELIVERY_ID');
     }
 
     /**

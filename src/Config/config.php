@@ -47,8 +47,18 @@ return [
      */
     'delivery' => [
         'multiple_locations' => false, //Multiple locations for one delivery method
+        'multiple_locations_autoload' => false, //Automatically load multiple locations into cart response
         'payments' => false, //Payment rules for each delivery method
         'countries' => false, //Country rules for delivery
+        'providers' => [
+            // 3 => [
+            //     'provider' => AdminEshop\Contracts\Delivery\DPDShipping::class,
+            //     'options' => [
+            //         'type' => 'parcelshop',
+            //         'import_locations' => true,
+            //     ],
+            // ],
+        ],
     ],
 
     /*
@@ -117,5 +127,10 @@ return [
             //Which field should be displayed in email template in section "Additional fields"
             'additional_email_fields' => [],
         ],
+    ],
+
+    'mail' => [
+        //Show without vat product values in email template
+        'show_no_vat' => false,
     ],
 ];
