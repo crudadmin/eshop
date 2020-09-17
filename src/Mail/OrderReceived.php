@@ -48,6 +48,8 @@ class OrderReceived extends Mailable
     public function setOwner($state)
     {
         $this->owner = $state;
+
+        return $this;
     }
 
     /**
