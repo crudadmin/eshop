@@ -4,7 +4,6 @@ namespace AdminEshop\Contracts\Delivery;
 
 use AdminEshop\Models\Delivery\DeliveriesLocation;
 use Carbon\Carbon;
-use Facades\AdminEshop\Contracts\Delivery\DPDShipping;
 use OrderService;
 
 class DeliveryLocationsImporter

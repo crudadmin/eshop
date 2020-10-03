@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Contracts\Delivery\Api\DPD;
+namespace AdminEshop\Contracts\Delivery\DPD;
 
 use AdminEshop\Contracts\Delivery\ShipmentException;
 use AdminEshop\Models\Orders\Order;

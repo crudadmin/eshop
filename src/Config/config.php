@@ -52,7 +52,7 @@ return [
         'countries' => false, //Country rules for delivery
         'providers' => [
             // 3 => [
-            //     'provider' => AdminEshop\Contracts\Delivery\DPDShipping::class,
+            //     'provider' => AdminEshop\Contracts\Delivery\DPD\DPDShipping::class,
             //     'options' => [
             //         'type' => 'parcelshop',
             //         'import_locations' => true,

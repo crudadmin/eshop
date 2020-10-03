@@ -1,13 +1,13 @@
 <?php
 
-namespace AdminEshop\Contracts\Delivery;
+namespace AdminEshop\Contracts\Delivery\DPD;
 
 use AdminEshop\Contracts\Delivery\ShipmentException;
 use AdminEshop\Contracts\Delivery\ShippingInterface;
 use AdminEshop\Contracts\Delivery\ShippingProvider;
 use AdminEshop\Contracts\Delivery\ShippingResponse;
 use Carbon\Carbon;
-use Facades\AdminEshop\Contracts\Delivery\Api\DPD\DPDApi;
+use Facades\AdminEshop\Contracts\Delivery\DPD\DPDApi;
 
 /**
  * Class Api.
