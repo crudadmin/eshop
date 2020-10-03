@@ -261,4 +261,9 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
 
         return $items;
     }
+
+    public function getTrackingUrl($trackingNumber)
+    {
+        return 'https://tracking.dpd.de/status/sk_SK/parcel/'.$trackingNumber;
+    }
 }

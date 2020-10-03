@@ -12,4 +12,13 @@ interface ShippingInterface
      * @return  AdminEshop\Contracts\Delivery\ShippingResponse
      */
     public function createPackage() : ShippingResponse;
+
+    /**
+     * Returns tracking url
+     *
+     * @param  int|string|null trackingNumber
+     *
+     * @return  string
+     */
+    public function getTrackingUrl($trackingNumber);
 }

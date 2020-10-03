@@ -310,6 +310,7 @@ class Order extends AdminModel
             'hasCompany',
             'statusText',
             'deliveryPriceWithVat',
+            'deliveryTrackingUrl',
             'paymentMethodPriceWithVat',
             'invoiceUrl',
         ]);

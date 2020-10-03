@@ -337,6 +337,18 @@ trait OrderTrait
             </span>';
         }
     }
+
+    public function getDeliveryTrackingUrlAttribute()
+    {
+        OrderService::setOrder($this);
+
+        //If delivery provider is not set
+        if ( !$this->delivery_identifier || !($provider = OrderService::getShippingProvider()) ){
+            return;
+        }
+
+        return $provider->getTrackingUrl($this->delivery_identifier);
+    }
 }
 
 ?>
