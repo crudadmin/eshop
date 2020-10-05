@@ -6,13 +6,15 @@ use AdminEshop\Contracts\Cart\Concerns\HasOptionableDiscounts;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
+use AdminEshop\Contracts\Order\Concerns\HasOrderItemNames;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use Cart;
 
 class CartItem implements UsesIdentifier
 {
     use IdentifierSupport,
-        HasOptionableDiscounts;
+        HasOptionableDiscounts,
+        HasOrderItemNames;
 
     /**
      * Cart item identififer

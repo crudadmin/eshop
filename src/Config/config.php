@@ -127,6 +127,9 @@ return [
             //Which field should be displayed in email template in section "Additional fields"
             'additional_email_fields' => [],
         ],
+
+        //Reregister cart identifier
+        'identifiers' => [],
     ],
 
     'mail' => [

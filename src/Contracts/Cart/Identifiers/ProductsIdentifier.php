@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
+use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Models\Products\ProductsVariant;
 
@@ -118,6 +119,21 @@ class ProductsIdentifier extends Identifier
     public function onRender(CartItem $item)
     {
         $item->hasQuantityOnStock = $this->hasQuantityOnStock($item);
+    }
+
+    /**
+     * Returns all product name information in array
+     *
+     * @return  array
+     */
+    public function getProductNameParts(UsesIdentifier $item) : array
+    {
+        $items = [
+            ($product = $item->getValue('product')) ? $product->name : null,
+            ($variant = $item->getValue('variant')) ? $variant->name : null,
+        ];
+
+        return array_filter($items);
     }
 }
 

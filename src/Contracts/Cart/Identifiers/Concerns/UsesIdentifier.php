@@ -24,6 +24,20 @@ interface UsesIdentifier
      * @return  mixed
      */
     public function getOriginalObject();
+
+    /**
+     * Returns all product name information in array
+     *
+     * @return  array
+     */
+    public function getProductNameParts() : array;
+
+    /**
+     * Returns product name with all additional informations divided with string separator
+     *
+     * @return  string
+     */
+    public function getProductName();
 }
 
 ?>

@@ -6,20 +6,11 @@ use Illuminate\Support\ServiceProvider;
 
 class ConfigServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
+    private $eshopConfigKey = 'admineshop';
+
+    private function getEshopConfigPath()
     {
-        $this->mergeAdminConfigs();
-
-        $this->mergeMarkdownConfigs();
-
-        $this->turnOfCacheForAdmin();
-
-        $this->pushComponentsPaths();
+        return __DIR__.'/../Config/config.php';
     }
 
     /**
@@ -30,32 +21,57 @@ class ConfigServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../Config/config.php', 'admineshop'
+            $this->getEshopConfigPath(), $this->eshopConfigKey
         );
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        //Merge crudadmin configs
+        $this->mergeConfigs(
+            'admin',
+            __DIR__.'/../Config/admin.php',
+            ['groups', 'models', 'components', 'author', 'passwords', 'gettext_source_paths']
+        );
+
+        //Merge admineshop configs
+        $this->mergeConfigs(
+            $this->eshopConfigKey,
+            $this->getEshopConfigPath(),
+            ['attributes', 'stock', 'delivery', 'discounts', 'cart', 'mail']
+        );
+
+        $this->mergeMarkdownConfigs();
+
+        $this->turnOfCacheForAdmin();
+
+        $this->pushComponentsPaths();
     }
 
     /*
      * Merge crudadmin config with admineshop config
      */
-    private function mergeAdminConfigs($key = 'admin')
+    private function mergeConfigs($key, $file, $keys)
     {
         //test 2
-        $admineshop_config = require __DIR__.'/../Config/admin.php';
+        $originalConfig = require $file;
 
         $config = $this->app['config']->get($key, []);
 
-        $this->app['config']->set($key, array_merge($admineshop_config, $config));
+        $this->app['config']->set($key, array_merge($originalConfig, $config));
 
         //Merge selected properties with two dimensional array
-        foreach (['groups', 'models', 'components', 'author', 'passwords', 'gettext_source_paths'] as $property) {
-            if ( ! array_key_exists($property, $admineshop_config) || ! array_key_exists($property, $config) )
+        foreach ($keys as $property) {
+            if ( ! array_key_exists($property, $originalConfig) || ! array_key_exists($property, $config) ) {
                 continue;
+            }
 
-            $attributes = array_merge($admineshop_config[$property], $config[$property]);
-
-            //If is not multidimensional array
-            if ( count($attributes) == count($attributes, COUNT_RECURSIVE) )
-                $attributes = array_unique($attributes);
+            $attributes = array_merge($originalConfig[$property], $config[$property]);
 
             $this->app['config']->set($key . '.' . $property, $attributes);
         }

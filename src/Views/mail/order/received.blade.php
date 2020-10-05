@@ -10,7 +10,7 @@
 | {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? _('Cena bez dph') : '' }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
 @foreach( $items as $item )
-| {{ $item->product->name }} @if ( isset($item->variant) )<small>{{ $item->variant->name }}</small> @endif| {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
+| {{ $item->getProductNamePartsSections(0) }} @if ( $additional = $item->getProductNamePartsSections(1) )<small>{{ $additional }}</small> @endif| {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
 @endforeach
 | {{ $delivery->name }} | - | {{ $showNoVat ? Store::priceFormat($order->delivery_price) : '' }} | {{ Store::priceFormat($order->delivery_price_with_vat) }} |
 | {{ $payment_method->name }} | - | {{ $showNoVat ? Store::priceFormat($order->payment_method_price) : '' }} | {{ Store::priceFormat($order->payment_method_price_with_vat) }} |

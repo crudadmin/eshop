@@ -18,13 +18,13 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
         DiscountHelper;
 
     /**
-     * Returns cart identifier of actual eloquent
+     * Returns cart identifier classname of actual eloquent
      *
      * @return  string
      */
     public function getModelIdentifier()
     {
-        return \AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier::class;
+        return Cart::getIdentifierByClassName('ProductsIdentifier');
     }
 
     public function scopeCartSelect($query)

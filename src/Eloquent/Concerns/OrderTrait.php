@@ -191,7 +191,7 @@ trait OrderTrait
         //Add order items
         foreach ($this->items as $item) {
             $invoice->items()->create([
-                'name' => $item->productName,
+                'name' => $item->getProductName(),
                 'quantity' => $item->quantity,
                 'vat' => $item->vat,
                 'price' => $item->price,

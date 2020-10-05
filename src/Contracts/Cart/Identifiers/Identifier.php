@@ -233,6 +233,16 @@ class Identifier
 
         return 'identifier_'.implode(';', $string);
     }
+
+    /**
+     * Returns all product name information in array
+     *
+     * @return  array
+     */
+    public function getProductNameParts(UsesIdentifier $item) : array
+    {
+        return [];
+    }
 }
 
 ?>

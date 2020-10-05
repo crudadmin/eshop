@@ -12,6 +12,7 @@ use AdminEshop\Contracts\Cart\Concerns\HasOptionableDiscounts;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
+use AdminEshop\Contracts\Order\Concerns\HasOrderItemNames;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\OrderItemTrait;
@@ -26,6 +27,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         IdentifierSupport,
         DiscountHelper,
         HasOptionableDiscounts,
+        HasOrderItemNames,
         OrderItemTrait;
 
     /*
@@ -126,6 +128,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             'grid.disabled' => true,
             'columns.product_name.name' => 'Položka',
             'columns.product_name.before' => 'quantity',
+            'columns.product_name.limit' => 30,
             'columns.quantity.after' => 'name',
             'columns.total' => [
                 'title' => 'Cena spolu',
@@ -144,7 +147,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             $this->calculateVatPrice($this->price, null) * $this->quantity
         );
 
-        $attributes['product_name'] = $this->productName;
+        $attributes['product_name'] = $this->getProductName();
 
         return $attributes;
     }
@@ -190,22 +193,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     }
 
     /**
-     * Returns product name attribute
-     *
-     * @return  string
-     */
-    public function getProductNameAttribute()
-    {
-        $items = [
-            $this->product ? $this->product->name : null,
-            $this->variant ? $this->variant->name : null,
-            $this->getValue('name') ? $this->getValue('name') : null,
-        ];
-
-        return implode(' - ', array_filter($items));
-    }
-
-    /**
      * Order response format
      *
      * @return  array
@@ -213,5 +200,26 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     public function toResponseFormat()
     {
         return $this;
+    }
+
+    /**
+     * Returns all product name information in array
+     *
+     * @return  array
+     */
+    public function getProductNameParts() : array
+    {
+        $array = [];
+
+        if ( ($identifier = $this->getIdentifierClass()) ){
+            $array = $identifier->getProductNameParts($this);
+        }
+
+        //Add additional order item description
+        if ( $name = $this->getValue('name') ) {
+            $array[] = $this->getValue('name');
+        }
+
+        return $array;
     }
 }

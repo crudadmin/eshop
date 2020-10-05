@@ -89,7 +89,7 @@ class GopayPayment extends PaymentHelper
         foreach ($order->items as $item)
         {
             $items[] = [
-                "name" => $item->productName,
+                "name" => $item->getProductName(),
                 "count" => $item->quantity,
                 "amount" => round($item->price_vat * $item->quantity * 100),
             ];

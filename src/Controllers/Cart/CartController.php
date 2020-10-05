@@ -19,6 +19,21 @@ use OrderService;
 class CartController extends Controller
 {
     /**
+     * Returns booted ProductsIdentifier
+     *
+     * @param  int  $productId
+     * @param  int  $variantId
+     *
+     * @return  AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier
+     */
+    private function getProductsIdentifier($productId, $variantId)
+    {
+        $classname = Cart::getIdentifierByClassName('ProductsIdentifier');
+
+        return new $classname($productId, $variantId);
+    }
+
+    /**
      * Basic cart summary with products data...
      *
      * @return  arrat
@@ -73,7 +88,7 @@ class CartController extends Controller
 
     public function addItem()
     {
-        $identifier = new ProductsIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
 
         Cart::addOrUpdate($identifier, request('quantity'));
 
@@ -82,7 +97,7 @@ class CartController extends Controller
 
     public function updateQuantity()
     {
-        $identifier = new ProductsIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
 
         Cart::updateQuantity($identifier, request('quantity'));
 
@@ -91,7 +106,7 @@ class CartController extends Controller
 
     public function removeItem()
     {
-        $identifier = new ProductsIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
 
         Cart::remove($identifier);
 

@@ -47,10 +47,16 @@ trait CartTrait
      */
     public function getRegistredIdentifiers()
     {
-        return $this->cache('cartIdentifiers', function(){
+        //First we need register identifier from config, because we may want rewrite original identifiers
+        $cartIdentifiers = array_merge(
+            $this->cartIdentifiers,
+            config('admineshop.cart.identifiers', [])
+        );
+
+        return $this->cache('cartIdentifiers', function() use ($cartIdentifiers) {
             $identifiers = array_map(function($item){
                 return new $item;
-            }, $this->cartIdentifiers);
+            }, $cartIdentifiers);
 
             $identifiersKeys = array_map(function($identifier){
                 return $identifier->getName();
@@ -72,6 +78,27 @@ trait CartTrait
 
         if ( array_key_exists($name, $identifiers) ) {
             return clone $identifiers[$name];
+        }
+    }
+
+    /**
+     * Return cart item identifier
+     *
+     * @param  string  $name
+     * @return null|AdminEshop\Contracts\Cart\Identifier
+     */
+    public function getIdentifierByClassName($name)
+    {
+        $identifiers = $this->getRegistredIdentifiers();
+
+        $name = mb_strtolower($name);
+
+        foreach ($identifiers as $identifier) {
+            $classname = get_class($identifier);
+
+            if ( mb_strtolower(class_basename($classname)) == $name ){
+                return $classname;
+            }
         }
     }
 
