@@ -128,9 +128,12 @@ class ProductsIdentifier extends Identifier
      */
     public function getProductNameParts(UsesIdentifier $item) : array
     {
+        $product = $item->getValue('product');
+        $variant = $item->getValue('variant');
+
         $items = [
-            ($product = $item->getValue('product')) ? $product->name : null,
-            ($variant = $item->getValue('variant')) ? $variant->name : null,
+            $product ? $product->name : null,
+            $variant ? $variant->name : ($product ? $product->attributesText : null),
         ];
 
         return array_filter($items);

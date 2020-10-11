@@ -30,7 +30,7 @@ trait HasProductAttributes
         ], $columns);
     }
 
-    public function getAttributesItemsSelect($query)
+    public function getAttributesItemsSelect()
     {
         return [
             'attributes_items.id',
@@ -53,7 +53,7 @@ trait HasProductAttributes
                 ->select($this->getAttributesSelect())
                 ->leftJoin('attributes', 'attributes.id', '=', 'products_attributes.attribute_id')
                 ->with(['items' => function($query){
-                    $query->select($this->getAttributesItemsSelect($query));
+                    $query->select($this->getAttributesItemsSelect());
                 }]);
     }
 

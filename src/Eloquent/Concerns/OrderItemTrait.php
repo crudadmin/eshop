@@ -6,6 +6,7 @@ use AdminEshop\Contracts\CartItem;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Store;
+use Admin;
 
 trait OrderItemTrait
 {
@@ -17,15 +18,27 @@ trait OrderItemTrait
      */
     public function getAvailableVariants()
     {
-        return ProductsVariant::select(['id', 'product_id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'])
-                ->whereHas('product', function($query){
-                    $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
-                })->get()->map(function($item){
-                    $item->setVisible(['id', 'product_id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
-                         ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
+        $variantsModel = Admin::getModel('ProductsVariant');
 
-                    return $item;
-                });
+        $products = $variantsModel->select([
+            'id', 'product_id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'
+        ])->whereHas('product', function($query){
+            $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
+        })->when($variantsModel->hasAttributesEnabled(), function($query){
+            $query->with(['attributesItems']);
+        })->get();
+
+        return $products->map(function($item) use ($variantsModel) {
+            //Extend name with attributes
+            if ( $variantsModel->hasAttributesEnabled() ) {
+                $item->name .= $item->attributesText ? ' - '.$item->attributesText : '';
+            }
+
+            $item->setVisible(['id', 'product_id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
+                 ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
+
+            return $item;
+        });
     }
 
     /**
@@ -35,13 +48,25 @@ trait OrderItemTrait
      */
     public function getAvailableProducts()
     {
-        return Product::select(['id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'])
-                ->get()->map(function($item){
-                    $item->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
-                         ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
+        $productModel = Admin::getModel('Product');
 
-                    return $item;
-                });
+        $products = $productModel->select([
+            'id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'
+        ])->when($productModel->hasAttributesEnabled(), function($query){
+            $query->with(['attributesItems']);
+        })->get();
+
+        return $products->map(function($item) use ($productModel) {
+            //Extend name with attributes
+            if ( $productModel->hasAttributesEnabled() ) {
+                $item->name .= $item->attributesText ? ' - '.$item->attributesText : '';
+            }
+
+            $item->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
+                 ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
+
+            return $item;
+        });
     }
 
     /**
