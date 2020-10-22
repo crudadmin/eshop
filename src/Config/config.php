@@ -136,4 +136,10 @@ return [
         //Show without vat product values in email template
         'show_no_vat' => false,
     ],
+
+    /*
+     * Validation for phone numbers in order/clients,address etc...
+     * SK,CZ...
+     */
+    'phone_countries' => 'SK,CZ',
 ];
