@@ -82,6 +82,13 @@ class Discount implements Discountable
     public $response = null;
 
     /**
+     * Order of given discount. This value will be binded automatically given by admineshop configruation
+     *
+     * @var  int
+     */
+    private $orderIndex = null;
+
+    /**
      * Discount key
      * Can be usefull if you need rewrite core discount
      *
@@ -349,6 +356,23 @@ class Discount implements Discountable
     public function getResponse()
     {
         return $this->response;
+    }
+
+    /**
+     * Set order index
+     *
+     * @param  this  $index
+     */
+    public function setOrderIndex(int $orderIndex)
+    {
+        $this->orderIndex = $orderIndex;
+
+        return $this;
+    }
+
+    public function getOrderIndex()
+    {
+        return $this->orderIndex;
     }
 
     /**

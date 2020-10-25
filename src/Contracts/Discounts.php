@@ -126,7 +126,7 @@ class Discounts
         });
 
         //Returns only active discounts
-        return array_values(array_filter($discounts, function($discount) use ($exceps) {
+        $discounts = array_values(array_filter($discounts, function($discount) use ($exceps) {
             if ( in_array($discount->getKey(), $exceps) ) {
                 return false;
             }
@@ -156,6 +156,13 @@ class Discounts
                 return true;
             });
         }));
+
+        //Set correct order index of applied discount
+        foreach ($discounts as $key => $discount) {
+            $discount->setOrderIndex($key);
+        }
+
+        return $discounts;
     }
 
     public function get(string $discountClass)

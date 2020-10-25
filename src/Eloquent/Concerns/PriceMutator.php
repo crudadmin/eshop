@@ -119,6 +119,21 @@ trait PriceMutator
     }
 
     /**
+     * Returns applied discounts in correct order by eshop configuration
+     *
+     * @return  array
+     */
+    public function getRegistredDiscounts()
+    {
+        //We want sort discounts by correct order
+        uasort($this->registredDiscounts, function($a, $b){
+            return $a->getOrderIndex() - $b->getOrderIndex();
+        });
+
+        return $this->registredDiscounts;
+    }
+
+    /**
      * Apply given discounts on given price
      *
      * @param  float/int  $price
@@ -141,7 +156,7 @@ trait PriceMutator
         }, $discounts ?: []);
 
         //Apply all discounts into final price
-        foreach ($this->registredDiscounts as $discount) {
+        foreach ($this->getRegistredDiscounts() as $discount) {
             //Skip non allowed discounts
             if (
                 $discounts === null
