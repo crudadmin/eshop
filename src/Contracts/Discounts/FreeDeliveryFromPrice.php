@@ -71,6 +71,11 @@ class FreeDeliveryFromPrice extends Discount implements Discountable
         $this->operator = 'abs';
 
         $this->value = function($item){
+            //If free delivery from price is not defined
+            if ( !$item->free_from ) {
+                return;
+            }
+
             $summaryWithVat = @$this->getCartSummary()['priceWithVat'] ?: 0;
 
             return $summaryWithVat >= $item->free_from ? 0 : null;
