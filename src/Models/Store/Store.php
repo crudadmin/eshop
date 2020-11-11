@@ -47,17 +47,20 @@ class Store extends AdminModel
         ];
     }
 
-    protected $options = [
-        'rounding' => [
-            2 => 'na 2 desetinné miesta',
-            1 => 'na 1 desetinné miesto',
-            0 => 'na celé čísla',
-        ],
-        'stock_type' => [
-            'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
-            'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
-            'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
-        ],
-    ];
+    public function options()
+    {
+        return [
+            'rounding' => [
+                2 => 'na 2 desetinné miesta',
+                1 => 'na 1 desetinné miesto',
+                0 => 'na celé čísla',
+            ],
+            'stock_type' => [
+                'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
+                'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
+                'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
+            ],
+        ];
+    }
 
 }
