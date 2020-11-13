@@ -38,7 +38,7 @@ class DPDApi
         $this->password = env('SHIPPMENT_DPD_PASSWORD');
         $this->options = [
             'testMode' => env('SHIPPMENT_DPD_DEBUG', true) ? true : false,
-            'timeout' => 10
+            'timeout' => 2
         ];
     }
 
