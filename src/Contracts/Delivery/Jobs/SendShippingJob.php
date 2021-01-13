@@ -48,6 +48,10 @@ class SendShippingJob implements ShouldQueue
 
         //Try send shipping, and log output
         try {
+            if ( $provider->isActive() == false ) {
+                throw new ShipmentException('Doprava nebola povolená na strane servera.');
+            }
+
             if (!($package = $provider->createPackage())){
                 throw new ShipmentException('Doprava nebola zaregistrovaná.');
             }

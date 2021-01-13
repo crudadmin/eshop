@@ -35,6 +35,14 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
      */
     private static $requestBuilder;
 
+    /*
+     * Check if provider is enabled
+     */
+    public function isActive()
+    {
+        return env('SHIPPMENT_DPD_ENABLED') === true;
+    }
+
     /**
      * You can modify parcels throught callback passed in this method
      *

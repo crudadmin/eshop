@@ -21,4 +21,9 @@ interface ShippingInterface
      * @return  string
      */
     public function getTrackingUrl($trackingNumber);
+
+    /*
+     * Check if provider is enabled
+     */
+    public function isActive();
 }
