@@ -74,11 +74,11 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
                 'identifier' => 'name:Cart identifier|invisible|index',
                 'product' => 'name:Produkt|belongsTo:products,name|required_without:manual_price|disabledIf:identifier,discount|limit:50|hidden',
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
-            ]),
+            ])->id('itemPrimary'),
             Group::half([
                 'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|hidden|required_with_values',
                 'name' => 'name:Popis položky|tooltip:Slúži pre položky bez priradeného produktu|hidden',
-            ]),
+            ])->id('itemAdditional'),
             Group::fields([
                 'default_price' => 'name:Pôvodna cena bez DPH|invisible|type:decimal|title:Cena produktu v čase objednania.|disabled',
                 'price' => 'name:Cena/j bez DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',

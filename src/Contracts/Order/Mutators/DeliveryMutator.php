@@ -41,7 +41,12 @@ class DeliveryMutator extends Mutator
      */
     public function isActive()
     {
-        return $this->getSelectedDelivery();
+        if ( $delivery = $this->getSelectedDelivery() ) {
+            return [
+                'delivery' => $this->getSelectedDelivery(),
+                'delivery_location' => $this->getSelectedLocation(),
+            ];
+        }
     }
 
     /**
@@ -52,8 +57,13 @@ class DeliveryMutator extends Mutator
      */
     public function isActiveInAdmin(Order $order)
     {
-        if ( $order->delivery_id && $order->delivery ) {
-            return $order->delivery;
+        $delivery = $order->delivery_id && $order->delivery ? $order->delivery : null;
+
+        if ( $delivery ) {
+            return [
+                'delivery' => $delivery,
+                'delivery_location' => $order->delivery_location_id && $order->delivery_location ? $order->delivery_location : null,
+            ];
         }
     }
 
@@ -63,12 +73,13 @@ class DeliveryMutator extends Mutator
      * @param  array  $row
      * @return array
      */
-    public function mutateOrder(Order $order, $delivery)
+    public function mutateOrder(Order $order, $activeResponse)
     {
         //We can fill order with delivery only if is creating new order.
         //Or if manual delivery is turned off.
         if ( $this->canGenerateDelivery($order) ) {
-            $location = $this->getSelectedLocation();
+            $delivery = $activeResponse['delivery'];
+            $location = $activeResponse['delivery_location'] ?? null;
 
             $order->fill([
                 'delivery_vat' => Store::getVatValueById($delivery->vat_id),
@@ -93,16 +104,18 @@ class DeliveryMutator extends Mutator
     /**
      * Mutate sum price of order/cart
      *
-     * @param  AdminEshop\Models\Delivery\Delivery|null  $delivery
+     * @param  array $activeResponse
      * @param  float  $price
      * @param  bool  $withVat
      * @param  Order  $order
      * @return  void
      */
-    public function mutatePrice($delivery, $price, bool $withVat, Order $order)
+    public function mutatePrice($activeResponse, $price, bool $withVat, Order $order)
     {
         //Add delivery price automatically
         if ( $this->canGenerateDelivery($order) ) {
+            $delivery = $activeResponse['delivery'];
+
             $price += $delivery->{$withVat ? 'priceWithVat' : 'priceWithoutVat'};
         }
 
