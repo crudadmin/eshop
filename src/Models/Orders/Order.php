@@ -104,12 +104,14 @@ class Order extends AdminModel
                 ])->inline()
             ]),
             'Doprava' => Group::fields([
-                Group::fields([
+                Group::inline([
                     'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
                     'delivery_location' => 'name:Predajňa|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:deliveries_locations,name',
-                    'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
+                ]),
+                Group::inline([
                     'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
-                ])->inline(),
+                    'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
+                ]),
                 'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
             ])->grid(6),
             'Platobná metóda' => Group::fields([
@@ -165,6 +167,7 @@ class Order extends AdminModel
             'title.update' => 'Objednávka č. :id - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',
+            'table.onclickopen' => true,
             'columns.price.add_after' => ' '.Store::getCurrency(),
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
