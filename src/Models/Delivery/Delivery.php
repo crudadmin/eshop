@@ -55,6 +55,7 @@ class Delivery extends AdminModel implements DiscountSupport
             'price' => 'name:Základná cena bez DPH|type:decimal|component:priceField|required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis dopravy|hidden',
+            'description_email' => 'name:Dodatočný popis k doprave v potvdzovaciom emaily objednávky|hidden|type:text',
         ];
     }
 

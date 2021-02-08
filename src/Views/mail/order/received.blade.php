@@ -34,6 +34,14 @@
 | {{ _('Vytvorená dňa') }}:  | {{ $order->created_at->format('d.m.Y H:i') }} |
 @endcomponent
 
+@if ( $delivery->description_email )
+@component('mail::panel')
+| {{ _('Podrobnosti k doprave') }} |
+| :------------- |
+| {{ $delivery->description_email }} }} |
+@endcomponent
+@endif
+
 @component('mail::panel')
 | {{ $order->delivery_different ? _('Fakturačná adresa') : _('Fakturačná a dodacia adresa') }} | |
 | :------------- | ----------:|
