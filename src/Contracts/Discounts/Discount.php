@@ -277,9 +277,7 @@ class Discount implements Discountable
      */
     public static function buildCartFromOrderItems($items, $discounts = null)
     {
-        $collection = new CartCollection($items->map(function($item) {
-            return $item->getCartItem();
-        }));
+        $collection = new CartCollection($items);
 
         return $collection->toCartFormat($discounts);
     }

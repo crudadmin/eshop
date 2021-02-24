@@ -72,7 +72,7 @@ class OrderItemsCollection extends CartCollection
      *
      * @return  CartCollection
      */
-    private function allowItemDiscountsInAdmin($item)
+    public function allowItemDiscountsInAdmin($item)
     {
         //We need apply discounts only on discountable items
         if ( Discounts::hasDiscountableTrait($item) ) {

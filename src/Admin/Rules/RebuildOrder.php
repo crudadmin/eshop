@@ -6,6 +6,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
 use Admin;
 use Ajax;
+use Store;
 
 class RebuildOrder extends AdminRule
 {
@@ -30,8 +31,23 @@ class RebuildOrder extends AdminRule
             $row->syncStock('+', 'order.canceled');
         }
 
+        $priceBefore = (float)$row->getOriginal('price_vat');
+
         //Change delivery prices etc..
         $row->calculatePrices();
+
+        //If order price has been changed on the background,
+        //we need notify user about this. Because sometimes bug may happend!
+        //We need know about that, especially administrator to findout that something is wrong.
+        if ( $priceBefore !== (float)$row->price_vat ) {
+            Ajax::warning(
+                sprintf(
+                    _('Cena objednávky bola po uložení zmenená z <strong>%s</strong> na <strong>%s</strong>.'),
+                    Store::priceFormat($priceBefore),
+                    Store::priceFormat($row->price_vat),
+                )
+            );
+        }
     }
 
     /*

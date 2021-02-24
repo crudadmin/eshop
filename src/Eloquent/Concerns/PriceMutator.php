@@ -412,6 +412,7 @@ trait PriceMutator
     /**
      * Return applied discounts on given property
      * with keys and applied discounts data
+     * Available for debug purposes
      *
      * @return  array
      */
