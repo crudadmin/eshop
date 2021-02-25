@@ -147,7 +147,7 @@ class Discounts
                 }
 
                 //Set is active response
-                $discount->setResponse($response);
+                $discount->setActiveResponse($response);
                 $discount->boot($response);
                 $discount->setMessage($discount->getMessage($response));
 
@@ -191,9 +191,29 @@ class Discounts
         //If is not active in backend/administration
         if ( $order = $this->getOrder() ) {
             //Set order into every discount
-            $discount->setOrder($this->getOrder());
+            $discount->setOrder($order);
 
-            if ( !($response = $discount->isActiveInAdmin($order)) ) {
+            //Get order discounts data
+            $orderDiscountData = $order->discount_data ?: [];
+
+            //Id discount is set as cachable, we need retrieve all discount data and set this data as actual discount state
+            if ( $discount->isCachableResponse() === true ) {
+                //If response is negative, we can cache discount
+                //Or If discount data are not present in saved order
+                if (
+                    !array_key_exists($discount->getKey(), $orderDiscountData)
+                    || !(
+                        $response = $discount->unserializeResponse(
+                            $orderDiscountData[$discount->getKey()]
+                        )
+                    )
+                ) {
+                    return $this->cacheDiscountState($discount, false);
+                }
+            }
+
+            //If discount is dynamical also in administration, we can check for actual discount state
+            else if ( !($response = $discount->isActiveInAdmin($order)) ) {
                 return $this->cacheDiscountState($discount, false);
             }
         }
@@ -206,9 +226,9 @@ class Discounts
         return $this->cacheDiscountState($discount, $response);
     }
 
-    public function cacheDiscountState($discounts, $state)
+    public function cacheDiscountState($discount, $state)
     {
-        $this->discountsCache[$discounts->getKey()] = $state;
+        $this->discountsCache[$discount->getKey()] = $state;
 
         return $state;
     }

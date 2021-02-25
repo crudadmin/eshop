@@ -138,6 +138,7 @@ class Order extends AdminModel
                 ])->width(6),
                 'Zľavy' => Group::fields([
                     'discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|hidden|canAdd',
+                    'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible',
                 ])->width(6)->id('discounts'),
             ])
         ];

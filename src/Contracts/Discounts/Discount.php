@@ -3,6 +3,8 @@
 namespace AdminEshop\Contracts\Discounts;
 
 use AdminEshop\Contracts\CartItem;
+use AdminEshop\Contracts\Cart\Concerns\ActiveInterface;
+use AdminEshop\Contracts\Cart\Concerns\ActiveResponse;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Discounts\Discountable;
@@ -15,10 +17,11 @@ use Cart;
 use Discounts;
 use Store;
 
-class Discount implements Discountable
+class Discount implements Discountable, ActiveInterface
 {
     use DataStore,
-        DriverSupport;
+        DriverSupport,
+        ActiveResponse;
 
     /**
      * Discount operator for managing price values
@@ -75,11 +78,13 @@ class Discount implements Discountable
     public $canApplyInCart = true;
 
     /**
-     * Here will be binded response from isActive
+     * Do we want store all discount data in database into given order?
+     * All discount parameters should be then loaded from time of creating a order.
+     * This prevents that discounts may change after order editing
      *
-     * @var  mixed
+     * @var  bool
      */
-    public $response = null;
+    public $cachableResponse = true;
 
     /**
      * Order of given discount. This value will be binded automatically given by admineshop configruation
@@ -137,6 +142,16 @@ class Discount implements Discountable
     public function isActiveInAdmin(Order $order)
     {
         return false;
+    }
+
+    /**
+     * Should be discounts data cached in database with order?
+     *
+     * @return  bool
+     */
+    public function isCachableResponse()
+    {
+        return $this->cachableResponse;
     }
 
     /**
@@ -334,26 +349,6 @@ class Discount implements Discountable
     public function setMessage($message)
     {
         $this->message = $message;
-    }
-
-    /**
-     * Set isActive response
-     *
-     * @param  mixed  $message
-     */
-    public function setResponse($response)
-    {
-        $this->response = $response;
-    }
-
-    /**
-     * Set isActive response
-     *
-     * @param  mixed  $message
-     */
-    public function getResponse()
-    {
-        return $this->response;
     }
 
     /**

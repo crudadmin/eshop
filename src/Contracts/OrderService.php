@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts;
 use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutators;
+use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
 use AdminEshop\Contracts\Order\Concerns\HasPayments;
 use AdminEshop\Contracts\Order\Concerns\HasProviders;
 use AdminEshop\Contracts\Order\Concerns\HasShipping;
@@ -13,7 +14,6 @@ use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
-use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
@@ -310,11 +310,18 @@ class OrderService
      */
     public function addDiscountsData($items)
     {
+        $data = [];
+
         foreach (Discounts::getDiscounts() as $discount) {
             if ( method_exists($discount, 'mutateOrderRow') ) {
                 $discount->mutateOrderRow($this->getOrder(), $items);
             }
+
+            $data[$discount->getKey()] = $discount->getSerializedResponse();
         }
+
+        //Save all discounts responses
+        $this->getOrder()->discount_data = $data;
 
         return $this;
     }

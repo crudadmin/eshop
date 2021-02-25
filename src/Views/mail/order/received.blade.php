@@ -38,7 +38,7 @@
 @component('mail::panel')
 | {{ _('Podrobnosti k doprave') }} |
 | :------------- |
-| {{ $delivery->description_email }} }} |
+| {!! $delivery->description_email !!} |
 @endcomponent
 @endif
 

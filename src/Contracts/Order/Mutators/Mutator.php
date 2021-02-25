@@ -2,14 +2,17 @@
 
 namespace AdminEshop\Contracts\Order\Mutators;
 
+use AdminEshop\Contracts\Cart\Concerns\ActiveInterface;
+use AdminEshop\Contracts\Cart\Concerns\ActiveResponse;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
 
-class Mutator
+class Mutator implements ActiveInterface
 {
     use DataStore,
-        DriverSupport;
+        DriverSupport,
+        ActiveResponse;
 
     /**
      * Register order validator with this mutators
@@ -17,13 +20,6 @@ class Mutator
      * @var  array
      */
     protected $validators = [];
-
-    /**
-     * Response from isActive/isActiveInAdmin methods
-     *
-     * @var  mixed
-     */
-    protected $activeResponse;
 
     /**
      * Returns if mutators is active
@@ -43,6 +39,17 @@ class Mutator
      * @return  bool
      */
     public function isActiveInAdmin(Order $order)
+    {
+        return false;
+    }
+
+    /**
+     * Mutators responses are not saved and supported in order yet
+     * This method is only to the future
+     *
+     * @return  bool
+     */
+    public function isCachableResponse()
     {
         return false;
     }
@@ -95,28 +102,6 @@ class Mutator
     public function mutateFullCartResponse($response) : array
     {
         return $response;
-    }
-
-    /**
-     * Set activeResponse
-     *
-     * @var mixed $response
-     *
-     * @return  bool
-     */
-    public function setActiveResponse($response)
-    {
-        $this->activeResponse = $response;
-    }
-
-    /**
-     * Returns active response
-     *
-     * @return  mixed
-     */
-    public function getActiveResponse()
-    {
-        return $this->activeResponse;
     }
 
     /**

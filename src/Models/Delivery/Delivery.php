@@ -144,6 +144,15 @@ class Delivery extends AdminModel implements DiscountSupport
         return $this->countries->pluck('id');
     }
 
+    public function getDescriptionEmailAttribute($string)
+    {
+        $string = trim($string);
+        $string = str_replace("\n", '</br>', $string);
+        $string = preg_replace("/<\/br><\/br>/", '</br>', $string);
+
+        return $string;
+    }
+
     /**
      * We may filter available deliveries
      *
