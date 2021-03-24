@@ -15,7 +15,7 @@ class ClientsGroup extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Skupiny klientov';
+    protected $name = 'Skupiny zákazníkov';
 
     protected $group = 'clients';
 

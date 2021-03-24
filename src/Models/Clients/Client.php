@@ -16,7 +16,7 @@ class Client extends Authenticatable
     /*
      * Template name
      */
-    protected $name = 'Zoznam klientov';
+    protected $name = 'Zoznam zákazníkov';
 
     protected $group = 'clients';
 

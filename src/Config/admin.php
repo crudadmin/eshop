@@ -19,7 +19,7 @@ return [
         'store' => ['Obchod', 'fa-shopping-cart'],
         'settings.store' => ['Obchod', 'fa-shopping-cart'],
         'products' => ['Produkty', 'fa-shopping-basket'],
-        'clients' => ['Klienti', 'fa-address-book-o'],
+        'clients' => ['Zákazníci', 'fa-address-book-o'],
     ],
 
     /*
