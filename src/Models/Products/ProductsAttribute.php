@@ -53,7 +53,7 @@ class ProductsAttribute extends AdminModel
     {
         return [
             'attribute' => 'name:Atribút|belongsTo:attributes,name|canAdd|required',
-            'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name:unit|filterBy:attribute|canAdd|required',
+            'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name:unit|filterBy:attribute|canAdd|column_visible|required',
         ];
     }
 
