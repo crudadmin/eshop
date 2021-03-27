@@ -111,13 +111,13 @@ return [
         'default_full_response' => false,
 
         //For REST authorization
-        'header_key' => 'Cart-Token',
+        'header_token' => 'Cart-Token',
 
         'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
         // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,
 
         //For session (NonRest) authorization with MySqlDriver..
-        //If we want use header_key (REST), we need turn off session
+        //If we want use header_token (REST), we need turn off session
         'session' => true,
 
         //Cart and order mutators
