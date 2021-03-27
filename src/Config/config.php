@@ -2,6 +2,19 @@
 
 return [
     /*
+     * Automaticaly boot routes
+     */
+    'routes' => [
+        'enabled' => [
+            'products' => false,
+            'discounts' => false,
+            'cart' => false,
+            'cart_submit' => false,
+            'cart_payments' => false,
+        ],
+    ],
+
+    /*
      * Available product types
      */
     'product_types' => [

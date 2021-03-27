@@ -1,4 +1,5 @@
 <?php
+
 namespace AdminEshop\Providers;
 
 use Admin;
@@ -13,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
         ConfigServiceProvider::class,
         StoreServiceProvider::class,
         RulesServiceProvider::class,
+        RouteServiceProvider::class,
     ];
 
     protected $facades = [
@@ -65,9 +67,6 @@ class AppServiceProvider extends ServiceProvider
         $this->bootRouteMiddleware();
 
         $this->addPublishes();
-
-        //Load routes
-        $this->loadRoutesFrom(__DIR__.'/../Routes/routes.php');
     }
 
     private function addPublishes()

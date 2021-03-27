@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts;
 
 use Admin;
+use AdminEshop\Contracts\Concerns\HasRoutes;
 use AdminEshop\Models\Orders\OrdersProduct;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Store\Country;
@@ -13,7 +14,8 @@ use Cart;
 
 class Store
 {
-    use DataStore;
+    use DataStore,
+        HasRoutes;
 
     /*
      * Should eshop automatically show B2B prices?

@@ -1,16 +1,23 @@
 <?php
 
-Route::group([ 'namespace' => 'AdminEshop\Controllers', 'middleware' => 'web' ], function(){
-    Route::get('/store/b2b/{value}', 'Store\StoreController@setB2B')->name('store::setB2B');
+if ( config('admineshop.routes.enabled.products') === true ) {
+    Store::routesForProducts();
+}
 
-    Route::post('/cart/add', 'Cart\CartController@addItem')->name('cart::addItem');
-    Route::post('/cart/remove', 'Cart\CartController@removeItem')->name('cart::removeItem');
-    Route::post('/cart/updateQuantity', 'Cart\CartController@updateQuantity')->name('cart::updateQuantity');
-    Route::post('/cart/addDiscountCode', 'Cart\CartController@addDiscountCode')->name('cart::addDiscountCode');
-    Route::post('/cart/removeDiscountCode', 'Cart\CartController@removeDiscountCode')->name('cart::removeDiscountCode');
-    Route::post('/cart/setDelivery', 'Cart\CartController@setDelivery')->name('cart::setDelivery');
-    Route::post('/cart/setPaymentMethod', 'Cart\CartController@setPaymentMethod')->name('cart::setPaymentMethod');
+if ( config('admineshop.routes.enabled.discounts') === true ) {
+    Store::routesForDiscounts();
+}
 
-    Route::get('/api/payments/gopay/{payment}/{type}/{hash}', 'Payments\GopayController@paymentStatus');
-});
+if ( config('admineshop.routes.enabled.cart') === true ) {
+    Store::routesForCart();
+}
+
+if ( config('admineshop.routes.enabled.cart_submit') === true ) {
+    Store::routesForCartSubmit();
+}
+
+if ( config('admineshop.routes.enabled.cart_payments') === true ) {
+    Store::routesForPayments();
+}
+
 ?>
