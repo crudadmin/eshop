@@ -181,11 +181,13 @@ trait HasStock
     /**
      * Commit product stock change
      *
+     * @param  string  $type "+" or "-"
      * @param  int  $sub
      * @param  int  $orderId
+     * @param  string|null  $message
      * @return void
      */
-    public function commitStockChange($type = '-', int $sub, $orderId, $message = null)
+    public function commitStockChange($type, int $sub, $orderId, $message = null)
     {
         //Set sub on product type
         $sub = ($type == '-' ? $sub * -1 : $sub);

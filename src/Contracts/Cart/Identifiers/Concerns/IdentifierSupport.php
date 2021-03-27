@@ -66,12 +66,7 @@ trait IdentifierSupport
 
         $identifierHash = $identifier->getIdentifierHash();
 
-        //We need cache item model of given cart,
-        //because we need return cloned instance of given property/eloquent.
-        //If returned model would not be cloned, it may rewrite prices in multiple
-        //order item eloquent places. Also if product is in cart multiple times, we need manipulate only with instance
-        //under this given cart item.
-        return $this->cacheItemModel($identifierHash, $type, $cloned, function() use ($type, $identifier, $identifierHash) {
+        $callback = function() use ($type, $identifier, $identifierHash) {
             //Item models has not been mounted yet
             if ( !array_key_exists($identifierHash, $this->itemModels) ) {
                 $this->fetchSingleItemModel();
@@ -100,7 +95,14 @@ trait IdentifierSupport
             }
 
             return $model;
-        });
+        };
+
+        //We need cache item model of given cart,
+        //because we need return cloned instance of given property/eloquent.
+        //If returned model would not be cloned, it may rewrite prices in multiple
+        //order item eloquent places. Also if product is in cart multiple times, we need manipulate only with instance
+        //under this given cart item.
+        return $this->cacheItemModel($identifierHash, $callback, $type, $cloned);
     }
 
     /**
@@ -130,12 +132,12 @@ trait IdentifierSupport
      * Return cachable item model of given class instance
      *
      * @param  string  $identifierHash
+     * @param  callable  $callback
      * @param  string|null  $type
      * @param  bool  $cloned
-     * @param  callable  $callback
      * @return  mixed
      */
-    private function cacheItemModel(string $identifierHash, $type = null, bool $cloned = true, callable $callback)
+    private function cacheItemModel(string $identifierHash, callable $callback, $type = null, bool $cloned = true)
     {
         $type = $identifierHash.'_'.($type ?: '-');
 
