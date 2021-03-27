@@ -224,27 +224,31 @@ trait OrderTrait
 
     public function getDeliveries()
     {
-        return Delivery::leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
-                        ->select(array_filter([
-                            'deliveries.id',
-                            'deliveries.name',
-                            'deliveries.price',
-                            config('admineshop.delivery.multiple_locations') ? 'deliveries.multiple_locations' : null,
-                            'vats.vat'
-                        ]))
-                        ->get();
+        return Admin::cache('order.options.deliveries', function(){
+            return Delivery::leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
+                            ->select(array_filter([
+                                'deliveries.id',
+                                'deliveries.name',
+                                'deliveries.price',
+                                config('admineshop.delivery.multiple_locations') ? 'deliveries.multiple_locations' : null,
+                                'vats.vat'
+                            ]))
+                            ->get();
+        });
     }
 
     public function getPaymentMethods()
     {
-        return PaymentsMethod::leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
-                        ->select([
-                            'payments_methods.id',
-                            'payments_methods.name',
-                            'payments_methods.price',
-                            'vats.vat'
-                        ])
-                        ->get();
+        return Admin::cache('order.options.payment_methods', function(){
+            return PaymentsMethod::leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
+                            ->select([
+                                'payments_methods.id',
+                                'payments_methods.name',
+                                'payments_methods.price',
+                                'vats.vat'
+                            ])
+                            ->get();
+        });
     }
 
     public function getPaymentUrl($paymentMethodId = null)

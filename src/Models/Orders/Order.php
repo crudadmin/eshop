@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Orders;
 
 use AdminEshop\Admin\Buttons\GenerateInvoice;
+use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Contracts\Discounts\DiscountCode;
@@ -49,6 +50,7 @@ class Order extends AdminModel
     protected $buttons = [
         GenerateInvoice::class,
         SendShippmentButton::class,
+        OrderMessagesButton::class,
     ];
 
     protected $rules = [
@@ -191,7 +193,7 @@ class Order extends AdminModel
 
     public function options()
     {
-        $countries = Country::all();
+        $countries = Store::getCountries();
 
         $vatOptions = Store::getVats()->map(function($item){
             $item->vatValue = $item->vat.'%';
@@ -218,6 +220,11 @@ class Order extends AdminModel
                 'error' => 'Neprijatá (chyba)',
             ],
         ];
+    }
+
+    public function scopeAdminRows($query)
+    {
+        $query->with(['log']);
     }
 
     public function setAdminAttributes($attributes)

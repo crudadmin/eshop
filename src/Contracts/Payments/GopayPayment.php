@@ -168,7 +168,7 @@ class GopayPayment extends PaymentHelper
         if ($response->hasSucceed()) {
             return $response->json['gw_url'];
         } else {
-            Log::error(json_encode($response->json));
+            $this->logPaymentError($response->json);
 
             return false;
         }

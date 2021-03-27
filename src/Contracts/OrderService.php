@@ -20,6 +20,8 @@ use Discounts;
 use Gogol\Invoices\Model\Invoice;
 use Mail;
 use Store;
+use Exception;
+use Log;
 
 class OrderService
 {
@@ -279,9 +281,18 @@ class OrderService
 
         $message = sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne prijatá.'), $order->number, $order->created_at->format('d.m.Y'));
 
-        Mail::to($order->email)->send(
-            new OrderReceived($order, $message, $invoice)
-        );
+        try {
+            Mail::to($order->email)->send(
+                new OrderReceived($order, $message, $invoice)
+            );
+        } catch (Exception $error){
+            Log::error($error);
+
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'email-client-error'
+            ]);
+        }
     }
 
     /**
@@ -296,9 +307,18 @@ class OrderService
 
             $message = sprintf(_('Gratulujeme! Obržali ste objednávku č. %s.'), $order->number);
 
-            Mail::to($email)->send(
-                (new OrderReceived($order, $message))->setOwner(true)
-            );
+            try {
+                Mail::to($email)->send(
+                    (new OrderReceived($order, $message))->setOwner(true)
+                );
+            } catch (Exception $error){
+                Log::error($error);
+
+                $order->log()->create([
+                    'type' => 'error',
+                    'code' => 'email-store-error'
+                ]);
+            }
         }
     }
 

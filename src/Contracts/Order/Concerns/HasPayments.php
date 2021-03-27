@@ -43,6 +43,14 @@ trait HasPayments
     {
         $order = $this->getOrder();
 
+        //Log wrong payment
+        if ( $order ){
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'payment-canceled',
+            ]);
+        }
+
         if ( is_callable($callback = $this->onPaymentErrorCallback) ) {
             return $callback($order);
         }

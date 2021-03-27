@@ -60,6 +60,8 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
     protected $reversed = true;
 
+    protected $icon = 'fa-shopping-basket';
+
     /*
      * Automatic form and database generation
      * @name - field name

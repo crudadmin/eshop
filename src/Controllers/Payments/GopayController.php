@@ -7,6 +7,8 @@ use AdminEshop\Notifications\OrderPaid;
 use Admin\Controllers\Controller;
 use Illuminate\Http\Request;
 use OrderService;
+use Exception;
+use Log;
 
 class GopayController extends Controller
 {
@@ -39,7 +41,18 @@ class GopayController extends Controller
                 $invoice = OrderService::makeInvoice('invoice');
 
                 //Send invoice email
-                $order->notify( new OrderPaid($order, $invoice) );
+                try {
+                    $order->notify(
+                        new OrderPaid($order, $invoice)
+                    );
+                } catch (Exception $e){
+                    Log::error($e);
+
+                    $order->log()->create([
+                        'type' => 'error',
+                        'code' => 'email-payment-done-error',
+                    ]);
+                }
             }
 
             return redirect(OrderService::onPaymentSuccess());
