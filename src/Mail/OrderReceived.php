@@ -52,6 +52,20 @@ class OrderReceived extends Mailable
         return $this;
     }
 
+    private function getAvailableAdditionalFields()
+    {
+        $additionalFields = config('admineshop.cart.order.additional_email_fields', []);
+
+        $fields = [];
+        foreach ($additionalFields as $fieldKey) {
+            if ( $this->order->getField($fieldKey) && !is_null($this->order->{$fieldKey}) ) {
+                $fields[$fieldKey] = $this->order->getField($fieldKey);
+            }
+        }
+
+        return $fields;
+    }
+
     /**
      * Build the message.
      *
@@ -69,7 +83,8 @@ class OrderReceived extends Mailable
                         'summary' => $this->cartSummary,
                         'discounts' => $this->discounts,
                         'owner' => $this->owner,
-                        'showNoVat' => config('admineshop.mail.show_no_vat', false)
+                        'showNoVat' => config('admineshop.mail.show_no_vat', false),
+                        'existingAdditionalFields' => $this->getAvailableAdditionalFields(),
                     ])
                     ->subject(_('Objednávka č. ') . $this->order->number);
 

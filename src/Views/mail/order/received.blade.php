@@ -46,17 +46,17 @@
 | {{ $order->delivery_different ? _('Fakturačná adresa') : _('Fakturačná a dodacia adresa') }} | |
 | :------------- | ----------:|
 @if ( $order->is_company )
-| {{ _('Firma') }} | {{ $order->company_name }} |
-| {{ _('IČ') }} | {{ $order->company_id }} |
-| {{ _('DIČ') }} | {{ $order->company_tax_id }} |
-| {{ _('IČ DPH') }} | {{ $order->company_vat_id }} |
+| {{ _('Firma') }}: | {{ $order->company_name }} |
+| {{ _('IČ') }}: | {{ $order->company_id }} |
+| {{ _('DIČ') }}: | {{ $order->company_tax_id }} |
+| {{ _('IČ DPH') }}: | {{ $order->company_vat_id }} |
 @endif
 | {{ _('Meno a priezvisko') }}: | {{ $order->username }} |
-| {{ _('Telefón') }} : | {{ $order->phone }} |
-| {{ _('Ulica') }} : | {{ $order->street }} |
-| {{ _('Mesto') }} : | {{ $order->city }} |
-| {{ _('PSČ') }} : | {{ $order->zipcode }} |
-| {{ _('Krajina') }} : | {{ $order->country ? $order->country->name : '' }} |
+| {{ _('Telefón') }}: | {{ $order->phone }} |
+| {{ _('Ulica') }}: | {{ $order->street }} |
+| {{ _('Mesto') }}: | {{ $order->city }} |
+| {{ _('PSČ') }}: | {{ $order->zipcode }} |
+| {{ _('Krajina') }}: | {{ $order->country ? $order->country->name : '' }} |
 @endcomponent
 
 @if ( $order->delivery_different )
@@ -64,25 +64,19 @@
 | {{ _('Dodacia adresa') }} | |
 | :------------- | ----------:|
 | {{ _('Meno a priezvisko / Firma') }}: | {{ $order->delivery_username }} |
-| {{ _('Telefón') }} : | {{ $order->delivery_phone }} |
-| {{ _('Ulica') }} : | {{ $order->delivery_street }} |
-| {{ _('Mesto') }} : | {{ $order->delivery_city }} |
-| {{ _('PSČ') }} : | {{ $order->delivery_zipcode }} |
-| {{ _('Krajina') }} : | {{ $order->delivery_country ? $order->delivery_country->name : '' }} |
+| {{ _('Telefón') }}: | {{ $order->delivery_phone }} |
+| {{ _('Ulica') }}: | {{ $order->delivery_street }} |
+| {{ _('Mesto') }}: | {{ $order->delivery_city }} |
+| {{ _('PSČ') }}: | {{ $order->delivery_zipcode }} |
+| {{ _('Krajina') }}: | {{ $order->delivery_country ? $order->delivery_country->name : '' }} |
 @endcomponent
 @endif
 
-<?php
-$additionalFields = config('admineshop.cart.order.additional_email_fields', []);
-$existingAdditionalFields = array_filter($additionalFields, function($fieldKey) use ($order) {
-    return $order->getField($fieldKey) && !is_null($order->{$fieldKey});
-});
-?>
 @if ( count($existingAdditionalFields) > 0 )
 @component('mail::panel')
 | {{ _('Ďalšie údaje') }} | |
 | :------------- | ----------:|
-@foreach($existingAdditionalFields as $fieldKey)
+@foreach($existingAdditionalFields as $fieldKey => $field)
 | {{ @$field['name'] }}: | {{ $order->{$fieldKey} }} |
 @endforeach
 @endcomponent
