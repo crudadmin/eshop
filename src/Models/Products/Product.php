@@ -2,12 +2,15 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Contracts\Collections\ProductsCollection;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
+use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
+use AdminEshop\Eloquent\Concerns\HasProductResponses;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
@@ -18,7 +21,9 @@ class Product extends CartEloquent implements HasAttributesSupport
 {
     use HasProductImage,
         HasProductAttributes,
-        HasStock;
+        HasStock,
+        HasProductFilter,
+        HasProductResponses;
 
     /**
      * Model constructor
