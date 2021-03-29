@@ -84,7 +84,7 @@ class ProductsAttribute extends AdminModel
         'buttons' => [
             'insert' => 'Nový atribút',
             'update' => 'Uložiť atribút',
-            'create' => 'Pridať atribút',
+            'create' => 'Priradiť atribút',
         ],
     ];
 

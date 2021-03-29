@@ -24,20 +24,15 @@ trait HasProductAttributes
             $columns[] = 'products_attributes.product_id';
         }
 
-        return array_merge([
-            'attributes.name',
-            'attributes.unit',
-        ], $columns);
+        return array_merge(
+            Admin::getModel('Attribute')->getAttributesSelect(),
+            $columns
+        );
     }
 
     public function getAttributesItemsSelect()
     {
-        return [
-            'attributes_items.id',
-            'attributes_items.attribute_id',
-            'attributes_items.name',
-            'attributes_items.slug',
-        ];
+        return Admin::getModel('AttributesItem')->getAttributesItemsSelect();
     }
 
     /*
@@ -46,7 +41,7 @@ trait HasProductAttributes
     public function attributesItems()
     {
         //We need return not model from package, but end model which may extend features
-        $relationClass = get_class(Admin::getModelByTable('products_attributes'));
+        $relationClass = get_class(Admin::getModel('ProductsAttribute'));
 
         return $this
                 ->hasMany($relationClass)

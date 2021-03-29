@@ -2,6 +2,8 @@
 
 namespace AdminEshop\Models\Store;
 
+use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
@@ -29,6 +31,20 @@ class Attribute extends AdminModel
 
     protected $sluggable = 'name';
 
+    protected $options = [
+        'sortby' => [
+            'asc' => 'Zostupne',
+            'desc' => 'Vzostupne',
+            'own' => 'Vlastné radenie',
+        ],
+    ];
+
+    protected $settings = [
+        'title.insert' => 'Nový atribút',
+        'title.update' => ':name',
+        'columns.id.hidden' => true,
+    ];
+
     public function active()
     {
         return count(config('admineshop.attributes.eloquents', [])) > 0;
@@ -51,17 +67,37 @@ class Attribute extends AdminModel
         ];
     }
 
-    protected $options = [
-        'sortby' => [
-            'asc' => 'Zostupne',
-            'desc' => 'Vzostupne',
-            'own' => 'Vlastné radenie',
-        ],
-    ];
+    public function scopeWithItemsForProducts($query, $productsQuery)
+    {
+        $attributes = $query->select([
+            'id', 'name', 'unit', 'slug'
+        ])->with([
+            'items' => function($query) use ($productsQuery) {
+                $query->select([
+                    'attributes_items.id',
+                    'attributes_items.attribute_id',
+                    'attributes_items.name',
+                    'attributes_items.slug',
+                ])->whereHas('productsAttributes', function($query) use ($productsQuery) {
+                    //Get attribute items from all products
+                    if ( (new Product)->hasAttributesEnabled() ) {
+                        $query->whereHas('products', $productsQuery);
+                    }
 
-    protected $settings = [
-        'title.insert' => 'Nový atribút',
-        'title.update' => ':name',
-        'columns.id.hidden' => true,
-    ];
+                    //Get attribute items also from all variants
+                    if ( (new ProductsVariant)->hasAttributesEnabled() ) {
+                        $query->orWhereHas('variants.product', $productsQuery);
+                    }
+                });
+            }
+        ]);
+    }
+
+    public function getAttributesSelect()
+    {
+        return [
+            'attributes.name',
+            'attributes.unit',
+        ];
+    }
 }

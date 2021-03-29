@@ -2,21 +2,23 @@
 
 namespace AdminEshop\Models\Products;
 
+use Admin;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
+use AdminEshop\Eloquent\Concerns\HasProductResponses;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
-use Admin;
 
 class ProductsVariant extends CartEloquent implements HasAttributesSupport
 {
     use HasProductAttributes,
         HasStock,
-        HasProductImage;
+        HasProductImage,
+        HasProductResponses;
 
     /**
      * Model constructor

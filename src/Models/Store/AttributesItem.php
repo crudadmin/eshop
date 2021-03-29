@@ -34,6 +34,12 @@ class AttributesItem extends AdminModel
 
     protected $hidden = ['pivot'];
 
+    protected $settings = [
+        'title.insert' => 'Nová hodnota atribútu',
+        'title.update' => ':name',
+        'columns.id.hidden' => true,
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -48,9 +54,13 @@ class AttributesItem extends AdminModel
         ];
     }
 
-    protected $settings = [
-        'title.insert' => 'Nová hodnota atribútu',
-        'title.update' => ':name',
-        'columns.id.hidden' => true,
-    ];
+    public function getAttributesItemsSelect()
+    {
+        return [
+            'attributes_items.id',
+            'attributes_items.attribute_id',
+            'attributes_items.name',
+            'attributes_items.slug',
+        ];
+    }
 }

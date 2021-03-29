@@ -58,6 +58,19 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     protected $sluggable = 'name';
 
+    protected $layouts = [
+        'form-top' => 'setProductTabs',
+    ];
+
+    /*
+     * This items will be selected from db for cart items
+     */
+    protected $cartSelect = [
+        'id', 'slug', 'name', 'image', 'price', 'vat_id', 'code',
+        'stock_quantity', 'stock_type', 'stock_sold',
+        'discount_operator', 'discount',
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -134,19 +147,6 @@ class Product extends CartEloquent implements HasAttributesSupport
         ];
     }
 
-    protected $layouts = [
-        'form-top' => 'setProductTabs',
-    ];
-
-    /*
-     * This items will be selected from db for cart items
-     */
-    protected $cartSelect = [
-        'id', 'slug', 'name', 'image', 'price', 'vat_id', 'code',
-        'stock_quantity', 'stock_type', 'stock_sold',
-        'discount_operator', 'discount',
-    ];
-
     public function scopeAdminRows($query)
     {
         //Load all attributes data
@@ -183,5 +183,19 @@ class Product extends CartEloquent implements HasAttributesSupport
         }
 
         return $this->product_type == $type;
+    }
+
+    public function mutateCategoryResponse()
+    {
+        $columns = [ 'product_type' ];
+
+        //If variants are enabled
+        if ( Store::filterConfig('variants', true) ){
+            $columns[] = 'variants';
+
+            $this->variants->each->setCategoryResponse();
+        }
+
+        $this->makeVisible($columns);
     }
 }
