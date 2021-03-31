@@ -25,14 +25,14 @@ trait HasProductAttributes
         }
 
         return array_merge(
-            Admin::getModel('Attribute')->getAttributesSelect(),
+            Admin::getModel('Attribute')->getProductAttributesColumns(),
             $columns
         );
     }
 
     public function getAttributesItemsSelect()
     {
-        return Admin::getModel('AttributesItem')->getAttributesItemsSelect();
+        return Admin::getModel('AttributesItem')->getProductAttributesItemsColumns();
     }
 
     /*
@@ -48,7 +48,9 @@ trait HasProductAttributes
                 ->select($this->getAttributesSelect())
                 ->leftJoin('attributes', 'attributes.id', '=', 'products_attributes.attribute_id')
                 ->with(['items' => function($query){
-                    $query->select($this->getAttributesItemsSelect());
+                    $query->select(
+                        $this->getAttributesItemsSelect()
+                    );
                 }]);
     }
 

@@ -56,6 +56,18 @@ class NuxtApiResponse extends ResourceCollection
 
                 $response['model'][$modelName] = $data->toArray();
             }
+
+            if ( $data instanceof JsonResource ){
+                $data = $data->toResponse($request)->getData(true);
+
+                foreach ($data as $key => $value) {
+                    if ( array_key_exists($key, $response) ) {
+                        $response[$key] = array_merge($response[$key], $value);
+                    } else {
+                        $response[$key] = $value;
+                    }
+                }
+            }
         }
 
         return $response;

@@ -6,6 +6,7 @@ use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Admin;
 
 class Attribute extends AdminModel
 {
@@ -69,16 +70,13 @@ class Attribute extends AdminModel
 
     public function scopeWithItemsForProducts($query, $productsQuery)
     {
-        $attributes = $query->select([
-            'id', 'name', 'unit', 'slug'
-        ])->with([
+        $attributes = $query->select(
+            $this->getAttributesColumns()
+        )->with([
             'items' => function($query) use ($productsQuery) {
-                $query->select([
-                    'attributes_items.id',
-                    'attributes_items.attribute_id',
-                    'attributes_items.name',
-                    'attributes_items.slug',
-                ])->whereHas('productsAttributes', function($query) use ($productsQuery) {
+                $query->select(
+                    Admin::getModel('AttributesItem')->getAttributesItemsColumns()
+                )->whereHas('productsAttributes', function($query) use ($productsQuery) {
                     //Get attribute items from all products
                     if ( (new Product)->hasAttributesEnabled() ) {
                         $query->whereHas('products', $productsQuery);
@@ -93,7 +91,24 @@ class Attribute extends AdminModel
         ]);
     }
 
-    public function getAttributesSelect()
+    /**
+     * This columns will be loaded into list of attributes in category response
+     *
+     * @return  array
+     */
+    public function getAttributesColumns()
+    {
+        return [
+            'id', 'name', 'unit', 'slug'
+        ];
+    }
+
+    /**
+     * This columns will be loaded into every attribute assigned in products attributes
+     *
+     * @return  array
+     */
+    public function getProductAttributesColumns()
     {
         return [
             'attributes.name',

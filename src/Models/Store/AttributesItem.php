@@ -54,7 +54,17 @@ class AttributesItem extends AdminModel
         ];
     }
 
-    public function getAttributesItemsSelect()
+    public function getAttributesItemsColumns()
+    {
+        return [
+            'attributes_items.id',
+            'attributes_items.attribute_id',
+            'attributes_items.name',
+            'attributes_items.slug',
+        ];
+    }
+
+    public function getProductAttributesItemsColumns()
     {
         return [
             'attributes_items.id',
