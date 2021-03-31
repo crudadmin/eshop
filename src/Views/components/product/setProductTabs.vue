@@ -26,7 +26,7 @@ export default {
                 hasOrderableVariants = selectedType ? selectedType[1].orderableVariants : false;
 
             this.model.setTabVisibility('products_variants', hasVariants);
-            this.model.setTabVisibility('price', !hasOrderableVariants);
+            this.model.setTabVisibility('price-tab', !hasOrderableVariants);
             this.model.hideFromForm('stock_quantity', hasOrderableVariants);
             this.model.hideFromForm('ean', hasOrderableVariants);
             this.model.hideFromForm('code', hasOrderableVariants);

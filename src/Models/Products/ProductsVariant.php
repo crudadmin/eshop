@@ -6,6 +6,7 @@ use Admin;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
+use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasProductResponses;
 use AdminEshop\Eloquent\Concerns\HasStock;
@@ -18,20 +19,8 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
     use HasProductAttributes,
         HasStock,
         HasProductImage,
+        HasProductFilter,
         HasProductResponses;
-
-    /**
-     * Model constructor
-     *
-     * @param  array  $options
-     */
-    public function __construct(array $options = [])
-    {
-        $this->append($this->getPriceAttributes());
-        $this->append($this->getStockAttributes());
-
-        parent::__construct($options);
-    }
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -59,9 +48,26 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
      * This items will be selected frm db for cart items
      */
     protected $cartSelect = [
-        'id', 'product_id', 'name', 'image', 'price', 'vat_id',
-        'discount_operator', 'discount', 'stock_quantity',
+        'id', 'product_id', 'name', 'image', 'stock_quantity',
     ];
+
+    /*
+     * Should be filter in caregory response applied also for selected variants?
+     */
+    protected $applyFilterOnVariants = true;
+
+    /**
+     * Model constructor
+     *
+     * @param  array  $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->append($this->getPriceAttributes());
+        $this->append($this->getStockAttributes());
+
+        parent::__construct($options);
+    }
 
     public function belongsToModel()
     {

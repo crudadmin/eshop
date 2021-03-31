@@ -233,6 +233,16 @@ class Store
     }
 
     /**
+     * Which product can consists of variants
+     *
+     * @return  array
+     */
+    function variantsProductTypes()
+    {
+        return $this->filterConfig('variants', true);
+    }
+
+    /**
      * Which product types are orderable
      *
      * @return  array

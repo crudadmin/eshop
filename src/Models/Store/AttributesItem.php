@@ -34,11 +34,14 @@ class AttributesItem extends AdminModel
 
     protected $hidden = ['pivot'];
 
-    protected $settings = [
-        'title.insert' => 'Nová hodnota atribútu',
-        'title.update' => ':name',
-        'columns.id.hidden' => true,
-    ];
+    public function settings()
+    {
+        return [
+            'title.insert' => 'Nová hodnota atribútu',
+            'title.update' => ':name',
+            'columns.id.hidden' => env('APP_DEBUG') == false,
+        ];
+    }
 
     /*
      * Automatic form and database generation

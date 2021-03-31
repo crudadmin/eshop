@@ -40,11 +40,14 @@ class Attribute extends AdminModel
         ],
     ];
 
-    protected $settings = [
-        'title.insert' => 'Nový atribút',
-        'title.update' => ':name',
-        'columns.id.hidden' => true,
-    ];
+    public function settings()
+    {
+        return [
+            'title.insert' => 'Nový atribút',
+            'title.update' => ':name',
+            'columns.id.hidden' => env('APP_DEBUG') == false,
+        ];
+    }
 
     public function active()
     {

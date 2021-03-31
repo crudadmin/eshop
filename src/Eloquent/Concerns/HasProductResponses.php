@@ -4,6 +4,8 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
+use Store;
+use Admin;
 
 trait HasProductResponses
 {
@@ -54,14 +56,68 @@ trait HasProductResponses
         return $this;
     }
 
-    public function scopeWithCategoryResponse($query)
+    /**
+     * Display products into category response
+     * Also filter products and variants
+     *
+     * @param  Builder  $query
+     * @param  array  $filterParams
+     */
+    public function scopeWithCategoryResponse($query, $filterParams = [])
     {
-        $query->with([
-            'attributesItems',
-        ]);
+        $query->applyQueryFilter($filterParams);
 
-        if ( $this instanceof Product ){
-            $query->with(['variants']);
+        if ( $this->hasAttributesEnabled() ) {
+            $query->with([
+                'attributesItems',
+            ]);
         }
+
+        if ( $this instanceof Product && count(Store::variantsProductTypes()) ){
+            $query->with(['variants' => function($query) use ($filterParams) {
+                //We can deside if filter should be applied also on selected variants
+                if ( Admin::getModel('ProductsVariant')->getProperty('applyFilterOnVariants') == true ) {
+                    $query->applyQueryFilter($filterParams);
+                }
+
+                if ( $query->getModel()->hasAttributesEnabled() ) {
+                    $query->with(['attributesItems']);
+                }
+            }]);
+        }
+    }
+
+    public function scopeGetPriceRange($query, $filterParams)
+    {
+        $products = $query
+                        ->select(...$this->getPriceSelectColumns())
+                        ->addSelect('product_type', 'id')
+                        ->applyQueryFilter($filterParams);
+
+        if ( count(Store::variantsProductTypes()) ) {
+            $products->with([
+                'variants' => function($query) use ($filterParams){
+                    $query->select(...$query->getModel()->getPriceSelectColumns())->addSelect('product_id')->withoutGlobalScope('order');
+
+                    //We can deside if filter should be applied also on selected variants
+                    if ( Admin::getModel('ProductsVariant')->getProperty('applyFilterOnVariants') == true ) {
+                        $query->applyQueryFilter($filterParams);
+                    }
+                }
+            ]);
+        }
+
+        $prices = $products->get()->map(function($product){
+            if ( in_array($product->product_type, Store::variantsProductTypes()) ){
+                return $product->cheapestVariantClientPrice;
+            } else {
+                return $product->clientPrice;
+            }
+        })->sort()->values();
+
+        return [
+            $prices->first() ?: 0,
+            $prices->last() ?: 0
+        ];
     }
 }

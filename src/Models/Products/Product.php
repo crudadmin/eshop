@@ -10,6 +10,7 @@ use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
+use AdminEshop\Eloquent\Concerns\HasProductPaginator;
 use AdminEshop\Eloquent\Concerns\HasProductResponses;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
@@ -23,6 +24,7 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasProductAttributes,
         HasStock,
         HasProductFilter,
+        HasProductPaginator,
         HasProductResponses;
 
     /**
@@ -66,9 +68,8 @@ class Product extends CartEloquent implements HasAttributesSupport
      * This items will be selected from db for cart items
      */
     protected $cartSelect = [
-        'id', 'slug', 'name', 'image', 'price', 'vat_id', 'code',
+        'id', 'slug', 'name', 'image', 'code',
         'stock_quantity', 'stock_type', 'stock_sold',
-        'discount_operator', 'discount',
     ];
 
     /*
@@ -84,7 +85,7 @@ class Product extends CartEloquent implements HasAttributesSupport
             Group::tab([
                 Group::fields([
                     'name' => 'name:Názov produktu|index|limit:30|required',
-                    'product_type' => 'name:Typ produktu|type:select|option:name|default:regular|required',
+                    'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|required',
                 ])->inline(),
                 'image' => 'name:Obrázok|type:file|image',
                 Group::fields([
@@ -101,7 +102,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                     'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
                     'discount' => 'name:Výška zľavy|type:decimal|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
                 ])->id('discount')->width(4),
-            ])->icon('fa-money'),
+            ])->icon('fa-money')->id('price-tab'),
             'Popis' => Group::tab([
                 'description' => 'name:Popis produktu|type:editor|hidden',
             ])->icon('fa-file-text-o'),
@@ -160,6 +161,11 @@ class Product extends CartEloquent implements HasAttributesSupport
         $query->whereIn('product_type', Store::nonVariantsProductTypes());
     }
 
+    public function scopeVariantProducts($query)
+    {
+        $query->whereIn('product_type', Store::variantsProductTypes());
+    }
+
     public function scopeOrderableProducts($query)
     {
         $query->whereIn('product_type', Store::orderableProductTypes());
@@ -187,15 +193,22 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function mutateCategoryResponse()
     {
-        $columns = [ 'product_type' ];
+        $visible = [ 'product_type' ];
 
         //If variants are enabled
-        if ( Store::filterConfig('variants', true) ){
-            $columns[] = 'variants';
+        if ( count(Store::variantsProductTypes()) ){
+            $visible[] = 'variants';
 
             $this->variants->each->setCategoryResponse();
         }
 
-        $this->makeVisible($columns);
+        $this->makeVisible($visible);
+    }
+
+    public function getCheapestVariantClientPriceAttribute()
+    {
+        $variant = $this->variants->sortBy('clientPrice')->first();
+
+        return $variant ? $variant->clientPrice : 0;
     }
 }

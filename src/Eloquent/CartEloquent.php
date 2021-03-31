@@ -17,6 +17,28 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
     use PriceMutator,
         DiscountHelper;
 
+    /*
+     * Columns required for price calculation
+     */
+    protected $priceSelect = [
+        'price', 'vat_id', 'discount_operator', 'discount',
+    ];
+
+    public function getPriceSelectColumns()
+    {
+        return array_unique($this->fixAmbiguousColumn(array_merge([
+            $this->priceSelect ?: [],
+        ])));
+    }
+
+    public function getCartSelectColumns()
+    {
+        return array_unique($this->fixAmbiguousColumn(array_merge([
+            $this->cartSelect ?: [],
+            $this->priceSelect ?: [],
+        ])));
+    }
+
     /**
      * Returns cart identifier classname of actual eloquent
      *
@@ -29,7 +51,7 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
 
     public function scopeCartSelect($query)
     {
-        $query->select($this->fixAmbiguousColumn($this->cartSelect ?: []));
+        $query->select($this->getCartSelectColumns());
 
         //Add attributes support into cart
         if (
@@ -46,6 +68,11 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
     public function addCartSelect(array $columns = [])
     {
         $this->cartSelect = array_merge($this->cartSelect ?: [], $columns);
+    }
+
+    public function addPriceSelect(array $columns = [])
+    {
+        $this->priceSelect = array_merge($this->priceSelect ?: [], $columns);
     }
 
     /**
