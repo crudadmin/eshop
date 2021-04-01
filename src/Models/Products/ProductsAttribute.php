@@ -2,12 +2,15 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Contracts\Concerns\HasUnit;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use \AdminEshop\Models\Store\AttributesItem;
 
 class ProductsAttribute extends AdminModel
 {
+    use HasUnit;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -53,7 +56,7 @@ class ProductsAttribute extends AdminModel
     {
         return [
             'attribute' => 'name:Atribút|belongsTo:attributes,name|canAdd|required',
-            'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name:unit|filterBy:attribute|canAdd|column_visible|required',
+            'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name :unitName|filterBy:attribute|canAdd|column_visible|required',
         ];
     }
 
@@ -62,9 +65,11 @@ class ProductsAttribute extends AdminModel
      */
     private function getVariantItemsOptions()
     {
-        return AttributesItem::select(['attributes_items.id', 'attributes_items.attribute_id', 'attributes_items.name', 'attributes.unit'])
+        return AttributesItem::select(['attributes_items.id', 'attributes_items.attribute_id', 'attributes_items.name', 'attributes.unit_id'])
                 ->leftJoin('attributes', 'attributes.id', '=', 'attributes_items.attribute_id')
-                ->get();
+                ->get()
+                ->append('unitName')
+                ->makeHidden('unit_id');
     }
 
     public function options()

@@ -6,6 +6,7 @@ use Admin;
 use AdminEshop\Contracts\Concerns\HasRoutes;
 use AdminEshop\Models\Orders\OrdersProduct;
 use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Store\AttributesUnit;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\Store as StoreModel;
 use AdminEshop\Models\Store\Vat;
@@ -34,6 +35,16 @@ class Store
     {
         return $this->cache('vats', function(){
             return (Admin::getModel('Vat') ?: new Vat)->get();
+        });
+    }
+
+    /*
+     * Return all vats
+     */
+    public function getUnits()
+    {
+        return $this->cache('units', function(){
+            return (Admin::getModel('AttributesUnit') ?: new AttributesUnit)->get();
         });
     }
 
@@ -75,6 +86,13 @@ class Store
             $vat = $this->getVats()->where('id', $vatId)->first();
 
             return $vat ? $vat->vat : 0;
+        });
+    }
+
+    public function getUnit($unitId)
+    {
+        return $this->cache('unit.'.$unitId, function() use ($unitId) {
+            return $this->getUnits()->where('id', $unitId)->first();
         });
     }
 

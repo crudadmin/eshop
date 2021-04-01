@@ -66,7 +66,7 @@ trait HasProductAttributes
         foreach ($this->getValue('attributesItems') as $attribute) {
             if ( $items = $attribute->getAttributesTextItems() ) {
                 $attributes[] = $items->map(function($item) use ($attribute) {
-                    return $item->name.$attribute->unit;
+                    return $item->name.$attribute->unitName;
                 })->join(config('admineshop.attributes.separator.item', ', '));
             }
         }

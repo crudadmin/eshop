@@ -2,11 +2,14 @@
 
 namespace AdminEshop\Models\Store;
 
+use AdminEshop\Contracts\Concerns\HasUnit;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 
 class AttributesItem extends AdminModel
 {
+    use HasUnit;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */

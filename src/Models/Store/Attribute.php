@@ -2,14 +2,17 @@
 
 namespace AdminEshop\Models\Store;
 
+use Admin;
+use AdminEshop\Contracts\Concerns\HasUnit;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Admin;
 
 class Attribute extends AdminModel
 {
+    use HasUnit;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -65,7 +68,7 @@ class Attribute extends AdminModel
     {
         return [
             'name' => 'name:Názov atribútu|required',
-            'unit' => 'name:Merná jednotka',
+            'unit' => 'name:Merná jednotka|belongsTo:attributes_units,:name (:unit)|canAdd',
             'title' => 'name:Popis',
             'sortby' => 'name:Zoradiť podľa|type:select|required|default:asc',
         ];
@@ -102,7 +105,7 @@ class Attribute extends AdminModel
     public function getAttributesColumns()
     {
         return [
-            'id', 'name', 'unit', 'slug'
+            'id', 'name', 'unit_id', 'slug'
         ];
     }
 
@@ -115,7 +118,7 @@ class Attribute extends AdminModel
     {
         return [
             'attributes.name',
-            'attributes.unit',
+            'attributes.unit_id',
         ];
     }
 }
