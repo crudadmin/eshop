@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Payments;
 
+use AdminEshop\Contracts\Payments\Exceptions\PaymentGateException;
 use AdminEshop\Contracts\Payments\PaymentHelper;
 use Gopay;
 use Log;
@@ -168,7 +169,9 @@ class GopayPayment extends PaymentHelper
         if ($response->hasSucceed()) {
             return $response->json['gw_url'];
         } else {
-            $this->logPaymentError($response->json);
+            throw new PaymentGateException(
+                json_encode($response->json, JSON_PRETTY_PRINT)
+            );
 
             return false;
         }

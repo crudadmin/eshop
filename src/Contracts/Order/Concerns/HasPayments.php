@@ -3,6 +3,8 @@
 namespace AdminEshop\Contracts\Order\Concerns;
 
 use AdminEshop\Contracts\Payments\GopayPayment;
+use Exception;
+use Log;
 
 trait HasPayments
 {
@@ -91,6 +93,27 @@ trait HasPayments
         ]);
     }
 
+    /**
+     * Log error payment message
+     *
+     * @param  string|array  $log
+     */
+    public function logPaymentError($log = null)
+    {
+        //Serialize array error
+        if ( is_array($log) ){
+            $log = json_encode($log, JSON_PRETTY_PRINT);
+        }
+
+        Log::error($log);
+
+        $this->getOrder()->log()->create([
+            'type' => 'error',
+            'code' => 'payment-error',
+            'log' => $log,
+        ]);
+    }
+
     public function getPaymentRedirect($paymentMethodId = null)
     {
         $payment = $this->makePayment($paymentMethodId);
@@ -98,7 +121,11 @@ trait HasPayments
         $paymentClass = $this->getPaymentClass($paymentMethodId);
         $paymentClass->setPayment($payment);
 
-        return $paymentClass->getPaymentUrl();
+        try {
+            return $paymentClass->getPaymentUrl();
+        } catch (Exception $e){
+            $this->logPaymentError($e);
+        }
     }
 }
 ?>
