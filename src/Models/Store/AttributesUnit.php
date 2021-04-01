@@ -39,6 +39,14 @@ class AttributesUnit extends AdminModel
         ];
     }
 
+    protected $options = [
+        'format' => [
+            'string' => 'Textové pole',
+            'number' => 'Čiselná hodnota',
+            'decimal' => 'Čiselná hodnota s možnosťou desatinných miest',
+        ],
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -51,6 +59,12 @@ class AttributesUnit extends AdminModel
         return [
             'name' => 'name:Názov mernej jednotky|required',
             'unit' => 'name:Merná jednotka|required',
+            'format' => 'name:Formát jednotky|type:select|default:string|required',
         ];
+    }
+
+    public function getIsNumericTypeAttribute()
+    {
+        return in_array($this->format, ['number', 'decimal']);
     }
 }

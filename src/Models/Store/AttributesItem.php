@@ -2,9 +2,11 @@
 
 namespace AdminEshop\Models\Store;
 
+use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store;
 
 class AttributesItem extends AdminModel
 {
@@ -37,12 +39,17 @@ class AttributesItem extends AdminModel
 
     protected $hidden = ['pivot'];
 
+    protected $rules = [
+        CastAttributeItemValue::class,
+    ];
+
     public function settings()
     {
         return [
             'title.insert' => 'Nová hodnota atribútu',
-            'title.update' => ':name',
+            'title.update' => ':item_name',
             'columns.id.hidden' => env('APP_DEBUG') == false,
+            'columns.item_name.name' => 'Hodnota atribútu',
         ];
     }
 
@@ -56,7 +63,28 @@ class AttributesItem extends AdminModel
     public function fields()
     {
         return [
-            'name' => 'name:Hodnota atribútu|required',
+            'name' => 'name:Hodnota atribútu|hidden|component:AttributeItemValue|validate_attribute_unit|required',
+        ];
+    }
+
+    public function scopeAdminRows($query)
+    {
+        $query->leftJoin('attributes', 'attributes.id', '=', 'attributes_items.attribute_id')
+              ->selectRaw('attributes_items.*, attributes.unit_id');
+    }
+
+    public function setAdminAttributes($attributes)
+    {
+        $attributes['item_name'] = $this->getValue('name').' '.$this->unitName;
+        $attributes['unit_id'] = $this->unit_id;
+
+        return $attributes;
+    }
+
+    public function getAdminModelInitialData()
+    {
+        return [
+            'store_units' => Store::getUnits(),
         ];
     }
 

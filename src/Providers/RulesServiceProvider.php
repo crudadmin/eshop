@@ -48,6 +48,16 @@ class RulesServiceProvider extends ServiceProvider
             return is_numeric($value) && strlen($value) === 5;
         }, _('PSČ musí byť zadané v tvare 000 00.'));
 
+        Validator::extend('validate_attribute_unit', function ($attribute, $value, $parameters, $validator) {
+            if ( ($unit = Store::getUnit(request('unit_id'))) && $unit->isNumericType ){
+                $value = str_replace(',', '.', $value);
+
+                return is_numeric($value);
+            }
+
+            return true;
+        }, _('Zadali ste nesprávny tvar hodnoty atribútu.'));
+
         Validator::extend('company_id', function ($attribute, $number, $parameters, $validator) {
             // be liberal in what you receive
             $ic = preg_replace('#\s+#', '', $number);
