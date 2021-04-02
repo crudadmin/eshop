@@ -25,4 +25,9 @@ class OrderCreated
     {
         $this->order = $order;
     }
+
+    public function getOrder()
+    {
+        return $this->order;
+    }
 }

@@ -11,7 +11,7 @@ class PaymentsMethod extends BasePaymentsMethod
 {
     use PriceMutator;
 
-    protected $group = 'settings.store';
+    protected $group = 'store';
 
     protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 

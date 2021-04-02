@@ -30,7 +30,7 @@ class DiscountsCode extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'settings.store';
+    protected $group = 'store';
 
     protected $icon = 'fa-percent';
 

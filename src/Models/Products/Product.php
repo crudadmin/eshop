@@ -211,4 +211,11 @@ class Product extends CartEloquent implements HasAttributesSupport
 
         return $variant ? $variant->clientPrice : 0;
     }
+
+    public function setAdminAttributes($attributes)
+    {
+        $attributes['attributes'] = $this->attributesText;
+
+        return $attributes;
+    }
 }

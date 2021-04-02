@@ -7,7 +7,7 @@ use Admin\Fields\Group;
 
 class Country extends BaseCountry
 {
-    protected $group = 'settings.store';
+    protected $group = 'store';
 
     public function mutateFields($fields)
     {

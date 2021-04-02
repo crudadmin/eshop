@@ -16,7 +16,7 @@ class ClientsFavourite extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Obľubene položky klienta';
+    protected $name = 'Obľubene položky';
 
     /*
      * Template title

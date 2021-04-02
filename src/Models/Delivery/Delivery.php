@@ -32,7 +32,7 @@ class Delivery extends AdminModel implements DiscountSupport
      */
     protected $title = '';
 
-    protected $group = 'settings.store';
+    protected $group = 'store';
 
     protected $reversed = true;
 

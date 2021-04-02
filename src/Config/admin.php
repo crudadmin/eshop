@@ -17,7 +17,6 @@ return [
         'settings' => 'Nastavenia',
         'content' => 'Správa obsahu',
         'store' => ['Obchod', 'fa-shopping-cart'],
-        'settings.store' => ['Obchod', 'fa-shopping-cart'],
         'products' => ['Produkty', 'fa-shopping-basket'],
         'clients' => ['Zákazníci', 'fa-address-book-o'],
     ],

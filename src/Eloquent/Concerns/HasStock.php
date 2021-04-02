@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use AdminEshop\Events\StockChanged;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsStocksLog;
 use AdminEshop\Models\Products\ProductsVariant;
@@ -129,8 +130,9 @@ trait HasStock
         $prevStock = null;
         foreach ($roundings as $onStock) {
             if ( $this->stock_quantity > $onStock ){
+                //If is more than sentences limiter
                 if ( ! $prevStock ){
-                    break;
+                    return config('admineshop.stock.rounding_more_than_char', '>').$roundings[0];
                 }
 
                 return config('admineshop.stock.rounding_less_than_char', '<').$prevStock;
@@ -139,8 +141,9 @@ trait HasStock
             $prevStock = $onStock;
         }
 
+        //If is less then lowest limit
         if ( count($roundings) > 0 ){
-            return config('admineshop.stock.rounding_more_than_char', '>').$roundings[0];
+            return config('admineshop.stock.rounding_less_than_char', '<').$roundings[count($roundings) - 1];
         }
 
         return $stockText;
@@ -197,7 +200,7 @@ trait HasStock
         $this->stock_quantity = $updatedStock < 0 ? 0 : $updatedStock;
         $this->save();
 
-        ProductsStocksLog::create([
+        $stockLog = ProductsStocksLog::create([
             'order_id' => $orderId,
             'product_id' => $this instanceof Product ? $this->getKey() : $this->product_id,
             'variant_id' => $this instanceof ProductsVariant ? $this->getKey() : null,
@@ -205,5 +208,8 @@ trait HasStock
             'stock' => $this->stock_quantity,
             'message' => $message,
         ]);
+
+        //Event for added discount code
+        event(new StockChanged($this, $stockLog));
     }
 }

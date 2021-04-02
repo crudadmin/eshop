@@ -37,6 +37,7 @@ class ClientsProductsDiscount extends AdminModel
 
     protected $settings = [
         'increments' => false,
+        'title.insert' => 'Nová zľava',
         'title.update' => 'Upravujete klientsku zľavu č. :id',
     ];
 

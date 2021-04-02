@@ -7,5 +7,5 @@ use Admin\Fields\Group;
 
 class Vat extends BaseVat
 {
-    protected $group = 'settings.store';
+    protected $group = 'store';
 }

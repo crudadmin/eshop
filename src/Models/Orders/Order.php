@@ -41,8 +41,6 @@ class Order extends AdminModel
      */
     protected $title = '';
 
-    protected $group = 'store';
-
     protected $publishable = false;
 
     protected $sortable = false;
