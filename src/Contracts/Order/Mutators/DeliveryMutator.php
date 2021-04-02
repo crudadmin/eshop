@@ -57,7 +57,9 @@ class DeliveryMutator extends Mutator
      */
     public function isActiveInAdmin(Order $order)
     {
-        $delivery = $order->delivery_id && $order->delivery ? $order->delivery : null;
+        $delivery = $order->delivery_id && $order->delivery
+                        ? Cart::addCartDiscountsIntoModel($order->delivery)
+                        : null;
 
         if ( $delivery ) {
             return [

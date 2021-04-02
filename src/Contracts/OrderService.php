@@ -224,8 +224,8 @@ class OrderService
 
         $summary = $items->getSummary(true);
 
-        $order->price = $items->count() == 0 ? 0 : $summary['priceWithoutVat'];
-        $order->price_vat = $items->count() == 0 ? 0 : $summary['priceWithVat'];
+        $order->price = $items->count() == 0 ? 0 : ($summary['priceWithoutVat'] ?? 0);
+        $order->price_vat = $items->count() == 0 ? 0 : ($summary['priceWithVat'] ?? 0);
 
         return $this;
     }

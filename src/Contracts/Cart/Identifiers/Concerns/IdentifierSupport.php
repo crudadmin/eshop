@@ -80,7 +80,7 @@ trait IdentifierSupport
             //Return default by identifier type
             else {
                 //Return default
-                $model = $identifier->getItemModel($this, $this->itemModels[$identifierHash]);
+                $model = $identifier->getItemModel($this, $this->itemModels[$identifierHash] ?? null);
             }
 
             if ( $model ){

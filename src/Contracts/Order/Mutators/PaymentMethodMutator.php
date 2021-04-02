@@ -46,7 +46,7 @@ class PaymentMethodMutator extends Mutator
     public function isActiveInAdmin(Order $order)
     {
         if ( $order->payment_method_id && $order->paymentMethod ) {
-            return $order->paymentMethod;
+            return Cart::addCartDiscountsIntoModel($order->paymentMethod);
         }
     }
 

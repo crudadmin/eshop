@@ -75,8 +75,9 @@ class FreeDeliveryByCode extends Discount implements Discountable
      */
     private function hasCodeFreeDelivery($code)
     {
-        if ( ! $code || $code->free_delivery != true )
+        if ( ! $code || $code->free_delivery != true ) {
             return false;
+        }
 
         return $code;
     }
