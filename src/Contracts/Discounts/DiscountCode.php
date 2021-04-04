@@ -24,6 +24,11 @@ class DiscountCode extends Discount implements Discountable
     public $canApplyOutsideCart = false;
 
     /*
+     * We does not want cache discount codes, because they may be changed in order
+     */
+    public $cachableResponse = false;
+
+    /*
      * Discount name
      */
     public function getName()
@@ -41,7 +46,9 @@ class DiscountCode extends Discount implements Discountable
      */
     public function getCacheKey()
     {
-        return $this->getKey().(self::getCodeName()?:'');
+        $code = $this->getResponse();
+
+        return $this->getKey().($code ? $code->code : '');
     }
 
     /*
@@ -176,8 +183,14 @@ class DiscountCode extends Discount implements Discountable
      */
     public function mutateOrderRow(Order $order, CartCollection $items)
     {
-        if ( $code = self::getDiscountCode() ) {
-            $order->discount_code_id = $code->getKey();
+        if ( $code = $this->getResponse() ) {
+            //If discount code has been changed, or is not set at all, we can assign response code and
+            //count usage for given code
+            if ( $order->getOriginal('discount_code_id') !== $code->getKey() ){
+                $code->update([ 'used' => $code->used + 1 ]);
+
+                $order->discount_code_id = $code->getKey();
+            }
         }
     }
 

@@ -26,6 +26,11 @@ class FreeDeliveryByCode extends Discount implements Discountable
      */
     public $canApplyOutsideCart = false;
 
+    /*
+     * We does not want cache discount codes, because they may be changed in order
+     */
+    public $cachableResponse = false;
+
     /**
      * Can be this discount shown in email?
      *

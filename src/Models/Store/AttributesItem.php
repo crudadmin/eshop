@@ -88,6 +88,9 @@ class AttributesItem extends AdminModel
         ];
     }
 
+    /**
+     * Load this attributes into attributes list
+     */
     public function getAttributesItemsColumns()
     {
         return [
@@ -98,6 +101,9 @@ class AttributesItem extends AdminModel
         ];
     }
 
+    /*
+     * Load this attributes into each product in category response
+     */
     public function getProductAttributesItemsColumns()
     {
         return [

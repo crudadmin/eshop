@@ -5,9 +5,8 @@
 {{ $message }}
 @endif
 
-## {{ _('Objednaný tovar') }}
 @component('mail::table')
-| {{ _('Názov produktu') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? _('Cena bez dph') : '' }} | {{ _('Cena s dph') }} |
+| {{ _('Objednaný tovar') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? _('Cena bez dph') : '' }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
 @foreach( $items as $item )
 | {{ $item->getProductNamePartsSections(0) }} @if ( $additional = $item->getProductNamePartsSections(1) )<small>{{ $additional }}</small> @endif| {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |

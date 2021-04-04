@@ -73,7 +73,7 @@ class Order extends AdminModel
                 'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
                 'city' => 'name:Mesto|required|hidden',
                 'zipcode' => 'name:PSČ|max:6|zipcode|required|hidden',
-                'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|exists:countries,id|required',
+                'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|required|exists:countries,id',
             ])->grid(4),
             'Dodacie údaje' => Group::fields([
                 'delivery_different' => 'name:Doručiť na inú adresu|type:checkbox|default:0',

@@ -98,14 +98,4 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
 
         return Cart::getItem($identifier);
     }
-
-    /**
-     * We can set cart response... we can append() or make hidden fields in this method here
-     *
-     * void
-     */
-    public function setCartResponse()
-    {
-
-    }
 }

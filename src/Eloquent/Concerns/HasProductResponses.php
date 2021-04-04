@@ -38,11 +38,6 @@ trait HasProductResponses
         ];
     }
 
-    public function mutateCategoryResponse()
-    {
-
-    }
-
     public function setCategoryResponse()
     {
         $this->setVisible(
@@ -54,6 +49,37 @@ trait HasProductResponses
         $this->mutateCategoryResponse();
 
         return $this;
+    }
+
+    public function setDetailResponse()
+    {
+        $this->setCategoryResponse();
+
+        $this->mutateDetailResponse();
+
+        $this->makeVisible([
+            'attributesItems',
+        ]);
+    }
+
+    /**
+     * We can set cart response... we can append() or make hidden fields in this method here
+     *
+     * void
+     */
+    public function setCartResponse()
+    {
+        $this->setCategoryResponse();
+    }
+
+    public function mutateCategoryResponse()
+    {
+
+    }
+
+    public function mutateDetailResponse()
+    {
+
     }
 
     /**
@@ -75,6 +101,8 @@ trait HasProductResponses
 
         if ( $this instanceof Product && count(Store::variantsProductTypes()) ){
             $query->with(['variants' => function($query) use ($filterParams) {
+                $query->withParentProductData();
+
                 //We can deside if filter should be applied also on selected variants
                 if ( Admin::getModel('ProductsVariant')->getProperty('applyFilterOnVariants') == true ) {
                     $query->applyQueryFilter($filterParams);

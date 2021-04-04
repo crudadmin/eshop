@@ -35,6 +35,24 @@ class ProductsAttribute extends AdminModel
 
     protected $publishable = false;
 
+    protected $settings = [
+        'title.insert' => 'Nový atribut',
+        'title.update' => 'Upravujete atribút',
+        'title.rows' => 'Zoznam atribútov kombinacie',
+        'columns.id.hidden' => true,
+        'grid.enabled' => false,
+        'grid.default' => 'full',
+        'buttons' => [
+            'insert' => 'Nový atribút',
+            'update' => 'Uložiť atribút',
+            'create' => 'Priradiť atribút',
+        ],
+    ];
+
+    protected $layouts = [
+        'form-top' => 'setProductAttributes',
+    ];
+
     public function active()
     {
         return count($this->belongsToModel()) > 0;
@@ -78,24 +96,6 @@ class ProductsAttribute extends AdminModel
             'items' => $this->getVariantItemsOptions(),
         ];
     }
-
-    protected $settings = [
-        'title.insert' => 'Nový atribut',
-        'title.update' => 'Upravujete atribút',
-        'title.rows' => 'Zoznam atribútov kombinacie',
-        'columns.id.hidden' => true,
-        'grid.enabled' => false,
-        'grid.default' => 'full',
-        'buttons' => [
-            'insert' => 'Nový atribút',
-            'update' => 'Uložiť atribút',
-            'create' => 'Priradiť atribút',
-        ],
-    ];
-
-    protected $layouts = [
-        'form-top' => 'setProductAttributes',
-    ];
 
     public function getAttributesTextItems()
     {

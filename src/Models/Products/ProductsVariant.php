@@ -88,10 +88,10 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
                 'product_type' => 'type:imaginary|component:AddTypeFieldIntoRequest',
                 Group::fields([
                     'name' => 'name:Názov varianty|limit:40|required',
-                    'image' => 'name:Obrázok varianty|image',
+                    'image' => 'name:Obrázok|image',
                 ])->inline(),
                 Group::fields([
-                    'ean' => 'name:EAN varianty',
+                    'ean' => 'name:EAN varianty|hidden',
                     'code' => 'name:Kód varianty',
                 ])->inline(),
             ])->grid(5)->icon('fa-pencil')->id('default'),
@@ -156,6 +156,13 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
         }
     }
 
+    public function setAdminAttributes($attributes)
+    {
+        $attributes['attributes'] = $this->attributesText;
+
+        return $attributes;
+    }
+
     /**
      * Variant product is all the time regular type
      *
@@ -165,5 +172,16 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
     public function isType($type)
     {
         return 'regular' == $type;
+    }
+
+    /**
+     * Returns on stock variants with product table
+     *
+     * @return  void
+     */
+    public function scopeWithParentProductData($query)
+    {
+        $query->select('products_variants.*', 'products.stock_type', 'products.stock_sold', 'products.image as product_image')
+              ->leftJoin('products', 'products.id', '=', 'products_variants.product_id');
     }
 }

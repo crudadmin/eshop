@@ -205,6 +205,14 @@ class Product extends CartEloquent implements HasAttributesSupport
         $this->makeVisible($visible);
     }
 
+    public function mutateDetailResponse()
+    {
+        //If variants are enabled
+        if ( count(Store::variantsProductTypes()) ){
+            $this->variants->each->setDetailResponse();
+        }
+    }
+
     public function getCheapestVariantClientPriceAttribute()
     {
         $variant = $this->variants->sortBy('clientPrice')->first();
