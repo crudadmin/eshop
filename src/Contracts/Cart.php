@@ -108,8 +108,8 @@ class Cart
      */
     public function remove(Identifier $identifier, Identifier $parentIdentifier = null)
     {
-        $this->items = $this->items->reject(function($item) use ($identifier, $parentIdentifier) {
-            return $identifier->hasThisItem($item) && $cartItem->hasSameParentIdentifier($parentIdentifier);
+        $this->items = $this->items->reject(function($cartItem) use ($identifier, $parentIdentifier) {
+            return $identifier->hasThisItem($cartItem) && $cartItem->hasSameParentIdentifier($parentIdentifier);
         })->values();
 
         $this->saveItems();
