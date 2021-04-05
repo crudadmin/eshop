@@ -131,7 +131,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             'grid.disabled' => true,
             'columns.product_name.name' => 'Položka',
             'columns.product_name.before' => 'quantity',
-            'columns.product_name.limit' => 40,
+            'columns.product_name.encode' => false,
             'columns.quantity.after' => 'name',
             'columns.total' => [
                 'title' => 'Cena spolu',

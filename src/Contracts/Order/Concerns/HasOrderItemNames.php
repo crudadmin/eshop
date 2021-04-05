@@ -55,6 +55,14 @@ trait HasOrderItemNames
     {
         $items = $this->getProductNameParts();
 
-        return $this->joinMultiple($items);
+        $name = '';
+
+        if ( $this->order_item_id ){
+            $name .= '<i class="fa fa-level-up-alt" style="transform: scaleX(-1); margin-left: 10px; margin-right: 10px"></i>';
+        }
+
+        $name .= e($this->joinMultiple($items));
+
+        return $name;
     }
 }
