@@ -29,6 +29,16 @@ class Identifier
     }
 
     /**
+     * Return identifiers keys and values
+     *
+     * @return  array
+     */
+    public function getIdentifiers()
+    {
+        return $this->identifiers;
+    }
+
+    /**
      * Bind values of given keys from identifier configuration
      *
      * @param  array  $args
@@ -142,7 +152,7 @@ class Identifier
      * @param  object  $item (here may be typed any type of cart item, product, without UsesIdentifier.)
      * @return  this
      */
-    public function cloneFormItem(object $item)
+    public function cloneFromItem(object $item)
     {
         //Build identifier
         foreach ($this->getIdentifyKeys() as $identifierKey => $options) {

@@ -50,26 +50,27 @@ class Cart
 
     /**
      * Add product into cart and save it into session
-     * @param Product     $product
+     * @param Identifier     $identifier
      * @param int|integer $quantity
+     * @param Identifier     $parentIdentifier
      */
-    public function addOrUpdate(Identifier $identifier, int $quantity = 1)
+    public function addOrUpdate(Identifier $identifier, int $quantity = 1, Identifier $parentIdentifier = null)
     {
         //Cannot add negative quantity
         if ( !is_numeric($quantity) || $quantity <= 0 ){
             $quantity = 1;
         }
 
-        //If items does not exists in cart
-        if ( $item = $this->getItem($identifier) ) {
-            $this->updateQuantity($identifier, $item->quantity + $quantity);
+        //If items does exists in cart
+        if ( $item = $this->getItem($identifier, $parentIdentifier) ) {
+            $this->updateQuantity($identifier, $item->quantity + $quantity, $parentIdentifier);
 
             $this->pushToAdded($item);
 
             return $this;
         }
 
-        $this->addNewItem($identifier, $quantity);
+        $this->addNewItem($identifier, $quantity, $parentIdentifier);
 
         return $this;
     }
@@ -79,11 +80,12 @@ class Cart
      *
      * @param  Identifier $identifier
      * @param  int  $quantity
+     * @param  Identifier $parentIdentifier
      * @return  this
      */
-    public function updateQuantity(Identifier $identifier, $quantity)
+    public function updateQuantity(Identifier $identifier, $quantity, Identifier $parentIdentifier = null)
     {
-        if ( ! ($item = $this->getItem($identifier)) ) {
+        if ( ! ($item = $this->getItem($identifier, $parentIdentifier)) ) {
             autoAjax()->message(_('Produkt nebol nájdeny v košíku.'))->code(422)->throw();
         }
 
@@ -104,10 +106,10 @@ class Cart
      * @param  Identifier $identifier
      * @return  this
      */
-    public function remove(Identifier $identifier)
+    public function remove(Identifier $identifier, Identifier $parentIdentifier = null)
     {
-        $this->items = $this->items->reject(function($item) use ($identifier) {
-            return $identifier->hasThisItem($item);
+        $this->items = $this->items->reject(function($item) use ($identifier, $parentIdentifier) {
+            return $identifier->hasThisItem($item) && $cartItem->hasSameParentIdentifier($parentIdentifier);
         })->values();
 
         $this->saveItems();
@@ -176,7 +178,7 @@ class Cart
      *
      * @param  AdminEshop\Contracts\Cart\Identifiers|Identifier|AdminEshop\Eloquent\Concerns\CanBeInCart  $identifier
      */
-    public function getItem($identifier)
+    public function getItem($identifier, $parentIdentifier = null)
     {
         //If we want cart item by given model. We need receive identifier from this model
         if ( $identifier instanceof CanBeInCart ) {
@@ -189,8 +191,8 @@ class Cart
         }
 
         //All identifiers must match
-        $items = $this->items->filter(function($item) use ($identifier) {
-            return $identifier->hasThisItem($item);
+        $items = $this->items->filter(function($cartItem) use ($identifier, $parentIdentifier) {
+            return $identifier->hasThisItem($cartItem) && $cartItem->hasSameParentIdentifier($parentIdentifier);
         });
 
         return $items->first();
@@ -201,10 +203,15 @@ class Cart
      *
      * @param  Identifier  $identifier
      * @param  int  $quantity
+     * @param  Identifier  $parentIdentifier
      */
-    private function addNewItem(Identifier $identifier, $quantity)
+    private function addNewItem(Identifier $identifier, $quantity, Identifier $parentIdentifier = null)
     {
         $item = new CartItem($identifier, $quantity);
+
+        if ( $parentIdentifier ) {
+            $item->setParentIdentifier($parentIdentifier);
+        }
 
         $this->items[] = $item;
 

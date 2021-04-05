@@ -164,7 +164,7 @@ trait IdentifierSupport
     {
         $identifier = Cart::getIdentifierByName($this->identifier) ?: new DefaultIdentifier;
 
-        $identifier->cloneFormItem($this);
+        $identifier->cloneFromItem($this);
 
         return $identifier;
     }

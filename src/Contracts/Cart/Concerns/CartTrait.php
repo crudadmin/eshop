@@ -149,12 +149,62 @@ trait CartTrait
                 return;
             }
 
-            $identifier->cloneFormItem($item);
+            $identifier->cloneFromItem($item);
 
-            return new CartItem($identifier, @$item->quantity ?: 0);
+            $cartItem = new CartItem($identifier, @$item->quantity ?: 0);
+
+            //If parent cartitem identifier has not been found, we need skip this item from cart
+            if ($this->assignParentCartItem($item, $cartItem) === false){
+                return;
+            }
+
+            return $cartItem;
         }, $items);
 
         return new CartCollection(array_filter($items));
+    }
+
+    /**
+     * Assign parent identifier into existing cart item
+     *
+     * @param  object  $item
+     * @param  CartItem  $cartItem
+     * @return  CartItem
+     */
+    private function assignParentCartItem($item, CartItem $cartItem)
+    {
+        if ( !$item->parentIdentifier ){
+            return;
+        }
+
+        //We need skip this item, because parent identifier is missing
+        if (!($parentIdentifier = $this->bootCartItemParentIdentifier($item->parentIdentifier))) {
+            return false;
+        }
+
+        $cartItem->setParentIdentifier($parentIdentifier);
+    }
+
+    /**
+     * Boot parent identifier from given array
+     *
+     * @param  array|null  $parentIdentifierArray
+     *
+     * @return  Identifier
+     */
+    public function bootCartItemParentIdentifier(array $parentIdentifierArray = null)
+    {
+        //If identifier is missing
+        if (
+            !is_array($parentIdentifierArray)
+            || !($parentIdentifier = $this->getIdentifierByName($parentIdentifierArray['identifier']))
+        ) {
+            return;
+        }
+
+        return $parentIdentifier->cloneFromItem(
+            (object)$parentIdentifierArray['data']
+        );
     }
 
     /**

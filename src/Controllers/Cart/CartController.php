@@ -87,11 +87,31 @@ class CartController extends Controller
         });
     }
 
+    private function getParentIdentifier()
+    {
+        if ( !($cartItem = request('cart_item')) ){
+            return;
+        }
+
+        $variantId = $cartItem['variant_id'] ?? null;
+
+        return $this->getProductsIdentifier(
+            (int)$cartItem['product_id'],
+            $variantId ? (int)$cartItem['variant_id'] : null
+        );
+    }
+
     public function addItem()
     {
         $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
 
-        Cart::addOrUpdate($identifier, request('quantity'));
+        $parentIdentifier = $this->getParentIdentifier();
+
+        Cart::addOrUpdate(
+            $identifier,
+            request('quantity'),
+            $parentIdentifier
+        );
 
         return Cart::baseResponse();
     }
@@ -100,7 +120,13 @@ class CartController extends Controller
     {
         $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
 
-        Cart::updateQuantity($identifier, request('quantity'));
+        $parentIdentifier = $this->getParentIdentifier();
+
+        Cart::updateQuantity(
+            $identifier,
+            request('quantity'),
+            $parentIdentifier
+        );
 
         return Cart::baseResponse();
     }
@@ -109,7 +135,9 @@ class CartController extends Controller
     {
         $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
 
-        Cart::remove($identifier);
+        $parentIdentifier = $this->getParentIdentifier();
+
+        Cart::remove($identifier, $parentIdentifier);
 
         return Cart::baseResponse();
     }

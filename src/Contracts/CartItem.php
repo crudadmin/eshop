@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts;
 
 use AdminEshop\Contracts\Cart\Concerns\HasOptionableDiscounts;
+use AdminEshop\Contracts\Cart\Concerns\HasParentIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
@@ -14,7 +15,8 @@ class CartItem implements UsesIdentifier
 {
     use IdentifierSupport,
         HasOptionableDiscounts,
-        HasOrderItemNames;
+        HasOrderItemNames,
+        HasParentIdentifier;
 
     /**
      * Cart item identififer
@@ -151,6 +153,7 @@ class CartItem implements UsesIdentifier
 
         return array_merge($array, [
             'identifier' => $this->identifier,
+            'parentIdentifier' => $this->parentIdentifier,
             'quantity' => $this->quantity,
         ]);
     }
