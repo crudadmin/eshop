@@ -232,7 +232,10 @@ class Cart
     {
         return $this->items
                     ->toCartFormat($discounts, function($item){
-                        $this->remove($item->getIdentifierClass());
+                        $this->remove(
+                            $item->getIdentifierClass(),
+                            $item->getParentIdentifier()
+                        );
                     });
     }
 

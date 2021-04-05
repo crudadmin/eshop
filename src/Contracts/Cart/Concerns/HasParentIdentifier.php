@@ -2,8 +2,9 @@
 
 namespace AdminEshop\Contracts\Cart\Concerns;
 
-use Cart;
+use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
+use Cart;
 
 trait HasParentIdentifier
 {
@@ -42,8 +43,15 @@ trait HasParentIdentifier
         );
     }
 
+    public function getParentCartItem()
+    {
+        if ( $parentIdentifier = $this->getParentIdentifier() ) {
+            return Cart::getItem($parentIdentifier);
+        }
+    }
+
     /**
-     * Check
+     * Check if given identifier is same as setted in parent identifier property
      *
      * @param  Identifier|null  $parentIdentifier
      * @return  bool
@@ -51,5 +59,16 @@ trait HasParentIdentifier
     public function hasSameParentIdentifier(Identifier $parentIdentifier = null)
     {
         return $parentIdentifier == $this->getParentIdentifier();
+    }
+
+    /**
+     * Check if actual cart item is parent to other child cart item
+     *
+     * @param  CartItem  $childCartItem
+     * @return  bool
+     */
+    public function isParentOwner(CartItem $childCartItem)
+    {
+        return !$this->parentIdentifier && $childCartItem->hasSameParentIdentifier($this->getIdentifierClass());
     }
 }

@@ -62,6 +62,21 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
     protected $icon = 'fa-shopping-basket';
 
+    protected $layouts = [
+        'form-top' => [
+            'recalculateVatPrices',
+            'setPricesFromProduct'
+        ],
+    ];
+
+    protected $rules = [
+        BindDefaultPrice::class,
+        BindIdentifierName::class,
+        AddMissingPrices::class,
+        ReloadProductQuantity::class,
+        RebuildOrderOnItemChange::class, //We need reload order prices after quantity check
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -80,6 +95,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             Group::half([
                 'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|hidden|required_with_values',
                 'name' => 'name:Popis položky|tooltip:Slúži pre položky bez priradeného produktu|hidden',
+                'order_item' => 'name:Patrí k položke|belongsTo:orders_items,id|inaccessible',
             ])->id('itemAdditional'),
             Group::fields([
                 'default_price' => 'name:Pôvodna cena bez DPH|invisible|type:decimal|title:Cena produktu v čase objednania.|disabled',
@@ -104,21 +120,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         ];
     }
 
-    protected $layouts = [
-        'form-top' => [
-            'recalculateVatPrices',
-            'setPricesFromProduct'
-        ],
-    ];
-
-    protected $rules = [
-        BindDefaultPrice::class,
-        BindIdentifierName::class,
-        AddMissingPrices::class,
-        ReloadProductQuantity::class,
-        RebuildOrderOnItemChange::class, //We need reload order prices after quantity check
-    ];
-
     public function settings()
     {
         return [
@@ -130,7 +131,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             'grid.disabled' => true,
             'columns.product_name.name' => 'Položka',
             'columns.product_name.before' => 'quantity',
-            'columns.product_name.limit' => 30,
+            'columns.product_name.limit' => 40,
             'columns.quantity.after' => 'name',
             'columns.total' => [
                 'title' => 'Cena spolu',

@@ -23,9 +23,12 @@ class CartCollection extends Collection
      */
     public function toCartFormat($discounts = null, $onItemRejected = null)
     {
-        return $this->applyOnOrderCart($discounts)
+        return $this
+                    ->applyOnOrderCart($discounts)
                     ->renderCartItems($discounts)
-                    ->rejectWithMissingProduct($onItemRejected);
+                    ->rejectWithMissingProduct($onItemRejected)
+                    ->rejectWithMissingParents($onItemRejected)
+                    ->sortByParentItemsOrder();
     }
 
     /**
@@ -132,6 +135,27 @@ class CartCollection extends Collection
         return $this->reject(function($item) use ($rejectionCallback) {
             //If product or variant is missing from cart item, remove this cart item
             if ( ! $item->getItemModel() && $item->getItemModel() !== false ) {
+                //If has callback on remove item
+                if ( is_callable($rejectionCallback) ) {
+                    $rejectionCallback($item);
+                }
+
+                return true;
+            }
+        })->values();
+    }
+
+    /**
+     * Reject assignes items when parent is not in cart anymore
+     *
+     * @param  null|callable  $rejectionCallback
+     * @return  CartCollection
+     */
+    public function rejectWithMissingParents($rejectionCallback = null)
+    {
+        return $this->reject(function($item) use ($rejectionCallback) {
+            //If product or variant is missing from cart item, remove this cart item
+            if ( $item->parentIdentifier && !$item->getParentCartItem() ) {
                 //If has callback on remove item
                 if ( is_callable($rejectionCallback) ) {
                     $rejectionCallback($item);
@@ -268,5 +292,47 @@ class CartCollection extends Collection
                 'discounts' => $item->appliedDiscounts,
             ];
         });
+    }
+
+    public function sortByParentItemsOrder()
+    {
+        $indexes = [];
+        $parentAddons = [];
+
+        //Add order for parent item, all the time of his index x-0 and second number must be zero
+        $this->each(function($cartItem, $key) use (&$indexes, &$parentAddons) {
+            //Set order only for items without parent
+            if ( !$cartItem->parentIdentifier ){
+                $parentAddons[$key] = 1;
+
+                $indexes[$key] = $key.'-0';
+            }
+        });
+
+        //Add sub-indexes for every child item
+        //for example: 0-1, 0-2... fist number is parent order, second is addon order
+        $this->each(function($childCartItem, $key) use (&$indexes, &$parentAddons) {
+            //Skip parent items / non assigned items
+            if ( !$childCartItem->parentIdentifier ){
+                return;
+            }
+
+            //Get parent cart item order
+            $parentOrder = $this->search(function($parentItem) use ($childCartItem) {
+                return $parentItem->isParentOwner($childCartItem);
+            });
+
+            $indexes[$key] = $parentOrder.'-'.$parentAddons[$parentOrder];
+
+            $parentAddons[$parentOrder]++;
+        });
+
+        $i = 0;
+        return $this->sortBy(function($a, $b) use($indexes, &$i) {
+            $order = $indexes[$i];
+
+            $i++;
+            return $order;
+        })->values();
     }
 }

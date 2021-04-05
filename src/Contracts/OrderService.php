@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts;
 
 use Admin;
+use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutators;
 use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
@@ -17,11 +18,11 @@ use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
+use Exception;
 use Gogol\Invoices\Model\Invoice;
+use Log;
 use Mail;
 use Store;
-use Exception;
-use Log;
 
 class OrderService
 {
@@ -135,7 +136,7 @@ class OrderService
         foreach ($items as $item) {
             $product = $item->getItemModel();
 
-            $this->order->items()->create([
+            $data = [
                 'identifier' => $item->getIdentifierClass()->getName(),
                 'discountable' => $item->hasDiscounts(),
                 'product_id' => $item->id,
@@ -145,7 +146,11 @@ class OrderService
                 'price' => $product->priceWithoutVat,
                 'vat' => Store::getVatValueById($product->vat_id),
                 'price_vat' => $product->priceWithVat,
-            ]);
+            ];
+
+            $this->assignParentCartItem($data, $items, $item);
+
+            $item->order_item_id = $this->order->items()->create($data);
         }
 
         //Add all order items into order
@@ -154,6 +159,29 @@ class OrderService
         $this->order->syncStock('-', 'order.new');
 
         return $this;
+    }
+
+    /**
+     * Add parent order item id if cart item was assigned to other cart item
+     *
+     * @param  array  &$data
+     * @param  collection  $items
+     * @param  CartItem  $item
+     */
+    private function assignParentCartItem(array &$data, $items, CartItem $cartItem)
+    {
+        if ( $cartItem->parentIdentifier ){
+            //We need find parent owner of givien child cart item
+            $parentCartItem = $items->filter(function($parentItem) use ($cartItem) {
+                return $parentItem->isParentOwner($cartItem);
+            })->first();
+
+            //We need receive order_item_id from parent cart item.
+            //Parent cart item must be saved before child cart items.
+            //Otherwise error will occur. What is ok, because child cannot be saved before
+            //parent item. CartColelction should order and return items in correct order.
+            $data['order_item_id'] = $parentCartItem->order_item_id->getKey();
+        }
     }
 
     public function addDiscountableItemsIntoOrder()
