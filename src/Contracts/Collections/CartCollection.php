@@ -299,40 +299,29 @@ class CartCollection extends Collection
         $indexes = [];
         $parentAddons = [];
 
-        //Add order for parent item, all the time of his index x-0 and second number must be zero
-        $this->each(function($cartItem, $key) use (&$indexes, &$parentAddons) {
-            //Set order only for items without parent
-            if ( !$cartItem->parentIdentifier ){
-                $parentAddons[$key] = 1;
-
-                $indexes[$key] = $key.'-0';
-            }
-        });
-
-        //Add sub-indexes for every child item
-        //for example: 0-1, 0-2... fist number is parent order, second is addon order
-        $this->each(function($childCartItem, $key) use (&$indexes, &$parentAddons) {
-            //Skip parent items / non assigned items
-            if ( !$childCartItem->parentIdentifier ){
-                return;
-            }
-
-            //Get parent cart item order
-            $parentOrder = $this->search(function($parentItem) use ($childCartItem) {
-                return $parentItem->isParentOwner($childCartItem);
-            });
-
-            $indexes[$key] = $parentOrder.'-'.$parentAddons[$parentOrder];
-
-            $parentAddons[$parentOrder]++;
-        });
-
-        $i = 0;
-        return $this->sortBy(function($a, $b) use($indexes, &$i) {
-            $order = $indexes[$i];
-
+        $i = -1;
+        return $this->sortBy(function($cartItem) use(&$i, &$parentAddons) {
             $i++;
-            return $order;
+
+            //Set order only for items without parent
+            if ( $cartItem->parentIdentifier ){
+                //Get parent cart item order
+                $parentOrder = $this->search(function($parentItem) use ($cartItem) {
+                    return $parentItem->isParentOwner($cartItem);
+                });
+
+                if ( !array_key_exists($parentOrder, $parentAddons) ){
+                    $parentAddons[$parentOrder] = 1;
+                }
+
+                $order = $parentOrder.'-'.$parentAddons[$parentOrder];
+
+                $parentAddons[$parentOrder]++;
+
+                return $order;
+            } else {
+                return $i.'-0';
+            }
         })->values();
     }
 }
