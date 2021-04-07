@@ -27,11 +27,30 @@ class CartController extends Controller
      *
      * @return  AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier
      */
-    private function getProductsIdentifier($productId, $variantId)
+    private function getIdentifierClass(array $request = null)
     {
-        $classname = Cart::getIdentifierByClassName('ProductsIdentifier');
+        $classname = Cart::getIdentifierByClassName($request['identifier'] ?? config('admineshop.cart.default_identifier'));
 
-        return new $classname($productId, $variantId);
+        $identifier = new $classname;
+        $identifier->bootFromRequestData(
+            is_array($request) ? $request : request()->all()
+        );
+
+        return $identifier;
+    }
+
+    /**
+     * Returns parent identifier class
+     *
+     * @return  AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier
+     */
+    private function getParentIdentifierClass()
+    {
+        if ( !($cartItem = request('cart_item')) ){
+            return;
+        }
+
+        return $this->getIdentifierClass($cartItem);
     }
 
     /**
@@ -54,58 +73,11 @@ class CartController extends Controller
         return Cart::fullCartResponse();
     }
 
-    /*
-     * Verify if row exists in db and return row key
-     */
-    private function getProductId()
-    {
-        return Admin::cache('cart.product_id', function(){
-            return Admin::getModelByTable('products')
-                        ->select(['id'])
-                        ->where('id', request('product_id'))
-                        ->firstOrFail()
-                        ->getKey();
-        });
-    }
-
-    /*
-     * Verify if variant exists in db and returns key
-     */
-    private function getVariantId()
-    {
-        if ( ! request('variant_id') ) {
-            return;
-        }
-
-        return Admin::cache('cart.variant_id', function(){
-            return Admin::getModelByTable('products_variants')
-                        ->select(['id'])
-                        ->where('id', request('variant_id'))
-                        ->where('product_id', $this->getProductId())
-                        ->firstOrFail()
-                        ->getKey();
-        });
-    }
-
-    private function getParentIdentifier()
-    {
-        if ( !($cartItem = request('cart_item')) ){
-            return;
-        }
-
-        $variantId = $cartItem['variant_id'] ?? null;
-
-        return $this->getProductsIdentifier(
-            (int)$cartItem['product_id'],
-            $variantId ? (int)$cartItem['variant_id'] : null
-        );
-    }
-
     public function addItem()
     {
-        $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = $this->getIdentifierClass();
 
-        $parentIdentifier = $this->getParentIdentifier();
+        $parentIdentifier = $this->getParentIdentifierClass();
 
         Cart::addOrUpdate(
             $identifier,
@@ -118,9 +90,9 @@ class CartController extends Controller
 
     public function updateQuantity()
     {
-        $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = $this->getIdentifierClass();
 
-        $parentIdentifier = $this->getParentIdentifier();
+        $parentIdentifier = $this->getParentIdentifierClass();
 
         Cart::updateQuantity(
             $identifier,
@@ -133,9 +105,9 @@ class CartController extends Controller
 
     public function removeItem()
     {
-        $identifier = $this->getProductsIdentifier($this->getProductId(), $this->getVariantId());
+        $identifier = $this->getIdentifierClass();
 
-        $parentIdentifier = $this->getParentIdentifier();
+        $parentIdentifier = $this->getParentIdentifierClass();
 
         Cart::remove($identifier, $parentIdentifier);
 

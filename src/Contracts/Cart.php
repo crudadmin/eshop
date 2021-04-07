@@ -89,9 +89,22 @@ class Cart
             autoAjax()->message(_('Produkt nebol nájdeny v košíku.'))->code(422)->throw();
         }
 
-        $item->setQuantity(
-            $this->checkQuantity($quantity)
-        );
+        $newQuantity = $this->checkQuantity($quantity);
+
+        $difference = $item->getQuantity()-$newQuantity;
+
+        //Set new quantity for actual cart item
+        $item->setQuantity($newQuantity);
+
+        //If quantity in parent product has been changed,
+        //we want change quantity for assigned child cart items in same quantity difference
+        $assignedCartItems = $this->items->filter(function($childItem) use ($item) {
+            return $item->isParentOwner($childItem);
+        })->each(function($item) use ($difference) {
+            $item->setQuantity(
+                $this->checkQuantity($item->getQuantity() - $difference)
+            );
+        });
 
         $this->saveItems();
 

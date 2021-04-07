@@ -144,6 +144,9 @@ return [
 
         //Reregister cart identifier
         'identifiers' => [],
+
+        //What identifier will be used by default for all cart requests
+        'default_identifier' => 'ProductsIdentifier',
     ],
 
     'mail' => [

@@ -6,6 +6,8 @@ use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Models\Products\ProductsVariant;
+use Store;
+use Admin;
 
 class ProductsIdentifier extends Identifier
 {
@@ -66,6 +68,21 @@ class ProductsIdentifier extends Identifier
         return $this->bindInKeysOrder(
             $isVariant ? $model->product_id : $model->getKey(),
             $isVariant ? $model->getKey() : null
+        );
+    }
+
+    /**
+     * Boot identifier from request data
+     *
+     * @param  array  $request
+     *
+     * @return  this
+     */
+    public function bootFromRequestData(array $request = [])
+    {
+        return $this->bindInKeysOrder(
+            $this->getValidProductIdFromRequest($request),
+            $this->getValidVariantIdFromRequest($request)
         );
     }
 
@@ -137,6 +154,43 @@ class ProductsIdentifier extends Identifier
         ];
 
         return array_filter($items);
+    }
+
+    /*
+     * Verify if row exists in db and return row key
+     */
+    private function getValidProductIdFromRequest(array $request)
+    {
+        if ( !($id = $request['product_id'] ?? $request['id']) ){
+            return;
+        }
+
+        return Store::cache('cart.product_id.'.$id, function() use ($request, $id) {
+            return Admin::getModelByTable('products')
+                        ->select(['id'])
+                        ->where('id', $id)
+                        ->firstOrFail()
+                        ->getKey();
+        });
+    }
+
+    /*
+     * Verify if variant exists in db and returns key
+     */
+    private function getValidVariantIdFromRequest(array $request)
+    {
+        if ( ! ($request['variant_id'] ?? null) ) {
+            return;
+        }
+
+        return Admin::cache('cart.variant_id.'.$request['variant_id'], function() use ($request) {
+            return Admin::getModelByTable('products_variants')
+                        ->select(['id'])
+                        ->where('id', $request['variant_id'])
+                        ->where('product_id', $this->getValidProductIdFromRequest($request))
+                        ->firstOrFail()
+                        ->getKey();
+        });
     }
 }
 
