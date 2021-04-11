@@ -8,11 +8,16 @@ use Admin;
 
 class CategoriesImport extends Synchronizer implements SynchronizerInterface
 {
+    public function getCategoryIdentifier()
+    {
+        return 'code';
+    }
+
     public function handle(array $rows = null)
     {
         $this->synchronize(
             Admin::getModel('Category'),
-            'code',
+            $this->getCategoryIdentifier(),
             $rows
         );
     }
