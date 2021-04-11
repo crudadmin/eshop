@@ -47,7 +47,7 @@ class NuxtApiResponse extends ResourceCollection
             }
 
             else if ( $data instanceof AdminModel ){
-                if ( isset($response['model']) ){
+                if ( !isset($response['model']) ){
                     $response['model'] = [];
                 }
 

@@ -30,6 +30,11 @@ return [
         ]
     ],
 
+    'categories' => [
+        'enabled' => false,
+        'max_level' => 1,
+    ],
+
     /*
      * Enable attributes
      */

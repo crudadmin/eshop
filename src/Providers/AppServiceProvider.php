@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Admin::registerAdminModels(__dir__ . '/../Models/**', 'AdminEshop\Models');
+        $this->registerModels();
 
         //Boot providers after this provider boot
         $this->bootProviders([
@@ -67,6 +67,20 @@ class AppServiceProvider extends ServiceProvider
         $this->bootRouteMiddleware();
 
         $this->addPublishes();
+    }
+
+    private function registerModels()
+    {
+        if ( config('admineshop.categories.enabled', false) === true ) {
+            Admin::registerAdminModels(__dir__ . '/../Models/Category/**', 'AdminEshop\Models\Category');
+        }
+
+        Admin::registerAdminModels(__dir__ . '/../Models/Clients/**', 'AdminEshop\Models\Clients');
+        Admin::registerAdminModels(__dir__ . '/../Models/Delivery/**', 'AdminEshop\Models\Delivery');
+        Admin::registerAdminModels(__dir__ . '/../Models/Invoice/**', 'AdminEshop\Models\Invoice');
+        Admin::registerAdminModels(__dir__ . '/../Models/Orders/**', 'AdminEshop\Models\Orders');
+        Admin::registerAdminModels(__dir__ . '/../Models/Products/**', 'AdminEshop\Models\Products');
+        Admin::registerAdminModels(__dir__ . '/../Models/Store/**', 'AdminEshop\Models\Store');
     }
 
     private function addPublishes()
