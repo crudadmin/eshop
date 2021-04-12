@@ -103,9 +103,9 @@ trait HasImporter
         return $row;
     }
 
-    private function getKeyMutatorMethodName(AdminModel $model, $key, $prefix = 'set')
+    private function getKeyMutatorMethodName(AdminModel $model, $key, $prefix = null)
     {
-        return $prefix.class_basename(get_class($model)).Str::studly($key).'Attribute';
+        return ($prefix ?: 'set').class_basename(get_class($model)).Str::studly($key).'Attribute';
     }
 
     public function castUpdateData(AdminModel $model, $row)
@@ -119,7 +119,7 @@ trait HasImporter
     {
         $this->removeHelperAttributes($row);
 
-        $this->applyMutators($model, $row, $oldRow, 'setUpdate');
+        $this->applyMutators($model, $row, $oldRow, 'setFinal');
 
         return $row;
     }

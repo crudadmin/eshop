@@ -30,11 +30,11 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         $this->synchronize(
             Admin::getModel('ProductsVariant'),
             $this->getVariantsIdentifier(),
-            $this->getVariants($rows)
+            $this->getPreparedVariants($rows)
         );
     }
 
-    private function getVariants($rows)
+    private function getPreparedVariants($rows)
     {
         $variants = [];
 
