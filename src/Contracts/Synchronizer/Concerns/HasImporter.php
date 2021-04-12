@@ -20,9 +20,9 @@ trait HasImporter
 
     private $displayedPercentage = [];
 
-    public function getExistingRows(AdminModel $model)
+    public function getExistingRows($table)
     {
-        return $this->existingRows[$model->getTable()];
+        return $this->existingRows[$table];
     }
 
     public function bootExistingRows(AdminModel $model, $fieldKey, $allIdentifiers)
@@ -179,7 +179,7 @@ trait HasImporter
         $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
 
         //Identify which rows should be updated and which created
-        $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model)));
+        $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model->getTable())));
         $this->onUpdate[$model->getTable()] = array_diff($rows->keys()->toArray(), $this->onCreate[$model->getTable()]);
 
         $this->message('On create '.count(
@@ -260,7 +260,7 @@ trait HasImporter
                 //Select all available columns from all rows
                 $rowsData = collect(array_map(function($onUpdateIdentifier) use ($model, $rows) {
                     return $this->castUpdateData($model, $rows[$onUpdateIdentifier]);
-                }, $chunkRows))->keyBy($fieldKey);
+                }, $chunkRows))->keyBy($fieldKey)->toArray();
 
                 $dbRows = DB::table($model->getTable())->select(
                     $this->getUpdateColumns($model, $rowsData)

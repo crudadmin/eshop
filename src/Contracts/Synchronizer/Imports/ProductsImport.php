@@ -14,7 +14,17 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return 'code';
     }
 
-    public function getVariantsIdentifier()
+    public function getProductsVariantIdentifier()
+    {
+        return 'code';
+    }
+
+    public function getAttributeIdentifier()
+    {
+        return 'code';
+    }
+
+    public function getAttributesItemIdentifier()
     {
         return 'code';
     }
@@ -29,8 +39,20 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
         $this->synchronize(
             Admin::getModel('ProductsVariant'),
-            $this->getVariantsIdentifier(),
+            $this->getProductsVariantIdentifier(),
             $this->getPreparedVariants($rows)
+        );
+
+        $this->synchronize(
+            Admin::getModel('Attribute'),
+            $this->getAttributeIdentifier(),
+            $preparedAttributes = $this->getPreparedAttributes($rows)
+        );
+
+        $this->synchronize(
+            Admin::getModel('AttributesItem'),
+            $this->getAttributesItemIdentifier(),
+            $this->getPreparedAttributesItems($preparedAttributes)
         );
     }
 
@@ -38,12 +60,10 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     {
         $variants = [];
 
-        $productModel = Admin::getModel('Product');
-
         foreach ($rows as $product) {
             foreach ($product['$variants'] ?? [] as $variant) {
                 $variants[] = $variant + [
-                    'product_id' => $this->getExistingRows($productModel)[
+                    'product_id' => $this->getExistingRows('products')[
                         $product[$this->getProductIdentifier()]
                     ],
                 ];
@@ -51,6 +71,55 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         }
 
         return $variants;
+    }
+
+    private function getPreparedAttributes($rows, $attributes = [])
+    {
+        foreach ($rows as $row) {
+            if ( !isset($row['$attributes']) ){
+                continue;
+            }
+
+            foreach ($row['$attributes'] as $attribute) {
+                $attrId = $attribute[$this->getAttributeIdentifier()];
+
+                //We want merge items if attribute exists already
+                if ( array_key_exists($attrId, $attributes) ) {
+                    $attributes[$attrId]['$items'] = collect($attributes[$attrId]['$items'])
+                                                            ->merge($attribute['$items'])
+                                                            ->unique($this->getAttributesItemIdentifier())
+                                                            ->toArray();
+                } else {
+                    $attributes[$attrId] = $attribute;
+                }
+            }
+
+            if ( isset($row['$variants']) ) {
+                $attributes = $this->getPreparedAttributes($row['$variants'], $attributes);
+            }
+        }
+
+        return $attributes;
+    }
+
+    private function getPreparedAttributesItems($attributes)
+    {
+        $items = [];
+
+        foreach ($attributes as $attribute) {
+            foreach ($attribute['$items'] ?: [] as $item) {
+                $item['attribute_id'] = $this->getExistingRows('attributes')[$attribute[$this->getAttributeIdentifier()]];
+
+                $items[] = $item;
+            }
+        }
+
+        return $items;
+    }
+
+    public function setProductsVatNumberAttribute($value, &$row)
+    {
+        $row['vat_id'] = $this->getVatIdByValue($value);
     }
 
     public function setProductsVariantVatNumberAttribute($value, &$row)
