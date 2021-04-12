@@ -29,6 +29,11 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return 'code';
     }
 
+    public function getProductsAttributeIdentifier()
+    {
+        return ['product_id', 'products_variant_id', 'attribute_id'];
+    }
+
     public function handle(array $rows = null)
     {
         $this->synchronize(
@@ -53,6 +58,12 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             Admin::getModel('AttributesItem'),
             $this->getAttributesItemIdentifier(),
             $this->getPreparedAttributesItems($preparedAttributes)
+        );
+
+        $this->synchronize(
+            Admin::getModel('ProductsAttribute'),
+            $this->getProductsAttributeIdentifier(),
+            $this->getPreparedProductsAttribute($rows)
         );
     }
 
@@ -115,6 +126,33 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         }
 
         return $items;
+    }
+
+    private function getPreparedProductsAttribute($rows, $productsAttribute = [], $relationTable = 'products', $relationName = 'product_id', $relationIdentifier = 'getProductIdentifier')
+    {
+        foreach ($rows as $row) {
+            foreach ($row['$attributes'] ?? [] as $attribute) {
+                $item = [
+                    $relationName => $this->getExistingRows($relationTable)[$row[$this->{$relationIdentifier}()]],
+                    'attribute_id' => $this->getExistingRows('attributes')[$attribute[$this->getAttributeIdentifier()]],
+                    '$items' => $attribute['$items'],
+                ];
+
+                $productsAttribute[] = $item;
+            }
+
+            if ( isset($row['$variants']) && count($row['$variants']) ){
+                $productsAttribute = $this->getPreparedProductsAttribute(
+                    $row['$variants'],
+                    $productsAttribute,
+                    'products_variants',
+                    'products_variant_id',
+                    'getProductsVariantIdentifier'
+                );
+            }
+        }
+
+        return $productsAttribute;
     }
 
     public function setProductsVatNumberAttribute($value, &$row)

@@ -25,12 +25,32 @@ trait HasImporter
         return $this->existingRows[$table];
     }
 
+    private function isMultiKey($fieldKey)
+    {
+        return is_array($fieldKey);
+    }
+
+    private function getIdentifierName($fieldKey)
+    {
+        return $this->isMultiKey($fieldKey) ? '_identifier' : $fieldKey;
+    }
+
     public function bootExistingRows(AdminModel $model, $fieldKey, $allIdentifiers)
     {
+        $selectcolumn = $this->isMultiKey($fieldKey)
+                            ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $fieldKey).', \'\')) as _identifier')
+                            : $fieldKey;
+
         $this->existingRows[$model->getTable()] = DB::table($model->getTable())
-                                ->select($model->getKeyName(), $fieldKey)
-                                ->whereIn($fieldKey, $allIdentifiers)
-                                ->pluck($model->getKeyName(), $fieldKey)
+                                ->selectRaw($model->getKeyName().', '.$selectcolumn)
+                                ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $allIdentifiers) {
+                                    $query->whereIn($fieldKey, $allIdentifiers);
+                                })
+                                //We can use where in clause with conat support, but this is slow. Faster is to load all data...
+                                // ->when($this->isMultiKey($fieldKey), function($query) use ($fieldKey, $allIdentifiers) {
+                                //     $query->havingRaw('_identifier in (? '.str_repeat(', ?', count($allIdentifiers) - 1).')', $allIdentifiers);
+                                // })
+                                ->pluck($model->getKeyName(), $this->getIdentifierName($fieldKey))
                                 ->toArray();
     }
 
@@ -171,9 +191,29 @@ trait HasImporter
         }
     }
 
+    private function keyByIdentifier($fieldKey)
+    {
+        if ( $this->isMultiKey($fieldKey) == false ){
+            return $fieldKey;
+        }
+
+        return function($row) use ($fieldKey) {
+            $values = [];
+
+            foreach ($fieldKey as $key) {
+                $values[] = $row[$key] ?? '';
+            }
+
+            return implode('-', $values);
+        };
+    }
+
     public function synchronize(AdminModel $model, $fieldKey, $rows)
     {
-        $rows = collect($rows)->keyBy($fieldKey);
+        $rows = collect($rows)->keyBy(
+            $this->keyByIdentifier($fieldKey)
+        );
+
         $allIdentifiers = $rows->keys()->toArray();
 
         $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
@@ -213,7 +253,7 @@ trait HasImporter
 
                 $id = $model->insertGetId($row);
 
-                $this->existingRows[$model->getTable()][$row[$fieldKey]] = $id;
+                $this->existingRows[$model->getTable()][$onCreateIdentifier] = $id;
 
                 $this->info('[created '.$i.'/'.$total.'] ['.$model->getTable().'] ['.$onCreateIdentifier.']');
             } catch(Throwable $e){
@@ -243,7 +283,9 @@ trait HasImporter
         $columns = array_flip($columns);
         $this->removeHelperAttributes($columns);
 
-        return array_merge([$model->getKeyName()], array_flip($columns));
+        $columns = array_merge([$model->getKeyName()], array_flip($columns));
+
+        return $columns;
     }
 
     private function updateRows(AdminModel $model, $rows, $fieldKey)
@@ -255,17 +297,22 @@ trait HasImporter
         $total = count($this->onUpdate[$model->getTable()]);
         $i = 0;
 
+        $modelKeyName = $model->getKeyName();
+
         foreach ($chunks as $chunkRows) {
             try {
                 //Select all available columns from all rows
-                $rowsData = collect(array_map(function($onUpdateIdentifier) use ($model, $rows) {
-                    return $this->castUpdateData($model, $rows[$onUpdateIdentifier]);
-                }, $chunkRows))->keyBy($fieldKey)->toArray();
+                $rowsDataWithIdsKeys = collect(array_map(function($onUpdateIdentifier) use ($model, $rows) {
+                    return $this->castUpdateData($model, $rows[$onUpdateIdentifier]) + [
+                        $model->getKeyName() => $this->getExistingRows($model->getTable())[$onUpdateIdentifier]
+                    ];
+                }, $chunkRows))->keyBy($modelKeyName)->toArray();
 
+                //We want select all neccessary data for given ids set of actual chunk
                 $dbRows = DB::table($model->getTable())->select(
-                    $this->getUpdateColumns($model, $rowsData)
+                    $this->getUpdateColumns($model, $rowsDataWithIdsKeys)
                 )
-                ->whereIn($fieldKey, $chunkRows)
+                ->whereIn($modelKeyName, array_keys($rowsDataWithIdsKeys))
                 ->get();
 
                 foreach ($dbRows as $dbRow) {
@@ -278,18 +325,16 @@ trait HasImporter
                         $this->displayedPercentage[$model->getTable()][] = $percentage;
                     }
 
-                    $castedUnioRow = $rowsData[$dbRow->{$fieldKey}];
+                    $castedImportRow = $rowsDataWithIdsKeys[$dbRow->{$modelKeyName}];
 
-                    $rowChanges = $this->getRowChanges($model, $castedUnioRow, $dbRow);
+                    $rowChanges = $this->getRowChanges($model, $castedImportRow, $dbRow);
                     $rowChanges = $this->postCastUpdateData($model, $rowChanges, $dbRow);
 
                     //Update row if something has been changed
                     if ( count($rowChanges) > 0 ){
-                        $keyName = $model->getKeyName();
-
                         //Only if ID is available
-                        if ( $id = $dbRow->{$keyName} ) {
-                            DB::table($model->getTable())->where($keyName, $id)->update($rowChanges);
+                        if ( $id = $dbRow->{$modelKeyName} ) {
+                            DB::table($model->getTable())->where($modelKeyName, $id)->update($rowChanges);
                         }
                     }
                 }
