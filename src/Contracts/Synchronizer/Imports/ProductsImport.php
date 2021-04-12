@@ -6,6 +6,7 @@ use AdminEshop\Contracts\Synchronizer\Synchronizer;
 use AdminEshop\Contracts\Synchronizer\SynchronizerInterface;
 use Admin;
 use Store;
+use DB;
 
 class ProductsImport extends Synchronizer implements SynchronizerInterface
 {
@@ -87,6 +88,10 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     private function getPreparedAttributes($rows, $attributes = [])
     {
         foreach ($rows as $row) {
+            if ( isset($row['$variants']) && count($row['$variants']) ) {
+                $attributes = $this->getPreparedAttributes($row['$variants'], $attributes);
+            }
+
             if ( !isset($row['$attributes']) ){
                 continue;
             }
@@ -96,17 +101,13 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
                 //We want merge items if attribute exists already
                 if ( array_key_exists($attrId, $attributes) ) {
-                    $attributes[$attrId]['$items'] = collect($attributes[$attrId]['$items'])
-                                                            ->merge($attribute['$items'])
-                                                            ->unique($this->getAttributesItemIdentifier())
-                                                            ->toArray();
+                    $attributes[$attrId]['$items'] = collect(array_merge($attributes[$attrId]['$items'], $attribute['$items']))
+                                                        ->unique($this->getAttributesItemIdentifier())
+                                                        ->toArray();
+
                 } else {
                     $attributes[$attrId] = $attribute;
                 }
-            }
-
-            if ( isset($row['$variants']) ) {
-                $attributes = $this->getPreparedAttributes($row['$variants'], $attributes);
             }
         }
 
@@ -118,7 +119,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         $items = [];
 
         foreach ($attributes as $attribute) {
-            foreach ($attribute['$items'] ?: [] as $item) {
+            foreach ($attribute['$items'] ?? [] as $item) {
                 $item['attribute_id'] = $this->getExistingRows('attributes')[$attribute[$this->getAttributeIdentifier()]];
 
                 $items[] = $item;
@@ -132,9 +133,15 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     {
         foreach ($rows as $row) {
             foreach ($row['$attributes'] ?? [] as $attribute) {
+                $itemString = implode(';', array_map(function($item){
+                    return $item[$this->getAttributesItemIdentifier()];
+                }, $attribute['$items']));
+                $itemHash = crc32($itemString);
+
                 $item = [
                     $relationName => $this->getExistingRows($relationTable)[$row[$this->{$relationIdentifier}()]],
                     'attribute_id' => $this->getExistingRows('attributes')[$attribute[$this->getAttributeIdentifier()]],
+                    'items_hash' => $itemHash,
                     '$items' => $attribute['$items'],
                 ];
 
@@ -163,6 +170,42 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     public function setProductsVariantVatNumberAttribute($value, &$row)
     {
         $row['vat_id'] = $this->getVatIdByValue($value);
+    }
+
+    public function setFinalProductsAttributeItemsHashAttribute($value, &$row, $dbRow)
+    {
+        $itemsIds = array_map(function($item) use ($row, $dbRow) {
+            $identifier = $item[$this->getAttributesItemIdentifier()];
+
+            return $this->getExistingRows('attributes_items')[$identifier];
+        }, $row['$items']);
+
+        $existingIds = DB::table('attributes_item_products_attribute_items')
+                            ->selectRaw('attributes_item_id as item_id')
+                            ->where('products_attribute_id', $dbRow->id)
+                            ->get()->pluck('item_id')->toArray();
+
+        //Insert missing ids
+        $toInsert = array_diff($itemsIds, $existingIds);
+        if ( count($toInsert) ) {
+            DB::table('attributes_item_products_attribute_items')->insert(array_map(function($id) use($dbRow){
+                return [
+                    'products_attribute_id' => $dbRow->id,
+                    'attributes_item_id' => $id,
+                ];
+            }, $toInsert));
+        }
+
+        //Remove uneccessary ids
+        $toRemove = array_diff($existingIds, $itemsIds);
+        if ( count($toRemove) ) {
+            DB::table('attributes_item_products_attribute_items')
+                ->where('products_attribute_id', $dbRow->id)
+                ->whereIn('attributes_item_id', $toRemove)
+                ->delete();
+        }
+
+        return $value;
     }
 
     private function getVatIdByValue($value)

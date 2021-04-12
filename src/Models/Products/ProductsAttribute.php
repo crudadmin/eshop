@@ -75,6 +75,7 @@ class ProductsAttribute extends AdminModel
         return [
             'attribute' => 'name:Atribút|belongsTo:attributes,name|canAdd|required',
             'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name :unitName|filterBy:attribute|canAdd|column_visible|required',
+            'items_hash' => 'name:Items hash|inaccessible|title:for import performance purposes|max:32',
         ];
     }
 

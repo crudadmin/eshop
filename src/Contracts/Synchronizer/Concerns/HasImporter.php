@@ -137,9 +137,9 @@ trait HasImporter
 
     public function postCastUpdateData(AdminModel $model, $row, $oldRow)
     {
-        $this->removeHelperAttributes($row);
-
         $this->applyMutators($model, $row, $oldRow, 'setFinal');
+
+        $this->removeHelperAttributes($row);
 
         return $row;
     }
