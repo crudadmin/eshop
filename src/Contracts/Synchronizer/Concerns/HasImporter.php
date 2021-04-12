@@ -12,20 +12,22 @@ use Throwable;
 
 trait HasImporter
 {
-    protected $insertIncrement = 0;
+    protected $insertIncrement = [];
 
     protected $onCreate = [];
 
     protected $existingRows = [];
 
-    public function getExistingRows()
+    private $displayedPercentage = [];
+
+    public function getExistingRows(AdminModel $model)
     {
-        return $this->existingRows;
+        return $this->existingRows[$model->getTable()];
     }
 
     public function bootExistingRows(AdminModel $model, $fieldKey, $allIdentifiers)
     {
-        $this->existingRows = DB::table($model->getTable())
+        $this->existingRows[$model->getTable()] = DB::table($model->getTable())
                                 ->select($model->getKeyName(), $fieldKey)
                                 ->whereIn($fieldKey, $allIdentifiers)
                                 ->pluck($model->getKeyName(), $fieldKey)
@@ -34,12 +36,12 @@ trait HasImporter
 
     private function isLocalizedField(AdminModel $model, $key)
     {
-        return $this->cache($model->getTable().'.isLocale'.$key, function() use ($model, $key){
+        return $this->cache($model->getTable().'.isLocale.'.$key, function() use ($model, $key){
             return $model->hasFieldParam($key, 'locale', true);
         });
     }
 
-    public function castData(AdminModel $model, $row)
+    public function castData(AdminModel $model, $row, $oldRow = null)
     {
         foreach ($row as $key => $value) {
             $isLocale = $this->isLocalizedField($model, $key);
@@ -59,9 +61,14 @@ trait HasImporter
             }
         }
 
-        if ( method_exists($this, 'setCastData') ){
-            $row = $this->setCastData($row);
+
+        $this->applyMutators($model, $row, $oldRow);
+
+        if ( method_exists($this, $castMethodName = ('set'.class_basename(get_class($model)).'CastData')) ){
+            $row = $this->{$castMethodName}($row);
         }
+
+        $this->removeHelperAttributes($row);
 
         return $row;
     }
@@ -84,10 +91,8 @@ trait HasImporter
     {
         $row = $this->castData($model, $row);
 
-        $this->applyMutators($row);
-
         if ( $model->isSortable() ){
-            $row['_order'] = $this->insertIncrement;
+            $row['_order'] = $this->insertIncrement[$model->getTable()];
         }
 
         if ( $model->hasSluggable() ){
@@ -99,18 +104,23 @@ trait HasImporter
         return $row;
     }
 
-    private function getKeyMutatorMethodName($key)
+    private function getKeyMutatorMethodName(AdminModel $model, $key)
     {
-        return 'set'.Str::studly($key).'Attribute';
+        return 'set'.class_basename(get_class($model)).Str::studly($key).'Attribute';
     }
 
-    public function castUpdateData(AdminModel $model, $row, $oldRow)
+    public function castUpdateData(AdminModel $model, $row)
     {
         $row = $this->castData($model, $row);
 
+        return $row;
+    }
+
+    public function getRowChanged(AdminModel $model, $row, $oldRow)
+    {
         $changes = [];
         foreach ($row as $key => $value) {
-            if ( $this->isSameValue($model, $key, $value, $oldRow->{$key}) == false ){
+            if ( $this->isSameValue($model, $key, $value, $oldRow->{$key} ?? null) == false ){
                 $changes[$key] = $value;
 
                 //create new slug if field of slug maker has been changed
@@ -120,17 +130,35 @@ trait HasImporter
             }
         }
 
-        $this->applyMutators($changes, $row, $oldRow);
-
         return $changes;
     }
 
-    private function applyMutators(&$row, $oldRow = null)
+    private function applyMutators(AdminModel $model, &$row, $oldRow = null)
     {
         //Apply mutators on changed inputs
         foreach ($row as $key => $value) {
-            if ( method_exists($this, $this->getKeyMutatorMethodName($key)) ) {
-                $row[$key] = $this->{$this->getKeyMutatorMethodName($key)}($value, $row, $oldRow);
+            if ( $isHelperAttribute = (substr($key, 0, 1) == '$') ) {
+                $key = str_replace('$', '', $key);
+            }
+
+            if ( method_exists($this, $this->getKeyMutatorMethodName($model, $key)) ) {
+                $value = $this->{$this->getKeyMutatorMethodName($model, $key)}($value, $row, $oldRow);
+
+                //Does not rewrite helper properties
+                if ( $isHelperAttribute == false ) {
+                    $row[$key] = $value;
+                }
+            }
+        }
+    }
+
+    private function removeHelperAttributes(&$row)
+    {
+        $toRemove = [];
+
+        foreach ($row as $key => $value) {
+            if ( substr($key, 0, 1) == '$' ){
+                unset($row[$key]);
             }
         }
     }
@@ -143,9 +171,14 @@ trait HasImporter
         $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
 
         //Identify which rows should be updated and which created
-        $this->onCreate = array_diff($allIdentifiers, array_keys($this->existingRows));
-        $this->onUpdate = array_diff($rows->keys()->toArray(), $this->onCreate);
-        $this->message('On create '.count($this->onCreate).' rows / On update '.count($this->onUpdate).' rows');
+        $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model)));
+        $this->onUpdate[$model->getTable()] = array_diff($rows->keys()->toArray(), $this->onCreate[$model->getTable()]);
+
+        $this->message('On create '.count(
+            $this->onCreate[$model->getTable()]
+        ).' rows / On update check '.count(
+            $this->onUpdate[$model->getTable()]
+        ).' rows');
 
         //Create new rows
         $start = Admin::start();
@@ -162,30 +195,33 @@ trait HasImporter
     {
         $insert = [];
 
-        $this->insertIncrement = $model->isSortable() ? $model->getNextOrderIncrement() : 0;
+        $this->insertIncrement[$model->getTable()] = $model->isSortable() ? $model->getNextOrderIncrement() : 0;
 
-        $total = count($this->onCreate);
+        $total = count($this->onCreate[$model->getTable()]);
 
-        foreach ($this->onCreate as $i => $onCreateIdentifier) {
+        foreach ($this->onCreate[$model->getTable()] as $i => $onCreateIdentifier) {
             try {
                 $row = $this->castInsertData($model, $rows[$onCreateIdentifier]);
 
                 $id = $model->insertGetId($row);
 
-                $this->existingRows[$row[$fieldKey]] = $id;
+                $this->existingRows[$model->getTable()][$row[$fieldKey]] = $id;
 
-                $this->message('[created '.$i.'/'.$total.'] ['.$model->getTable().'] ['.$onCreateIdentifier.']');
+                $this->info('[created '.$i.'/'.$total.'] ['.$model->getTable().'] ['.$onCreateIdentifier.']');
             } catch(Throwable $e){
                 $this->error('[create error] '.$e->getMessage().' in '.str_replace(base_path(), '', $e->getFile()).':'.$e->getLine());
+
+                //If debug is turned on
+                if ( env('APP_DEBUG') === true ){
+                    throw $e;
+                }
             }
         }
     }
 
     private function getUpdateColumns(AdminModel $model, $rows)
     {
-        $columns = [
-            $model->getKeyName()
-        ];
+        $columns = [];
 
         foreach ($rows as $row) {
             $newKeys = array_diff(array_keys($row), $columns);
@@ -195,28 +231,48 @@ trait HasImporter
             }
         }
 
-        return $columns;
+        //We need remove ghost keys
+        $columns = array_flip($columns);
+        $this->removeHelperAttributes($columns);
+
+        return array_merge([$model->getKeyName()], array_flip($columns));
     }
 
     private function updateRows(AdminModel $model, $rows, $fieldKey)
     {
-        $chunks = array_chunk($this->onUpdate, 1000);
+        $this->displayedPercentage[$model->getTable()] = [];
+
+        $chunks = array_chunk($this->onUpdate[$model->getTable()], 1000, true);
+
+        $total = count($this->onUpdate[$model->getTable()]);
+        $i = 0;
 
         foreach ($chunks as $chunkRows) {
             try {
                 //Select all available columns from all rows
-                $rowsData = array_map(function($onUpdateIdentifier) use ($rows) {
-                    return $rows[$onUpdateIdentifier];
-                }, $chunkRows);
+                $rowsData = collect(array_map(function($onUpdateIdentifier) use ($model, $rows) {
+                    return $this->castUpdateData($model, $rows[$onUpdateIdentifier]);
+                }, $chunkRows))->keyBy($fieldKey);
 
                 $dbRows = DB::table($model->getTable())->select(
                     $this->getUpdateColumns($model, $rowsData)
-                )->get();
+                )
+                ->whereIn($fieldKey, $chunkRows)
+                ->get();
 
                 foreach ($dbRows as $dbRow) {
-                    $unioRow = $rows[$dbRow->{$fieldKey}];
+                    $i++;
 
-                    $rowChanges = $this->castUpdateData($model, $unioRow, $dbRow);
+                    $percentage = (int)round(100 / $total * $i);
+
+                    if ( ($percentage) % 10 == 0 && in_array($percentage, $this->displayedPercentage[$model->getTable()]) === false ){
+                        $this->info('[updated '.$i.' / '.$total.'] ['.$model->getTable().'] ('.$percentage.'%)');
+                        $this->displayedPercentage[$model->getTable()][] = $percentage;
+                    }
+
+                    $castedUnioRow = $rowsData[$dbRow->{$fieldKey}];
+
+                    $rowChanges = $this->getRowChanged($model, $castedUnioRow, $dbRow);
 
                     //Update row if something has been changed
                     if ( count($rowChanges) > 0 ){
@@ -230,6 +286,11 @@ trait HasImporter
                 }
             } catch(Throwable $e){
                 $this->error('[update error] '.$e->getMessage().' in '.str_replace(base_path(), '', $e->getFile()).':'.$e->getLine());
+
+                //If debug is turned on
+                if ( env('APP_DEBUG') === true ){
+                    throw $e;
+                }
             }
         }
     }

@@ -269,6 +269,11 @@ class Store
     {
         return $this->filterConfig('orderableVariants', false);
     }
+
+    public function isEnabledLocalization()
+    {
+        return Admin::isEnabledLocalization() && config('admineshop.localization', false) === true;
+    }
 }
 
 ?>

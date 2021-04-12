@@ -164,4 +164,9 @@ return [
      * SK,CZ...
      */
     'phone_countries' => 'SK,CZ',
+
+    /*
+     * Should be products and other attributes localized?
+     */
+    'localization' => false,
 ];

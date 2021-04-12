@@ -87,16 +87,16 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
             'Nastavenie varianty' => Group::tab([
                 'product_type' => 'type:imaginary|component:AddTypeFieldIntoRequest',
                 Group::fields([
-                    'name' => 'name:Názov varianty|limit:40|required',
+                    'name' => 'name:Názov varianty|limit:40|required'.(Store::isEnabledLocalization() ? '|locale' : ''),
                     'image' => 'name:Obrázok|image',
                 ])->inline(),
                 Group::fields([
                     'ean' => 'name:EAN varianty|hidden',
                     'code' => 'name:Kód varianty',
                 ])->inline(),
-            ])->grid(5)->icon('fa-pencil')->id('default'),
+            ])->grid(5)->icon('fa-pencil')->id('general'),
             'Popis' => Group::tab([
-                'description' => 'name:Popis varianty|type:editor|hidden',
+                'description' => 'name:Popis varianty|type:editor|hidden'.(Store::isEnabledLocalization() ? '|locale' : ''),
             ])->icon('fa-file-text-o'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([

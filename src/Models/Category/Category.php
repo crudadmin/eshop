@@ -4,7 +4,7 @@ namespace AdminEshop\Models\Category;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Admin;
+use Store;
 
 class Category extends AdminModel
 {
@@ -51,7 +51,7 @@ class Category extends AdminModel
     public function fields()
     {
         return [
-            'name' => 'name:Názov kategórie|required|max:90'.(Admin::isEnabledLocalization() ? '|locale' : ''),
+            'name' => 'name:Názov kategórie|required|max:90'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'code' => 'name:Kód kategórie|index|max:30',
         ];
     }
