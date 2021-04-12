@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Models\Store;
+namespace AdminEshop\Models\Attribute;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;

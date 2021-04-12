@@ -6,7 +6,7 @@ use Admin;
 use AdminEshop\Contracts\Concerns\HasRoutes;
 use AdminEshop\Models\Orders\OrdersProduct;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Store\AttributesUnit;
+use AdminEshop\Models\Attribute\AttributesUnit;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\Store as StoreModel;
 use AdminEshop\Models\Store\Vat;

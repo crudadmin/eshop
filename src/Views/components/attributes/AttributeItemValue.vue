@@ -17,7 +17,7 @@
 
 <script type="text/javascript">
 export default {
-    props : ['field_key', 'field', 'row', 'model'],
+    props : ['field_key', 'field', 'row', 'model', 'value'],
 
     data(){
         return {
@@ -26,10 +26,6 @@ export default {
     },
 
     computed : {
-        //Get input value
-        value(){
-            return this.field.value || this.field.default;
-        },
         unit(){
             let parentModel = this.model.getParentModel(),
                 unitId;
@@ -66,7 +62,7 @@ export default {
     methods : {
         //Update input value
         onChange(e){
-            this.field.value = e.target.value;
+            this.$parent.changeValue(e);
         },
     }
 }

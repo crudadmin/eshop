@@ -5,7 +5,7 @@ namespace AdminEshop\Eloquent\Concerns;
 use Admin;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsAttribute;
-use AdminEshop\Models\Store\AttributesItem;
+use AdminEshop\Models\Attribute\AttributesItem;
 
 trait HasProductAttributes
 {

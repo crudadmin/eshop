@@ -75,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
             Admin::registerAdminModels(__dir__ . '/../Models/Category/**', 'AdminEshop\Models\Category');
         }
 
+        Admin::registerAdminModels(__dir__ . '/../Models/Attribute/**', 'AdminEshop\Models\Attribute');
         Admin::registerAdminModels(__dir__ . '/../Models/Clients/**', 'AdminEshop\Models\Clients');
         Admin::registerAdminModels(__dir__ . '/../Models/Delivery/**', 'AdminEshop\Models\Delivery');
         Admin::registerAdminModels(__dir__ . '/../Models/Invoice/**', 'AdminEshop\Models\Invoice');

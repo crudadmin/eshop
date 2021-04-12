@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Models\Store;
+namespace AdminEshop\Models\Attribute;
 
 use Admin;
 use AdminEshop\Contracts\Concerns\HasUnit;
@@ -8,6 +8,7 @@ use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store;
 
 class Attribute extends AdminModel
 {
@@ -67,9 +68,9 @@ class Attribute extends AdminModel
     public function fields()
     {
         return [
-            'name' => 'name:Názov atribútu|required',
+            'name' => 'name:Názov atribútu|required'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'unit' => 'name:Merná jednotka|belongsTo:attributes_units,:name (:unit)|canAdd',
-            'title' => 'name:Popis',
+            'title' => 'name:Popis|'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'sortby' => 'name:Zoradiť podľa|type:select|required|default:asc',
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Models\Store;
+namespace AdminEshop\Models\Attribute;
 
 use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
@@ -63,7 +63,7 @@ class AttributesItem extends AdminModel
     public function fields()
     {
         return [
-            'name' => 'name:Hodnota atribútu|hidden|component:AttributeItemValue|validate_attribute_unit|required',
+            'name' => 'name:Hodnota atribútu|hidden|component:AttributeItemValue|validate_attribute_unit|required'.(Store::isEnabledLocalization() ? '|locale' : ''),
         ];
     }
 

@@ -5,7 +5,7 @@ namespace AdminEshop\Models\Products;
 use AdminEshop\Contracts\Concerns\HasUnit;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use \AdminEshop\Models\Store\AttributesItem;
+use \AdminEshop\Models\Attribute\AttributesItem;
 
 class ProductsAttribute extends AdminModel
 {
