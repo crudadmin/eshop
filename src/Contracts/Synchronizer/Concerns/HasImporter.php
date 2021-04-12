@@ -41,7 +41,7 @@ trait HasImporter
         });
     }
 
-    public function castData(AdminModel $model, $row, $oldRow = null)
+    public function castData(AdminModel $model, $row)
     {
         foreach ($row as $key => $value) {
             $isLocale = $this->isLocalizedField($model, $key);
@@ -61,14 +61,11 @@ trait HasImporter
             }
         }
 
-
-        $this->applyMutators($model, $row, $oldRow);
+        $this->applyMutators($model, $row);
 
         if ( method_exists($this, $castMethodName = ('set'.class_basename(get_class($model)).'CastData')) ){
             $row = $this->{$castMethodName}($row);
         }
-
-        $this->removeHelperAttributes($row);
 
         return $row;
     }
@@ -91,6 +88,8 @@ trait HasImporter
     {
         $row = $this->castData($model, $row);
 
+        $this->removeHelperAttributes($row);
+
         if ( $model->isSortable() ){
             $row['_order'] = $this->insertIncrement[$model->getTable()];
         }
@@ -104,9 +103,9 @@ trait HasImporter
         return $row;
     }
 
-    private function getKeyMutatorMethodName(AdminModel $model, $key)
+    private function getKeyMutatorMethodName(AdminModel $model, $key, $prefix = 'set')
     {
-        return 'set'.class_basename(get_class($model)).Str::studly($key).'Attribute';
+        return $prefix.class_basename(get_class($model)).Str::studly($key).'Attribute';
     }
 
     public function castUpdateData(AdminModel $model, $row)
@@ -116,7 +115,16 @@ trait HasImporter
         return $row;
     }
 
-    public function getRowChanged(AdminModel $model, $row, $oldRow)
+    public function postCastUpdateData(AdminModel $model, $row, $oldRow)
+    {
+        $this->removeHelperAttributes($row);
+
+        $this->applyMutators($model, $row, $oldRow, 'setUpdate');
+
+        return $row;
+    }
+
+    public function getRowChanges(AdminModel $model, $row, $oldRow)
     {
         $changes = [];
         foreach ($row as $key => $value) {
@@ -133,7 +141,7 @@ trait HasImporter
         return $changes;
     }
 
-    private function applyMutators(AdminModel $model, &$row, $oldRow = null)
+    private function applyMutators(AdminModel $model, &$row, $oldRow = null, $prefix = null)
     {
         //Apply mutators on changed inputs
         foreach ($row as $key => $value) {
@@ -141,8 +149,8 @@ trait HasImporter
                 $key = str_replace('$', '', $key);
             }
 
-            if ( method_exists($this, $this->getKeyMutatorMethodName($model, $key)) ) {
-                $value = $this->{$this->getKeyMutatorMethodName($model, $key)}($value, $row, $oldRow);
+            if ( method_exists($this, $this->getKeyMutatorMethodName($model, $key, $prefix)) ) {
+                $value = $this->{$this->getKeyMutatorMethodName($model, $key, $prefix)}($value, $row, $oldRow);
 
                 //Does not rewrite helper properties
                 if ( $isHelperAttribute == false ) {
@@ -272,7 +280,8 @@ trait HasImporter
 
                     $castedUnioRow = $rowsData[$dbRow->{$fieldKey}];
 
-                    $rowChanges = $this->getRowChanged($model, $castedUnioRow, $dbRow);
+                    $rowChanges = $this->getRowChanges($model, $castedUnioRow, $dbRow);
+                    $rowChanges = $this->postCastUpdateData($model, $rowChanges, $dbRow);
 
                     //Update row if something has been changed
                     if ( count($rowChanges) > 0 ){
