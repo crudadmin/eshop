@@ -39,4 +39,9 @@ class ProductsGallery extends AdminModel
         'increments' => false,
         'grid.enabled' => false,
     ];
+
+    public function belongsToModel()
+    {
+        return config('admineshop.gallery.eloquents', []);
+    }
 }

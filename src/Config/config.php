@@ -51,6 +51,14 @@ return [
         ],
     ],
 
+    'gallery' => [
+        //Allowed models with gallery
+        'eloquents' => [
+            AdminEshop\Models\Products\Product::class,
+            // AdminEshop\Models\Products\ProductsVariant::class,
+        ],
+    ],
+
     /*
      * Product stocks properties
      */

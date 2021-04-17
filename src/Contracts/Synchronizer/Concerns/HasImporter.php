@@ -108,6 +108,8 @@ trait HasImporter
     {
         $row = $this->castData($model, $row);
 
+        $this->applyMutators($model, $row, null, 'setFinal');
+
         $this->removeHelperAttributes($row);
 
         if ( $model->isSortable() ){

@@ -20,6 +20,11 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return 'code';
     }
 
+    public function getProductsGalleryIdentifier()
+    {
+        return ['product_id', 'products_variant_id', 'code'];
+    }
+
     public function getAttributeIdentifier()
     {
         return 'code';
@@ -47,6 +52,12 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             Admin::getModel('ProductsVariant'),
             $this->getProductsVariantIdentifier(),
             $this->getPreparedVariants($rows)
+        );
+
+        $this->synchronize(
+            Admin::getModel('ProductsGallery'),
+            $this->getProductsGalleryIdentifier(),
+            $this->getPreparedGallery($rows)
         );
 
         $this->synchronize(
@@ -83,6 +94,31 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         }
 
         return $variants;
+    }
+
+    private function getPreparedGallery($rows, $gallery = [], $relationTable = 'products', $relationName = 'product_id', $relationIdentifier = 'getProductIdentifier')
+    {
+        foreach ($rows as $row) {
+            if ( isset($row['$gallery']) && count($row['$gallery']) ) {
+                $gallery = $this->getPreparedGallery(
+                    $row['$gallery'],
+                    $gallery,
+                    'products_variants',
+                    'products_variant_id',
+                    'getProductsVariantIdentifier'
+                );
+            }
+
+            foreach ($row['$gallery'] ?? [] as $image) {
+                $image[$relationName] = $this->getExistingRows($relationTable)[
+                    $row[$this->{$relationIdentifier}()]
+                ];
+
+                $gallery[] = $image;
+            }
+        }
+
+        return $gallery;
     }
 
     private function getPreparedAttributes($rows, $attributes = [])
