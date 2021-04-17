@@ -55,4 +55,9 @@ class Category extends AdminModel
             'code' => 'name:Kód kategórie|index|max:30',
         ];
     }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class, 'category_id');
+    }
 }

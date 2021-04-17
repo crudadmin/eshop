@@ -7,6 +7,7 @@ use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasCart;
+use AdminEshop\Eloquent\Concerns\HasCategoryTree;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
@@ -25,7 +26,8 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasStock,
         HasProductFilter,
         HasProductPaginator,
-        HasProductResponses;
+        HasProductResponses,
+        HasCategoryTree;
 
     /**
      * Model constructor
@@ -119,10 +121,22 @@ class Product extends CartEloquent implements HasAttributesSupport
         ];
     }
 
+    public function mutateFields($fields)
+    {
+        if ( config('admineshop.categories.enabled') ){
+            $fields->group('general', function($group){
+                $group->push([
+                    'categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd',
+                ]);
+            });
+        }
+    }
+
     public function options()
     {
-        return [
+        $options = [
             'vat_id' => Store::getVats(),
+            'categories' => $this->getCategoriesOptions(),
             'product_type' => config('admineshop.product_types', []),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
             'stock_type' => [
@@ -132,6 +146,8 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
             ],
         ];
+
+        return $options;
     }
 
     public function settings()
