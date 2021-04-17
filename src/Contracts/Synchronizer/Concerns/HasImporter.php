@@ -43,6 +43,9 @@ trait HasImporter
 
         $this->existingRows[$model->getTable()] = DB::table($model->getTable())
                                 ->selectRaw($model->getKeyName().', '.$selectcolumn)
+                                ->when($model->hasSoftDeletes(), function($query){
+                                    $query->whereNull('deleted_at');
+                                })
                                 ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $allIdentifiers) {
                                     $query->whereIn($fieldKey, $allIdentifiers);
                                 })
@@ -251,13 +254,16 @@ trait HasImporter
 
         foreach ($this->onCreate[$model->getTable()] as $i => $onCreateIdentifier) {
             try {
-                $row = $this->castInsertData($model, $rows[$onCreateIdentifier]);
+                $originalRow = $rows[$onCreateIdentifier];
+                $row = $this->castInsertData($model, $originalRow);
 
                 $id = $model->insertGetId($row);
 
                 $this->existingRows[$model->getTable()][$onCreateIdentifier] = $id;
 
                 $this->info('[created '.$i.'/'.$total.'] ['.$model->getTable().'] ['.$onCreateIdentifier.']');
+
+                $this->runAfterMethod($model, $originalRow, $id);
             } catch(Throwable $e){
                 $this->error('[create error] '.$e->getMessage().' in '.str_replace(base_path(), '', $e->getFile()).':'.$e->getLine());
 
@@ -266,6 +272,15 @@ trait HasImporter
                     throw $e;
                 }
             }
+        }
+    }
+
+    private function runAfterMethod($model, $originalRow, $id)
+    {
+        $afterMethodName = ('fireAfter'.class_basename(get_class($model)));
+
+        if ( method_exists($this, $afterMethodName) ){
+            $this->{$afterMethodName}($originalRow, $id);
         }
     }
 
@@ -314,6 +329,9 @@ trait HasImporter
                 $dbRows = DB::table($model->getTable())->select(
                     $this->getUpdateColumns($model, $rowsDataWithIdsKeys)
                 )
+                ->when($model->hasSoftDeletes(), function($query){
+                    $query->whereNull('deleted_at');
+                })
                 ->whereIn($modelKeyName, array_keys($rowsDataWithIdsKeys))
                 ->get();
 

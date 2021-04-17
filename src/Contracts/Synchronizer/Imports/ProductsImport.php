@@ -208,9 +208,9 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         $row['vat_id'] = $this->getVatIdByValue($value);
     }
 
-    public function setFinalProductsAttributeItemsHashAttribute($value, &$row, $dbRow)
+    public function fireAfterProductsAttribute(&$row, $productsAttributeId)
     {
-        $itemsIds = array_map(function($item) use ($row, $dbRow) {
+        $itemsIds = array_map(function($item) use ($row) {
             $identifier = $item[$this->getAttributesItemIdentifier()];
 
             return $this->getExistingRows('attributes_items')[$identifier];
@@ -218,15 +218,15 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
         $existingIds = DB::table('attributes_item_products_attribute_items')
                             ->selectRaw('attributes_item_id as item_id')
-                            ->where('products_attribute_id', $dbRow->id)
+                            ->where('products_attribute_id', $productsAttributeId)
                             ->get()->pluck('item_id')->toArray();
 
         //Insert missing ids
         $toInsert = array_diff($itemsIds, $existingIds);
         if ( count($toInsert) ) {
-            DB::table('attributes_item_products_attribute_items')->insert(array_map(function($id) use($dbRow){
+            DB::table('attributes_item_products_attribute_items')->insert(array_map(function($id) use($productsAttributeId){
                 return [
-                    'products_attribute_id' => $dbRow->id,
+                    'products_attribute_id' => $productsAttributeId,
                     'attributes_item_id' => $id,
                 ];
             }, $toInsert));
@@ -236,12 +236,10 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         $toRemove = array_diff($existingIds, $itemsIds);
         if ( count($toRemove) ) {
             DB::table('attributes_item_products_attribute_items')
-                ->where('products_attribute_id', $dbRow->id)
+                ->where('products_attribute_id', $productsAttributeId)
                 ->whereIn('attributes_item_id', $toRemove)
                 ->delete();
         }
-
-        return $value;
     }
 
     private function getVatIdByValue($value)
