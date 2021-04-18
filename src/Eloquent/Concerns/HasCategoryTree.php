@@ -20,7 +20,7 @@ trait HasCategoryTree
             $tree = [];
 
             foreach ($categories as $category) {
-                $categoryTree = $this->getCategoryTreeName($category, $categories);
+                $categoryTree = $this->getCategoryTreeIds($category, $categories);
 
                 $tree[] = [
                     'id' => $category->getKey(),
@@ -35,7 +35,7 @@ trait HasCategoryTree
         });
     }
 
-    private function getCategoryTreeName($category, $categories, $tree = [])
+    public function getCategoryTreeIds($category, $categories, $tree = [])
     {
         $tree = array_merge([ $category->getKey() ], $tree);
 
@@ -43,7 +43,7 @@ trait HasCategoryTree
             $category->category_id
             && $parentCategory = $categories->where('id', $category->category_id)->first()
         ){
-            $tree = $this->getCategoryTreeName($parentCategory, $categories, $tree);
+            $tree = $this->getCategoryTreeIds($parentCategory, $categories, $tree);
         }
 
         return $tree;

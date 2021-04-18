@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Synchronizer\Concerns;
 use Admin;
 use Admin\Eloquent\AdminModel;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Localization;
@@ -38,7 +39,27 @@ trait HasImporter
         return $this->isMultiKey($fieldKey) ? '_identifier' : $fieldKey;
     }
 
-    public function bootExistingRows(AdminModel $model, $fieldKey, $allIdentifiers)
+    private function isPublishable($model)
+    {
+        return $model instanceof AdminModel && $model->getProperty('publishable');
+    }
+
+    private function hasSoftDeletes($model)
+    {
+        return $model instanceof AdminModel && $model->hasSoftDeletes();
+    }
+
+    private function hasSluggable($model)
+    {
+        return $model instanceof AdminModel && $model->hasSluggable();
+    }
+
+    private function isSortable($model)
+    {
+        return $model instanceof AdminModel && $model->isSortable();
+    }
+
+    public function bootExistingRows(Model $model, $fieldKey, $allIdentifiers)
     {
         $selectcolumn = $this->isMultiKey($fieldKey)
                             ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $fieldKey).', \'\')) as _identifier')
@@ -46,9 +67,9 @@ trait HasImporter
 
         $existingRows = DB::table($model->getTable())
             ->selectRaw(implode(', ', array_filter([
-                $model->getKeyName(), $selectcolumn, $model->getProperty('publishable') ? 'published_at' : null
+                $model->getKeyName(), $selectcolumn, $this->isPublishable($model) ? 'published_at' : null
             ])))
-            ->when($model->hasSoftDeletes(), function($query){
+            ->when($this->hasSoftDeletes($model), function($query){
                 $query->whereNull('deleted_at');
             })
             ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $allIdentifiers) {
@@ -65,7 +86,7 @@ trait HasImporter
             $this->getIdentifierName($fieldKey)
         )->toArray();
 
-        if ( $model->getProperty('publishable') ) {
+        if ( $this->isPublishable($model) ) {
             $rowsToPublish = $existingRows->whereNull('published_at')->filter(function($row) use ($fieldKey, $allIdentifiers) {
                 //Single key identifier is passed, because we filter in database
                 if ( !$this->isMultiKey($fieldKey) ) {
@@ -82,14 +103,14 @@ trait HasImporter
         $this->unpublishedRowsToPublish[$model->getTable()] = $rowsToPublish;
     }
 
-    private function isLocalizedField(AdminModel $model, $key)
+    private function isLocalizedField(Model $model, $key)
     {
         return $this->cache($model->getTable().'.isLocale.'.$key, function() use ($model, $key){
-            return $model->hasFieldParam($key, 'locale', true);
+            return $model instanceof AdminModel && $model->hasFieldParam($key, 'locale', true);
         });
     }
 
-    public function castData(AdminModel $model, $row)
+    public function castData(Model $model, $row)
     {
         foreach ($row as $key => $value) {
             $isLocale = $this->isLocalizedField($model, $key);
@@ -126,7 +147,7 @@ trait HasImporter
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
-    private function isSameValue(AdminModel $model, $key, $value, $oldValue)
+    private function isSameValue(Model $model, $key, $value, $oldValue)
     {
         if ( $this->isLocalizedField($model, $key) ) {
             return $value == $this->encodeJsonArray(json_decode($oldValue));
@@ -135,7 +156,7 @@ trait HasImporter
         return $value == $oldValue;
     }
 
-    public function castInsertData(AdminModel $model, $row)
+    public function castInsertData(Model $model, $row)
     {
         $row = $this->castData($model, $row);
 
@@ -143,11 +164,11 @@ trait HasImporter
 
         $this->removeHelperAttributes($row);
 
-        if ( $model->isSortable() ){
+        if ( $this->isSortable($model) ){
             $row['_order'] = $this->insertIncrement[$model->getTable()];
         }
 
-        if ( $model->hasSluggable() ){
+        if ( $this->hasSluggable($model) ){
             $slug = $row[$model->getProperty('sluggable')];
 
             $row['slug'] = $model->makeSlug($slug);
@@ -156,19 +177,19 @@ trait HasImporter
         return $row;
     }
 
-    private function getKeyMutatorMethodName(AdminModel $model, $key, $prefix = null)
+    private function getKeyMutatorMethodName(Model $model, $key, $prefix = null)
     {
         return ($prefix ?: 'set').class_basename(get_class($model)).Str::studly($key).'Attribute';
     }
 
-    public function castUpdateData(AdminModel $model, $row)
+    public function castUpdateData(Model $model, $row)
     {
         $row = $this->castData($model, $row);
 
         return $row;
     }
 
-    public function postCastUpdateData(AdminModel $model, $row, $oldRow)
+    public function postCastUpdateData(Model $model, $row, $oldRow)
     {
         $this->applyMutators($model, $row, $oldRow, 'setFinal');
 
@@ -177,7 +198,7 @@ trait HasImporter
         return $row;
     }
 
-    public function getRowChanges(AdminModel $model, $row, $oldRow)
+    public function getRowChanges(Model $model, $row, $oldRow)
     {
         $changes = [];
         foreach ($row as $key => $value) {
@@ -185,7 +206,7 @@ trait HasImporter
                 $changes[$key] = $value;
 
                 //create new slug if field of slug maker has been changed
-                if ( $model->getProperty('sluggable') == $key ){
+                if ( $this->hasSluggable($model) && $model->getProperty('sluggable') == $key ){
                     $changes['slug'] = $model->makeSlug($value);
                 }
             }
@@ -194,7 +215,7 @@ trait HasImporter
         return $changes;
     }
 
-    private function applyMutators(AdminModel $model, &$row, $oldRow = null, $prefix = null)
+    private function applyMutators(Model $model, &$row, $oldRow = null, $prefix = null)
     {
         //Apply mutators on changed inputs
         foreach ($row as $key => $value) {
@@ -241,7 +262,7 @@ trait HasImporter
         };
     }
 
-    public function synchronize(AdminModel $model, $fieldKey, $rows)
+    public function synchronize(Model $model, $fieldKey, $rows)
     {
         $totalStart = Admin::start();
         $this->message('************* '.$model->getTable());
@@ -262,7 +283,7 @@ trait HasImporter
         $this->message(
              'On create rows: '.count($this->onCreate[$model->getTable()]) ."\n"
             .'Existing rows: '.count($this->onUpdate[$model->getTable()])."\n"
-            .'On '.($model->getProperty('publishable') ? 'unpublish' : 'delete').': '.count($this->onDeleteOrHide[$model->getTable()])."\n"
+            .'On '.($this->isPublishable($model) ? 'unpublish' : 'delete').': '.count($this->onDeleteOrHide[$model->getTable()])."\n"
             .'On publish: '.count($this->unpublishedRowsToPublish[$model->getTable()])
             ."\n"
         );
@@ -280,13 +301,13 @@ trait HasImporter
         $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
     }
 
-    private function createRows(AdminModel $model, $rows, $fieldKey)
+    private function createRows(Model $model, $rows, $fieldKey)
     {
         $start = Admin::start();
 
         $insert = [];
 
-        $this->insertIncrement[$model->getTable()] = $model->isSortable() ? $model->getNextOrderIncrement() : 0;
+        $this->insertIncrement[$model->getTable()] = $this->isSortable($model) ? $model->getNextOrderIncrement() : 0;
 
         $total = count($this->onCreate[$model->getTable()]);
         $inserted = 0;
@@ -320,7 +341,7 @@ trait HasImporter
         $this->message('> Inserted '.$inserted.' from '.$total.' successfully in '.Admin::end($start).'s');
     }
 
-    private function getDeletionRows(AdminModel $model, $fieldKey, $allIdentifiers)
+    private function getDeletionRows(Model $model, $fieldKey, $allIdentifiers)
     {
         $selectFieldKeyColumn = $this->isMultiKey($fieldKey)
                             ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $fieldKey).', \'\')) as _identifier')
@@ -328,10 +349,10 @@ trait HasImporter
 
         return DB::table($model->getTable())
             ->selectRaw($model->getKeyName().', '.$selectFieldKeyColumn)
-            ->when($model->hasSoftDeletes(), function($query){
+            ->when($this->hasSoftDeletes($model), function($query){
                 $query->whereNull('deleted_at');
             })
-            ->when($model->getProperty('publishable'), function($query){
+            ->when($this->isPublishable($model), function($query){
                 $query->whereNotNull('published_at');
             })
             //Select only keys not present in given identifiers
@@ -356,17 +377,19 @@ trait HasImporter
 
         $query = DB::table($model->getTable())->whereIn($model->getKeyName(), $toRemove);
 
-        if ( $model->getProperty('publishable') ){
+        if ( $this->isPublishable($model) ){
             $query->update([
                 'published_at' => null,
             ]);
-        } else if ( $model->hasSoftDeletes() ) {
+        } else if ( $this->hasSoftDeletes($model) ) {
             $query->update([
                 'deleted_at' => Carbon::now(),
             ]);
+        } else {
+            $query->delete();
         }
 
-        $this->message('> '.($model->getProperty('publishable') ? 'Unpublished' : 'Deleted').' '.count($toRemove).' successfully.');
+        $this->message('> '.($this->isPublishable($model) ? 'Unpublished' : 'Deleted').' '.count($toRemove).' successfully.');
     }
 
     private function publishMissing($model)
@@ -384,7 +407,7 @@ trait HasImporter
         $this->message('- Missing '.count($toPublish).' rows published successfully.');
     }
 
-    private function getUpdateColumns(AdminModel $model, $rows)
+    private function getUpdateColumns(Model $model, $rows)
     {
         $columns = [];
 
@@ -405,7 +428,7 @@ trait HasImporter
         return $columns;
     }
 
-    private function updateRows(AdminModel $model, $rows, $fieldKey)
+    private function updateRows(Model $model, $rows, $fieldKey)
     {
         $start = Admin::start();
 
@@ -434,7 +457,7 @@ trait HasImporter
                 $dbRows = DB::table($model->getTable())->select(
                     $this->getUpdateColumns($model, $rowsDataWithIdsKeys)
                 )
-                ->when($model->hasSoftDeletes(), function($query){
+                ->when($this->hasSoftDeletes($model), function($query){
                     $query->whereNull('deleted_at');
                 })
                 ->whereIn($modelKeyName, array_keys($rowsDataWithIdsKeys))

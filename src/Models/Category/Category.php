@@ -2,12 +2,15 @@
 
 namespace AdminEshop\Models\Category;
 
+use AdminEshop\Eloquent\Concerns\HasCategoryTree;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
 class Category extends AdminModel
 {
+    use HasCategoryTree;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */

@@ -2,11 +2,12 @@
 
 namespace AdminEshop\Contracts\Synchronizer\Imports;
 
+use Admin;
 use AdminEshop\Contracts\Synchronizer\Synchronizer;
 use AdminEshop\Contracts\Synchronizer\SynchronizerInterface;
-use Admin;
-use Store;
+use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use DB;
+use Store;
 
 class ProductsImport extends Synchronizer implements SynchronizerInterface
 {
@@ -60,6 +61,12 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         );
 
         $this->synchronize(
+            new ProductsCategoriesPivot,
+            ['product_id', 'category_id'],
+            $this->getPreparedProductsCategories($rows)
+        );
+
+        $this->synchronize(
             Admin::getModel('ProductsGallery'),
             $this->getProductsGalleryIdentifier(),
             $this->getPreparedGallery($rows)
@@ -106,6 +113,40 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         }
 
         return $variants;
+    }
+
+    private function getPreparedProductsCategories($rows)
+    {
+        $categories = [];
+
+        $dbCategories = $this->getCategories();
+        $categoriesTree = $dbCategories->keyBy('id')->map(function($item) use ($dbCategories) {
+            return $item->getCategoryTreeIds($item, $dbCategories);
+        });
+
+        foreach ($rows as $row) {
+            if ( !isset($row['$categories']) ){
+                continue;
+            }
+
+            //Add all parent categories with added category
+            $toAdd = [];
+            foreach ($row['$categories'] as $id) {
+                $toAdd = array_merge($categoriesTree[$id]);
+            }
+
+            //Merge parent categories with setted categories
+            $allCategoriesTree = array_unique(array_merge($toAdd, $row['$categories']));
+            asort($allCategoriesTree);
+            foreach ($allCategoriesTree as $id) {
+                $categories[] = [
+                    'product_id' => $this->getExistingRows('products')[$row[$this->getProductIdentifier()]],
+                    'category_id' => $id,
+                ];
+            }
+        }
+
+        return $categories;
     }
 
     private function getPreparedGallery($rows, $gallery = [], $relationTable = 'products', $relationName = 'product_id', $relationIdentifier = 'getProductIdentifier')
@@ -233,7 +274,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         $existingIds = DB::table('attributes_item_products_attribute_items')
                             ->selectRaw('attributes_item_id as item_id')
                             ->where('products_attribute_id', $productsAttributeId)
-                            ->get()->pluck('item_id')->toArray();
+                            ->get()
+                            ->pluck('item_id')->toArray();
 
         //Insert missing ids
         $toInsert = array_diff($itemsIds, $existingIds);
