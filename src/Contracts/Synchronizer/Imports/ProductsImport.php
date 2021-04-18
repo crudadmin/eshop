@@ -35,6 +35,11 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return 'code';
     }
 
+    public function getCategoryIdentifier()
+    {
+        return 'code';
+    }
+
     public function getProductsAttributeIdentifier()
     {
         return ['product_id', 'products_variant_id', 'attribute_id'];
@@ -77,6 +82,13 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $this->getProductsAttributeIdentifier(),
             $this->getPreparedProductsAttribute($rows)
         );
+    }
+
+    public function getCategories()
+    {
+        return $this->cache('import.categories', function(){
+            return Admin::getModel('Category')->select('id', 'category_id', $this->getCategoryIdentifier())->get();
+        });
     }
 
     private function getPreparedVariants($rows)
@@ -208,8 +220,10 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         $row['vat_id'] = $this->getVatIdByValue($value);
     }
 
-    public function fireAfterProductsAttribute(&$row, $productsAttributeId)
+    public function setAfterProductsAttributeItemsHashAttribute($value, &$row, $dbRow)
     {
+        $productsAttributeId = $dbRow->id;
+
         $itemsIds = array_map(function($item) use ($row) {
             $identifier = $item[$this->getAttributesItemIdentifier()];
 

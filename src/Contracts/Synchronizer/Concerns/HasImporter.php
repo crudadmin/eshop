@@ -104,7 +104,10 @@ trait HasImporter
                 }
 
                 //Cast json data
-                $row[$key] = array_filter($row[$key]);
+                $row[$key] = array_filter($row[$key], function($item){
+                    return is_null($item) === false && $item !== '';
+                });
+
                 $row[$key] = $this->encodeJsonArray($row[$key]);
             }
         }
@@ -299,7 +302,9 @@ trait HasImporter
 
                 $this->info('- inserted '.($inserted+1).'/'.$total.' - ['.$onCreateIdentifier.']');
 
-                $this->runAfterMethod($model, $originalRow, $id);
+                $object = new \stdClass;
+                $object->{$model->getKeyName()} = $id;
+                $this->applyMutators($model, $originalRow, $object, 'setAfter');
 
                 $inserted++;
             } catch(Throwable $e){
@@ -377,15 +382,6 @@ trait HasImporter
         ]);
 
         $this->message('- Missing '.count($toPublish).' rows published successfully.');
-    }
-
-    private function runAfterMethod($model, $originalRow, $id)
-    {
-        $afterMethodName = ('fireAfter'.class_basename(get_class($model)));
-
-        if ( method_exists($this, $afterMethodName) ){
-            $this->{$afterMethodName}($originalRow, $id);
-        }
     }
 
     private function getUpdateColumns(AdminModel $model, $rows)
@@ -469,6 +465,8 @@ trait HasImporter
                                 $totalUpdated++;
 
                                 DB::table($model->getTable())->where($modelKeyName, $id)->update($rowChanges);
+
+                                $this->applyMutators($model, $castedImportRow, $dbRow, 'setAfter');
 
                                 $updated++;
                             }
