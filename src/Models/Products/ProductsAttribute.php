@@ -97,9 +97,4 @@ class ProductsAttribute extends AdminModel
             'items' => $this->getVariantItemsOptions(),
         ];
     }
-
-    public function getAttributesTextItems()
-    {
-        return $this->items;
-    }
 }

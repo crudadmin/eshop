@@ -34,7 +34,7 @@ trait HasProductResponses
     public function appendOrderableColumns()
     {
         return [
-            'thumbnail', 'attributesText',
+            'thumbnail',
         ];
     }
 

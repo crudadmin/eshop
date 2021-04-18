@@ -109,17 +109,4 @@ class Attribute extends AdminModel
             'id', 'name', 'unit_id', 'slug'
         ];
     }
-
-    /**
-     * This columns will be loaded into every attribute assigned in products attributes
-     *
-     * @return  array
-     */
-    public function getProductAttributesColumns()
-    {
-        return [
-            'attributes.name',
-            'attributes.unit_id',
-        ];
-    }
 }

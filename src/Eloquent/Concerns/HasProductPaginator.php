@@ -53,8 +53,8 @@ trait HasProductPaginator
 
         $items = $items->filter(function($product) use (&$prices, $filterParams) {
             $price = in_array($product->product_type, Store::variantsProductTypes())
-                        ? $product->cheapestVariantClientPrice
-                        : $product->clientPrice;
+                        ? $product->getAttribute('cheapestVariantClientPrice')
+                        : $product->getAttribute('clientPrice');
 
             //Collect all prices, to be able calculate price-range
             $prices[] = $price;

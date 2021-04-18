@@ -3,33 +3,13 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
+use AdminEshop\Models\Attribute\AttributesItem;
+use AdminEshop\Models\Products\Pivot\ProductsAttributesItem;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsAttribute;
-use AdminEshop\Models\Attribute\AttributesItem;
 
 trait HasProductAttributes
 {
-    public function getAttributesSelect()
-    {
-        $columns = [
-            'products_attributes.id',
-            'products_attributes.attribute_id',
-        ];
-
-        if ( $this->hasAttributesEnabled(ProductsVariant::class) ){
-            $columns[] = 'products_attributes.products_variant_id';
-        }
-
-        if ( $this->hasAttributesEnabled(Product::class) ){
-            $columns[] = 'products_attributes.product_id';
-        }
-
-        return array_merge(
-            Admin::getModel('Attribute')->getProductAttributesColumns(),
-            $columns
-        );
-    }
-
     public function getAttributesItemsSelect()
     {
         return Admin::getModel('AttributesItem')->getProductAttributesItemsColumns();
@@ -43,15 +23,15 @@ trait HasProductAttributes
         //We need return not model from package, but end model which may extend features
         $relationClass = get_class(Admin::getModel('ProductsAttribute'));
 
-        return $this
-                ->hasMany($relationClass)
-                ->select($this->getAttributesSelect())
-                ->leftJoin('attributes', 'attributes.id', '=', 'products_attributes.attribute_id')
-                ->with(['items' => function($query){
-                    $query->select(
-                        $this->getAttributesItemsSelect()
-                    );
-                }]);
+        return $this->hasManyThrough(ProductsAttributesItem::class, $relationClass)
+                    ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_products_attribute_items.attributes_item_id')
+                    ->select(
+                        'products_attributes.attribute_id',
+                        'attributes_item_products_attribute_items.attributes_item_id'
+                    )
+                    ->whereNull('products_attributes.deleted_at')
+                    ->whereNull('attributes_items.deleted_at');
+                ;
     }
 
     public function getAttributesTextAttribute()
@@ -63,12 +43,13 @@ trait HasProductAttributes
 
         $attributes = [];
 
-        foreach ($this->getValue('attributesItems') as $attribute) {
-            if ( $items = $attribute->getAttributesTextItems() ) {
-                $attributes[] = $items->map(function($item) use ($attribute) {
-                    return $item->name.$attribute->unitName;
-                })->join(config('admineshop.attributes.separator.item', ', '));
-            }
+        foreach ($this->attributesItems->groupBy('products_attribute_id') as $attributeItems) {
+            $attributes[] = $attributeItems->map(function($item) {
+                $attribute = $item->getAttributeRow();
+                $attrItem = $item->getItemRow();
+
+                return ($attrItem ? $attrItem->name : '').($attribute ? $attribute->unitName : '');
+            })->join(config('admineshop.attributes.separator.item', ', '));
         }
 
         return implode(config('admineshop.attributes.separator.attribute', ', '), $attributes);

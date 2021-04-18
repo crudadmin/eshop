@@ -202,7 +202,7 @@ trait PriceMutator
      */
     public function getInitialPriceWithoutVatAttribute()
     {
-        return Store::roundNumber($this->price);
+        return Store::roundNumber($this->getAttribute('price'));
     }
 
     /*
@@ -210,7 +210,7 @@ trait PriceMutator
      */
     public function getInitialPriceWithVatAttribute($value)
     {
-        return $this->calculateVatPrice($this->initialPriceWithoutVat);
+        return $this->calculateVatPrice($this->getAttribute('initialPriceWithoutVat'));
     }
 
     /*
@@ -222,7 +222,7 @@ trait PriceMutator
             return Store::roundNumber($defaultPrice);
         }
 
-        $price = operator_modifier($this->initialPriceWithoutVat, $this->discount_operator, $this->discount);
+        $price = operator_modifier($this->getAttribute('initialPriceWithoutVat'), $this->getAttribute('discount_operator'), $this->getAttribute('discount'));
 
         return Store::roundNumber($price);
     }
@@ -232,7 +232,7 @@ trait PriceMutator
      */
     public function getDefaultPriceWithVatAttribute()
     {
-        return $this->calculateVatPrice($this->defaultPriceWithoutVat);
+        return $this->calculateVatPrice($this->getAttribute('defaultPriceWithoutVat'));
     }
 
     /*
@@ -240,7 +240,7 @@ trait PriceMutator
      */
     public function getPriceWithoutVatAttribute()
     {
-        $price = $this->applyDiscounts($this->defaultPriceWithoutVat, $this->toCartArrayDiscounts);
+        $price = $this->applyDiscounts($this->getAttribute('defaultPriceWithoutVat'), $this->toCartArrayDiscounts);
 
         return Store::roundNumber($price);
     }
@@ -250,7 +250,7 @@ trait PriceMutator
      */
     public function getPriceWithVatAttribute()
     {
-        return $this->calculateVatPrice($this->priceWithoutVat);
+        return $this->calculateVatPrice($this->getAttribute('priceWithoutVat'));
     }
 
     /*
@@ -259,7 +259,7 @@ trait PriceMutator
     public function totalPriceWithVat(int $quantity)
     {
         return Store::roundNumber(
-            $this->calculateVatPrice($this->priceWithoutVat, null) * $quantity
+            $this->calculateVatPrice($this->getAttribute('priceWithoutVat'), null) * $quantity
         );
     }
 
@@ -271,10 +271,10 @@ trait PriceMutator
     public function getInitialClientPriceAttribute()
     {
         if ( $this->showVatPrices() ) {
-            return $this->initialPriceWithVat;
+            return $this->getAttribute('initialPriceWithVat');
         }
 
-        return $this->initialPriceWithoutVat;
+        return $this->getAttribute('initialPriceWithoutVat');
     }
 
     /**
@@ -285,10 +285,10 @@ trait PriceMutator
     public function getDefaultClientPriceAttribute()
     {
         if ( $this->showVatPrices() ) {
-            return $this->defaultPriceWithVat;
+            return $this->getAttribute('defaultPriceWithVat');
         }
 
-        return $this->defaultPriceWithoutVat;
+        return $this->getAttribute('defaultPriceWithoutVat');
     }
 
     /**
@@ -299,10 +299,10 @@ trait PriceMutator
     public function getClientPriceAttribute()
     {
         if ( $this->showVatPrices() ) {
-            return $this->priceWithVat;
+            return $this->getAttribute('priceWithVat');
         }
 
-        return $this->priceWithoutVat;
+        return $this->getAttribute('priceWithoutVat');
     }
 
     /**
@@ -320,7 +320,7 @@ trait PriceMutator
             $round = Store::hasSummaryRounding();
         }
 
-        $vat = $this->vatValue;
+        $vat = $this->getAttribute('vatValue');
 
         //If model has rewriten vat value
         if ( ! is_null($this->getRewritedVatValue()) ) {
@@ -339,12 +339,9 @@ trait PriceMutator
      */
     public function getVatValueAttribute()
     {
-        //If exists vat attribute
-        if ( $this->vat_id === null && $this->vat !== null ) {
-            return $this->vat;
+        if ( $this->vat_id ) {
+            return Store::getVatValueById($this->vat_id);
         }
-
-        return Store::getVatValueById($this->vat_id);
     }
 
     /**

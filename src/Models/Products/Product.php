@@ -231,9 +231,15 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function getCheapestVariantClientPriceAttribute()
     {
-        $variant = $this->variants->sortBy('clientPrice')->first();
+        $prices = [];
 
-        return $variant ? $variant->clientPrice : 0;
+        foreach ($this->variants as $variant) {
+            $prices[] = $variant->getAttribute('clientPrice');
+        }
+
+        asort($prices);
+
+        return count($prices) ? $prices[0] : 0;
     }
 
     public function setAdminAttributes($attributes)

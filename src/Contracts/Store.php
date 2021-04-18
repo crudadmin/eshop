@@ -4,9 +4,10 @@ namespace AdminEshop\Contracts;
 
 use Admin;
 use AdminEshop\Contracts\Concerns\HasRoutes;
+use AdminEshop\Contracts\Concerns\HasStoreAttributes;
+use AdminEshop\Models\Attribute\AttributesUnit;
 use AdminEshop\Models\Orders\OrdersProduct;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Attribute\AttributesUnit;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\Store as StoreModel;
 use AdminEshop\Models\Store\Vat;
@@ -16,7 +17,8 @@ use Cart;
 class Store
 {
     use DataStore,
-        HasRoutes;
+        HasRoutes,
+        HasStoreAttributes;
 
     /*
      * Should eshop automatically show B2B prices?
@@ -119,7 +121,14 @@ class Store
             return false;
         }
 
-        return $this->rounding ?: (int)$this->getSettings()->rounding;
+        if ( $this->rounding ) {
+            return $this->rounding;
+        }
+
+        //We need cache rounding value for better performance
+        return $this->cache('store.rounding', function(){
+            return (int)$this->getSettings()->rounding;
+        });
     }
 
     /**
@@ -207,7 +216,9 @@ class Store
      */
     public function hasB2B()
     {
-        return Cart::getDriver()->get('b2b', $this->hasB2B);
+        return $this->cache('hasB2B', function(){
+            return Cart::getDriver()->get('b2b', $this->hasB2B);
+        });
     }
 
     /*
