@@ -82,6 +82,15 @@ class Attribute extends AdminModel
         ];
     }
 
+    public function mutateFields($fields)
+    {
+        if ( config('admineshop.attributes.filtrable', true) === true ) {
+            $fields->push([
+                'filtrable' => 'name:Filtrovať podľa atribútu|type:checkbox|default:0',
+            ]);
+        }
+    }
+
     public function scopeWithItemsForProducts($query, $productsQuery)
     {
         $attributes = $query->select(
@@ -112,8 +121,9 @@ class Attribute extends AdminModel
      */
     public function getAttributesColumns()
     {
-        return [
-            'id', 'name', 'unit_id', 'slug'
-        ];
+        return array_filter([
+            'id', 'name', 'unit_id', 'slug',
+            config('admineshop.attributes.filtrable', true) ? 'filtrable' : null,
+        ]);
     }
 }

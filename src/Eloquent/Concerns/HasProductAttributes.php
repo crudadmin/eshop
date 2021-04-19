@@ -10,11 +10,6 @@ use AdminEshop\Models\Products\ProductsAttribute;
 
 trait HasProductAttributes
 {
-    public function getAttributesItemsSelect()
-    {
-        return Admin::getModel('AttributesItem')->getProductAttributesItemsColumns();
-    }
-
     /*
      * Return attributes items
      */
@@ -29,9 +24,7 @@ trait HasProductAttributes
                         'products_attributes.attribute_id',
                         'attributes_item_products_attribute_items.attributes_item_id'
                     )
-                    ->whereNull('products_attributes.deleted_at')
                     ->whereNull('attributes_items.deleted_at');
-                ;
     }
 
     public function getAttributesTextAttribute()

@@ -6,13 +6,28 @@ use Admin;
 
 trait HasStoreAttributes
 {
+    private $attributesScope;
+
+    public function setAttributesScope($attributesScope)
+    {
+        $this->attributesScope = $attributesScope;
+
+        return $this;
+    }
+
     public function getAttributes()
     {
         return $this->cache('store.attributes', function(){
-            return Admin::getModel('Attribute')->with(['items' => function($query){
-
-            }])->get()->keyBy('id');
+            return Admin::getModel('Attribute')
+                        ->withItemsForProducts($this->attributesScope)
+                        ->get()
+                        ->keyBy('id');
         });
+    }
+
+    public function getFilterAttributes()
+    {
+        return $this->getAttributes()->where('filtrable', true);
     }
 
     private function getAttributesItems()

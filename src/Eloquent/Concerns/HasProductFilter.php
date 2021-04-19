@@ -5,7 +5,6 @@ namespace AdminEshop\Eloquent\Concerns;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Store;
-use Admin;
 
 trait HasProductFilter
 {
@@ -16,16 +15,13 @@ trait HasProductFilter
         });
     }
 
-    public function scopeFilterAttributeBySlug($query, string $attributeSlug, array $itemIds)
+    public function scopeFilterAttributeItems($query, int $attributeId, array $itemIds)
     {
-        $query->whereHas('attributes', function($query) use ($attributeSlug, $itemIds) {
+        $query->whereHas('attributesItems', function($query) use ($attributeId, $itemIds) {
             $query
-                ->withoutGlobalScope('order')
-                ->whereHas('attribute', function($query) use ($attributeSlug) {
-                    $query->where('slug', $attributeSlug)->withoutGlobalScope('order');
-                })->whereHas('items', function($query) use ($itemIds) {
-                    $query->whereIn('attributes_items.id', $itemIds)->withoutGlobalScope('order');
-                });
+                ->where('products_attributes.attribute_id', $attributeId)
+                ->whereIn('attributes_item_products_attribute_items.attributes_item_id', $itemIds)
+                ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_products_attribute_items.attributes_item_id');
         });
     }
 
@@ -39,45 +35,52 @@ trait HasProductFilter
         }
 
         $existingAttributes = Store::cache('existing_attributes', function() use ($params) {
-            return Admin::getModel('Attribute')->whereIn('slug', array_keys($params))->pluck('slug')->toArray();
+            return Store::getAttributes()->whereIn('slug', array_keys($params))->keyBy('slug')->toArray();
         });
 
+        $filter = [];
         foreach ($params as $key => $value) {
-            $attributeSlug = $key;
-            $itemIds = explode(',', $value);
-
             //Denny non attributes queries
-            if ( !in_array($key, $existingAttributes) ){
-                continue;
+            if ( array_key_exists($key, $existingAttributes) ){
+                $attributeId = $existingAttributes[$key]['id'];
+
+                $filter[$attributeId] = explode(',', $value);
+            }
+        }
+
+        $query->where(function($query) use ($filter) {
+            $model = $query->getModel();
+
+            if ( $model instanceof Product ) {
+                $query
+                    //Filter by basic product type
+                    ->where(function($query) use ($filter) {
+                        $query->nonVariantProducts();
+
+                        foreach ($filter as $attributeId => $itemIds) {
+                            $query->filterAttributeItems($attributeId, $itemIds);
+                        }
+                    })
+                    //Filter product by variant attributes
+                    ->orWhere(function($query) use ($filter) {
+                        $query
+                            ->variantProducts()
+                            ->whereHas('variants', function($query) use ($filter) {
+                                foreach ($filter as $attributeId => $itemIds) {
+                                    $query->filterAttributeItems($attributeId, $itemIds)->withoutGlobalScope('order');
+                                }
+                            });
+                    });
             }
 
-            $query->where(function($query) use ($attributeSlug, $itemIds) {
-                $model = $query->getModel();
+            //If actual object is already variant, we need filter only attributes
+            else if ( $model instanceof ProductsVariant ) {
+                $query->withoutGlobalScope('order');
 
-                if ( $model instanceof Product ) {
-                    $query
-                        //Filter by basic product type
-                        ->where(function($query) use ($attributeSlug, $itemIds) {
-                            $query
-                                ->nonVariantProducts()
-                                ->filterAttributeBySlug($attributeSlug, $itemIds);
-                        })
-
-                        //Filter product by variant attributes
-                        ->orWhere(function($query) use ($attributeSlug, $itemIds) {
-                            $query
-                                ->variantProducts()
-                                ->whereHas('variants', function($query) use ($attributeSlug, $itemIds) {
-                                    $query->filterAttributeBySlug($attributeSlug, $itemIds)->withoutGlobalScope('order');
-                                });
-                        });
+                foreach ($filter as $attributeId => $itemIds) {
+                    $query->filterAttributeItems($attributeId, $itemIds);
                 }
-
-                //If actual object is already variant, we need filter only attributes
-                else if ( $model instanceof ProductsVariant ) {
-                    $query->filterAttributeBySlug($attributeSlug, $itemIds)->withoutGlobalScope('order');
-                }
-            });
-        }
+            }
+        });
     }
 }

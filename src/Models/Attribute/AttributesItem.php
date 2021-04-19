@@ -102,24 +102,17 @@ class AttributesItem extends AdminModel
      */
     public function getAttributesItemsColumns()
     {
-        return [
+        $columns = [
             'attributes_items.id',
             'attributes_items.attribute_id',
             'attributes_items.name',
             'attributes_items.slug',
         ];
-    }
 
-    /*
-     * Load this attributes into each product in category response
-     */
-    public function getProductAttributesItemsColumns()
-    {
-        return [
-            'attributes_items.id',
-            'attributes_items.attribute_id',
-            'attributes_items.name',
-            'attributes_items.slug',
-        ];
+        if ( config('admineshop.attributes.types.colors', false) === true ){
+            $columns[] = 'attributes_items.color';
+        }
+
+        return $columns;
     }
 }

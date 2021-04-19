@@ -45,6 +45,7 @@ return [
             AdminEshop\Models\Products\ProductsVariant::class,
         ],
         'load_in_cart' => true, //Load attributes data in cart responses
+        'filtrable' => true, //Toggle if attribute should be presnet in filter
         'separator' => [
             'item' => ', ',
             'attribute' => ', ',
