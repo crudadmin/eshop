@@ -11,6 +11,8 @@ use Store;
 
 trait HasProductPaginator
 {
+    private $pricesTree;
+
     /**
      * Paginate the given query.
      *
@@ -49,26 +51,11 @@ trait HasProductPaginator
     {
         $filterParams = is_array($filterParams) ? $filterParams : [];
 
-        $prices = [];
-
-        $items = $items->filter(function($product) use (&$prices, $filterParams) {
-            $price = in_array($product->product_type, Store::variantsProductTypes())
-                        ? $product->getAttribute('cheapestVariantClientPrice')
-                        : $product->getAttribute('clientPrice');
-
-            //Collect all prices, to be able calculate price-range
-            $prices[] = $price;
-
-            //Filter by price
-            if ( is_bool($filterPriceResponse = $this->filterByPrice($price, $filterParams)) ) {
-                return $filterPriceResponse;
-            }
-
-            return true;
-        })->values();
+        $this->filterItemsByPrice($items, $filterParams);
+        $this->sortItems($items, $filterParams);
 
         //Sort collected prices
-        $prices = collect($prices)->sort()->values();
+        $prices = collect($this->pricesTree)->sort()->values();
 
         return [
             $items,
@@ -78,7 +65,26 @@ trait HasProductPaginator
         ];
     }
 
-    private function filterByPrice($price, array $filterParams)
+    private function filterItemsByPrice(&$items, $filterParams)
+    {
+        $items = $items->filter(function($product) use ($filterParams) {
+            $price = in_array($product->product_type, Store::variantsProductTypes())
+                        ? $product->getAttribute('cheapestVariantClientPrice')
+                        : $product->getAttribute('clientPrice');
+
+            //Collect all prices, to be able calculate price-range
+            $this->pricesTree[$product->getKey()] = $price;
+
+            //Filter by price
+            if ( is_bool($filterPriceResponse = $this->isPriceInRange($price, $filterParams)) ) {
+                return $filterPriceResponse;
+            }
+
+            return true;
+        })->values();
+    }
+
+    private function isPriceInRange($price, array $filterParams)
     {
         $priceRanges = array_filter(explode(',', $filterParams['_price'] ?? ''));
 
@@ -93,5 +99,22 @@ trait HasProductPaginator
         else if ( $filterCount == 1 ){
             return $price <= $priceRanges[0];
         }
+    }
+
+    private function sortItems(&$items, array $filterParams)
+    {
+        if ( !($sortBy = ($filterParams['_sort'] ?? null)) ){
+            return;
+        }
+
+        $desc = in_array($sortBy, ['expensive']);
+
+        $items = $items->{ $desc ? 'sortByDesc' : 'sortBy' }(function($item) use ($sortBy) {
+            if ( in_array($sortBy, ['cheapest', 'expensive']) ) {
+                return $this->pricesTree[$item->getKey()];
+            }
+
+            return $this->getKey();
+        });
     }
 }
