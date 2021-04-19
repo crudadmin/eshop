@@ -58,6 +58,13 @@ class Attribute extends AdminModel
         return count(config('admineshop.attributes.eloquents', [])) > 0;
     }
 
+    public function reserved()
+    {
+        return array_filter([
+            env('ATTR_COLOR_ID'),
+        ]);
+    }
+
     /*
      * Automatic form and database generation
      * @name - field name

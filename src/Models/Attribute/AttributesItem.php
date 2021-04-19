@@ -67,6 +67,15 @@ class AttributesItem extends AdminModel
         ];
     }
 
+    public function mutateFields($fields)
+    {
+        if ( config('admineshop.attributes.types.colors', false) === true ){
+            $fields->push([
+                'color' => 'name:Farba|type:color|required_if:attribute_id,'.env('ATTR_COLOR_ID').'|inaccessibleIfNotIn:attribute_id,'.env('ATTR_COLOR_ID'),
+            ]);
+        }
+    }
+
     public function scopeAdminRows($query)
     {
         $query->leftJoin('attributes', 'attributes.id', '=', 'attributes_items.attribute_id')

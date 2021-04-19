@@ -10,6 +10,7 @@ use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasProductResponses;
 use AdminEshop\Eloquent\Concerns\HasStock;
+use AdminEshop\Eloquent\Concerns\HasVariantColors;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
@@ -20,7 +21,8 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
         HasStock,
         HasProductImage,
         HasProductFilter,
-        HasProductResponses;
+        HasProductResponses,
+        HasVariantColors;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -184,4 +186,12 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
         $query->select('products_variants.*', 'products.stock_type', 'products.stock_sold', 'products.image as product_image')
               ->leftJoin('products', 'products.id', '=', 'products_variants.product_id');
     }
+
+    public function mutateCategoryResponse()
+    {
+        if ( config('admineshop.attributes.types.colors', false) === true ){
+            $this->addColorsInResponse();
+        }
+    }
+
 }

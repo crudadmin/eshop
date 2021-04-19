@@ -34,7 +34,10 @@ class Category extends AdminModel
 
     protected $sluggable = 'name';
 
-    protected $belongsToModel = Category::class;
+    public function belongsToModel()
+    {
+        return get_class($this);
+    }
 
     public function settings()
     {
@@ -61,6 +64,6 @@ class Category extends AdminModel
 
     public function categories()
     {
-        return $this->hasMany(Category::class, 'category_id');
+        return $this->hasMany(get_class($this), 'category_id');
     }
 }

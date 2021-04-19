@@ -49,6 +49,9 @@ return [
             'item' => ', ',
             'attribute' => ', ',
         ],
+        'types' => [
+            'colors' => false,
+        ],
     ],
 
     'gallery' => [
