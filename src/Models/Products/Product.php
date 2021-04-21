@@ -70,7 +70,7 @@ class Product extends CartEloquent implements HasAttributesSupport
      * This items will be selected from db for cart items
      */
     protected $cartSelect = [
-        'id', 'slug', 'name', 'image', 'code',
+        'id', 'product_type', 'slug', 'name', 'image', 'code',
         'stock_quantity', 'stock_type', 'stock_sold',
     ];
 

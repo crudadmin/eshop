@@ -2,10 +2,13 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Eloquent\Concerns\HasProductImage;
 use Admin\Eloquent\AdminModel;
 
 class ProductsGallery extends AdminModel
 {
+    use HasProductImage;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -43,5 +46,12 @@ class ProductsGallery extends AdminModel
     public function belongsToModel()
     {
         return config('admineshop.gallery.eloquents', []);
+    }
+
+    public function setDetailResponse()
+    {
+        $this->setVisible(['id', 'detailThumbnail']);
+
+        $this->append(['detailThumbnail']);
     }
 }

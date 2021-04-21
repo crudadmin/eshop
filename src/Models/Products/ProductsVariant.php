@@ -194,4 +194,8 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
         }
     }
 
+    public function gallery()
+    {
+        return $this->hasMany(get_class(Admin::getModel('ProductsGallery')));
+    }
 }

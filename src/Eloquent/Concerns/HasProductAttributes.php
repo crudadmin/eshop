@@ -27,6 +27,25 @@ trait HasProductAttributes
                     ->whereNull('attributes_items.deleted_at');
     }
 
+    public function getAttributesAttribute()
+    {
+        $attributes = [];
+
+        foreach ($this->attributesItems as $item) {
+            if ( !$item->attribute || !$item->item ){
+                continue;
+            }
+
+            if ( !array_key_exists($item->attribute_id, $attributes) ){
+                $attributes[$item->attribute_id] = (clone $item->attribute)->setRelation('items', collect());
+            }
+
+            $attributes[$item->attribute_id]->items[] = $item->item;
+        }
+
+        return array_values($attributes);
+    }
+
     public function getAttributesTextAttribute()
     {
         //If attributes for given model are not enabled
@@ -38,8 +57,8 @@ trait HasProductAttributes
 
         foreach ($this->attributesItems->groupBy('products_attribute_id') as $attributeItems) {
             $attributes[] = $attributeItems->map(function($item) {
-                $attribute = $item->getAttributeRow();
-                $attrItem = $item->getItemRow();
+                $attribute = $item->attribute;
+                $attrItem = $item->item;
 
                 return ($attrItem ? $attrItem->name : '').($attribute ? $attribute->unitName : '');
             })->join(config('admineshop.attributes.separator.item', ', '));

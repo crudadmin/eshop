@@ -367,6 +367,13 @@ trait HasImporter
             ->toArray();
     }
 
+    private function getReservedIds(Model $model)
+    {
+        return $model instanceof AdminModel ? array_map(function($id){
+            return (int)$id;
+        }, $model->getProperty('reserved')) : [];
+    }
+
     private function hideOrUnpublish($model)
     {
         $toRemove = array_keys($this->onDeleteOrHide[$model->getTable()]);
@@ -374,6 +381,10 @@ trait HasImporter
         if ( count($toRemove) == 0 ){
             return;
         }
+
+        //We cannot remove reserved rows
+        $reserved = $this->getReservedIds($model);
+        $toRemove = array_diff($toRemove, $reserved);
 
         $query = DB::table($model->getTable())->whereIn($model->getKeyName(), $toRemove);
 

@@ -86,7 +86,9 @@ trait HasProductPaginator
 
     private function isPriceInRange($price, array $filterParams)
     {
-        $priceRanges = array_filter(explode(',', $filterParams['_price'] ?? ''));
+        $priceRanges = array_filter(explode(',', $filterParams['_price'] ?? ''), function($item){
+            return !is_null($item) && $item !== '';
+        });
 
         $filterCount = count($priceRanges);
 

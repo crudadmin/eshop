@@ -100,6 +100,10 @@ class Attribute extends AdminModel
                 $query->select(
                     Admin::getModel('AttributesItem')->getAttributesItemsColumns()
                 )->whereHas('productsAttributes', function($query) use ($productsQuery) {
+                    if ( !$productsQuery ){
+                        return;
+                    }
+
                     //Get attribute items from all products
                     if ( (new Product)->hasAttributesEnabled() ) {
                         $query->whereHas('products', $productsQuery);

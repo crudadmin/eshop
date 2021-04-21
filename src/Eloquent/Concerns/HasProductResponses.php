@@ -57,8 +57,26 @@ trait HasProductResponses
 
         $this->mutateDetailResponse();
 
+        if ( $this->hasGalleryEnabled() ) {
+            $this->gallery->each->setDetailResponse();
+
+            $this->makeVisible(['gallery']);
+        }
+
+        if ( $this->hasAttributesEnabled() ) {
+            $this->makeVisible(['attributes']);
+            $this->append(['attributes']);
+        }
+
+
         $this->makeVisible([
-            'attributesItems',
+            'categories',
+            'detailThumbnail',
+            'code',
+        ]);
+
+        $this->append([
+            'detailThumbnail',
         ]);
     }
 
@@ -113,6 +131,15 @@ trait HasProductResponses
                 }
             }]);
         }
+    }
+
+    public function scopewithDetailResponse($query)
+    {
+        if ( $this->hasGalleryEnabled() ) {
+            $query->with(['gallery']);
+        }
+
+        $query->with(['variants.gallery']);
     }
 
     public function scopeGetPriceRange($query, $filterParams)
