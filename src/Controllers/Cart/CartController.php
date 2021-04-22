@@ -257,11 +257,11 @@ class CartController extends Controller
             abort(401);
         }
 
-        return [
+        return api([
             'order' => $order->makeHidden(['items'])->toResponseFormat(),
             'items' => $order->items->map(function($item){
                 return $item->toResponseFormat();
             }),
-        ];
+        ]);
     }
 }

@@ -13,9 +13,11 @@ class FavouriteController extends Controller
             return collect([]);
         }
 
-        return client()->favourites()->responseQuery()->get()->map(function($item){
-            return $item->toResponseFormat();
-        });
+        return api([
+            'favourites' => client()->favourites()->responseQuery()->get()->map(function($item){
+                return $item->toResponseFormat();
+            }),
+        ]);
     }
 
     public function toggleFavourite()
