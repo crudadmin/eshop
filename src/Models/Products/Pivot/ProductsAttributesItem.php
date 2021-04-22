@@ -11,11 +11,27 @@ class ProductsAttributesItem extends Pivot
 
     public function getItemAttribute()
     {
-        return Store::getAttributeItem($this->attributes_item_id);
+        if ( $this->relationLoaded('getItemAttribute') ) {
+            return $this->getRelation('getItemAttribute');
+        }
+
+        if ( $item = Store::getAttributeItem($this->attributes_item_id) ){
+            $item = clone $item;
+        }
+
+        return $this->setRelation('getItemAttribute', $item);
     }
 
     public function getAttributeAttribute()
     {
-        return Store::getAttribute($this->attribute_id);
+        if ( $this->relationLoaded('getAttributeAttribute') ) {
+            return $this->getRelation('getAttributeAttribute');
+        }
+
+        if ( $attribute = Store::getAttribute($this->attribute_id) ){
+            $attribute = clone $attribute;
+        }
+
+        return $this->setRelation('getAttributeAttribute', $attribute);
     }
 }

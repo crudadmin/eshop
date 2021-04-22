@@ -173,7 +173,7 @@ trait CartTrait
      */
     private function assignParentCartItem($item, CartItem $cartItem)
     {
-        if ( !$item->parentIdentifier ){
+        if ( !($item->parentIdentifier ?? null) ){
             return;
         }
 

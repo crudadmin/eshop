@@ -27,7 +27,7 @@ trait HasProductAttributes
                     ->whereNull('attributes_items.deleted_at');
     }
 
-    public function getAttributesAttribute()
+    public function getAttributesListAttribute()
     {
         $attributes = [];
 
@@ -37,13 +37,13 @@ trait HasProductAttributes
             }
 
             if ( !array_key_exists($item->attribute_id, $attributes) ){
-                $attributes[$item->attribute_id] = (clone $item->attribute)->setRelation('items', collect());
+                $attributes[$item->attribute_id] = $item->attribute->setRelation('items', collect());
             }
 
             $attributes[$item->attribute_id]->items[] = $item->item;
         }
 
-        return array_values($attributes);
+        return collect(array_values($attributes));
     }
 
     public function getAttributesTextAttribute()

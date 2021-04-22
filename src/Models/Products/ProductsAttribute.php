@@ -79,6 +79,13 @@ class ProductsAttribute extends AdminModel
         ];
     }
 
+    public function options()
+    {
+        return [
+            'items' => $this->getVariantItemsOptions(),
+        ];
+    }
+
     /*
      * Push units into attribute item options from variant
      */
@@ -89,12 +96,5 @@ class ProductsAttribute extends AdminModel
                 ->get()
                 ->append('unitName')
                 ->makeHidden('unit_id');
-    }
-
-    public function options()
-    {
-        return [
-            'items' => $this->getVariantItemsOptions(),
-        ];
     }
 }

@@ -64,8 +64,12 @@ trait HasProductResponses
         }
 
         if ( $this->hasAttributesEnabled() ) {
-            $this->makeVisible(['attributes']);
-            $this->append(['attributes']);
+            $this->makeVisible(['attributesList']);
+            $this->append(['attributesList']);
+
+            $this->attributesList->each->append([
+                'unitName',
+            ]);
         }
 
 
@@ -78,6 +82,8 @@ trait HasProductResponses
         $this->append([
             'detailThumbnail',
         ]);
+
+        return $this;
     }
 
     /**
@@ -88,6 +94,8 @@ trait HasProductResponses
     public function setCartResponse()
     {
         $this->setCategoryResponse();
+
+        return $this;
     }
 
     public function mutateCategoryResponse()

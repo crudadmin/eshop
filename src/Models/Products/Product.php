@@ -136,7 +136,6 @@ class Product extends CartEloquent implements HasAttributesSupport
     {
         $options = [
             'vat_id' => Store::getVats(),
-            'categories' => $this->getCategoriesOptions(),
             'product_type' => config('admineshop.product_types', []),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
             'stock_type' => [
@@ -146,6 +145,10 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
             ],
         ];
+
+        if ( config('admineshop.categories.enabled') ) {
+            $options['categories'] = $this->getCategoriesOptions();
+        }
 
         return $options;
     }
