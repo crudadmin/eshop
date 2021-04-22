@@ -84,18 +84,22 @@ class Attribute extends AdminModel
 
     public function mutateFields($fields)
     {
-        if ( config('admineshop.attributes.filtrable', true) === true ) {
-            $fields->push([
-                'filtrable' => 'name:Filtrovať podľa atribútu|type:checkbox|default:0',
-            ]);
+        $filtrable = config('admineshop.attributes.filtrable', true);
+        $attributesText = config('admineshop.attributes.attributesText', false);
+
+        if ( $filtrable || $attributesText ){
+            $fields->push(
+                Group::inline(array_filter([
+                    'filtrable' => $filtrable ? 'name:Filtrovať podľa atribútu|type:checkbox|default:0' : null,
+                    'product_info' => $attributesText ? 'name:V skrátenom popise produktu|title:Zobraziť v skátenom popise produktu|type:checkbox|default:0' : null,
+                ]))->name('Nastavenia atribútu')
+            );
         }
     }
 
     public function scopeWithItemsForProducts($query, $productsQuery)
     {
-        $attributes = $query->select(
-            $this->getAttributesColumns()
-        )->with([
+        $attributes = $query->with([
             'items' => function($query) use ($productsQuery) {
                 $query->select(
                     Admin::getModel('AttributesItem')->getAttributesItemsColumns()
@@ -128,6 +132,17 @@ class Attribute extends AdminModel
         return array_filter([
             'id', 'name', 'unit_id', 'slug',
             config('admineshop.attributes.filtrable', true) ? 'filtrable' : null,
+            config('admineshop.attributes.attributesText', false) ? 'product_info' : null,
         ]);
+    }
+
+    /**
+     * Can this attribute be displayed in attributesText attribute
+     *
+     * @return  bool
+     */
+    public function displayableInTextAttributes()
+    {
+        return $this->getAttribute('product_info') == true;
     }
 }

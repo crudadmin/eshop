@@ -22,7 +22,7 @@ class RulesServiceProvider extends ServiceProvider
     public function addProductsValidators()
     {
         Validator::extend('positivePriceIfRequired', function ($attribute, $value, $parameters, $validator) {
-            $type = $parameters[0];
+            $type = $parameters[0] ?? null;
 
             //If is non orderable product type, just continue...
             if ( $type == 'products' && !in_array(request('product_type'), Store::orderableProductTypes()) ) {

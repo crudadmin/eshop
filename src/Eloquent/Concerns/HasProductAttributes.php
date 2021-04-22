@@ -60,8 +60,12 @@ trait HasProductAttributes
                 $attribute = $item->attribute;
                 $attrItem = $item->item;
 
+                if ( $attribute && $attribute->displayableInTextAttributes() !== true ){
+                    return;
+                }
+
                 return ($attrItem ? $attrItem->name : '').($attribute ? $attribute->unitName : '');
-            })->join(config('admineshop.attributes.separator.item', ', '));
+            })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 
         return implode(config('admineshop.attributes.separator.attribute', ', '), $attributes);

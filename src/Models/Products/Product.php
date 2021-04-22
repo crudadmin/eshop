@@ -86,7 +86,7 @@ class Product extends CartEloquent implements HasAttributesSupport
         return [
             Group::tab([
                 Group::fields([
-                    'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : 'index'),
+                    'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : '|index'),
                     'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|required',
                 ])->inline(),
                 'image' => 'name:Obrázok|type:file|image',
@@ -97,7 +97,7 @@ class Product extends CartEloquent implements HasAttributesSupport
             ])->icon('fa-pencil')->id('general'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
-                    'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|positivePriceIfRequired|canAdd|hidden',
+                    'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|positivePriceIfRequired:products|canAdd|hidden',
                     'price' => 'name:Cena bez DPH|type:decimal|default:0|component:PriceField|positivePriceIfRequired:products|required_if:product_type,'.implode(',', Store::orderableProductTypes()),
                 ])->id('price')->width(8),
                 'Zľava' => Group::fields([

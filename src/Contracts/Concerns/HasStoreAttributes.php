@@ -18,7 +18,10 @@ trait HasStoreAttributes
     public function getAttributes()
     {
         return $this->cache('store.attributes', function(){
-            return Admin::getModel('Attribute')
+            $model = Admin::getModel('Attribute');
+
+            return $model
+                        ->select($model->getAttributesColumns())
                         ->withItemsForProducts($this->attributesScope)
                         ->get()
                         ->keyBy('id');
