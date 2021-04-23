@@ -141,9 +141,9 @@ class CartController extends Controller
     {
         $delivery = Delivery::findOrFail($id);
 
-        return [
+        return api([
             'locations' => $delivery->locations,
-        ];
+        ]);
     }
 
     public function removeDiscountCode()
