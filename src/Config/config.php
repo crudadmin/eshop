@@ -141,6 +141,7 @@ return [
 
         //Cart and order mutators
         'mutators' => [
+            AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class,
             AdminEshop\Contracts\Order\Mutators\ClientDataMutator::class,
             AdminEshop\Contracts\Order\Mutators\CountryMutator::class,
             AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,

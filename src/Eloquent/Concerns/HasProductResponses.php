@@ -74,6 +74,7 @@ trait HasProductResponses
 
 
         $this->makeVisible([
+            'description',
             'categories',
             'detailThumbnail',
             'code',

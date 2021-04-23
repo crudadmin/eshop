@@ -46,9 +46,13 @@ class DiscountCode extends Discount implements Discountable
      */
     public function getCacheKey()
     {
-        $code = $this->getResponse();
+        if ( Admin::isAdmin() ) {
+            $identifier = ($order = $this->getOrder()) ? $order->discount_code_id : '-';
+        } else {
+            $identifier = self::getCodeName();
+        }
 
-        return $this->getKey().($code ? $code->code : '');
+        return $this->getKey().($identifier?:'');
     }
 
     /*

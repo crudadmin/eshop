@@ -131,6 +131,11 @@ class Discounts
                 return false;
             }
 
+            //Set order into every discount
+            if ( $order = $this->getOrder() ) {
+                $discount->setOrder($order);
+            }
+
             return $this->cache('discounts.'.$discount->getCacheKey(), function() use ($discount) {
                 //This discount is now under "boot" state. We need save this state
                 //because in isActive method may be needed cartSummary. In this case
@@ -140,7 +145,7 @@ class Discounts
                 $this->bootingDiscounts[] = $discount->getKey();
 
                 //If is in except mode
-                if ( !($response = $this->isActiveDiscount($discount)) ) {
+                if ( !($response = $this->getActiveDiscountState($discount)) ) {
                     $this->removeDiscountFromBootState($discount);
 
                     return false;
@@ -186,13 +191,10 @@ class Discounts
         ]);
     }
 
-    private function isActiveDiscount($discount)
+    private function getActiveDiscountState($discount)
     {
         //If is not active in backend/administration
         if ( $order = $this->getOrder() ) {
-            //Set order into every discount
-            $discount->setOrder($order);
-
             //Get order discounts data
             $orderDiscountData = $order->discount_data ?: [];
 
