@@ -60,13 +60,15 @@ trait OrderTrait
         foreach ($items as $item) {
             //If order item has setted manual price,
             //we does not want to modify this item.
-            if ( $item->hasManualPrice == true ) {
+            if ( $item->hasManualPrice == true || $item->discountable == false ) {
                 continue;
             }
 
             //Receive item model of given OrderItem
-            //If identifier is missing, OrderItem itself will be returned
-            $itemModel = $item->getItemModel();
+            //If identifier is missing, DefaultIdentifier will be initialized and OrderItem itself will be returned
+            if ( !($itemModel = $item->getItemModel()) ) {
+                continue;
+            }
 
             $hasChanges = false;
 

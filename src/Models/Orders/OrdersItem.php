@@ -103,7 +103,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
                 'vat' => 'name:DPH %|type:select|default:'.Store::getDefaultVat().'|required_if:manual_price,1|disabledIf:manual_price,0',
                 'price_vat' => 'name:Cena/j s DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
                 'manual_price' => 'name:Manuálna cena|default:0|hidden|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',
-                'discountable' => 'name:Povoliť zľavy|type:checkbox|default:0|invisible',
+                'discountable' => 'name:Povoliť zľavy na položku|type:checkbox|default:0|invisible',
             ])->inline()
         ];
     }
