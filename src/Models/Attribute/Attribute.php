@@ -86,12 +86,14 @@ class Attribute extends AdminModel
     {
         $filtrable = config('admineshop.attributes.filtrable', true);
         $attributesText = config('admineshop.attributes.attributesText', false);
+        $attributesVariants = config('admineshop.attributes.attributesVariants', false);
 
-        if ( $filtrable || $attributesText ){
+        if ( $filtrable || $attributesText || $attributesVariants ){
             $fields->push(
                 Group::inline(array_filter([
                     'filtrable' => $filtrable ? 'name:Filtrovať podľa atribútu|type:checkbox|default:0' : null,
                     'product_info' => $attributesText ? 'name:V skrátenom popise produktu|title:Zobraziť v skátenom popise produktu|type:checkbox|default:0' : null,
+                    'variants' => $attributesVariants ? 'name:Definuje variantu produktu|title:Zobrazi sa v detaile produktu možnosť preklikávania medzi priradenými hodnotami atribútu|type:checkbox|default:0' : null,
                 ]))->name('Nastavenia atribútu')
             );
         }
@@ -133,6 +135,7 @@ class Attribute extends AdminModel
             'id', 'name', 'unit_id', 'slug',
             config('admineshop.attributes.filtrable', true) ? 'filtrable' : null,
             config('admineshop.attributes.attributesText', false) ? 'product_info' : null,
+            config('admineshop.attributes.attributesVariants', false) ? 'variants' : null,
         ]);
     }
 
@@ -143,6 +146,11 @@ class Attribute extends AdminModel
      */
     public function displayableInTextAttributes()
     {
+        //In administration variant list display all attributes when no text attributes is allowed
+        if ( config('admineshop.attributes.attributesText', false) === false ){
+            return true;
+        }
+
         return $this->getAttribute('product_info') == true;
     }
 }

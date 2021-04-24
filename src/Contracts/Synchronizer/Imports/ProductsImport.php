@@ -251,6 +251,19 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return $productsAttribute;
     }
 
+    public function castDescriptionAttribute($value)
+    {
+        if ( is_array($value) ){
+            foreach ($value as $key => $string) {
+                $value[$key] = $this->castDescriptionAttribute($string);
+            }
+        } else if ( is_string($value) && $value && strpos($value, '<p>') === false ) {
+            $value = '<p>'.$value.'</p>';
+        }
+
+        return $value;
+    }
+
     public function setProductsVatNumberAttribute($value, &$row)
     {
         $row['vat_id'] = $this->getVatIdByValue($value);

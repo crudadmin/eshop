@@ -47,6 +47,7 @@ return [
         'load_in_cart' => true, //Load attributes data in cart responses
         'filtrable' => true, //Toggle if attribute should be presnet in filter
         'attributesText' => false, //display attributesText property in products
+        'attributesVariants' => false, //set which attributes can define variants
         'separator' => [
             'item' => ', ',
             'attribute' => ', ',
