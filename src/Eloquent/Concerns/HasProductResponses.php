@@ -2,10 +2,11 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Admin;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
+use Admin\Eloquent\Modules\SeoModule;
 use Store;
-use Admin;
 
 trait HasProductResponses
 {
@@ -76,6 +77,17 @@ trait HasProductResponses
 
             $this->attributesList->each->append([
                 'unitName',
+            ]);
+        }
+
+        if ( $this->getProperty('seo') == true ){
+            $this->makeVisible([
+                ...SeoModule::$metaKeys,
+                'metaImageThumbnail',
+            ]);
+
+            $this->append([
+                'metaImageThumbnail',
             ]);
         }
 

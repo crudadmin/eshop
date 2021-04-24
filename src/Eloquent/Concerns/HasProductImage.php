@@ -4,6 +4,7 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Contracts\ImageResponse;
 use AdminEshop\Models\Products\Product;
+use Admin\Helpers\SEO;
 use Store;
 
 trait HasProductImage
@@ -89,5 +90,15 @@ trait HasProductImage
 
         //Check if given class has enabled attributes support
         return in_array(class_basename($classname), $enabledClasses);
+    }
+
+    public function getMetaImageThumbnailAttribute($value)
+    {
+        $seo = new SEO;
+        $seo->setModel($this);
+
+        return collect($seo->getImages())->map(function($image){
+            return $image->url;
+        });
     }
 }
