@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Synchronizer;
 
+use AdminEshop\Contracts\Synchronizer\Concerns\HasGlobalCasts;
 use AdminEshop\Contracts\Synchronizer\Concerns\HasImporter;
 use AdminEshop\Contracts\Synchronizer\Concerns\HasLogger;
 use AdminEshop\Contracts\Synchronizer\Concerns\SynchronizerLogger;
@@ -10,7 +11,8 @@ use Throwable;
 
 class Synchronizer extends SynchronizerLogger
 {
-    use HasImporter;
+    use HasImporter,
+        HasGlobalCasts;
 
     /*
      * Command for messages output
