@@ -148,18 +148,78 @@ trait HasProductPaginator
 
     private function sortItems(&$items)
     {
-        if ( !($sortBy = ($this->filterParams['_sort'] ?? null)) ){
+        $filter = $this->filterParams;
+
+        $existingAttributes = Store::getExistingAttributesFromFilter($filter);
+
+        if ( !($sortBy = ($filter['_sort'] ?? null)) && count($existingAttributes) == 0 ){
             return;
         }
 
-        $desc = in_array($sortBy, ['expensive']);
+        //Sort by sorter
+        if ( $sortBy ) {
+            $desc = in_array($sortBy, ['expensive']);
 
-        $items = $items->{ $desc ? 'sortByDesc' : 'sortBy' }(function($item) use ($sortBy) {
-            if ( in_array($sortBy, ['cheapest', 'expensive']) ) {
-                return $this->pricesTree[$this->getVariantsKey($item)];
+            $items = $items->{ $desc ? 'sortByDesc' : 'sortBy' }(function($item) use ($sortBy) {
+                if ( in_array($sortBy, ['cheapest', 'expensive']) ) {
+                    return $this->pricesTree[$this->getVariantsKey($item)];
+                }
+
+                return $this->getKey();
+            });
+        }
+
+        //Sort by filter score
+        else {
+            $items = $items->sortByDesc(function($item) use ($existingAttributes) {
+                return $this->getProductFilterScore($item, $existingAttributes);
+            });
+        }
+    }
+
+    private function getProductFilterScore($item, $existingAttributes)
+    {
+        $filter = $this->filterParams;
+
+        $maxAttributeScore = count($existingAttributes);
+
+        $score = 0;
+
+        if ( $item->attributesItems->count() ) {
+            $attributesItems = $item->attributesItems->groupBy('attribute_id');
+
+            //On each attribute match we will add +10 score
+            $aScore = 1;
+            foreach ($existingAttributes as $filterAttribute) {
+                if ( !($attributesItems[$filterAttribute['id']] ?? null) ){
+                    continue;
+                }
+
+                $requestedFilterValue = explode(',', $filter[$filterAttribute['slug']]);
+
+                //Add higher score when attribute is set as first, and low score when attribute match is for example on the third place
+                foreach ($attributesItems[$filterAttribute['id']] as $i => $attrItem) {
+                    if ( in_array($attrItem->attributes_item_id, $requestedFilterValue) ) {
+                        //On each attribute match add aScore
+                        $aScore++;
+
+                        //On each attributeMatch we add 10 score, but we need substract position of item match.
+                        //If item is in first order, we will add full 10 score
+                        //if item is in second order, we will add 10-1=>9 score, because it is not primary value for this match.
+                        //So if two products will be set as red color, but second product is primary brown and secondary red
+                        //then both products will be in front, but product with brown will have lower score.
+                        $score += ($aScore * 10) - $i;
+                    }
+                }
             }
+        }
 
-            return $this->getKey();
-        });
+        if ( ($variants = $item->getAttribute('variants')) && $variants->count() ){
+            foreach ($variants as $variant) {
+                $score += $this->getProductFilterScore($variant, $existingAttributes);
+            }
+        }
+
+        return $score;
     }
 }

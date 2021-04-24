@@ -34,18 +34,7 @@ trait HasProductFilter
             return;
         }
 
-        $existingAttributes = Store::cache('existing_attributes', function() use ($params) {
-            $attributeIdentifiers = array_keys($params);
-
-            //Check if given attribute keys are string, if yes, then search attribute by slug and not by ID
-            $isSlugIdentifier = count(array_filter($attributeIdentifiers, function($identifier){
-                return is_string($identifier);
-            })) == count($attributeIdentifiers);
-
-            $keyIdentifier = $isSlugIdentifier ? 'slug' : 'id';
-
-            return Store::getAttributes()->whereIn($keyIdentifier, $attributeIdentifiers)->keyBy($keyIdentifier)->toArray();
-        });
+        $existingAttributes = Store::getExistingAttributesFromFilter($params);
 
         $filter = [];
         foreach ($params as $key => $value) {

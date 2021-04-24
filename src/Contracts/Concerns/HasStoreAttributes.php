@@ -46,6 +46,24 @@ trait HasStoreAttributes
         });
     }
 
+    public function getExistingAttributesFromFilter($filter)
+    {
+        $filter = array_wrap($filter);
+
+        return $this->cache('existing_attributes', function() use ($filter) {
+            $attributeIdentifiers = array_keys($filter);
+
+            //Check if given attribute keys are string, if yes, then search attribute by slug and not by ID
+            $isSlugIdentifier = count(array_filter($attributeIdentifiers, function($identifier){
+                return is_string($identifier);
+            })) == count($attributeIdentifiers);
+
+            $keyIdentifier = $isSlugIdentifier ? 'slug' : 'id';
+
+            return $this->getAttributes()->whereIn($keyIdentifier, $attributeIdentifiers)->keyBy($keyIdentifier)->toArray();
+        });
+    }
+
     public function getFilterAttributes()
     {
         return $this->getAttributes()->where('filtrable', true);
