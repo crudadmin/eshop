@@ -38,9 +38,9 @@ class Attribute extends AdminModel
 
     protected $options = [
         'sortby' => [
-            'asc' => 'Zostupne',
-            'desc' => 'Vzostupne',
-            'own' => 'Vlastné radenie',
+            'asc' => 'Vzostupne (0-9|A-Z)',
+            'desc' => 'Zostupne (Z-A|9-0)',
+            'order' => 'Vlastné radenie podľa tabuľky',
         ],
     ];
 
@@ -132,7 +132,7 @@ class Attribute extends AdminModel
     public function getAttributesColumns()
     {
         return array_filter([
-            'id', 'name', 'unit_id', 'slug',
+            'id', 'name', 'unit_id', 'slug', 'sortby',
             config('admineshop.attributes.filtrable', true) ? 'filtrable' : null,
             config('admineshop.attributes.attributesText', false) ? 'product_info' : null,
             config('admineshop.attributes.attributesVariants', false) ? 'variants' : null,

@@ -152,9 +152,9 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     private function getPreparedGallery($rows, $gallery = [], $relationTable = 'products', $relationName = 'product_id', $relationIdentifier = 'getProductIdentifier')
     {
         foreach ($rows as $row) {
-            if ( isset($row['$gallery']) && count($row['$gallery']) ) {
+            if ( isset($row['$variants']) && count($row['$variants']) ) {
                 $gallery = $this->getPreparedGallery(
-                    $row['$gallery'],
+                    $row['$variants'],
                     $gallery,
                     'products_variants',
                     'products_variant_id',
@@ -265,20 +265,18 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     {
         $productsAttributeId = $dbRow->id;
 
-        $itemsIds = array_map(function($item) use ($row) {
+        //We need remove all previous attributes, and insert them again for correct order
+        DB::table('attributes_item_products_attribute_items')
+            ->where('products_attribute_id', $productsAttributeId)
+            ->delete();
+
+        $toInsert = array_map(function($item) use ($row) {
             $identifier = $item[$this->getAttributesItemIdentifier()];
 
             return $this->getExistingRows('attributes_items')[$identifier];
         }, $row['$items']);
 
-        $existingIds = DB::table('attributes_item_products_attribute_items')
-                            ->selectRaw('attributes_item_id as item_id')
-                            ->where('products_attribute_id', $productsAttributeId)
-                            ->get()
-                            ->pluck('item_id')->toArray();
-
         //Insert missing ids
-        $toInsert = array_diff($itemsIds, $existingIds);
         if ( count($toInsert) ) {
             DB::table('attributes_item_products_attribute_items')->insert(array_map(function($id) use($productsAttributeId){
                 return [
@@ -286,15 +284,6 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                     'attributes_item_id' => $id,
                 ];
             }, $toInsert));
-        }
-
-        //Remove uneccessary ids
-        $toRemove = array_diff($existingIds, $itemsIds);
-        if ( count($toRemove) ) {
-            DB::table('attributes_item_products_attribute_items')
-                ->where('products_attribute_id', $productsAttributeId)
-                ->whereIn('attributes_item_id', $toRemove)
-                ->delete();
         }
     }
 

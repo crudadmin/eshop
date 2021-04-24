@@ -24,6 +24,24 @@ trait HasStoreAttributes
                         ->select($model->getAttributesColumns())
                         ->withItemsForProducts($this->attributesScope)
                         ->get()
+                        ->each(function($attribute){
+                            //Skip reordeing, already ordered from database
+                            if ( $attribute->sortby == 'order' ){
+                                return;
+                            }
+
+                            $isDescSort = in_array($attribute->sortby, ['desc']);
+
+                            $itemsSorted = $attribute->items->{ $isDescSort ? 'sortByDesc' : 'sortBy' }(function($a, $b) use ($attribute) {
+                                if ( in_array($attribute->sortby, ['asc', 'desc']) ){
+                                    return $a->name;
+                                }
+
+                                return $a->getKey();
+                            })->values();
+
+                            $attribute->setRelation('items', $itemsSorted);
+                        })
                         ->keyBy('id');
         });
     }

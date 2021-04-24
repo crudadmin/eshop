@@ -120,7 +120,7 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
     public function settings()
     {
         return [
-            'increments' => false,
+            'increments' => env('APP_DEBUG') == true,
             'title.insert' => 'Nová varianta',
             'title.update' => 'Úprava varianty :name',
             'title.rows' => 'Zoznam variant',

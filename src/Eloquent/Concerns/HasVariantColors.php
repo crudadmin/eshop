@@ -16,7 +16,7 @@ trait HasVariantColors
 
         return $colorAttributes->map(function($item){
             return Store::getAttributeItem($item->attributes_item_id);
-        })->filter()->each->setVisible(['id', 'name', 'color']);
+        })->filter()->values()->each->setVisible(['id', 'name', 'color']);
     }
 
     public function addColorsInResponse()
