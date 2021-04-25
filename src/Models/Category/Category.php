@@ -36,7 +36,9 @@ class Category extends AdminModel
 
     public function belongsToModel()
     {
-        return get_class($this);
+        if ( config('admineshop.categories.max_level', 1) > 1 ) {
+            return get_class($this);
+        }
     }
 
     public function settings()
