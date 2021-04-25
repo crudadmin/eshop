@@ -13,8 +13,13 @@ trait HasCategoryTree
     protected function getCategoriesOptions()
     {
         return Admin::cache('store.categories.tree', function(){
-            $categories = Admin::getModel('Category')
-                            ->select(['id', 'name', 'category_id'])
+            $model = Admin::getModel('Category');
+            $categories = $model
+                            ->select(array_filter([
+                                'id',
+                                'name',
+                                $model->getProperty('belongsToModel') ? 'category_id' : null
+                            ]))
                             ->withUnpublished()->get()->keyBy('id');
 
             $tree = [];

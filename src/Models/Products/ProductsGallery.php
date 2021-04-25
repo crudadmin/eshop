@@ -19,8 +19,6 @@ class ProductsGallery extends AdminModel
      */
     protected $name = 'Galéria produktu';
 
-    protected $belongsToModel = Product::class;
-
     protected $inTab = true;
     protected $withoutParent = true;
 

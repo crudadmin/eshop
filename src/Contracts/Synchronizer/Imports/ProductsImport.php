@@ -6,6 +6,8 @@ use Admin;
 use AdminEshop\Contracts\Synchronizer\Synchronizer;
 use AdminEshop\Contracts\Synchronizer\SynchronizerInterface;
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
+use AdminEshop\Models\Products\ProductsGallery;
+use AdminEshop\Models\Products\ProductsVariant;
 use DB;
 use Store;
 
@@ -23,7 +25,11 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
     public function getProductsGalleryIdentifier()
     {
-        return ['product_id', 'products_variant_id', 'code'];
+        return array_filter([
+            'product_id',
+            $this->hasVariantsGallery() ? 'products_variant_id' : null,
+            'code'
+        ]);
     }
 
     public function getAttributeIdentifier()
@@ -94,7 +100,14 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     public function getCategories()
     {
         return $this->cache('import.categories', function(){
-            return Admin::getModel('Category')->select('id', 'category_id', $this->getCategoryIdentifier())->get();
+            $model = Admin::getModel('Category');
+            $columns = ['id', $this->getCategoryIdentifier()];
+
+            if ( $model->getProperty('belongsToModel') ){
+                $columns[] = 'category_id';
+            }
+
+            return $model->select($columns)->get();
         });
     }
 
@@ -149,10 +162,17 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return $categories;
     }
 
+    private function hasVariantsGallery()
+    {
+        return (new ProductsGallery)->hasGalleryEnabled(ProductsVariant::class);
+    }
+
     private function getPreparedGallery($rows, $gallery = [], $relationTable = 'products', $relationName = 'product_id', $relationIdentifier = 'getProductIdentifier')
     {
+        $hasVariantsGallery = $this->hasVariantsGallery();
+
         foreach ($rows as $row) {
-            if ( isset($row['$variants']) && count($row['$variants']) ) {
+            if ( $hasVariantsGallery && isset($row['$variants']) && count($row['$variants']) ) {
                 $gallery = $this->getPreparedGallery(
                     $row['$variants'],
                     $gallery,

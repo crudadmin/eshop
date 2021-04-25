@@ -357,10 +357,12 @@ trait HasImporter
             })
             //Select only keys not present in given identifiers
             ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $allIdentifiers) {
-                $query->whereNotIn($fieldKey, $allIdentifiers);
+                if ( count($allIdentifiers) ) {
+                    $query->whereNotIn($fieldKey, $allIdentifiers);
+                }
             })
             //We can use where in clause with conat support, but this is slow. Faster is to load all data...
-            ->when($this->isMultiKey($fieldKey), function($query) use ($fieldKey, $allIdentifiers) {
+            ->when($this->isMultiKey($fieldKey) && count($allIdentifiers), function($query) use ($fieldKey, $allIdentifiers) {
                 $query->havingRaw('_identifier not in (? '.str_repeat(', ?', count($allIdentifiers) - 1).')', $allIdentifiers);
             })
             ->pluck($this->getIdentifierName($fieldKey), $model->getKeyName())
