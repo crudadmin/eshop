@@ -161,13 +161,15 @@ trait HasProductResponses
         }
     }
 
-    public function scopewithDetailResponse($query)
+    public function scopeWithDetailResponse($query)
     {
         if ( $this->hasGalleryEnabled() ) {
             $query->with(['gallery']);
         }
 
-        $query->with(['variants.gallery']);
+        if ( Admin::getModel('ProductsVariant')->hasGalleryEnabled() ) {
+            $query->with(['variants.gallery']);
+        }
     }
 
     public function scopeGetPriceRange($query, $filterParams)
