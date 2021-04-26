@@ -28,22 +28,12 @@ trait HasProductResponses
             $columns = array_merge($columns, ['stock_quantity', 'stockText', 'stockNumber', 'hasStock',]);
         }
 
-        $columns = array_merge($columns, ['thumbnail', 'attributesText', 'attributes',]);
+        $columns = array_merge($columns, array_filter([
+            'thumbnail',
+            'attributesText',
+        ]));
 
         return $columns;
-    }
-
-    /**
-     * Which columns should be appended
-     * You can replace this method in your model
-     *
-     * @return  array
-     */
-    public function appendOrderableColumns()
-    {
-        return [
-            'thumbnail',
-        ];
     }
 
     public function setCategoryResponse()
@@ -52,13 +42,21 @@ trait HasProductResponses
             $this->visibleOrderableColumns()
         );
 
-        $this->append($this->appendOrderableColumns());
+        $this->append([
+            'thumbnail',
+        ]);
 
         $this->mutateCategoryResponse();
 
         return $this;
     }
 
+    /**
+     * Which columns should be appended
+     * You can replace this method in your model
+     *
+     * @return  array
+     */
     public function setDetailResponse()
     {
         $this->setCategoryResponse();
@@ -101,6 +99,7 @@ trait HasProductResponses
 
         $this->append([
             'detailThumbnail',
+            'attributesText'
         ]);
 
         return $this;
