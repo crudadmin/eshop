@@ -8,7 +8,9 @@ trait HasVariantColors
 {
     public function getColorsAttribute()
     {
-        $colorAttributes = $this->attributesItems->where('attribute_id', env('ATTR_COLOR_ID'));
+        $colorAttribute = env('ATTR_COLOR_EXACT_ID') ?: env('ATTR_COLOR_ID');
+
+        $colorAttributes = $this->attributesItems->whereIn('attribute_id', explode(',', $colorAttribute));
 
         if ( $colorAttributes->count() == 0 ){
             return [];
