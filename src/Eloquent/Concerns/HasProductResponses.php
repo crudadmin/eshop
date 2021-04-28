@@ -3,6 +3,7 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
+use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\Modules\SeoModule;
@@ -168,6 +169,20 @@ trait HasProductResponses
 
         if ( Admin::getModel('ProductsVariant')->hasGalleryEnabled() ) {
             $query->with(['variants.gallery']);
+        }
+    }
+
+    public function scopeWithCartResponse($query)
+    {
+        $query->select($this->getCartSelectColumns());
+
+        //Add attributes support into cart
+        if (
+            config('admineshop.attributes.load_in_cart') === true
+            && $query->getModel() instanceof HasAttributesSupport
+            && $query->getModel()->hasAttributesEnabled()
+        ) {
+            $query->with(['attributesItems']);
         }
     }
 

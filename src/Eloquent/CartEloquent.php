@@ -49,16 +49,7 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
 
     public function scopeCartSelect($query)
     {
-        $query->select($this->getCartSelectColumns());
-
-        //Add attributes support into cart
-        if (
-            config('admineshop.attributes.load_in_cart') === true
-            && $query->getModel() instanceof HasAttributesSupport
-            && $query->getModel()->hasAttributesEnabled()
-        ) {
-            $query->with(['attributesItems']);
-        }
+        $query->withCartResponse();
 
         return $query;
     }

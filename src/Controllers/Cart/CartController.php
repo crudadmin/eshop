@@ -29,7 +29,11 @@ class CartController extends Controller
      */
     private function getIdentifierClass(array $request = null)
     {
-        $classname = Cart::getIdentifierByClassName($request['identifier'] ?? config('admineshop.cart.default_identifier'));
+        if ( $identifierName = $request['identifier'] ?? null ) {
+            $classname = Cart::getIdentifierByName($identifierName);
+        } else {
+            $classname = Cart::getIdentifierByClassName(config('admineshop.cart.default_identifier'));
+        }
 
         $identifier = new $classname;
         $identifier->bootFromRequestData(
