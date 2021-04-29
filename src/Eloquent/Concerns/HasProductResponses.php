@@ -102,8 +102,11 @@ trait HasProductResponses
 
         $this->append([
             'detailThumbnail',
-            'attributesText'
         ]);
+
+        if ( config('admineshop.attributes.attributesText', false) == true ) {
+            $this->append(['attributesText']);
+        }
 
         return $this;
     }
@@ -169,8 +172,24 @@ trait HasProductResponses
             $query->with(['gallery']);
         }
 
+        //Extend variants with gallery
+        //We need rewrite eagerLoads and keep existing variants scope if is present
+        //because if withCategoryResponse has been called before, we will throw all nested withs if we would
+        //call simple with("variants.gallery")
         if ( Admin::getModel('ProductsVariant')->hasGalleryEnabled() ) {
-            $query->with(['variants.gallery']);
+            $eagerLoads = $query->getEagerLoads();
+
+            $loads = array_merge($eagerLoads, [
+                'variants' => function($query) use ($eagerLoads) {
+                    if ( isset($eagerLoads['variants']) ) {
+                        $eagerLoads['variants']($query);
+                    }
+
+                    $query->with('gallery');
+                },
+            ]);
+
+            $query->setEagerLoads($loads);
         }
     }
 
