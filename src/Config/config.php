@@ -26,7 +26,8 @@ return [
         'variants' => [
             'name' => 'Produkt s variantami',
             'variants' => true,
-            'orderableVariants' => true
+            'orderableVariants' => true,
+            'loadInCart' => false, //variants relation in product model should not be loaded, because variant is loaded separately in cart item
         ]
     ],
 

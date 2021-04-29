@@ -48,8 +48,8 @@ trait HasProductAttributes
 
     public function getAttributesTextAttribute()
     {
-        //If attributes for given model are not enabled
-        if ( $this->hasAttributesEnabled() == false ){
+        //If attributes for given model are not enabled, or fetched by developer
+        if ( $this->hasAttributesEnabled() == false || !$this->relationLoaded('attributesItems') ){
             return;
         }
 

@@ -79,7 +79,7 @@ class CartController extends Controller
 
     public function addItem()
     {
-        $identifier = $this->getIdentifierClass();
+        $identifier = $this->getIdentifierClass(request()->all());
 
         $parentIdentifier = $this->getParentIdentifierClass();
 
@@ -94,7 +94,7 @@ class CartController extends Controller
 
     public function updateQuantity()
     {
-        $identifier = $this->getIdentifierClass();
+        $identifier = $this->getIdentifierClass(request()->all());
 
         $parentIdentifier = $this->getParentIdentifierClass();
 
@@ -109,7 +109,7 @@ class CartController extends Controller
 
     public function removeItem()
     {
-        $identifier = $this->getIdentifierClass();
+        $identifier = $this->getIdentifierClass(request()->all());
 
         $parentIdentifier = $this->getParentIdentifierClass();
 

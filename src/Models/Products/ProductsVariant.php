@@ -50,7 +50,7 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
      * This items will be selected frm db for cart items
      */
     protected $cartSelect = [
-        'id', 'product_id', 'name', 'image', 'stock_quantity',
+        'id', 'product_id', 'name', 'image', 'code', 'stock_quantity',
     ];
 
     /*
@@ -65,7 +65,6 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
      */
     public function __construct(array $options = [])
     {
-        $this->append($this->getPriceAttributes());
         $this->append($this->getStockAttributes());
 
         parent::__construct($options);

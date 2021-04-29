@@ -10,6 +10,11 @@ trait HasVariantColors
     {
         $colorAttribute = env('ATTR_COLOR_EXACT_ID') ?: env('ATTR_COLOR_ID');
 
+        //If relation has not been loaded by developer
+        if ( !$this->relationLoaded('attributesItems') ){
+            return [];
+        }
+
         $colorAttributes = $this->attributesItems->whereIn('attribute_id', explode(',', $colorAttribute));
 
         if ( $colorAttributes->count() == 0 ){

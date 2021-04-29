@@ -24,6 +24,13 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
         'price', 'vat_id', 'discount_operator', 'discount',
     ];
 
+    public function setCartResponse()
+    {
+        $this->append($this->getPriceAttributes());
+
+        return $this;
+    }
+
     public function getPriceSelectColumns()
     {
         return array_unique($this->fixAmbiguousColumn($this->priceSelect ?: []));
@@ -49,7 +56,9 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
 
     public function scopeCartSelect($query)
     {
-        $query->withCartResponse();
+        if ( method_exists($this, 'scopeWithCartResponse') ) {
+            $query->withCartResponse();
+        }
 
         return $query;
     }

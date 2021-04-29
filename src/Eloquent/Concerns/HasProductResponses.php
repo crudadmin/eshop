@@ -39,6 +39,8 @@ trait HasProductResponses
 
     public function setCategoryResponse()
     {
+        $this->append($this->getPriceAttributes());
+
         $this->setVisible(
             $this->visibleOrderableColumns()
         );
@@ -64,13 +66,13 @@ trait HasProductResponses
 
         $this->mutateDetailResponse();
 
-        if ( $this->hasGalleryEnabled() ) {
+        if ( $this->hasGalleryEnabled() && $this->relationLoaded('gallery') ) {
             $this->gallery->each->setDetailResponse();
 
             $this->makeVisible(['gallery']);
         }
 
-        if ( $this->hasAttributesEnabled() ) {
+        if ( $this->hasAttributesEnabled() && $this->relationLoaded('attributesItems') ) {
             $this->makeVisible(['attributesList']);
             $this->append(['attributesList']);
 
@@ -174,7 +176,17 @@ trait HasProductResponses
 
     public function scopeWithCartResponse($query)
     {
+        $query->withCategoryResponse();
+
         $query->select($this->getCartSelectColumns());
+
+        //If variants are not enabled in cart response, we need throw away relation
+        $variantsIntoCart = array_filter(Store::variantsProductTypes(), function($key){
+            return config('admineshop.product_types.'.$key.'.loadInCart', false) == true;
+        });
+        if ( count($variantsIntoCart) == 0 ){
+            $query->without('variants');
+        }
 
         //Add attributes support into cart
         if (

@@ -29,18 +29,6 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasProductResponses,
         HasCategoryTree;
 
-    /**
-     * Model constructor
-     *
-     * @param  array  $options
-     */
-    public function __construct(array $options = [])
-    {
-        $this->append($this->getPriceAttributes());
-        $this->append($this->getStockAttributes());
-
-        parent::__construct($options);
-    }
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -73,6 +61,18 @@ class Product extends CartEloquent implements HasAttributesSupport
         'id', 'product_type', 'slug', 'name', 'image', 'code',
         'stock_quantity', 'stock_type', 'stock_sold',
     ];
+
+    /**
+     * Model constructor
+     *
+     * @param  array  $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->append($this->getStockAttributes());
+
+        parent::__construct($options);
+    }
 
     /*
      * Automatic form and database generation
@@ -214,8 +214,9 @@ class Product extends CartEloquent implements HasAttributesSupport
     {
         $visible = [ 'product_type' ];
 
-        //If variants are enabled
-        if ( count(Store::variantsProductTypes()) ){
+        //If variants are enabled, and has been loaded before.
+        //We does not want to push variants into product, when developer did not fetch variants from database
+        if ( count(Store::variantsProductTypes()) && $this->relationLoaded('variants') ){
             $visible[] = 'variants';
 
             $this->variants->each->setCategoryResponse();
