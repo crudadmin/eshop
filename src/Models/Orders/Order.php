@@ -12,6 +12,7 @@ use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
+use AdminEshop\Requests\SubmitOrderRequest;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Discounts;
@@ -82,7 +83,7 @@ class Order extends AdminModel
                     'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
                     'delivery_street' => 'name:Ulica a č.p.|required_with:delivery_different',
                     'delivery_city' => 'name:Mesto|required_with:delivery_different',
-                    'delivery_zipcode' => 'name:PSČ|required_with:delivery_different',
+                    'delivery_zipcode' => 'name:PSČ|required_with:delivery_different|zipcode',
                     'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1|required_with:delivery_different',
                 ])->add('hideFieldIfNot:delivery_different,1')
             ])->add('hidden')->grid(4),
@@ -323,5 +324,17 @@ class Order extends AdminModel
             'paymentMethodPriceWithVat',
             'invoiceUrl',
         ]);
+    }
+
+    /**
+     * We can mutate request request before validation here
+     *
+     * @return  Admin\Core\Fields\FieldsValidator
+     */
+    public function orderValidator()
+    {
+        return $this->validator()->use(
+            config('admineshop.cart.order.validator', SubmitOrderRequest::class)
+        );
     }
 }

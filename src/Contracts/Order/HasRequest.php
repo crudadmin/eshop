@@ -27,6 +27,17 @@ trait HasRequest
     ];
 
     /**
+     * Returns request data
+     *
+     * @param  array  $row
+     * @return  this
+     */
+    public function getRequestData()
+    {
+        return $this->requestData;
+    }
+
+    /**
      * Clean order row and made modifications whit order row
      *
      * @param  array  $row
@@ -48,18 +59,17 @@ trait HasRequest
      */
     public function setResetIfNotPresent(array $array)
     {
-        $this->resetIfNotPresent = array_merge($this->resetIfNotPresent, $array);
+        $this->resetIfNotPresent = $array;
     }
 
     /**
-     * Returns request data
+     * Get reset if not present mutators list
      *
-     * @param  array  $row
-     * @return  this
+     * @return  array
      */
-    public function getRequestData()
+    public function getResetIfNotPresent()
     {
-        return $this->requestData;
+        return $this->resetIfNotPresent;
     }
 
     /**
@@ -70,7 +80,7 @@ trait HasRequest
      */
     public function cleanNotPresent($row)
     {
-        foreach ($this->resetIfNotPresent as $isPresentKey => $fieldsToRemove) {
+        foreach ($this->getResetIfNotPresent() as $isPresentKey => $fieldsToRemove) {
             if ( !array_key_exists($isPresentKey, $row) || !in_array($row[$isPresentKey], [1, 'on']) ) {
                 foreach ($fieldsToRemove as $key) {
                     $row[$key] = null;
