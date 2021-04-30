@@ -194,12 +194,25 @@ class Identifier
     public function tryOrderItemsColumn($key, $item = null)
     {
         if ( $item instanceof OrdersItem ) {
-            $options = @$this->getIdentifyKeys()[$key] ?: [];
+            $options = $this->getIdentifyKeys()[$key] ?? [];
 
-            $key = @$options['orders_items_column'] ?: $key;
+            $key = $options['orders_items_column'] ?? $key;
         }
 
         return $key;
+    }
+
+    public function getOrderItemsColumns()
+    {
+        $columns = [];
+
+        foreach ($this->getIdentifyKeys() as $key => $options) {
+            $orderItemKey = $options['orders_items_column'] ?? $key;
+
+            $columns[$orderItemKey] = $this->getIdentifier($key);
+        }
+
+        return $columns;
     }
 
     /**

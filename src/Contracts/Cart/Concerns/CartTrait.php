@@ -11,6 +11,7 @@ use AdminEshop\Contracts\Collections\CartCollection;
 use Admin\Eloquent\AdminModel;
 use Discounts;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Store;
 use \Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
@@ -355,6 +356,38 @@ trait CartTrait
         }
 
         $this->getDriver()->set('items', $arrayItems);
+    }
+
+    public function getBoughtWithProducts()
+    {
+        $identifiersKeys = $this->items->map(function($item){
+            $identifier = $item->getIdentifierClass();
+
+            if ( !($identifier instanceof ProductsIdentifier) ){
+                return;
+            }
+
+            return $identifier->getOrderItemsColumns();
+        })->filter()->values();
+
+        $orderIdsWithThisProducts = DB::table('orders_items')
+            ->where(function($query) use ($identifiersKeys) {
+                foreach ($identifiersKeys as $key => $keys) {
+                    $query->{$key == 0 ? 'where' : 'orWhere'}($keys);
+                }
+            })
+            ->select('order_id')
+            ->take(300)
+            ->get()
+            ->pluck('order_id');
+
+        return Admin::getModel('Product')
+                //Except items in cart
+                ->whereNotIn('id', $identifiersKeys->pluck('product_id'))
+                //Only products which has been ordered in given orders list
+                ->whereHas('ordersItem', function($query) use ($orderIdsWithThisProducts) {
+                    $query->whereIn('order_id', $orderIdsWithThisProducts);
+                });
     }
 }
 
