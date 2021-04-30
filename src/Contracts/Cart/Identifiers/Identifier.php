@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Cart\Identifiers;
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Models\Orders\OrdersItem;
+use Store;
 
 class Identifier
 {
@@ -252,6 +253,31 @@ class Identifier
     public function getProductNameParts(UsesIdentifier $item) : array
     {
         return [];
+    }
+
+    public function onOrderItemCreate(CartItem $item)
+    {
+        $product = $item->getItemModel();
+
+        $data = [
+            'identifier' => $this->getName(),
+            'discountable' => $item->hasDiscounts(),
+            'quantity' => $item->quantity,
+            'default_price' => $product->defaultPriceWithoutVat,
+            'price' => $product->priceWithoutVat,
+            'vat' => Store::getVatValueById($product->vat_id),
+            'price_vat' => $product->priceWithVat,
+        ];
+
+        foreach ($this->getIdentifyKeys() as $key => $options) {
+            $orderItemKey = $options['orders_items_column'] ?? $key;
+
+            $identifierValue = $this->getIdentifierValue($item, $key);
+
+            $data[$orderItemKey] = $identifierValue;
+        }
+
+        return $data;
     }
 }
 

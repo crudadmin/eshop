@@ -7,9 +7,20 @@ use OrderService;
 
 trait HasOrderProcess
 {
-    public function validateOrder($mutators = null)
+    public function validateOrder($mutators = null, $fetchStoredClientData = false)
     {
-        $row = Admin::getModel('Order')->orderValidator()->validate()->getData();
+        $request = request();
+
+        if ( $fetchStoredClientData ){
+            $clientData = OrderService::getFromSession();
+
+            $request->merge($request->all() + $clientData);
+        }
+
+        $validator = Admin::getModel('Order')->orderValidator($request);
+
+
+        $row = $validator->validate()->getData();
 
         //Remove uneccessary delivery and company info from order
         OrderService::setRequestData($row)->storeIntoSession();

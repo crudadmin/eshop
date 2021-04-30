@@ -16,6 +16,7 @@ use AdminEshop\Requests\SubmitOrderRequest;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Discounts;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use OrderService;
 use Store;
@@ -331,9 +332,9 @@ class Order extends AdminModel
      *
      * @return  Admin\Core\Fields\FieldsValidator
      */
-    public function orderValidator()
+    public function orderValidator(Request $request)
     {
-        return $this->validator()->use(
+        return $this->validator($request)->use(
             config('admineshop.cart.order.validator', SubmitOrderRequest::class)
         );
     }

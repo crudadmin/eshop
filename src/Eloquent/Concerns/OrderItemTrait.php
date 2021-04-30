@@ -24,13 +24,13 @@ trait OrderItemTrait
             'id', 'product_id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'
         ])->whereHas('product', function($query){
             $query->whereIn('product_type', Store::filterConfig('orderableVariants', true));
-        })->when($variantsModel->hasAttributesEnabled(), function($query){
+        })->when($variantsModel->hasAttributesEnabled() && config('admineshop.attributes.attributesText', false), function($query){
             $query->with(['attributesItems']);
         })->get();
 
         return $products->map(function($item) use ($variantsModel) {
             //Extend name with attributes
-            if ( $variantsModel->hasAttributesEnabled() ) {
+            if ( $variantsModel->hasAttributesEnabled() && config('admineshop.attributes.attributesText', false) ) {
                 $item->name .= $item->attributesText ? ' - '.$item->attributesText : '';
             }
 
@@ -52,13 +52,13 @@ trait OrderItemTrait
 
         $products = $productModel->select([
             'id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'
-        ])->when($productModel->hasAttributesEnabled(), function($query){
+        ])->when($productModel->hasAttributesEnabled() && config('admineshop.attributes.attributesText', false), function($query){
             $query->with(['attributesItems']);
         })->get();
 
         return $products->map(function($item) use ($productModel) {
             //Extend name with attributes
-            if ( $productModel->hasAttributesEnabled() ) {
+            if ( $productModel->hasAttributesEnabled() && config('admineshop.attributes.attributesText', false) ) {
                 $item->name .= $item->attributesText ? ' - '.$item->attributesText : '';
             }
 

@@ -134,19 +134,9 @@ class OrderService
         $items = Cart::allWithMutators();
 
         foreach ($items as $item) {
-            $product = $item->getItemModel();
+            $identifier = $item->getIdentifierClass();
 
-            $data = [
-                'identifier' => $item->getIdentifierClass()->getName(),
-                'discountable' => $item->hasDiscounts(),
-                'product_id' => $item->id,
-                'variant_id' => $item->variant_id,
-                'quantity' => $item->quantity,
-                'default_price' => $product->defaultPriceWithoutVat,
-                'price' => $product->priceWithoutVat,
-                'vat' => Store::getVatValueById($product->vat_id),
-                'price_vat' => $product->priceWithVat,
-            ];
+            $data = $identifier->onOrderItemCreate($item);
 
             $this->assignParentCartItem($data, $items, $item);
 
