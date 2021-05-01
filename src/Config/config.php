@@ -55,6 +55,7 @@ return [
         ],
         'types' => [
             'colors' => false,
+            'images' => false,
         ],
     ],
 

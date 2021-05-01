@@ -74,6 +74,12 @@ class AttributesItem extends AdminModel
                 'color' => 'name:Farba|type:color|required_if:attribute_id,'.env('ATTR_COLOR_ID').'|inaccessibleIfNotIn:attribute_id,'.env('ATTR_COLOR_ID'),
             ]);
         }
+
+        if ( config('admineshop.attributes.types.images', false) === true ){
+            $fields->push([
+                'image' => 'name:Obrázok|type:file|image|required_if:attribute_id,'.env('ATTR_IMAGES_ID').'|inaccessibleIfNotIn:attribute_id,'.env('ATTR_IMAGES_ID'),
+            ]);
+        }
     }
 
     public function scopeAdminRows($query)
