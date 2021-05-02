@@ -53,13 +53,13 @@ class Synchronizer extends SynchronizerLogger
 
     public function tryOrLog($command = null)
     {
+        if ( $command ) {
+            $this->setCommand($command);
+        }
+
         $preparedData = $this->prepare();
 
         try {
-            if ( $command ) {
-                $this->setCommand($command);
-            }
-
             $this->message('************* '.class_basename(get_class($this)));
 
             $this->handle($preparedData);
