@@ -29,20 +29,19 @@ trait HasProductFilter
     {
         $params = is_array($params) ? $params : [];
 
-        //If no filter params are present
-        if ( count($params) == 0 ){
-            return;
-        }
-
-        $existingAttributes = Store::getExistingAttributesFromFilter($params);
-
         $filter = [];
-        foreach ($params as $key => $value) {
-            //Denny non attributes queries
-            if ( array_key_exists($key, $existingAttributes) ){
-                $attributeId = $existingAttributes[$key]['id'];
 
-                $filter[$attributeId] = explode(',', $value);
+        //If no filter params are present
+        if ( count($params) > 0 ){
+            $existingAttributes = Store::getExistingAttributesFromFilter($params);
+
+            foreach ($params as $key => $value) {
+                //Denny non attributes queries
+                if ( array_key_exists($key, $existingAttributes) ){
+                    $attributeId = $existingAttributes[$key]['id'];
+
+                    $filter[$attributeId] = explode(',', $value);
+                }
             }
         }
 
