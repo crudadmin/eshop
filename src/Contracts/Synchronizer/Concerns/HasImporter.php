@@ -110,38 +110,6 @@ trait HasImporter
         });
     }
 
-    public function castData(Model $model, $row)
-    {
-        foreach ($row as $key => $value) {
-            $isLocale = $this->isLocalizedField($model, $key);
-
-            if ( $isLocale ){
-                if ( is_string($value) ) {
-                    $defaultLocaleSlug = Localization::get()->slug;
-
-                    $row[$key] = [
-                        $defaultLocaleSlug => $value
-                    ];
-                }
-
-                //Cast json data
-                $row[$key] = array_filter($row[$key], function($item){
-                    return is_null($item) === false && $item !== '';
-                });
-
-                $row[$key] = $this->encodeJsonArray($row[$key]);
-            }
-        }
-
-        $this->applyMutators($model, $row);
-
-        if ( method_exists($this, $castMethodName = ('set'.class_basename(get_class($model)).'CastData')) ){
-            $row = $this->{$castMethodName}($row);
-        }
-
-        return $row;
-    }
-
     private function encodeJsonArray($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
@@ -156,46 +124,9 @@ trait HasImporter
         return $value == $oldValue;
     }
 
-    public function castInsertData(Model $model, $row)
-    {
-        $row = $this->castData($model, $row);
-
-        $this->applyMutators($model, $row, null, 'setFinal');
-
-        $this->removeHelperAttributes($row);
-
-        if ( $this->isSortable($model) ){
-            $row['_order'] = $this->insertIncrement[$model->getTable()];
-        }
-
-        if ( $this->hasSluggable($model) ){
-            $slug = $row[$model->getProperty('sluggable')];
-
-            $row['slug'] = $model->makeSlug($slug);
-        }
-
-        return $row;
-    }
-
     private function getKeyMutatorMethodName(Model $model, $key, $prefix = null)
     {
         return ($prefix ?: 'set').class_basename(get_class($model)).Str::studly($key).'Attribute';
-    }
-
-    public function castUpdateData(Model $model, $row)
-    {
-        $row = $this->castData($model, $row);
-
-        return $row;
-    }
-
-    public function postCastUpdateData(Model $model, $row, $oldRow)
-    {
-        $this->applyMutators($model, $row, $oldRow, 'setFinal');
-
-        $this->removeHelperAttributes($row);
-
-        return $row;
     }
 
     public function getRowChanges(Model $model, $row, $oldRow)
@@ -215,7 +146,7 @@ trait HasImporter
         return $changes;
     }
 
-    private function applyMutators(Model $model, &$row, $oldRow = null, $prefix = null)
+    private function applyFieldMutators(Model $model, &$row, $oldRow = null, $prefix = null)
     {
         //Apply mutators on changed inputs
         foreach ($row as $key => $value) {
@@ -325,7 +256,7 @@ trait HasImporter
 
                 $object = new \stdClass;
                 $object->{$model->getKeyName()} = $id;
-                $this->applyMutators($model, $originalRow, $object, 'setAfter');
+                $this->applyFieldMutators($model, $originalRow, $object, 'setAfter');
 
                 $inserted++;
             } catch(Throwable $e){
@@ -491,18 +422,17 @@ trait HasImporter
                         $castedImportRow = $rowsDataWithIdsKeys[$dbRow->{$modelKeyName}];
 
                         $rowChanges = $this->getRowChanges($model, $castedImportRow, $dbRow);
-                        $rowChanges = $this->postCastUpdateData($model, $rowChanges, $dbRow);
+                        $rowChanges = $this->castFinalFieldsData($model, $rowChanges, $dbRow);
 
                         //Update row if something has been changed
                         if ( count($rowChanges) > 0 ){
-
                             //Only if ID is available
                             if ( $id = $dbRow->{$modelKeyName} ) {
                                 $totalUpdated++;
 
                                 DB::table($model->getTable())->where($modelKeyName, $id)->update($rowChanges);
 
-                                $this->applyMutators($model, $castedImportRow, $dbRow, 'setAfter');
+                                $this->applyFieldMutators($model, $castedImportRow, $dbRow, 'setAfter');
 
                                 $updated++;
                             }
