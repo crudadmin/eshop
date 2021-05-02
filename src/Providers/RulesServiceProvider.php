@@ -25,12 +25,12 @@ class RulesServiceProvider extends ServiceProvider
             $type = $parameters[0] ?? null;
 
             //If is non orderable product type, just continue...
-            if ( $type == 'products' && !in_array(request('product_type'), Store::orderableProductTypes()) ) {
+            if ( $type == 'products' && !in_array($validator->getData()['product_type'] ?? null, Store::orderableProductTypes()) ) {
                 return true;
             }
 
             //If is orderable product type, just continue...
-            if ( $type == 'variants' && in_array(request('product_type'), Store::orderableProductTypes()) ) {
+            if ( $type == 'variants' && in_array($validator->getData()['product_type'] ?? null, Store::orderableProductTypes()) ) {
                 return true;
             }
 
@@ -42,6 +42,16 @@ class RulesServiceProvider extends ServiceProvider
             return true;
         }, _('Cena produktu musí byť kladná.'));
 
+        Validator::extend('required_if_checked', function ($attribute, $value, $parameters, $validator) {
+            $parentField = $validator->getData()[$parameters[0]] ?? null;
+
+            if ( (!$parentField || $parentField == 0) ){
+                return true;
+            }
+
+            return is_null($value) ? false : true;
+        }, trans('validation.required'));
+
         Validator::extend('zipcode', function ($attribute, $value, $parameters, $validator) {
             $value = str_replace(' ', '', $value);
 
@@ -49,7 +59,7 @@ class RulesServiceProvider extends ServiceProvider
         }, _('PSČ musí byť zadané v tvare 000 00.'));
 
         Validator::extend('validate_attribute_unit', function ($attribute, $value, $parameters, $validator) {
-            if ( ($unit = Store::getUnit(request('unit_id'))) && $unit->isNumericType ){
+            if ( ($unit = Store::getUnit($validator->getData()['unit_id'] ?? null)) && $unit->isNumericType ){
                 $value = str_replace(',', '.', $value);
 
                 return is_numeric($value);

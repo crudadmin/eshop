@@ -80,21 +80,21 @@ class Order extends AdminModel
             'Dodacie údaje' => Group::fields([
                 'delivery_different' => 'name:Doručiť na inú adresu|type:checkbox|default:0',
                 Group::fields([
-                    'delivery_username' => 'name:Meno a priezvisko / Firma|required_with:delivery_different',
+                    'delivery_username' => 'name:Meno a priezvisko / Firma|required_if_checked:delivery_different',
                     'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
-                    'delivery_street' => 'name:Ulica a č.p.|required_with:delivery_different',
-                    'delivery_city' => 'name:Mesto|required_with:delivery_different',
-                    'delivery_zipcode' => 'name:PSČ|required_with:delivery_different|zipcode',
-                    'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1|required_with:delivery_different',
+                    'delivery_street' => 'name:Ulica a č.p.|required_if_checked:delivery_different',
+                    'delivery_city' => 'name:Mesto|required_if_checked:delivery_different',
+                    'delivery_zipcode' => 'name:PSČ|required_if_checked:delivery_different|zipcode',
+                    'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1|required_if_checked:delivery_different',
                 ])->add('hideFieldIfNot:delivery_different,1')
             ])->add('hidden')->grid(4),
             Group::fields([
                 'Firemné údaje' => Group::fields([
                     'is_company' => 'name:Nákup na firmu|type:checkbox|default:0',
                     Group::fields([
-                        'company_name' => 'name:Názov firmy|required_with:is_company',
-                        'company_id' => 'name:IČ|company_id|required_with:is_company',
-                        'company_tax_id' => 'name:DIČ|required_with:is_company',
+                        'company_name' => 'name:Názov firmy|required_if_checked:is_company',
+                        'company_id' => 'name:IČ|company_id|required_if_checked:is_company',
+                        'company_tax_id' => 'name:DIČ|required_if_checked:is_company',
                         'company_vat_id' => 'name:IČ DPH',
                     ])->add('hideFieldIfNot:is_company,1')
                 ])->add('hidden'),

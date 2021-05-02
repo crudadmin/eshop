@@ -19,7 +19,6 @@ trait HasOrderProcess
 
         $validator = Admin::getModel('Order')->orderValidator($request);
 
-
         $row = $validator->validate()->getData();
 
         //Remove uneccessary delivery and company info from order
