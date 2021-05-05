@@ -78,7 +78,7 @@ class Order extends AdminModel
                 'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|required|exists:countries,id',
             ])->grid(4),
             'Dodacie údaje' => Group::fields([
-                'delivery_different' => 'name:Doručiť na inú adresu|type:checkbox|default:0',
+                'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|type:checkbox|default:0',
                 Group::fields([
                     'delivery_username' => 'name:Meno a priezvisko / Firma|required_if_checked:delivery_different',
                     'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
