@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Order;
 
+use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use Illuminate\Support\Traits\Macroable;
 
 trait HasRequest
@@ -21,7 +22,7 @@ trait HasRequest
      *
      * @var  array
      */
-    protected $resetIfNotPresent = [
+    protected $defaultresetIfNotPresent = [
         'delivery_different' => ['delivery_username', 'delivery_phone', 'delivery_street', 'delivery_city', 'delivery_zipcode', 'delivery_city', 'delivery_country_id'],
         'is_company' => ['company_name', 'company_id', 'company_tax_id', 'company_vat_id'],
     ];
@@ -41,11 +42,13 @@ trait HasRequest
      * Clean order row and made modifications whit order row
      *
      * @param  array  $row
+     * @param  bool  $submitOrder
+     *
      * @return  this
      */
-    public function setRequestData($row)
+    public function setRequestData($row, $submitOrder = false)
     {
-        $row = $this->cleanNotPresent($row);
+        $row = $this->cleanNotPresent($row, $submitOrder);
 
         $this->requestData = $row;
 
@@ -57,9 +60,9 @@ trait HasRequest
      *
      * @param  array  $array
      */
-    public function setResetIfNotPresent(array $array)
+    public function setDefaultResetIfNotPresent(array $array)
     {
-        $this->resetIfNotPresent = $array;
+        $this->defaultresetIfNotPresent = $array;
     }
 
     /**
@@ -67,9 +70,9 @@ trait HasRequest
      *
      * @return  array
      */
-    public function getResetIfNotPresent()
+    public function getDefaultResetIfNotPresent()
     {
-        return $this->resetIfNotPresent;
+        return $this->defaultresetIfNotPresent;
     }
 
     /**
@@ -78,9 +81,12 @@ trait HasRequest
      * @param  array  $row
      * @return  $row
      */
-    public function cleanNotPresent($row)
+    public function cleanNotPresent($row, $submitOrder = false)
     {
-        foreach ($this->getResetIfNotPresent() as $isPresentKey => $fieldsToRemove) {
+        $resetFields = config('admineshop.cart.order.'.($submitOrder ? 'fields_reset_submit' : 'fields_reset_process'));
+        $resetFields = is_array($resetFields) ? $resetFields : $this->getDefaultResetIfNotPresent();
+
+        foreach ($resetFields as $isPresentKey => $fieldsToRemove) {
             if ( !array_key_exists($isPresentKey, $row) || !in_array($row[$isPresentKey], [1, 'on']) ) {
                 foreach ($fieldsToRemove as $key) {
                     $row[$key] = null;
@@ -89,6 +95,30 @@ trait HasRequest
         }
 
         return $row;
+    }
+
+    /**
+     * Store row into session
+     *
+     * @return  this
+     */
+    public function storeIntoSession()
+    {
+        $requestData = $this->getRequestData();
+
+        (new ClientDataMutator)->setClientData($requestData);
+
+        return $this;
+    }
+
+    /**
+     * Get row data from session
+     *
+     * @return  this
+     */
+    public function getFromSession()
+    {
+        return (new ClientDataMutator)->getClientData();
     }
 }
 ?>

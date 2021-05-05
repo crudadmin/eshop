@@ -86,7 +86,7 @@ class Order extends AdminModel
                     'delivery_city' => 'name:Mesto|required_if_checked:delivery_different',
                     'delivery_zipcode' => 'name:PSČ|required_if_checked:delivery_different|zipcode',
                     'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1|required_if_checked:delivery_different',
-                ])->add('hideFieldIfNot:delivery_different,1')
+                ])->attributes('hideFieldIfNot:delivery_different,1')->id('delivery_fields'),
             ])->add('hidden')->grid(4),
             Group::fields([
                 'Firemné údaje' => Group::fields([
@@ -96,7 +96,7 @@ class Order extends AdminModel
                         'company_id' => 'name:IČ|company_id|required_if_checked:is_company',
                         'company_tax_id' => 'name:DIČ|required_if_checked:is_company',
                         'company_vat_id' => 'name:IČ DPH',
-                    ])->add('hideFieldIfNot:is_company,1')
+                    ])->attributes('hideFieldIfNot:is_company,1')->id('company_fields'),
                 ])->add('hidden'),
             ])->grid(4),
             'Nastavenia objednávky' => Group::fields([

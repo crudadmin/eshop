@@ -162,6 +162,17 @@ return [
 
             //Which field should be displayed in email template in section "Additional fields"
             'additional_email_fields' => [],
+
+            /**
+             * For example if is_company is not checked, we can reset all company fields when they present in request.
+             *
+             * example value for both parameters:
+             * [ 'is_company' => ['company_name', 'company_id', 'company_tax_id', 'company_vat_id'] ] -> reset all company fields, if is_company is not checked
+             * [] -> does not reset anything
+             * null -> reset by defailt settings
+             */
+            'fields_reset_process' => null, //Reseting fields in mid-save detail info process step
+            'fields_reset_submit' => null, //Reseting fields in final submit order step
         ],
 
         //Reregister cart identifier

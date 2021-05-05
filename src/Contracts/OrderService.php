@@ -12,7 +12,6 @@ use AdminEshop\Contracts\Order\Concerns\HasProviders;
 use AdminEshop\Contracts\Order\Concerns\HasShipping;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
-use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
@@ -68,31 +67,6 @@ class OrderService
 
         return $this;
     }
-
-    /**
-     * Store row into session
-     *
-     * @return  this
-     */
-    public function storeIntoSession()
-    {
-        $requestData = $this->getRequestData();
-
-        (new ClientDataMutator)->setClientData($requestData);
-
-        return $this;
-    }
-
-    /**
-     * Get row data from session
-     *
-     * @return  this
-     */
-    public function getFromSession()
-    {
-        return (new ClientDataMutator)->getClientData();
-    }
-
 
     /**
      * Set order

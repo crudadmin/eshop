@@ -107,7 +107,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                 $columns[] = 'category_id';
             }
 
-            return $model->select($columns)->get();
+            return $model->select($columns)->withUnpublished()->get();
         });
     }
 

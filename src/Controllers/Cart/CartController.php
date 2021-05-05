@@ -209,7 +209,7 @@ class CartController extends Controller
 
     public function submitOrder()
     {
-        if ( $errorResponse = OrderService::validateOrder(null, true) ){
+        if ( $errorResponse = OrderService::processFinalOrderValidation() ){
             return $errorResponse;
         }
 
