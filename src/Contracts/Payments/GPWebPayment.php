@@ -56,7 +56,7 @@ class GPWebPayment extends PaymentHelper
                 PaymentRequest::EUR,
                 0,
                 $this->getResponseUrl('status'),
-                $payment->getKey()
+                $order->getKey(),
             );
 
             $request->setEmail($order->email);
@@ -88,7 +88,7 @@ class GPWebPayment extends PaymentHelper
         $response = new PaymentResponse(
             request('OPERATION'),
             request('ORDERNUMBER'),
-            request('MEORDERNUM') ?: request('ORDERNUMBER'),
+            request('MERORDERNUM') ?: request('ORDERNUMBER'),
             request('PRCODE'),
             request('SRCODE'),
             request('RESULTTEXT'),
