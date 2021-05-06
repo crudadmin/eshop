@@ -174,18 +174,6 @@ class GopayPayment extends PaymentHelper
         return $paymentResponse;
     }
 
-    /**
-     * In email post payment redirect we want redirect on same link as first payment link
-     *
-     * @param  string  $paymentResponse
-     *
-     * @return  string
-     */
-    public function getPostPaymentUrl($paymentResponse)
-    {
-        return $paymentResponse;
-    }
-
     public function getPaymentData($paymentResponse)
     {
         return [
