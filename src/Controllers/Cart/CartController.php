@@ -242,10 +242,7 @@ class CartController extends Controller
         return autoAjax()->success(_('Objednávka bola úspešne odoslaná.'))->data([
             'order' => $order,
             'order_hash' => $order->getHash(),
-            'payment' => ($paymentUrl = $order->getPaymentUrl()) ? [
-                'url' => $paymentUrl,
-                'provider' => class_basename(get_class(OrderService::getPaymentClass())),
-            ] : [],
+            'payment' => ($paymentData = $order->getPaymentData()) ? $paymentData : [],
         ]);
     }
 

@@ -51,8 +51,9 @@ class OrdersLog extends AdminModel
             'email-client-error' => 'Neúspešne odoslaný email zázkazníkovy',
             'email-store-error' => 'Neúspešne odoslaný email obchodu',
             'email-payment-done-error' => 'Neúspešne odoslaný email zázkazníkovy pri potvrdení platby',
-            'payment-canceled' => 'Platba bola zrušená zákazníkom, alebo neprebehla v poriadku.',
             'payment-error' => 'Platbu nebolo možné zrealizovať.',
+            'payment-status-error' => 'Platba bola zrušená zákazníkom, alebo ešte nebola úspešne overená po vytvorení objednávky.',
+            'payment-status-unknown-error' => 'Prevod platby zlyhal chybou. Kontaktujte svojho administrátora.',
         ],
     ];
 

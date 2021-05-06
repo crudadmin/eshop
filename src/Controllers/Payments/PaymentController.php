@@ -2,15 +2,16 @@
 
 namespace AdminEshop\Controllers\Payments;
 
+use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 use AdminEshop\Models\Orders\Payment;
 use AdminEshop\Notifications\OrderPaid;
 use Admin\Controllers\Controller;
-use Illuminate\Http\Request;
-use OrderService;
 use Exception;
+use Illuminate\Http\Request;
 use Log;
+use OrderService;
 
-class GopayController extends Controller
+class PaymentController extends Controller
 {
     public function paymentStatus(Payment $payment, $type, $hash)
     {
@@ -27,11 +28,12 @@ class GopayController extends Controller
         }
 
         //Check payment
-        if ( $paymentClass->isPaid() )
-        {
+        try {
+            //Check if order is paid or throw ErrorPaymentException
+            $paymentClass->isPaid();
+
             //If order is not paid
-            if ( ! $order->paid_at )
-            {
+            if ( ! $order->paid_at ) {
                 //Update order status paid
                 $order->update([
                     'paid_at' => \Carbon\Carbon::now()
@@ -56,7 +58,27 @@ class GopayController extends Controller
             }
 
             return redirect(OrderService::onPaymentSuccess());
-        } else {
+        }
+
+        catch (PaymentResponseException $e) {
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'payment-status-error',
+                'log' => $e->getMessage(),
+            ]);
+
+            return redirect(OrderService::onPaymentError());
+        }
+
+        catch (Exception $e) {
+            Log::error($e);
+
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'payment-status-unknown-error',
+                'log' => $e->getMessage(),
+            ]);
+
             return redirect(OrderService::onPaymentError());
         }
     }

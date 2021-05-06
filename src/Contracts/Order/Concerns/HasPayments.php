@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Order\Concerns;
 
+use Admin;
 use AdminEshop\Contracts\Payments\GopayPayment;
 use Exception;
 use Log;
@@ -44,14 +45,6 @@ trait HasPayments
     public function onPaymentError()
     {
         $order = $this->getOrder();
-
-        //Log wrong payment
-        if ( $order ){
-            $order->log()->create([
-                'type' => 'error',
-                'code' => 'payment-canceled',
-            ]);
-        }
 
         if ( is_callable($callback = $this->onPaymentErrorCallback) ) {
             return $callback($order);
@@ -114,18 +107,25 @@ trait HasPayments
         ]);
     }
 
-    public function getPaymentRedirect($paymentMethodId = null)
+    public function bootPaymentClass($paymentMethodId)
     {
-        $payment = $this->makePayment($paymentMethodId);
+        return Admin::cache('payments.'.$paymentMethodId.'.data', function() use ($paymentMethodId) {
+            try {
+                $payment = $this->makePayment($paymentMethodId);
 
-        $paymentClass = $this->getPaymentClass($paymentMethodId);
-        $paymentClass->setPayment($payment);
+                $paymentClass = $this->getPaymentClass($paymentMethodId);
 
-        try {
-            return $paymentClass->getPaymentUrl();
-        } catch (Exception $e){
-            $this->logPaymentError($e);
-        }
+                $paymentClass->setPayment($payment);
+
+                $paymentClass->setResponse(
+                    $paymentClass->getPaymentResponse()
+                );
+
+                return $paymentClass;
+            } catch (Exception $e){
+                $this->logPaymentError($e);
+            }
+        });
     }
 }
 ?>

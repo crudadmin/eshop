@@ -253,22 +253,53 @@ trait OrderTrait
         });
     }
 
+    private function bootOrderIntoOrderService()
+    {
+        $order = OrderService::getOrder();
+
+        //If order in payment helper is not set already
+        if ( !$order || $order->getKey() != $this->getKey() ){
+            OrderService::setOrder($this);
+        }
+    }
+
+    public function getPaymentData($paymentMethodId = null)
+    {
+        $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
+
+        $this->bootOrderIntoOrderService();
+
+        if (
+            !OrderService::hasOnlinePayment($paymentMethodId)
+            || !($paymentClass = OrderService::bootPaymentClass($paymentMethodId))
+        ){
+            return [];
+        }
+
+        return array_merge(
+            [
+                'provider' => class_basename(get_class(OrderService::getPaymentClass()))
+            ],
+            $paymentClass->getPaymentData(
+                $paymentClass->getResponse()
+            )
+        );
+    }
+
     public function getPaymentUrl($paymentMethodId = null)
     {
         $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
 
-        return Admin::cache('payment.link.'.$this->getKey().'.'.$paymentMethodId, function() use ($paymentMethodId) {
-            $order = OrderService::getOrder();
+        if (
+            !OrderService::hasOnlinePayment($paymentMethodId)
+            || !($paymentClass = OrderService::bootPaymentClass($paymentMethodId))
+        ){
+            return [];
+        }
 
-            //If order in payment helper is not set already
-            if ( !$order || $order->getKey() != $this->getKey() ){
-                OrderService::setOrder($this);
-            }
-
-            if ( OrderService::hasOnlinePayment($paymentMethodId) ) {
-                return OrderService::getPaymentRedirect($paymentMethodId);
-            }
-        });
+        return $paymentClass->getPaymentUrl(
+            $paymentClass->getResponse()
+        );
     }
 
     private function getClientName()
