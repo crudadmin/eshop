@@ -253,55 +253,6 @@ trait OrderTrait
         });
     }
 
-    private function bootOrderIntoOrderService()
-    {
-        $order = OrderService::getOrder();
-
-        //If order in payment helper is not set already
-        if ( !$order || $order->getKey() != $this->getKey() ){
-            OrderService::setOrder($this);
-        }
-    }
-
-    public function getPaymentData($paymentMethodId = null)
-    {
-        $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
-
-        $this->bootOrderIntoOrderService();
-
-        if (
-            !OrderService::hasOnlinePayment($paymentMethodId)
-            || !($paymentClass = OrderService::bootPaymentClass($paymentMethodId))
-        ){
-            return [];
-        }
-
-        return array_merge(
-            [
-                'provider' => class_basename(get_class(OrderService::getPaymentClass()))
-            ],
-            $paymentClass->getPaymentData(
-                $paymentClass->getResponse()
-            )
-        );
-    }
-
-    public function getPaymentUrl($paymentMethodId = null)
-    {
-        $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
-
-        if (
-            !OrderService::hasOnlinePayment($paymentMethodId)
-            || !($paymentClass = OrderService::bootPaymentClass($paymentMethodId))
-        ){
-            return [];
-        }
-
-        return $paymentClass->getPaymentUrl(
-            $paymentClass->getResponse()
-        );
-    }
-
     private function getClientName()
     {
         $clientName = str_limit(e(strip_tags($this->is_company ? $this->company_name : $this->username)), 20);

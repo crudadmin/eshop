@@ -51,6 +51,16 @@ class PaymentHelper extends OrderProvider
             $this->getOrderHash($type),
         ]);
     }
+
+    public function getPostPaymentUrl($paymentResponse)
+    {
+        $type = 'postpayment';
+
+        return action('\AdminEshop\Controllers\Payments\PaymentController@postPayment', [
+            $this->getOrder()->getKey(),
+            $this->getOrderHash($type),
+        ]);
+    }
 }
 
 ?>

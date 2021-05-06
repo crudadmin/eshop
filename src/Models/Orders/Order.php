@@ -8,6 +8,7 @@ use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
+use AdminEshop\Eloquent\Concerns\OrderPayments;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
@@ -25,6 +26,7 @@ class Order extends AdminModel
 {
     use Notifiable,
         OrderTrait,
+        OrderPayments,
         HasOrderHashes;
 
     /*

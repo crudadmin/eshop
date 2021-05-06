@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Order\Concerns;
 
 use Admin;
+use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\GopayPayment;
 use Exception;
 use Log;
@@ -42,12 +43,22 @@ trait HasPayments
         }
     }
 
-    public function onPaymentError()
+    /**
+     * Get redirect link with payment error code
+     *
+     * @param  int  $code
+     *
+     *
+     * @return  string|nullable
+     */
+    public function onPaymentError(int $code = 1)
     {
         $order = $this->getOrder();
 
         if ( is_callable($callback = $this->onPaymentErrorCallback) ) {
-            return $callback($order);
+            $message = PaymentErrorCodes::getMessage($code);
+
+            return $callback($order, $code, $message);
         }
     }
 
@@ -109,6 +120,10 @@ trait HasPayments
 
     public function bootPaymentClass($paymentMethodId)
     {
+        if ( !$this->hasOnlinePayment($paymentMethodId) ){
+            return false;
+        }
+
         return Admin::cache('payments.'.$paymentMethodId.'.data', function() use ($paymentMethodId) {
             try {
                 $payment = $this->makePayment($paymentMethodId);

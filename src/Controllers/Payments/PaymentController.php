@@ -2,7 +2,9 @@
 
 namespace AdminEshop\Controllers\Payments;
 
+use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
+use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\Payment;
 use AdminEshop\Notifications\OrderPaid;
 use Admin\Controllers\Controller;
@@ -15,12 +17,11 @@ class PaymentController extends Controller
 {
     public function paymentStatus(Payment $payment, $type, $hash)
     {
-        $paymentId = request('id');
-
         $order = $payment->order;
 
         $paymentClass = OrderService::setOrder($order)
-                                    ->getPaymentClass($payment->payment_method_id);
+                                    ->getPaymentClass($payment->payment_method_id)
+                                    ->setPayment($payment);
 
         //Check if is payment hash correct hash and ids
         if ( $hash != $paymentClass->getOrderHash($type) ) {
@@ -67,7 +68,9 @@ class PaymentController extends Controller
                 'log' => $e->getMessage(),
             ]);
 
-            return redirect(OrderService::onPaymentError());
+            return redirect(
+                OrderService::onPaymentError(PaymentErrorCodes::CODE_PAYMENT_UNVERIFIED)
+            );
         }
 
         catch (Exception $e) {
@@ -79,7 +82,43 @@ class PaymentController extends Controller
                 'log' => $e->getMessage(),
             ]);
 
-            return redirect(OrderService::onPaymentError());
+            return redirect(
+                OrderService::onPaymentError(PaymentErrorCodes::CODE_ERROR)
+            );
         }
+    }
+
+    public function postPayment(Order $order, $hash)
+    {
+        $type = 'postpayment';
+
+        OrderService::setOrder($order);
+
+        //Check if is payment hash correct hash and ids
+        if ( $hash != $order->makePaymentHash($type) ) {
+            abort(401);
+        }
+
+        //Order has been paid already
+        if ( $order->paid_at ) {
+            return redirect(
+                OrderService::onPaymentError(
+                    PaymentErrorCodes::CODE_PAID
+                )
+            );
+        }
+
+        $paymentUrl = $order->getPaymentUrl(
+            $order->payment_method_id
+        );
+
+        //If payment url could not be generated successfully
+        if ( !$paymentUrl ) {
+            $paymentUrl = OrderService::onPaymentError(
+                PaymentErrorCodes::CODE_PAID
+            );
+        }
+
+        return redirect($paymentUrl);
     }
 }

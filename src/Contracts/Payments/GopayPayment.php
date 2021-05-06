@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Payments;
 
 use AdminEshop\Contracts\Payments\Exceptions\PaymentGateException;
+use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 use AdminEshop\Contracts\Payments\PaymentHelper;
 use Gopay;
 use Log;
@@ -26,15 +27,6 @@ class GopayPayment extends PaymentHelper
             'isProductionMode' => $config['production'],
             'scope' => \GoPay\Definition\TokenScope::ALL,
             'language' => \GoPay\Definition\Language::SLOVAK,
-        ]);
-    }
-
-    public function getResponseUrl($type)
-    {
-        return action('\AdminEshop\Controllers\Payments\GopayController@paymentStatus', [
-            $this->getPayment()->getKey(),
-            $type,
-            $this->getOrderHash($type),
         ]);
     }
 
@@ -136,7 +128,7 @@ class GopayPayment extends PaymentHelper
         ]);
     }
 
-    public function getPaymentUrl()
+    public function getPaymentResponse()
     {
         if ( !$this->gopay ){
             return false;
@@ -155,7 +147,7 @@ class GopayPayment extends PaymentHelper
             "payer" => $payer,
             "amount" => round($payment->price * 100),
             "currency" => "EUR",
-            "order_number" => $order->getKey(),
+            "order_number" => $payment->getKey(),
             "order_description" => sprintf(_('Platba %s'), env('APP_NAME')),
             "items" => $this->getItems(),
             "callback" => [
@@ -177,10 +169,38 @@ class GopayPayment extends PaymentHelper
         }
     }
 
+    public function getPaymentUrl($paymentResponse)
+    {
+        return $paymentResponse;
+    }
+
+    /**
+     * In email post payment redirect we want redirect on same link as first payment link
+     *
+     * @param  string  $paymentResponse
+     *
+     * @return  string
+     */
+    public function getPostPaymentUrl($paymentResponse)
+    {
+        return $paymentResponse;
+    }
+
+    public function getPaymentData($paymentResponse)
+    {
+        return [
+            'url' => $paymentResponse,
+        ];
+    }
+
     public function isPaid($id = null)
     {
-        if ( !$this->gopay || !($id = ($id ?: request('id'))) ) {
-            return false;
+        if ( !$this->gopay ) {
+            throw new Exception('Gopay instance has not been found.');
+        }
+
+        if ( !($id = ($id ?: request('id'))) ) {
+            throw new Exception('Gopay ID is missing.');
         }
 
         $status = $this->gopay->getStatus($id);
@@ -189,7 +209,7 @@ class GopayPayment extends PaymentHelper
             return true;
         }
 
-        return false;
+        throw new PaymentResponseException('Payment not verified.');
     }
 }
 

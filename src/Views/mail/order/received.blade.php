@@ -87,10 +87,10 @@
 @endcomponent
 @endif
 
-@if ( $owner == false && $redirect = $order->getPaymentUrl() )
+@if ( $owner == false && $postPaymentUrl = $order->getPostPaymentUrl() )
 {{ _('Ak ste platbu nevykonali po vytvorení objednávky, môžete ju zaplatiť aj z tohto e-mailu.') }}
 
-@component('mail::button', ['url' => $redirect])
+@component('mail::button', ['url' => $postPaymentUrl ])
 {{ _('Zaplatiť platbu online') }}
 @endcomponent
 @else

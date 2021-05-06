@@ -46,7 +46,8 @@ trait HasRoutes
     public function routesForPayments()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers\Payments'], function(){
-            Route::get('/api/payments/{payment}/{type}/{hash}', 'PaymentController@paymentStatus');
+            Route::get('/_store/payments/create/{payment}/{type}/{hash}', 'PaymentController@paymentStatus');
+            Route::get('/_store/payments/post-payment/{order}/{hash}', 'PaymentController@postPayment');
         });
     }
 }

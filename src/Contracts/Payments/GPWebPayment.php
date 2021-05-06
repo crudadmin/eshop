@@ -2,17 +2,16 @@
 
 namespace AdminEshop\Contracts\Payments;
 
-use AdamStipak\Webpay\Api as WebpayApi;
-use AdamStipak\Webpay\PaymentRequest;
-use AdamStipak\Webpay\PaymentResponse;
-use AdamStipak\Webpay\PaymentResponseException as WebpayPaymentResponseException;
-use AdamStipak\Webpay\Signer;
+use AdminEshop\Contracts\Payments\GPWebpay\Api as WebpayApi;
+use AdminEshop\Contracts\Payments\GPWebpay\PaymentRequest;
+use AdminEshop\Contracts\Payments\GPWebpay\PaymentResponse;
+use AdminEshop\Contracts\Payments\GPWebpay\PaymentResponseException as WebpayPaymentResponseException;
+use AdminEshop\Contracts\Payments\GPWebpay\Signer;
+use AdminEshop\Contracts\Payments\GPWebpay\FinalizePaymentRequest;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentGateException;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 use AdminEshop\Contracts\Payments\PaymentHelper;
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\TransferStats;
 use Log;
 
 class GPWebPayment extends PaymentHelper
@@ -52,47 +51,20 @@ class GPWebPayment extends PaymentHelper
             $payment = $this->getPayment();
 
             $request = new PaymentRequest(
-                $order->getKey(),
+                $payment->getKey(),
                 $payment->price,
                 PaymentRequest::EUR,
                 0,
                 $this->getResponseUrl('status'),
-                $order->getKey()
+                $payment->getKey()
             );
 
-            $url = $this->webpay->createPaymentRequestUrl($request);
-            $url = $this->getFinalPaymentUrl($url);
+            $request->setEmail($order->email);
 
-            return $url;
+            return $this->webpay->createPaymentRequestUrl($request);
         } catch (Exception $e) {
             throw new PaymentGateException($e->getMessage());
         }
-    }
-
-    /*
-     * We want send into email final payment redirect,
-     * because first redirect wont work in email and will throw an error
-     */
-    private function getFinalPaymentUrl($url)
-    {
-        $client = new Client([
-            'allow_redirects' => true
-        ]);
-
-        $redirects = [];
-
-        $client->get($url, [
-            'on_stats' => function (TransferStats $stats) use (&$redirects) {
-                $redirects[] = (string)$stats->getEffectiveUri();
-            },
-        ]);
-
-        return end($redirects);
-    }
-
-    public function getPaymentUrl($paymentResponse)
-    {
-        return $paymentResponse;
     }
 
     public function getPaymentData($paymentResponse)
@@ -102,10 +74,15 @@ class GPWebPayment extends PaymentHelper
         ];
     }
 
+    public function getPaymentUrl($paymentResponse)
+    {
+        return $paymentResponse;
+    }
+
     public function isPaid($id = null)
     {
         if ( !$this->webpay ) {
-            return false;
+            throw new Exception('Webpay instance has not been found.');
         }
 
         $response = new PaymentResponse(
@@ -127,8 +104,6 @@ class GPWebPayment extends PaymentHelper
         //Payment is not successfull
         catch (WebpayPaymentResponseException $e) {
             throw new PaymentResponseException($e->getMessage());
-
-            return false;
         }
 
         // Digest is not correct.

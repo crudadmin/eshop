@@ -14,8 +14,7 @@
         "crudadmin/crudadmin": "^3.0|dev-3.0-dev",
         "marekgogol/invoices": "^3.0|dev-3.0-dev",
         "propaganistas/laravel-phone": "^4.2",
-        "gopay/payments-sdk-php": "^1.4",
-        "adamstipak/webpay-php": "dev-master"
+        "gopay/payments-sdk-php": "^1.4"
     },
     "autoload": {
         "psr-4": {
