@@ -10,6 +10,7 @@ trait HasRoutes
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
             Route::post('/cart/add', 'Cart\CartController@addItem')->name('cart::addItem')->visible();
+            Route::post('/cart/toggle', 'Cart\CartController@toggleItems')->name('cart::toggleItems')->visible();
             Route::post('/cart/update', 'Cart\CartController@updateQuantity')->name('cart::updateQuantity')->visible();
             Route::post('/cart/remove', 'Cart\CartController@removeItem')->name('cart::removeItem')->visible();
         });

@@ -130,6 +130,27 @@ class Cart
         return $this;
     }
 
+
+    /**
+     * Add product into cart and save it into session
+     * @param Identifier     $identifier
+     * @param int|integer $quantity
+     * @param Identifier     $parentIdentifier
+     */
+    public function toggleItem(Identifier $identifier, Identifier $parentIdentifier = null)
+    {
+        //If items does exists in cart
+        if ( $item = $this->getItem($identifier, $parentIdentifier) ) {
+            $this->remove($identifier, $parentIdentifier);
+
+            return $this;
+        }
+
+        $this->addNewItem($identifier, 1, $parentIdentifier);
+
+        return $this;
+    }
+
     /**
      * Returns cart response
      *

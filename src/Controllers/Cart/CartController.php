@@ -48,9 +48,9 @@ class CartController extends Controller
      *
      * @return  AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier
      */
-    private function getParentIdentifierClass()
+    private function getParentIdentifierClass($request)
     {
-        if ( !($cartItem = request('cart_item')) ){
+        if ( !($cartItem = $request['cart_item'] ?? null) ){
             return;
         }
 
@@ -79,9 +79,11 @@ class CartController extends Controller
 
     public function addItem()
     {
-        $identifier = $this->getIdentifierClass(request()->all());
+        $request = request()->all();
 
-        $parentIdentifier = $this->getParentIdentifierClass();
+        $identifier = $this->getIdentifierClass($request);
+
+        $parentIdentifier = $this->getParentIdentifierClass($request);
 
         Cart::addOrUpdate(
             $identifier,
@@ -92,11 +94,31 @@ class CartController extends Controller
         return Cart::baseResponse();
     }
 
+    public function toggleItems()
+    {
+        $items = request('items', []);
+
+        foreach ($items as $itemData) {
+            $identifier = $this->getIdentifierClass($itemData);
+
+            $parentIdentifier = $this->getParentIdentifierClass($itemData);
+
+            Cart::toggleItem(
+                $identifier,
+                $parentIdentifier
+            );
+        }
+
+        return Cart::baseResponse();
+    }
+
     public function updateQuantity()
     {
-        $identifier = $this->getIdentifierClass(request()->all());
+        $request = request()->all();
 
-        $parentIdentifier = $this->getParentIdentifierClass();
+        $identifier = $this->getIdentifierClass($request);
+
+        $parentIdentifier = $this->getParentIdentifierClass($request);
 
         Cart::updateQuantity(
             $identifier,
@@ -109,9 +131,11 @@ class CartController extends Controller
 
     public function removeItem()
     {
-        $identifier = $this->getIdentifierClass(request()->all());
+        $request = request()->all();
 
-        $parentIdentifier = $this->getParentIdentifierClass();
+        $identifier = $this->getIdentifierClass($request);
+
+        $parentIdentifier = $this->getParentIdentifierClass($request);
 
         Cart::remove($identifier, $parentIdentifier);
 
