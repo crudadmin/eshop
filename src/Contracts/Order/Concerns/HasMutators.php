@@ -14,22 +14,22 @@ trait HasMutators
     /**
      * Available order mutators
      *
-     * @var  array
+     * If null is present, config mutators will be loaded
+     *
+     * @var  array|null
      */
-    protected $mutators = [];
+    protected $mutators;
 
     /**
-     * Register new order mutator
+     * Set order available mutators
      *
      * @param  string|array  $namespace
      */
-    public function addMutator($mutators)
+    public function setMutators($mutators = null)
     {
-        $namespaces = array_wrap($mutators);
+        $this->mutators = $mutators;
 
-        foreach ($namespaces as $namespace) {
-            $this->mutators[] = $namespace;
-        }
+        return $this;
     }
 
     /**
@@ -39,9 +39,11 @@ trait HasMutators
      */
     public function getMutators()
     {
-        $mutators = array_merge($this->mutators, config('admineshop.cart.mutators'));
+        $mutators = is_array($this->mutators) ? $this->mutators : config('admineshop.cart.mutators');
 
-        return $this->cache('orderMutators', function() use ($mutators) {
+        $mutatorsCacheKey = implode(';', $mutators);
+
+        return $this->cache('orderMutators.'.$mutatorsCacheKey, function() use ($mutators) {
             return array_map(function($item) {
                 return new $item;
             }, $mutators);
