@@ -41,6 +41,13 @@ class OrderService
      */
     protected $order;
 
+    /**
+     * Cart items which will be filled into order
+     *
+     * @var  CartCollection
+     */
+    protected $cartItems;
+
     /*
      * Returns if invoices support is allowed
      */
@@ -50,23 +57,52 @@ class OrderService
     }
 
     /**
-     * Store order int osession
+     * Simple order store
      *
      * @return  this
      */
     public function store()
     {
-        $order = clone Admin::getModelByTable('orders');
-
-        $this->setOrder($order);
+        $this->setOrder(
+            clone Admin::getModelByTable('orders')
+        );
 
         //Build order with all attributes
-        $this->rebuildOrder(Cart::all());
+        $this->buildOrder(
+            //Todo:: check if here shouldn't go items with mutators, maybe price may be wrong without mutators if some are availeble
+            $this->getCartItems()
+        );
 
-        $order->save();
+        $this->getOrder()->save();
+
+        //Add items into order
+        $this->addItemsIntoOrder();
 
         return $this;
     }
+
+    /**
+     * Modify cart items inserted into order
+     *
+     * @param  CartCollection  $items
+     */
+    public function setCartItems(CartCollection $items)
+    {
+        $this->cartItems = $items;
+
+        return $this;
+    }
+
+    /**
+     * This cart items will be inserted into order
+     *
+     * @return  CartCollection
+     */
+    public function getCartItems()
+    {
+        return is_null($this->cartItems) ? Cart::all() : $this->cartItems;
+    }
+
 
     /**
      * Set order
@@ -105,7 +141,9 @@ class OrderService
      */
     public function addItemsIntoOrder()
     {
-        $items = Cart::allWithMutators();
+        $items = Cart::addItemsFromMutators(
+            $this->getCartItems()
+        );
 
         foreach ($items as $item) {
             $identifier = $item->getIdentifierClass();
@@ -146,6 +184,8 @@ class OrderService
             //parent item. CartColelction should order and return items in correct order.
             $data['order_item_id'] = $parentCartItem->order_item_id->getKey();
         }
+
+        return $this;
     }
 
     public function addDiscountableItemsIntoOrder()
@@ -169,6 +209,8 @@ class OrderService
                 'price_vat' => Store::priceWithVat($discount->value) * ($discount->operator == '-' ? -1 : 1),
             ]);
         }
+
+        return $this;
     }
 
     /**
@@ -228,16 +270,14 @@ class OrderService
      * @param  array  $row
      * @return  array
      */
-    public function rebuildOrder(CartCollection $items)
+    public function buildOrder(CartCollection $items)
     {
-        $order = $this->getOrder();
-
         $this->addOrderPrices($items);
         $this->addDiscountsData($items);
         $this->fireMutators();
         $this->addClientIntoOrder();
 
-        return $order;
+        return $this;
     }
 
     private function addClientIntoOrder()
@@ -275,7 +315,7 @@ class OrderService
 
         try {
             Mail::to($order->email)->send(
-                new OrderReceived($order, $message, $invoice)
+                new OrderReceived($order, $this->getCartItems(), $message, $invoice)
             );
         } catch (Exception $error){
             Log::error($error);
@@ -285,6 +325,8 @@ class OrderService
                 'code' => 'email-client-error'
             ]);
         }
+
+        return $this;
     }
 
     /**
@@ -301,7 +343,7 @@ class OrderService
 
             try {
                 Mail::to($email)->send(
-                    (new OrderReceived($order, $message))->setOwner(true)
+                    (new OrderReceived($order, $this->getCartItems(), $message))->setOwner(true)
                 );
             } catch (Exception $error){
                 Log::error($error);
@@ -312,6 +354,8 @@ class OrderService
                 ]);
             }
         }
+
+        return $this;
     }
 
     /**

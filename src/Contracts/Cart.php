@@ -273,9 +273,10 @@ class Cart
                     });
     }
 
-    public function allWithMutators($discounts = null)
+    public function addItemsFromMutators(CartCollection $items, $discounts = null)
     {
-        $items = $this->all($discounts);
+        //Todo: test if we need clone this items, meybe this is uneccessary
+        $items = clone $items;
 
         foreach ( OrderService::getActiveMutators() as $mutator ) {
             if ( ! method_exists($mutator, 'addCartItems') ) {

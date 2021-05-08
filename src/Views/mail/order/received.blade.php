@@ -5,6 +5,7 @@
 {{ $message }}
 @endif
 
+@if ( $items )
 @component('mail::table')
 | {{ _('Objednaný tovar') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? _('Cena bez dph') : '' }} | {{ _('Cena s dph') }} |
 | :------------ |:-------------:| ----------:| ----------:|
@@ -20,6 +21,7 @@
 @endforeach
 | <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ $showNoVat ? Store::priceFormat($summary['priceWithoutVat']) : '' }} | {{ Store::priceFormat($summary['priceWithVat']) }} |
 @endcomponent
+@endif
 
 @component('mail::panel')
 | {{ _('Informácie o objednávke') }} | |

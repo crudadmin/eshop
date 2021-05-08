@@ -2,10 +2,11 @@
 
 namespace AdminEshop\Mail;
 
+use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Models\Orders\Order;
-use Gogol\Invoices\Model\Invoice;
 use Cart;
 use Discounts;
+use Gogol\Invoices\Model\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -30,7 +31,7 @@ class OrderReceived extends Mailable
      *
      * @return void
      */
-    public function __construct(Order $order, $message = null, Invoice $invoice = null)
+    public function __construct(Order $order, CartCollection $items = null, $message = null, Invoice $invoice = null)
     {
         $this->order = $order;
 
@@ -38,9 +39,9 @@ class OrderReceived extends Mailable
 
         $this->invoice = $invoice;
 
-        $this->cartItems = Cart::allWithMutators();
+        $this->cartItems = $items ? Cart::addItemsFromMutators($items) : null;
 
-        $this->cartSummary = Cart::all()->getSummary(true);
+        $this->cartSummary = $items->getSummary(true);
 
         $this->discounts = Discounts::getDiscounts();
     }

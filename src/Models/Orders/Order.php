@@ -106,7 +106,7 @@ class Order extends AdminModel
                     'note' => 'name:Poznámka|type:text|hidden',
                     'internal_note' => 'name:Interná poznámka|type:text|hidden',
                 ])->inline()
-            ]),
+            ])->id('additional'),
             'Doprava' => Group::fields([
                 Group::inline([
                     'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
@@ -117,7 +117,7 @@ class Order extends AdminModel
                     'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
                 ]),
                 'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
-            ])->grid(6),
+            ])->grid(6)->id('delivery'),
             'Platobná metóda' => Group::fields([
                 Group::fields([
                     'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
@@ -125,7 +125,7 @@ class Order extends AdminModel
                     'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
                 ])->inline(),
                 'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
-            ])->grid(6),
+            ])->grid(6)->id('payment'),
             Group::fields([
                 'Cena objednávky' => Group::fields([
                     Group::fields([

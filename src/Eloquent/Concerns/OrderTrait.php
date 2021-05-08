@@ -34,7 +34,7 @@ trait OrderTrait
                     ->rewritePricesInModels()
                     ->applyOnOrderCart();
 
-        OrderService::rebuildOrder($items);
+        OrderService::buildOrder($items);
 
         $this->save();
 

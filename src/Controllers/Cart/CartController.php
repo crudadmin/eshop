@@ -240,9 +240,6 @@ class CartController extends Controller
         //Create order
         OrderService::store();
 
-        //Add items into order
-        OrderService::addItemsIntoOrder();
-
         //Send shipping
         OrderService::sendShipping();
 
