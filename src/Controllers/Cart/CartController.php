@@ -12,8 +12,6 @@ use AdminEshop\Events\OrderCreated;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Cart;
-use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
-use Facades\AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use Illuminate\Validation\ValidationException;
 use OrderService;
 
@@ -148,16 +146,18 @@ class CartController extends Controller
 
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
-        $code = DiscountCode::getDiscountCode($code);
+        $discountMutator = new DiscountCode;
+
+        $code = $discountMutator->getDiscountCode($code);
 
         //Validate code and throw error
-        if ( $errorMessage = (new DiscountCode)->getCodeError($code) ){
+        if ( $errorMessage = $discountMutator->getCodeError($code) ){
             throw ValidationException::withMessages([
                 'code' => $errorMessage,
             ]);
         }
 
-        DiscountCode::saveDiscountCode($code->code);
+        $discountMutator->setDiscountCode($code->code);
 
         //Event for added discount code
         event(new DiscountCodeAdded($code));
@@ -176,7 +176,7 @@ class CartController extends Controller
 
     public function removeDiscountCode()
     {
-        DiscountCode::removeDiscountCode();
+        (new DiscountCode)->removeDiscountCode();
 
         return Cart::baseResponse();
     }
@@ -196,16 +196,19 @@ class CartController extends Controller
             }
         }
 
-        DeliveryMutator::saveDelivery(
+        OrderService::getDeliveryMutator()->setDelivery(
             isset($delivery) ? $delivery->getKey() : null,
-            isset($location) ? $location->getKey() : null
+        );
+
+        OrderService::getDeliveryMutator()->setDeliveryLocation(
+            isset($location) ? $location->getKey() : null,
         );
 
         //If no payment method is present, reset payment method to null
         //Because payment method may be selected, but will be unavailable
         //under this selected delivery
-        if ( ! PaymentMethodMutator::getSelectedPaymentMethod() ) {
-            PaymentMethodMutator::savePaymentMethod(null);
+        if ( ! OrderService::getPaymentMethodMutator()->getSelectedPaymentMethod() ) {
+            OrderService::getPaymentMethodMutator()->setPaymentMethod(null);
         }
 
         return Cart::fullCartResponse();
@@ -217,7 +220,7 @@ class CartController extends Controller
 
         $paymentMethod = PaymentsMethod::findOrFail($paymentMethodId);
 
-        PaymentMethodMutator::savePaymentMethod($paymentMethod->getKey());
+        OrderService::getPaymentMethodMutator()->setPaymentMethod($paymentMethod->getKey());
 
         return Cart::fullCartResponse();
     }

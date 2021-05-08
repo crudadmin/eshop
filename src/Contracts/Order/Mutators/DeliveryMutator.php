@@ -3,7 +3,6 @@
 namespace AdminEshop\Contracts\Order\Mutators;
 
 use Admin;
-use Facades\AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\DeliveryLocationValidator;
 use AdminEshop\Contracts\Order\Validation\DeliveryValidator;
@@ -26,12 +25,12 @@ class DeliveryMutator extends Mutator
     /*
      * driver key for delivery
      */
-    private $deliveryKey = 'delivery';
+    const DELIVERY_KEY = 'delivery';
 
     /*
      * driver location key
      */
-    private $deliveryLocationKey = 'delivery_location';
+    const DELIVERY_LOCATION_KEY = 'delivery_location';
 
     /**
      * Returns if mutators is active
@@ -156,7 +155,7 @@ class DeliveryMutator extends Mutator
         //and country has been selected
         if (
             config('admineshop.delivery.countries') == true
-            && $selectedCountry = CountryMutator::getSelectedCountry()
+            && $selectedCountry = $this->getCountryMutator()->getSelectedCountry()
         ) {
             $deliveries = $deliveries->filter(function($delivery) use ($selectedCountry) {
                 $allowedCountries = $delivery->countries->pluck('id')->toArray();
@@ -208,9 +207,9 @@ class DeliveryMutator extends Mutator
      */
     public function getSelectedDelivery()
     {
-        $id = $this->getDriver()->get($this->deliveryKey);
+        $id = $this->getDriver()->get(self::DELIVERY_KEY);
 
-        return $this->cache('selectedDelivery'.$id, function() use ($id) {
+        return $this->cache('selectedDelivery.'.$id, function() use ($id) {
             return Cart::addCartDiscountsIntoModel($this->getDeliveries()->where('id', $id)->first());
         });
     }
@@ -220,9 +219,9 @@ class DeliveryMutator extends Mutator
      */
     public function getSelectedLocation()
     {
-        $id = $this->getDriver()->get($this->deliveryLocationKey);
+        $id = $this->getDriver()->get(self::DELIVERY_LOCATION_KEY);
 
-        return $this->cache('selectedLocation'.$id, function() use ($id) {
+        return $this->cache('selectedLocation.'.$id, function() use ($id) {
             if ( !($delivery = $this->getSelectedDelivery()) ) {
                 return;
             }
@@ -235,13 +234,26 @@ class DeliveryMutator extends Mutator
      * Save delivery into driver
      *
      * @param  int|null  $id
-     * @param  int|null  $locationId
+     * @param  bool  $persist
      * @return  this
      */
-    public function saveDelivery($id = null, $locationId = null)
+    public function setDelivery($id = null, $persist = true)
     {
-        $this->getDriver()->set($this->deliveryKey, $id);
-        $this->getDriver()->set($this->deliveryLocationKey, $locationId);
+        $this->getDriver()->set(self::DELIVERY_KEY, $id, $persist);
+
+        return $this;
+    }
+
+    /**
+     * Save delivery location into driver
+     *
+     * @param  int|null  $id
+     * @param  bool  $persist
+     * @return  this
+     */
+    public function setDeliveryLocation($locationId, $persist = true)
+    {
+        $this->getDriver()->set(self::DELIVERY_LOCATION_KEY, $locationId, $persist);
 
         return $this;
     }

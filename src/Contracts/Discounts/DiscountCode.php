@@ -14,7 +14,7 @@ class DiscountCode extends Discount implements Discountable
     /*
      * Discount code key in session
      */
-    private static $discountCodeKey = 'discount';
+    const DISCOUNT_CODE_KEY = 'discount';
 
     /**
      * Discount code can't be applied outside cart
@@ -205,7 +205,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function getCodeName()
     {
-        return (new static)->getDriver()->get(self::$discountCodeKey);
+        return (new static)->getDriver()->get(self::DISCOUNT_CODE_KEY);
     }
 
     /**
@@ -242,7 +242,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function saveDiscountCode(string $code)
     {
-        (new static)->getDriver()->set(self::$discountCodeKey, $code);
+        (new static)->getDriver()->set(self::DISCOUNT_CODE_KEY, $code);
     }
 
     /**
@@ -252,7 +252,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public static function removeDiscountCode()
     {
-        (new static)->getDriver()->forget(self::$discountCodeKey);
+        (new static)->getDriver()->forget(self::DISCOUNT_CODE_KEY);
     }
 }
 

@@ -6,6 +6,7 @@ use Admin;
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutators;
+use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
 use AdminEshop\Contracts\Order\Concerns\HasPayments;
 use AdminEshop\Contracts\Order\Concerns\HasProviders;
@@ -31,6 +32,7 @@ class OrderService
         HasPayments,
         HasValidation,
         HasMutators,
+        HasMutatorsForward,
         HasOrderProcess,
         HasShipping;
 

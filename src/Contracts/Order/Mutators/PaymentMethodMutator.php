@@ -7,7 +7,6 @@ use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\PaymentMethodValidator;
 use AdminEshop\Models\Orders\Order;
 use Cart;
-use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use Store;
 
 class PaymentMethodMutator extends Mutator
@@ -24,7 +23,7 @@ class PaymentMethodMutator extends Mutator
     /*
      * driver key for payment method
      */
-    private $paymentKey = 'paymentMethod';
+    const PAYMENT_METHOD_KEY = 'paymentMethod';
 
     /**
      * Returns if mutators is active
@@ -132,12 +131,12 @@ class PaymentMethodMutator extends Mutator
      */
     public function getSelectedPaymentMethod()
     {
-        $id = $this->getDriver()->get($this->paymentKey);
+        $id = $this->getDriver()->get(self::PAYMENT_METHOD_KEY);
 
         //We need to save also delivery key into cacheKey,
         //because if delivery would change, paymentMethod can dissapear
         //if is not assigned into selected delivery
-        $delivery = DeliveryMutator::getSelectedDelivery();
+        $delivery = $this->getDeliveryMutator()->getSelectedDelivery();
 
         return $this->cache('selectedPaymentMethod'.$id.'-'.($delivery ? $delivery->getKey() : 0), function() use ($id) {
             return Cart::addCartDiscountsIntoModel($this->getPaymentMethodsByDelivery()->where('id', $id)->first());
@@ -151,7 +150,7 @@ class PaymentMethodMutator extends Mutator
      */
     public function getPaymentMethodsByDelivery()
     {
-        $delivery = DeliveryMutator::getSelectedDelivery();
+        $delivery = $this->getDeliveryMutator()->getSelectedDelivery();
 
         //If delivery is selected and payments rules are enabled, we can receive filter
         $allowedPaymentMethods = $delivery && config('admineshop.delivery.payments') == true
@@ -172,11 +171,12 @@ class PaymentMethodMutator extends Mutator
      * Save payment method into driver
      *
      * @param  int|null  $id
+     * @param  int|null  $persist
      * @return  this
      */
-    public function savePaymentMethod($id = null)
+    public function setPaymentMethod($id = null, $persist = true)
     {
-        $this->getDriver()->set($this->paymentKey, $id);
+        $this->getDriver()->set(self::PAYMENT_METHOD_KEY, $id, $persist);
 
         return $this;
     }

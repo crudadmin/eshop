@@ -7,7 +7,6 @@ use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\CountryValidator;
 use AdminEshop\Models\Orders\Order;
 use Cart;
-use Facades\AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use Store;
 
 class CountryMutator extends Mutator
@@ -24,7 +23,7 @@ class CountryMutator extends Mutator
     /*
      * driver key for delivery
      */
-    private $countryKey = 'country_id';
+    const COUNTRY_KEY = 'country_id';
 
     /**
      * Flush driver data on order successfully completed
@@ -67,7 +66,7 @@ class CountryMutator extends Mutator
      */
     public function getSelectedCountry($id = null)
     {
-        $id = $id ?: $this->getDriver()->get($this->countryKey);
+        $id = $id ?: $this->getDriver()->get(self::COUNTRY_KEY);
 
         if ( ! $id ){
             return;
@@ -95,13 +94,13 @@ class CountryMutator extends Mutator
 
         //If delivery is selected already, we need check if selected delivery has this country
         //if no, we need reset delivery
-        else if ( $selectedDelivery = DeliveryMutator::getSelectedDelivery() ) {
+        else if ( $selectedDelivery = $this->getDeliveryMutator()->getSelectedDelivery() ) {
             if ( $selectedDelivery->countries()->where('countries.id', $selectedCountry->getKey())->count() == 0 ) {
-                DeliveryMutator::saveDelivery(null);
+                $this->getDeliveryMutator()->setDelivery(null);
             }
         }
 
-        $this->getDriver()->set($this->countryKey, $id);
+        $this->getDriver()->set(self::COUNTRY_KEY, $id);
 
         return $this;
     }

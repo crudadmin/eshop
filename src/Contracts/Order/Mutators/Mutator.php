@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Order\Mutators;
 use AdminEshop\Contracts\Cart\Concerns\ActiveInterface;
 use AdminEshop\Contracts\Cart\Concerns\ActiveResponse;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
+use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
 
@@ -12,7 +13,8 @@ class Mutator implements ActiveInterface
 {
     use DataStore,
         DriverSupport,
-        ActiveResponse;
+        ActiveResponse,
+        HasMutatorsForward;
 
     /**
      * Register order validator with this mutators

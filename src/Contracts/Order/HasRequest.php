@@ -3,12 +3,9 @@
 namespace AdminEshop\Contracts\Order;
 
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
-use Illuminate\Support\Traits\Macroable;
 
 trait HasRequest
 {
-    use Macroable;
-
     /**
      * Request data of order
      *

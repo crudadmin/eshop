@@ -24,7 +24,7 @@ class ClientDataMutator extends Mutator
      *
      * @var  string
      */
-    protected $clientKey = 'clientData';
+    const CLIENT_KEY = 'clientData';
 
     /**
      * Returns if mutators is active
@@ -81,7 +81,7 @@ class ClientDataMutator extends Mutator
      */
     public function setClientData($row = null)
     {
-        $this->getDriver()->set($this->clientKey, $row);
+        $this->getDriver()->set(self::CLIENT_KEY, $row);
     }
 
     /**
@@ -91,7 +91,7 @@ class ClientDataMutator extends Mutator
      */
     public function getClientData()
     {
-        return $this->getDriver()->get($this->clientKey, null);
+        return $this->getDriver()->get(self::CLIENT_KEY, null);
     }
 }
 
