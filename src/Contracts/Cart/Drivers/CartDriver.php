@@ -104,6 +104,6 @@ class CartDriver
             }
         }
 
-        $this->getDriver()->set(null, $data);
+        $this->getDriver()->replace($data);
     }
 }

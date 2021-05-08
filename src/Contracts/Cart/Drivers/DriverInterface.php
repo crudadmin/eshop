@@ -21,6 +21,13 @@ interface DriverInterface
     public function set($key, $value);
 
     /**
+     * Replace all data in driver
+     *
+     * @param  array  $data
+     */
+    public function replace(array $data);
+
+    /**
      * Get data from driver
      *
      * @param  string  $key

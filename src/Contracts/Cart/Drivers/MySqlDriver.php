@@ -2,12 +2,13 @@
 
 namespace AdminEshop\Contracts\Cart\Drivers;
 
+use AdminEshop\Contracts\Cart\Drivers\BaseDriver;
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
 use AdminEshop\Models\Store\CartToken;
 use Arr;
 use Str;
 
-class MySqlDriver implements DriverInterface
+class MySqlDriver extends BaseDriver implements DriverInterface
 {
     /**
      * Session identifier for stored key
@@ -101,13 +102,9 @@ class MySqlDriver implements DriverInterface
     public function set($key, $value)
     {
         //Merge existing data with new data set
-        if ( $key === null ){
-            $data = $value;
-        } else {
-            $data = array_merge($this->getCartSession()->data ?: [], [
-                $key => $value,
-            ]);
-        }
+        $data = array_merge($this->getCartSession()->data ?: [], [
+            $key => $value,
+        ]);
 
         //If empty values has been given, we want remove key
         if ( $value === null ) {
@@ -115,6 +112,22 @@ class MySqlDriver implements DriverInterface
         }
 
         $this->getCartSession()->update([ 'data' => $data ]);
+
+        return $this;
+    }
+
+    /**
+     * Replace all data
+     *
+     * @param  array  $data
+     *
+     * @return  this
+     */
+    public function replace(array $data)
+    {
+        $this->getCartSession()->update([ 'data' => $data ]);
+
+        return $this;
     }
 
     /**

@@ -2,9 +2,10 @@
 
 namespace AdminEshop\Contracts\Cart\Drivers;
 
+use AdminEshop\Contracts\Cart\Drivers\BaseDriver;
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
 
-class SessionDriver implements DriverInterface
+class SessionDriver extends BaseDriver implements DriverInterface
 {
     /*
      * Session key for basket items
@@ -33,8 +34,25 @@ class SessionDriver implements DriverInterface
      */
     public function set($key, $value)
     {
-        session()->put($this->key.($key ? '.'.$key : ''), $value);
+        session()->put($this->key.'.'.$key, $value);
         session()->save();
+
+        return $this;
+    }
+
+    /**
+     * Replace whole data
+     *
+     * @param  array  $data
+     *
+     * @return  this
+     */
+    public function replace(array $data)
+    {
+        session()->put($this->key, $data);
+        session()->save();
+
+        return $this;
     }
 
     /**

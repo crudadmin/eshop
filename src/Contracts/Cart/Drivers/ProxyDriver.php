@@ -55,10 +55,21 @@ class ProxyDriver
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  mixed  $persist
      */
-    public function set($key, $value)
+    public function set($key, $value, $persist = true)
     {
-        $this->driver->set($this->keyName($key) ?: null, $value);
+        $keyName = $this->keyName($key);
+
+        if ( $persist === true ) {
+            //If temporary data are available, and has been rewrited with persistant value
+            //we want throw away temporary data
+            $this->removeTemporary($keyName);
+
+            $this->driver->set($keyName, $value);
+        } else {
+            $this->driver->setTemporary($keyName, $value);
+        }
 
         return $this;
     }
@@ -72,7 +83,13 @@ class ProxyDriver
      */
     public function get($key = '', $default = null)
     {
-        return $this->driver->get($this->keyName($key), $default);
+        $keyName = $this->keyName($key);
+
+        if ( $this->hasTemporary($keyName) ){
+            return $this->getTemporary($keyName);
+        }
+
+        return $this->driver->get($keyName, $default);
     }
 
     /**
@@ -84,7 +101,11 @@ class ProxyDriver
      */
     public function forget($key = null)
     {
-        return $this->driver->forget($this->keyName($key));
+        $keyName = $this->keyName($key);
+
+        $this->removeTemporary($keyName);
+
+        return $this->driver->forget($keyName);
     }
 
     /**
