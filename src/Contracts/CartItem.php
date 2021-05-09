@@ -33,6 +33,13 @@ class CartItem implements UsesIdentifier
     public $quantity = 1;
 
     /**
+     * Cart data
+     *
+     * @var  array|null
+     */
+    public $data;
+
+    /**
      * Identifier
      *
      * @param  Identifier  $identifier
@@ -151,11 +158,46 @@ class CartItem implements UsesIdentifier
             $array[$key] = $identifier->getIdentifier($key);
         }
 
-        return array_merge($array, [
+        $item = [
             'identifier' => $this->identifier,
             'parentIdentifier' => $this->parentIdentifier,
             'quantity' => $this->quantity,
-        ]);
+        ];
+
+        //CartItem additional data
+        if ( is_null($this->data) === false ){
+            $item['data'] = $this->data;
+        }
+
+        return array_merge($array, $item);
+    }
+
+    /**
+     * Set cart item additional data
+     *
+     * @param  mixed  $data
+     * @param  mixed  $persist
+     */
+    public function setData($data = null, $persist = true)
+    {
+        $this->data = $data;
+
+        //Save cart items
+        if ( $persist === true ){
+            Cart::saveItems();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get CartItem additional data
+     *
+     * @return  mixed
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }
 

@@ -154,6 +154,11 @@ trait CartTrait
 
             $cartItem = new CartItem($identifier, @$item->quantity ?: 0);
 
+            //Set data of item
+            if ( isset($item->data) ){
+                $cartItem->setData($item->data, false);
+            }
+
             //If parent cartitem identifier has not been found, we need skip this item from cart
             if ($this->assignParentCartItem($item, $cartItem) === false){
                 return;
