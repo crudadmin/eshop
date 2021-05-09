@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
-use AdminEshop\Contracts\Order\Validation\Validation;
 use Cart;
 
 class CartItemsValidator extends Validator

@@ -2,8 +2,6 @@
 
 namespace AdminEshop\Contracts\Order\Validation;
 
-use AdminEshop\Contracts\Order\Validation\Validation;
-
 class CountryValidator extends Validator
 {
     public function isActive()
