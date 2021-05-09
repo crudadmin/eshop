@@ -7,10 +7,10 @@
 
 @if ( $items )
 @component('mail::table')
-| {{ _('Objednaný tovar') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? _('Cena bez dph') : '' }} | {{ _('Cena s dph') }} |
+| {{ _('Objednaný tovar') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? ('<span style="display: inline-block; width: 90px">'._('Cena bez dph').'</span>') : '' }} | <span style="display: inline-block; width: 90px">{{ _('Cena s dph') }}</span> |
 | :------------ |:-------------:| ----------:| ----------:|
 @foreach( $items as $item )
-| {{ $item->getProductNamePartsSections(0) }} @if ( $additional = $item->getProductNamePartsSections(1) )<small>{{ $additional }}</small> @endif| {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
+| {!! $item->emailItemName() !!} | {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
 @endforeach
 | {{ $delivery->name }} | - | {{ $showNoVat ? Store::priceFormat($order->delivery_price) : '' }} | {{ Store::priceFormat($order->delivery_price_with_vat) }} |
 | {{ $payment_method->name }} | - | {{ $showNoVat ? Store::priceFormat($order->payment_method_price) : '' }} | {{ Store::priceFormat($order->payment_method_price_with_vat) }} |
@@ -22,6 +22,8 @@
 | <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ $showNoVat ? Store::priceFormat($summary['priceWithoutVat']) : '' }} | {{ Store::priceFormat($summary['priceWithVat']) }} |
 @endcomponent
 @endif
+
+@include('admineshop::mail.order.slots.received_before')
 
 @component('mail::panel')
 | {{ _('Informácie o objednávke') }} | |
@@ -88,6 +90,8 @@
 <small><strong>{{ _('Poznámka') }}: </strong></small> {{ $order->note }}
 @endcomponent
 @endif
+
+@include('admineshop::mail.order.slots.received_after')
 
 @if ( $owner == false && $postPaymentUrl = $order->getPostPaymentUrl() )
 {{ _('Ak ste platbu nevykonali po vytvorení objednávky, môžete ju zaplatiť aj z tohto e-mailu.') }}

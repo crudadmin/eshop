@@ -65,4 +65,15 @@ trait HasOrderItemNames
 
         return $name;
     }
+
+    public function emailItemName()
+    {
+        $name = e($this->getProductNamePartsSections(0));
+
+        if ( $additional = $this->getProductNamePartsSections(1) ) {
+            $name = '<small>'.e($additional).'</small>';
+        }
+
+        return $name;
+    }
 }

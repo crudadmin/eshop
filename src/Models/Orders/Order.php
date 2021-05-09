@@ -7,6 +7,7 @@ use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Contracts\Discounts\DiscountCode;
+use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\OrderPayments;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
@@ -27,7 +28,8 @@ class Order extends AdminModel
     use Notifiable,
         OrderTrait,
         OrderPayments,
-        HasOrderHashes;
+        HasOrderHashes,
+        HasOrderEmails;
 
     /*
      * Model created date, for ordering tables in database and in user interface

@@ -313,7 +313,7 @@ class OrderService
     {
         $order = $this->getOrder();
 
-        $message = sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne prijatá.'), $order->number, $order->created_at->format('d.m.Y'));
+        $message = $order->getClientEmailMessage();
 
         try {
             Mail::to($order->email)->send(
@@ -341,7 +341,7 @@ class OrderService
         if ( $email = Store::getSettings()->email ) {
             $order = $this->getOrder();
 
-            $message = sprintf(_('Gratulujeme! Obržali ste objednávku č. %s.'), $order->number);
+            $message = $order->getStoreEmailMessage();
 
             try {
                 Mail::to($email)->send(

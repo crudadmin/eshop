@@ -86,7 +86,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function addPublishes()
     {
-        $this->publishes([__DIR__ . '/../Views' => resource_path('vendor/admineshop') ], 'admineshop.views');
+        $this->publishes([__DIR__ . '/../Views' => resource_path('views/vendor/admineshop') ], 'admineshop.views');
         $this->publishes([__DIR__ . '/../Config/config.php' => config_path('admineshop.php') ], 'admineshop.config');
     }
 
