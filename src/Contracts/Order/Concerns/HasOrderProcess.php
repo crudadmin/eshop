@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\contracts\Order\Concerns;
+namespace AdminEshop\Contracts\Order\Concerns;
 
 use Admin;
 use OrderService;
