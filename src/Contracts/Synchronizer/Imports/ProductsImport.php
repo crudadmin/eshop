@@ -271,7 +271,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return $productsAttribute;
     }
 
-    public function setProductsVatNumberAttribute($value, &$row)
+    public function setProductVatNumberAttribute($value, &$row)
     {
         $row['vat_id'] = $this->getVatIdByValue($value);
     }
