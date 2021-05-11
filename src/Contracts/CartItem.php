@@ -132,7 +132,7 @@ class CartItem implements UsesIdentifier
         if ( isset($this->itemModels[$identifierHash]) ) {
             foreach ($this->itemModels[$identifierHash] as $key => $model) {
                 //We can make hidden fields here, or append additional attributes...
-                if ( method_exists($model, 'setCartResponse') ){
+                if ( $model && method_exists($model, 'setCartResponse') ){
                     $model->setCartResponse();
                 }
 
