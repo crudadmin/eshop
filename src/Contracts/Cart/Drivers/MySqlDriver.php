@@ -102,13 +102,13 @@ class MySqlDriver extends BaseDriver implements DriverInterface
     public function set($key, $value)
     {
         //Merge existing data with new data set
-        $data = array_merge($this->getCartSession()->data ?: [], [
-            $key => $value,
-        ]);
+        $data = $this->getCartSession()->data ?: [];
 
         //If empty values has been given, we want remove key
-        if ( $value === null ) {
+        if ( $value === null && array_key_exists($key, $data) ) {
             unset($data[$key]);
+        } else {
+            Arr::set($data, $key, $value);
         }
 
         $this->getCartSession()->update([ 'data' => $data ]);
