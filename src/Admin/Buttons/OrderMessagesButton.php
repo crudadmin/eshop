@@ -13,7 +13,7 @@ class OrderMessagesButton extends Button
     public function __construct(AdminModel $row)
     {
         //Name of button on hover
-        $this->name = $this->getOrderLogContent($row);
+        $this->name = $this->getOrderLogContent($row, false);
 
         //Button classes
         $this->class = 'btn-warning';
@@ -28,7 +28,7 @@ class OrderMessagesButton extends Button
         $this->tooltipEncode = false;
     }
 
-    private function getOrderLogContent($row)
+    private function getOrderLogContent($row, $withLog = false)
     {
         $lines = [
             '<strong>Hlásenia:</strong>'
@@ -37,11 +37,23 @@ class OrderMessagesButton extends Button
         $total = $row->log->count();
 
         foreach ($row->log as $i => $log) {
+            $id = 'id-'.$log->getKey();
+
+            $logInfo = '';
+
             $color = $log->type == 'error' ? 'red' : 'inherit';
 
-            $message = ($total - $i).'. '.$log->getSelectOption('code').''.($log->message ? ' - '.$log->message : '');
+            $message = $log->getSelectOption('code').' '.$log->created_at->format('d.m.Y H:i').($log->message ? ' - '.$log->message : '');
 
-            $lines[] = '<span class="log-type-'.$log->type.'">'.$message.'</span>';
+            //Add clone log into clipboard
+            if ( $log->log && $withLog == true ) {
+                $logInfo = '
+                    <i class="fa fa-info-circle" data-toggle="tooltip" title="Nakopírovať hlásenie" onclick="var t = this.nextElementSibling; t.style.display = \'block\'; t.select();document.execCommand(\'copy\'); t.style.display = \'none\'"></i>
+                    <textarea id="'.$id.'" style="display: none">'.e($log->log).'</textarea>
+                ';
+            }
+
+            $lines[] = '<span class="log-type-'.$log->type.'">'.$logInfo.' '.$message.'</span>';
         }
 
         return implode('<br>', $lines);
@@ -52,8 +64,8 @@ class OrderMessagesButton extends Button
      */
     public function fire(AdminModel $row)
     {
-        return $this->warning(
-            $this->getOrderLogContent($row)
+        return $this->title('Hlásenia ('.$row->log->count().')')->warning(
+            $this->getOrderLogContent($row, true)
         );
     }
 }
