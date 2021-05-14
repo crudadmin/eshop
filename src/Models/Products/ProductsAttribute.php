@@ -73,8 +73,8 @@ class ProductsAttribute extends AdminModel
     public function fields()
     {
         return [
-            'attribute' => 'name:Atribút|belongsTo:attributes,name|canAdd|required',
-            'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name :unitName|filterBy:attribute|canAdd|column_visible|required',
+            'attribute' => 'name:Atribút|belongsTo:attributes,name|canAdd|canEdit|required',
+            'items' => 'name:Hodnota atribútu|belongsToMany:attributes_items,:name :unitName|filterBy:attribute|canAdd|canEdit|column_visible|required',
             'items_hash' => 'name:Items hash|inaccessible|title:for import performance purposes|max:32',
         ];
     }
