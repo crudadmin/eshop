@@ -4,8 +4,6 @@ namespace AdminEshop\Models\Attribute;
 
 use Admin;
 use AdminEshop\Contracts\Concerns\HasUnit;
-use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
@@ -111,12 +109,12 @@ class Attribute extends AdminModel
                     }
 
                     //Get attribute items from all products
-                    if ( (new Product)->hasAttributesEnabled() ) {
+                    if ( Admin::getModel('Product')->hasAttributesEnabled() ) {
                         $query->whereHas('products', $productsQuery);
                     }
 
                     //Get attribute items also from all variants
-                    if ( (new ProductsVariant)->hasAttributesEnabled() ) {
+                    if ( Admin::getModel('ProductsVariant')->hasAttributesEnabled() ) {
                         $query->orWhereHas('variants.product', $productsQuery);
                     }
                 });

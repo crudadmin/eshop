@@ -151,7 +151,7 @@ trait HasProductResponses
         }
 
         if ( $this instanceof Product && count(Store::variantsProductTypes()) ){
-            $query->with(['variants' => function($query) use ($filterParams) {
+            $query->extendWith(['variants' => function($query) use ($filterParams) {
                 $query->withParentProductData();
 
                 //We can deside if filter should be applied also on selected variants
@@ -177,19 +177,11 @@ trait HasProductResponses
         //because if withCategoryResponse has been called before, we will throw all nested withs if we would
         //call simple with("variants.gallery")
         if ( Admin::getModel('ProductsVariant')->hasGalleryEnabled() ) {
-            $eagerLoads = $query->getEagerLoads();
-
-            $loads = array_merge($eagerLoads, [
-                'variants' => function($query) use ($eagerLoads) {
-                    if ( isset($eagerLoads['variants']) ) {
-                        $eagerLoads['variants']($query);
-                    }
-
+            $query->extendWith([
+                'variants' => function($query) {
                     $query->with('gallery');
                 },
             ]);
-
-            $query->setEagerLoads($loads);
         }
     }
 

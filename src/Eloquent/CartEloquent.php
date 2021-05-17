@@ -9,13 +9,15 @@ use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Eloquent\Concerns\WithExtender;
 use Admin\Eloquent\AdminModel;
 use Cart;
 
 class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
 {
     use PriceMutator,
-        DiscountHelper;
+        DiscountHelper,
+        WithExtender;
 
     /*
      * Columns required for price calculation
