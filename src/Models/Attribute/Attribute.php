@@ -165,6 +165,8 @@ class Attribute extends AdminModel
 
     public function setDetailResponse()
     {
+        $this->setCategoryResponse();
+
         $this->append([
             'unitName',
         ]);
