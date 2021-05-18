@@ -14,4 +14,13 @@ trait HasUnit
             return $unit->getAttribute('unit');
         }
     }
+
+    public function getUnitFormatAttribute()
+    {
+        $unitId = $this->getAttribute('unit_id');
+
+        if ( $unitId && $unit = Store::getUnit($unitId) ) {
+            return $unit->getAttribute('format');
+        }
+    }
 }

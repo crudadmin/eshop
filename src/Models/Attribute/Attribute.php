@@ -74,7 +74,7 @@ class Attribute extends AdminModel
     {
         return [
             'name' => 'name:Názov atribútu|required'.(Store::isEnabledLocalization() ? '|locale' : ''),
-            'unit' => 'name:Merná jednotka|belongsTo:attributes_units,:name (:unit)|canAdd',
+            'unit' => 'name:Merná jednotka / Typ atribútu|belongsTo:attributes_units,:name (:unit)|canAdd',
             'title' => 'name:Popis|'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'sortby' => 'name:Zoradiť podľa|type:select|required|default:asc',
         ];
@@ -150,6 +150,17 @@ class Attribute extends AdminModel
         }
 
         return $this->getAttribute('product_info') == true;
+    }
+
+    public function setCategoryResponse()
+    {
+        $this->append([
+            'unitFormat',
+        ]);
+
+        $this->items->each->setCategoryResponse();
+
+        return $this;
     }
 
     public function setDetailResponse()

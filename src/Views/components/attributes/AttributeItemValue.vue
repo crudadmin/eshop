@@ -1,6 +1,6 @@
 <template>
     <div class="form-group">
-        <label>{{ field.name }} {{ unit ? '('+unit.unit+')' : '' }}</label>
+        <label>{{ field.name }} <span v-if="unit && unit.unit">{{ unit ? '('+unit.unit+')' : '' }}</span></label>
 
         <input type="hidden" name="unit_id" v-if="unit" :value="unit.id">
 
@@ -22,6 +22,16 @@ export default {
     data(){
         return {
 
+        }
+    },
+
+    mounted(){
+        this.bootUnitType();
+    },
+
+    watch : {
+        unitFormat(format){
+            this.bootUnitType();
         }
     },
 
@@ -64,6 +74,11 @@ export default {
         onChange(e){
             this.$parent.changeValue(e);
         },
+        bootUnitType(){
+            //Colors
+            this.model.setColumnVisibility('color', this.unitFormat == 'color');
+            this.model.removeFromForm('color', this.unitFormat != 'color');
+        }
     }
 }
 </script>

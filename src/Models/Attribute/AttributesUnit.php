@@ -44,6 +44,7 @@ class AttributesUnit extends AdminModel
             'string' => 'Textové pole',
             'number' => 'Čiselná hodnota',
             'decimal' => 'Čiselná hodnota s možnosťou desatinných miest',
+            'color' => 'Farba',
         ],
     ];
 
@@ -58,7 +59,7 @@ class AttributesUnit extends AdminModel
     {
         return [
             'name' => 'name:Názov mernej jednotky|required',
-            'unit' => 'name:Merná jednotka|required',
+            'unit' => 'name:Merná jednotka',
             'format' => 'name:Formát jednotky|type:select|default:string|required',
         ];
     }

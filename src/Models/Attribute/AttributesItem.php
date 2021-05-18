@@ -71,7 +71,7 @@ class AttributesItem extends AdminModel
     {
         if ( config('admineshop.attributes.types.colors', false) === true ){
             $fields->push([
-                'color' => 'name:Farba|type:color|required_if:attribute_id,'.env('ATTR_COLOR_ID').'|inaccessibleIfNotIn:attribute_id,'.env('ATTR_COLOR_ID'),
+                'color' => 'name:Farba|type:color',
             ]);
         }
 
@@ -120,6 +120,11 @@ class AttributesItem extends AdminModel
         }
 
         return $columns;
+    }
+
+    public function setCategoryResponse()
+    {
+        return $this;
     }
 
     public function setDetailResponse()
