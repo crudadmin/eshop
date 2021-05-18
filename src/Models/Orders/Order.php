@@ -5,10 +5,12 @@ namespace AdminEshop\Models\Orders;
 use AdminEshop\Admin\Buttons\GenerateInvoice;
 use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
+use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
+use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\OrderPayments;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
@@ -29,7 +31,8 @@ class Order extends AdminModel
         OrderTrait,
         OrderPayments,
         HasOrderHashes,
-        HasOrderEmails;
+        HasOrderEmails,
+        HasOrderNumber;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -58,6 +61,7 @@ class Order extends AdminModel
     ];
 
     protected $rules = [
+        OrderNumber::class,
         RebuildOrder::class,
     ];
 
@@ -71,6 +75,8 @@ class Order extends AdminModel
     public function fields()
     {
         return [
+            'number' => 'name:Č. obj.|max:20|hideFromForm',
+            'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
             'client' => 'name:Klient|belongsTo:clients|invisible',
             'Fakturačné údaje' => Group::fields([
                 'username' => 'name:Meno a priezvisko|required|hidden',
@@ -169,9 +175,10 @@ class Order extends AdminModel
     {
         return [
             'autoreset' => false,
+            'increments' => false,
             'title.insert' => 'Nová objednávka',
             'buttons.insert' => 'Vytvoriť novú objednávku',
-            'title.update' => 'Objednávka č. :id - :created',
+            'title.update' => 'Objednávka č. :number - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',
             'table.onclickopen' => true,
@@ -180,7 +187,7 @@ class Order extends AdminModel
             'columns.created.name' => 'Vytvorená dňa',
             'columns.client_name' => [
                 'encode' => false,
-                'after' => 'id',
+                'after' => 'number',
                 'name' => 'Zákazník',
             ],
             'columns.delivery_address' => [
@@ -233,6 +240,8 @@ class Order extends AdminModel
 
     public function setAdminAttributes($attributes)
     {
+        $attributes['number'] = $this->number;
+
         $attributes['client_name'] = $this->getClientName();
 
         $attributes['delivery_address'] = $this->getDeliveryAddress();
@@ -249,9 +258,14 @@ class Order extends AdminModel
         return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
 
-    public function getNumberAttribute()
+    public function getNumberAttribute($value)
     {
-        return str_pad($this->getKey(), 6, '0', STR_PAD_LEFT);
+        if ( config('admineshop.cart.order.number.custom', false) === true ) {
+            return $value;
+        }
+
+        //Generate order number automatically by order ID
+        return str_pad($this->getKey(), config('admineshop.cart.order.number.length', 6), '0', STR_PAD_LEFT);
     }
 
     public function getPaymentMethodPriceWithVatAttribute()
