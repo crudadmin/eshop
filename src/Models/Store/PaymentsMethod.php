@@ -15,6 +15,8 @@ class PaymentsMethod extends BasePaymentsMethod
 
     protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 
+    protected $publishable = true;
+
     public function reserved()
     {
         return array_filter([

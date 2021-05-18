@@ -10,6 +10,7 @@ use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Order\Concerns\HasOrderItemNames;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use Cart;
+use Illuminate\Database\Eloquent\Model;
 
 class CartItem implements UsesIdentifier
 {
@@ -132,7 +133,7 @@ class CartItem implements UsesIdentifier
         if ( isset($this->itemModels[$identifierHash]) ) {
             foreach ($this->itemModels[$identifierHash] as $key => $model) {
                 //We can make hidden fields here, or append additional attributes...
-                if ( $model && method_exists($model, 'setCartResponse') ){
+                if ( $model instanceof Model && method_exists($model, 'setCartResponse') ){
                     $model->setCartResponse();
                 }
 

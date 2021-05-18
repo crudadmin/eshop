@@ -25,9 +25,9 @@ class CartCollection extends Collection
     {
         return $this
                     ->applyOnOrderCart($discounts)
-                    ->renderCartItems($discounts)
                     ->rejectWithMissingProduct($onItemRejected)
                     ->rejectWithMissingParents($onItemRejected)
+                    ->renderCartItems($discounts)
                     ->sortByParentItemsOrder();
     }
 
