@@ -76,9 +76,7 @@ trait HasProductResponses
             $this->makeVisible(['attributesList']);
             $this->append(['attributesList']);
 
-            $this->attributesList->each->append([
-                'unitName',
-            ]);
+            $this->attributesList->each->setDetailResponse();
         }
 
         if ( $this->getProperty('seo') == true ){

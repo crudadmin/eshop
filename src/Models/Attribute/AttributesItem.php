@@ -121,4 +121,9 @@ class AttributesItem extends AdminModel
 
         return $columns;
     }
+
+    public function setDetailResponse()
+    {
+        return $this;
+    }
 }

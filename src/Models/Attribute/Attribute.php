@@ -151,4 +151,15 @@ class Attribute extends AdminModel
 
         return $this->getAttribute('product_info') == true;
     }
+
+    public function setDetailResponse()
+    {
+        $this->append([
+            'unitName',
+        ]);
+
+        $this->items->each->setDetailResponse();
+
+        return $this;
+    }
 }
