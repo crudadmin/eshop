@@ -147,11 +147,17 @@ class ProductsIdentifier extends Identifier
     {
         $product = $item->getValue('product');
         $variant = $item->getValue('variant');
+        $productOrVariant = $variant ?: $product;
 
         $items = [
-            $product ? $product->name : null,
-            $variant ? $variant->name : ($product ? $product->attributesText : null),
+            $variant ? $variant->name : $product->name
         ];
+
+        if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+            $items[] = $productOrVariant->attributesVariantsText;
+        } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+            $items[] = $productOrVariant->attributesText;
+        }
 
         return array_filter($items);
     }

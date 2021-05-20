@@ -152,6 +152,11 @@ class Attribute extends AdminModel
         return $this->getAttribute('product_info') == true;
     }
 
+    public function displayableInVariantsTextAttributes()
+    {
+        return $this->getAttribute('variants') == true;
+    }
+
     public function setCategoryResponse()
     {
         $this->append([

@@ -64,7 +64,32 @@ trait HasProductAttributes
                     return;
                 }
 
-                return ($attrItem ? $attrItem->name : '').($attribute ? $attribute->unitName : '');
+                return ($attrItem ? $attrItem->name : '').($attribute ? (' '.$attribute->unitName) : '');
+            })->filter()->join(config('admineshop.attributes.separator.item', ', '));
+        }
+
+        return implode(config('admineshop.attributes.separator.attribute', ', '), $attributes);
+    }
+
+    public function getAttributesVariantsTextAttribute()
+    {
+        //If attributes for given model are not enabled, or fetched by developer
+        if ( $this->hasAttributesEnabled() == false || !$this->relationLoaded('attributesItems') ){
+            return;
+        }
+
+        $attributes = [];
+
+        foreach ($this->attributesItems->groupBy('products_attribute_id') as $attributeItems) {
+            $attributes[] = $attributeItems->map(function($item) {
+                $attribute = $item->attribute;
+                $attrItem = $item->item;
+
+                if ( $attribute && $attribute->displayableInVariantsTextAttributes() !== true ){
+                    return;
+                }
+
+                return ($attrItem ? $attrItem->name : '').($attribute ? (' '.$attribute->unitName) : '');
             })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 

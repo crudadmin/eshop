@@ -71,7 +71,7 @@ trait HasOrderItemNames
         $name = e($this->getProductNamePartsSections(0));
 
         if ( $additional = $this->getProductNamePartsSections(1) ) {
-            $name = '<small>'.e($additional).'</small>';
+            $name .= ' <small>'.e($additional).'</small>';
         }
 
         return $name;
