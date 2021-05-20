@@ -258,10 +258,12 @@ class Order extends AdminModel
         return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
 
-    public function getNumberAttribute($value)
+    public function getNumberAttribute()
     {
+        //We need return value from attributes, because this property may be appended also when field does exists.
+        //If we would use $value from parameter, this parameter may be null
         if ( config('admineshop.cart.order.number.custom', false) === true ) {
-            return $value;
+            return $this->attributes['number'];
         }
 
         //Generate order number automatically by order ID

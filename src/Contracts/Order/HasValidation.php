@@ -13,10 +13,7 @@ trait HasValidation
      *
      * @var  array
      */
-    protected $orderValidators = [
-        //Todo: remove this from here, because this is in BaseOrderMutator
-        StockValidator::class,
-    ];
+    protected $orderValidators = [];
 
     /**
      * Error messages from validators
