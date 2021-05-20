@@ -111,7 +111,7 @@ class Product extends CartEloquent implements HasAttributesSupport
             'Sklad' => Group::tab([
                 'stock_quantity' => 'name:Sklad|type:integer|default:0',
                 'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
-                'stock_sold' => 'name:Text dostupnosti tovaru pri vypredaní|hideFromFormIfNot:stock_type,everytime'
+                'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
             ])->icon('fa-bars')->add('hidden'),
             $this->hasAttributesEnabled() ? Group::tab( ProductsAttribute::class ) : [],
             'Ostatné nastavenia' => Group::tab([

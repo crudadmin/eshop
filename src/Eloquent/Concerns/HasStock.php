@@ -16,7 +16,7 @@ trait HasStock
      * @var  array
      */
     protected $stockAttributes = [
-        'stockText', 'hasStock', 'stockNumber',
+        'stockText', 'hasStock', 'stockNumber', 'canOrderEverytime'
     ];
 
     /**
@@ -53,45 +53,56 @@ trait HasStock
     }
 
     /*
-     * Get product value or value from global settings
+     * Is product on stock
      */
-    public function getStockSoldAttribute($value)
-    {
-        //Overide default value by global settings
-        if ( ! $value ) {
-            return Store::getSettings()->stock_sold;
-        }
-
-        return $value;
-    }
-
     public function getHasStockAttribute()
     {
         return $this->stock_quantity > 0;
     }
 
-    public function getIsAvailableAttribute()
-    {
-        return $this->stock_quantity > 0 || $this->canOrderEverytime();
-    }
-
     /*
      * Check if order can be ordered with zero quantity on stock
      */
-    public function canOrderEverytime()
+    public function getCanOrderEverytimeAttribute()
     {
         return $this->stock_type == 'everytime';
     }
 
-    /*
-     * Check if product can be ordered
+    /**
+     * Returns text if product is on stock
+     *
+     * @return  string
      */
-    public function getCanOrderAttribute()
+    public function getOnStockTextAttribute()
     {
-        if ( $this->isAvailable )
-            return true;
+        return _('Skladom');
+    }
 
-        return false;
+    /**
+     * Returns text if product is not on stock
+     *
+     * @return  string
+     */
+    public function getOffStockTextAttribute()
+    {
+        return _('Nie je skladom');
+    }
+
+    /*
+     * Get product value or value from global settings of sold product which is able to order
+     */
+    public function getStockSoldAttribute($value)
+    {
+        //Overide default value by global settings
+        if ( ! $value ) {
+            $settings = Store::getSettings();
+
+            if ( $settings->stock_type == 'everytime' ) {
+                return Store::getSettings()->stock_sold;
+            }
+        }
+
+        return $value;
     }
 
     /**
@@ -102,19 +113,19 @@ trait HasStock
     public function getStockTextAttribute()
     {
         if ( $this->hasStock ) {
-            if ( $this->canOrderEverytime() == false && config('admineshop.stock.status_with_quantity') === true ) {
+            if ( $this->canOrderEverytime == false && config('admineshop.stock.status_with_quantity') === true ) {
                 return sprintf(_('Skladom %sks'), $this->stockNumber);
             }
 
-            return _('Skladom');
+            return $this->onStockText;
         }
 
-        //If is custom message
-        if ( $this->canOrderEverytime() && $this->stock_sold ) {
-            return $this->stock_sold;
+        //If is custom message for sold product which are able to order anytime.
+        if ( $this->canOrderEverytime && $soldText = $this->stock_sold ) {
+            return $soldText;
         }
 
-        return _('Nie je skladom');
+        return $this->offStockText;
     }
 
     public function getStockNumberAttribute()

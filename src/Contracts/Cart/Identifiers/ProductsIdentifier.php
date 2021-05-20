@@ -119,7 +119,7 @@ class ProductsIdentifier extends Identifier
         }
 
         //We can skip checking products which all allowed all the time
-        if ( $model->canOrderEverytime() ) {
+        if ( $model->canOrderEverytime ) {
             return true;
         }
 

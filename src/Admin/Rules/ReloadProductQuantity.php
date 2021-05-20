@@ -75,7 +75,7 @@ class ReloadProductQuantity extends AdminRule
         }
 
         //If is no enought items on stock to subtract from product quantity
-        if ( $row->product->canOrderEverytime() == false && ($product->stock_quantity - $quantity) < 0 ) {
+        if ( $row->product->canOrderEverytime == false && ($product->stock_quantity - $quantity) < 0 ) {
             return Ajax::error('Pre pridanie daného produktu do objednávky <strong>nie je</strong> dostatočný počet produktov na sklade.');
         }
 
