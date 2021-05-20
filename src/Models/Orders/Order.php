@@ -263,7 +263,7 @@ class Order extends AdminModel
         //We need return value from attributes, because this property may be appended also when field does exists.
         //If we would use $value from parameter, this parameter may be null
         if ( config('admineshop.cart.order.number.custom', false) === true ) {
-            return $this->attributes['number'];
+            return $this->attributes['number'] ?? null;
         }
 
         //Generate order number automatically by order ID
