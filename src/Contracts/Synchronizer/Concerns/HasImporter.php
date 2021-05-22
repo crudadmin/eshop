@@ -232,6 +232,33 @@ trait HasImporter
         $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
     }
 
+    public function synchronizeUpdateOnly(Model $model, $fieldKey, $rows)
+    {
+        $totalStart = Admin::start();
+        $this->message('************* '.$model->getTable());
+
+        $rows = collect($rows)->keyBy(
+            $this->keyByIdentifier($fieldKey)
+        );
+
+        $allIdentifiers = $rows->keys()->toArray();
+
+        $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
+
+        //Identify which rows should be updated and which created
+        $this->onUpdate[$model->getTable()] = array_intersect(
+            $rows->keys()->toArray(),
+            array_keys($this->existingRows[$model->getTable()]),
+        );
+
+        $this->message('Existing rows: '.count($this->onUpdate[$model->getTable()])."\n");
+
+        //Update existing rows
+        $this->updateRows($model, $rows, $fieldKey);
+
+        $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
+    }
+
     private function createRows(Model $model, $rows, $fieldKey)
     {
         $start = Admin::start();

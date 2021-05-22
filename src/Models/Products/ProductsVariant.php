@@ -46,6 +46,8 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
 
     protected $sluggable = 'name';
 
+    protected $icon = 'fa-bars';
+
     /*
      * This items will be selected frm db for cart items
      */
