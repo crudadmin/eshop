@@ -19,7 +19,7 @@ class ClientDataValidator extends Validator
      */
     public function getMessage()
     {
-        return _('Nastala nečakaná chyba pri ukladani informácii o klientovi, skúste neskôr prosím, poprípade nás kontaktujte.');
+        return _('Nevyplnili ste informácie o objednávke. Prekontrolujte prosím predchadzajúce kroky Vášho košíka.');
     }
 }
 
