@@ -27,6 +27,14 @@ trait DriverSupport
     }
 
     /**
+     * On driver flush event
+     */
+    public function onDriverFlush()
+    {
+
+    }
+
+    /**
      * Returns proxy cart driver
      *
      * @return AdminEshop\Contracts\Cart\Drivers\ProxyDriver

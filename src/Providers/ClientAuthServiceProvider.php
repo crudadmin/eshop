@@ -1,4 +1,5 @@
 <?php
+
 namespace AdminEshop\Providers;
 
 use Illuminate\Support\ServiceProvider;

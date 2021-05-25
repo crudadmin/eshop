@@ -15,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
         StoreServiceProvider::class,
         RulesServiceProvider::class,
         RouteServiceProvider::class,
+        EventsServiceProvider::class,
     ];
 
     protected $facades = [

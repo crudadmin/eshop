@@ -8,7 +8,6 @@ use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Controllers\Controller;
 use AdminEshop\Events\DiscountCodeAdded;
-use AdminEshop\Events\OrderCreated;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Cart;
@@ -241,32 +240,18 @@ class CartController extends Controller
         }
 
         //Create order
-        OrderService::store();
-
-        //Send shipping
-        OrderService::sendShipping();
-
-        //Generate default invoice document
-        $proform = OrderService::makeInvoice('proform');
-
-        //Send email to client
-        OrderService::sentClientEmail($proform);
-
-        //Sent store email
-        OrderService::sentStoreEmail();
-
-        $order = OrderService::getOrder();
-
-        //Event for added discount code
-        event(new OrderCreated($order));
+        OrderService::store()->fireCreatedEvent();
 
         //Forget whole cart
         Cart::forget();
+
+        $order = OrderService::getOrder();
 
         return autoAjax()->success(_('Objednávka bola úspešne odoslaná.'))->data([
             'order' => $order,
             'order_hash' => $order->getHash(),
             'payment' => ($paymentData = $order->getPaymentData()) ? $paymentData : [],
+            'cart' => Cart::fullCartResponse(),
         ]);
     }
 

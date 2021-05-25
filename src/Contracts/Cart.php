@@ -298,10 +298,10 @@ class Cart
      * @param  int|null  $id
      * @return  this
      */
-    public function forget()
+    public function forget($force = false)
     {
         //On local environment does not flush data
-        if ( ! app()->environment('local') ) {
+        if ( ! app()->environment('local') || $force === true ) {
             //Remove all order mutators from session
             foreach (OrderService::getMutators() as $mutator) {
                 if ( method_exists($mutator, 'onCartForget') ) {
@@ -310,13 +310,17 @@ class Cart
             }
 
             CartDriver::flushAllExceptWhitespaced();
-
         }
 
-        //Set created order id into cart
-        Cart::getDriver()->set('order_id', OrderService::getOrder()->getKey());
-
         return $this;
+    }
+
+    /**
+     * We need reset cart items on driver flush
+     */
+    public function onDriverFlush()
+    {
+        $this->items = new CartCollection;
     }
 }
 

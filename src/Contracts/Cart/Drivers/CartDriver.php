@@ -102,6 +102,8 @@ class CartDriver
                     unset($data[$dataKey]);
                 }
             }
+
+            $class->onDriverFlush();
         }
 
         $this->getDriver()->replace($data);

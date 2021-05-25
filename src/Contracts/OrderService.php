@@ -13,6 +13,7 @@ use AdminEshop\Contracts\Order\Concerns\HasProviders;
 use AdminEshop\Contracts\Order\Concerns\HasShipping;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
+use AdminEshop\Events\OrderCreated;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
@@ -79,6 +80,21 @@ class OrderService
 
         //Add items into order
         $this->addItemsIntoOrder();
+
+        return $this;
+    }
+
+    /**
+     * Fire order event
+     *
+     * @return  this
+     */
+    public function fireCreatedEvent()
+    {
+        $order = $this->getOrder();
+
+        //Event for added discount code
+        event(new OrderCreated($order));
 
         return $this;
     }
