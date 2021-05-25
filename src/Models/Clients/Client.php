@@ -2,9 +2,11 @@
 
 namespace AdminEshop\Models\Clients;
 
+use AdminEshop\Contracts\Discounts\ClientPercentageDiscount;
 use Admin\Eloquent\Authenticatable;
 use Admin\Fields\Group;
 use Illuminate\Notifications\Notifiable;
+use Discounts;
 
 class Client extends Authenticatable
 {
@@ -23,6 +25,18 @@ class Client extends Authenticatable
     protected $publishable = true;
 
     protected $appends = ['is_company', 'thumbnail'];
+
+    protected $settings = [
+        'title.insert' => 'Nový klient',
+        'title.update' => 'Klient :username',
+        'grid' => [
+            'default' => 'full',
+            'enabled' => false,
+        ],
+        'columns.orders.name' => 'Počet obj.',
+        'columns.orders.before' => 'last_logged_at',
+        'columns.last_order.name' => 'Posledná objednávka',
+    ];
 
     /*
      * Automatic form and database generation
@@ -56,20 +70,22 @@ class Client extends Authenticatable
                 'company_tax_id' => 'name:DIČ|required_with:is_company',
                 'company_vat_id' => 'name:IČ DPH',
             ])->add('hidden'),
+            'Zľavy' => Group::tab([
+
+            ])->id('discounts')->icon('fa-percentage'),
         ];
     }
 
-    protected $settings = [
-        'title.insert' => 'Nový klient',
-        'title.update' => 'Klient :username',
-        'grid' => [
-            'default' => 'full',
-            'enabled' => false,
-        ],
-        'columns.orders.name' => 'Počet obj.',
-        'columns.orders.before' => 'last_logged_at',
-        'columns.last_order.name' => 'Posledná objednávka',
-    ];
+    public function mutateFields($fields)
+    {
+        if ( Discounts::isRegistredDiscount(ClientPercentageDiscount::class) ) {
+            $fields->group('discounts', function($group){
+                $group->push([
+                    'percentage_discount' => 'name:Zľava na všetky produkty|type:decimal|default:0',
+                ]);
+            });
+        }
+    }
 
     public function getClientNameAttribute()
     {
