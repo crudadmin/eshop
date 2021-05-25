@@ -240,7 +240,22 @@ class CartController extends Controller
         }
 
         //Create order
-        OrderService::store()->fireCreatedEvent();
+        OrderService::store();
+
+        //Generate default invoice document
+        $proform = OrderService::makeInvoice('proform');
+
+        //Send email to client
+        OrderService::sentClientEmail($proform);
+
+        //Sent store email
+        OrderService::sentStoreEmail();
+
+        //Send shipping
+        OrderService::sendShipping();
+
+        //Set order creation event
+        OrderService::fireCreatedEvent();
 
         //Forget whole cart
         Cart::forget();
