@@ -57,13 +57,13 @@ class Client extends Authenticatable
                 'username' => 'name:Meno a priezvisko',
                 'phone' => 'name:Telefon|'.phoneValidatorRule(),
                 'groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd',
-            ]),
+            ])->id('personal'),
             'Fakturačné údaje' => Group::half([
                 'street' => 'name:Ulica a č.p.',
                 'city' => 'name:Mesto',
                 'zipcode' => 'name:PSČ|zipcode',
                 'country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id',
-            ]),
+            ])->id('billing'),
             'Firemné údaje' => Group::half([
                 'company_name' => 'name:Názov firmy|required_with:is_company',
                 'company_id' => 'name:IČO|company_id|required_with:is_company',

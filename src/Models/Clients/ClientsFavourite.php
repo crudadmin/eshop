@@ -5,6 +5,7 @@ namespace AdminEshop\Models\Clients;
 use AdminEshop\Models\Clients\Client;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Admin;
 
 class ClientsFavourite extends AdminModel
 {
@@ -23,12 +24,6 @@ class ClientsFavourite extends AdminModel
      */
     protected $title = '';
 
-    /*
-     * Model Parent
-     * Eg. Article::class
-     */
-    protected $belongsToModel = Client::class;
-
     protected $sortable = false;
     protected $publishable = false;
     protected $insertable = false;
@@ -38,6 +33,16 @@ class ClientsFavourite extends AdminModel
         'dates' => true,
         'increments' => false,
     ];
+
+    public function belongsToModel()
+    {
+        return get_class(Admin::getModel('Client'));
+    }
+
+    public function active()
+    {
+        return config('admineshop.client.favourites', false);
+    }
 
     /*
      * Automatic form and database generator by fields list

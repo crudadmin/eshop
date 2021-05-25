@@ -5,6 +5,7 @@ namespace AdminEshop\Models\Clients;
 use AdminEshop\Admin\Rules\SetDefaultDeliveryAddress;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Admin;
 
 class ClientsAddress extends AdminModel
 {
@@ -21,9 +22,17 @@ class ClientsAddress extends AdminModel
     protected $publishable = false;
     protected $sortable = false;
 
-    protected $belongsToModel = Client::class;
-
     protected $hidden = ['created_at', 'deleted_at', 'published_at', '_order'];
+
+    public function belongsToModel()
+    {
+        return get_class(Admin::getModel('Client'));
+    }
+
+    public function active()
+    {
+        return config('admineshop.client.addresses', false);
+    }
 
     /*
      * Automatic form and database generation

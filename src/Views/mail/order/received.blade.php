@@ -33,7 +33,7 @@
 @if ( $location && $location->address )
 | {{ _('Adresa zvolenej dopravy') }}: | {{ $location->address }} |
 @endif
-| {{ _('Tel. číslo') }}: | {{ $order->phone }} |
+| {{ _('Tel. číslo') }}: | {{ $order->phone ?: $order->delivery_phone }} |
 | {{ _('Vytvorená dňa') }}:  | {{ $order->created_at->format('d.m.Y H:i') }} |
 @endcomponent
 
@@ -55,7 +55,9 @@
 | {{ _('IČ DPH') }}: | {{ $order->company_vat_id }} |
 @endif
 | {{ _('Meno a priezvisko') }}: | {{ $order->username }} |
+@if ( $order->phone )
 | {{ _('Telefón') }}: | {{ $order->phone }} |
+@endif
 | {{ _('Ulica') }}: | {{ $order->street }} |
 | {{ _('Mesto') }}: | {{ $order->city }} |
 | {{ _('PSČ') }}: | {{ $order->zipcode }} |

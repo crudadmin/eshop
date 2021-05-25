@@ -192,6 +192,11 @@ return [
         'show_no_vat' => false,
     ],
 
+    'client' => [
+        'addresses' => false,
+        'favourites' => false,
+    ],
+
     /*
      * Validation for phone numbers in order/clients,address etc...
      * SK,CZ...
