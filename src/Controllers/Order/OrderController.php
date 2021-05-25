@@ -10,13 +10,15 @@ class OrderController extends Controller
     {
         $orders = client()->orders()
                         ->with('invoices:id,order_id,pdf')
-                        ->get()->map(function($order){
-                            return $order->makeHidden('invoices')->toResponseFormat();
-                        });
+                        ->paginate(request('limit', 10));
 
-        return [
+        $orders->getCollection()->each(function($order){
+            return $order->makeHidden('invoices')->toResponseFormat();
+        });
+
+        return api([
             'orders' => $orders,
-        ];
+        ]);
     }
 
     public function show($id)
@@ -26,11 +28,11 @@ class OrderController extends Controller
                         ->findOrFail($id)
                         ->toResponseFormat();
 
-        return [
+        return api([
             'order' => $order,
             'items' => $order->items->map(function($item){
                 return $item->toResponseFormat();
             }),
-        ];
+        ]);
     }
 }

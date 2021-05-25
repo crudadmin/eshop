@@ -6,11 +6,15 @@ trait HasOrderHashes
 {
     public function makePaymentHash(string $type)
     {
-        return sha1(md5(sha1(md5(env('APP_KEY').$this->payment_method_id.$this->getKey().$type))));
+        $key = env('APP_KEY').$this->payment_method_id.$this->getKey().$type;
+
+        return hash('sha256', sha1(md5(sha1(md5($key)))));
     }
 
     public function getHash()
     {
-        return sha1(env('APP_KEY').$this->getKey().'XL');
+        $key = (env('APP_KEY').$this->getKey().'XL');
+
+        return hash('sha256', $key);
     }
 }
