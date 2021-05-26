@@ -33,20 +33,6 @@ class OrderProvider
         return $this;
     }
 
-    public function setDelivery(Delivery $delivery = null)
-    {
-        $this->delivery = $delivery;
-
-        return $this;
-    }
-
-    public function setPaymentMethod(PaymentsMethod $method = null)
-    {
-        $this->paymentMethod = $method;
-
-        return $this;
-    }
-
     public function getOrder()
     {
         return $this->order;

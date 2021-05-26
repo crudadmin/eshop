@@ -212,7 +212,9 @@ class DeliveryMutator extends Mutator
 
         return $this->cache('selectedDelivery.'.$id, function() use ($id) {
             if ( $delivery = $this->getDeliveries()->where('id', $id)->first() ) {
-                return Cart::addCartDiscountsIntoModel($delivery->setCartResponse());
+                return Cart::addCartDiscountsIntoModel(
+                    $delivery->setCartResponse()
+                );
             }
         });
     }

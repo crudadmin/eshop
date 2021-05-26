@@ -78,8 +78,7 @@ trait HasPayments
         if ( array_key_exists($paymentMethodId, $providers) ) {
             $paymentClass = new $providers[$paymentMethodId];
 
-            return $paymentClass->setOrder($order)
-                                ->setPaymentMethod($order->payment_method);
+            return $paymentClass->setOrder($order);
         }
     }
 

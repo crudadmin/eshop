@@ -28,8 +28,6 @@ trait HasProviders
         $order = $this->getOrder();
 
         //Returns booted provider class
-        return $class->setOrder($order)
-                     ->setDelivery($order ? $order->delivery : null)
-                     ->setPaymentMethod($order ? $order->payment_method : null);
+        return $class->setOrder($order);
     }
 }

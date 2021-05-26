@@ -6,7 +6,7 @@ use AdminEshop\Contracts\Delivery\Jobs\SendShippingJob;
 
 trait HasShipping
 {
-    protected $configKey = 'admineshop.delivery.providers';
+    protected $shippingConfigKey = 'admineshop.delivery.providers';
 
     public function getShippingProvider($deliveryId = null)
     {
@@ -14,7 +14,7 @@ trait HasShipping
 
         $deliveryId = $deliveryId ?: $order->delivery_id;
 
-        return $this->getProviderById($this->configKey, $deliveryId);
+        return $this->getProviderById($this->shippingConfigKey, $deliveryId);
     }
 
     /*
