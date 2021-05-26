@@ -103,7 +103,7 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
 
             $packet = $gw->createPacket($apiPassword, $data);
 
-            return new ShippingResponse(true, $packet->id);
+            return new ShippingResponse($packet->id);
         }
 
         catch(SoapFault $error) {

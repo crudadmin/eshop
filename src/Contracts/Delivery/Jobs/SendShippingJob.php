@@ -59,7 +59,14 @@ class SendShippingJob implements ShouldQueue
 
             $order->delivery_status = 'ok';
             $order->delivery_identifier = $package->shippingId();
-            $order->addDeliveryMessage($package->getMessage());
+
+            if ( $package->getMessage() ) {
+                $order->log()->create([
+                    'type' => 'info',
+                    'code' => 'delivery-info',
+                    'message' => $package->getMessage(),
+                ]);
+            }
         }
 
         catch (CreatePackageException $error){
@@ -68,12 +75,22 @@ class SendShippingJob implements ShouldQueue
             }
 
             $order->delivery_status = 'error';
-            $order->addDeliveryMessage($error->getMessage());
+
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'delivery-error',
+                'log' => implode(' ', array_wrap($error->getMessage())),
+            ]);
         }
 
         catch (ShipmentException $error){
             $order->delivery_status = 'error';
-            $order->addDeliveryMessage($error->getMessage());
+
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'delivery-error',
+                'log' => implode(' ', array_wrap($error->getMessage())),
+            ]);
         }
 
         $order->save();

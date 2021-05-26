@@ -46,14 +46,14 @@ class SendShippmentButton extends Button
         $row->refresh();
 
         if ( $row->delivery_status == 'new' ) {
-            return $this->message('Zasielka bude za malý okamih odoslaná na do DPD. Sledujte stav objednávky doručenia.');
+            return $this->message('Zasielka bude za malý okamih odoslaná na do zvolenej dopravnej služby. Sledujte stav objednávky doručenia.');
         }
 
         if ( $row->delivery_status == 'ok' ) {
-            return $this->message('Zásielka bola úspešne odoslaná do DPD.');
+            return $this->message('Zásielka bola úspešne odoslaná do zvolenej dopravnej služby.');
         }
 
-        return $this->error('Nastala nečakná chyba. Skontrolujte hlásenia dopravy pre danu objednávku:<br>'.$row->delivery_message);
+        return $this->error('Nastala nečakná chyba. Skontrolujte hlásenia pre danu objednávku.');
     }
 
     /**

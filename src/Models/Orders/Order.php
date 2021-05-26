@@ -139,7 +139,6 @@ class Order extends AdminModel
                     Group::fields([
                         'status' => 'name:Stav objednávky|column_name:Stav|type:select|required|default:new',
                         'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
-                        'delivery_message' => 'name:Hlásenie z dopravnej služby|invisible',
                         'delivery_identifier' => 'name:Identifikátor zvozu dopravy|invisible',
                     ])->inline(),
                     Group::fields([

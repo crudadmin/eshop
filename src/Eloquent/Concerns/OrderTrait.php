@@ -276,25 +276,8 @@ trait OrderTrait
         ]));
     }
 
-    /**
-     * Add timestamp and message into delivery messages
-     *
-     * @param  string|array  $messages
-     */
-    public function addDeliveryMessage($messages)
-    {
-        $msg = $this->delivery_message ?: '';
-        $msg .= "\n".date('d.m.Y H:i').' - '.implode(' ', array_wrap($messages));
-        $msg = trim(trim($msg, "\n"));
-
-        $this->delivery_message = $msg;
-
-        return $this;
-    }
-
     protected function getDeliveryStatusText()
     {
-        $icon = '';
         $color = '';
         $tooltip = '';
 
@@ -315,10 +298,9 @@ trait OrderTrait
             $message = 'Čaká';
         }
 
-        if ( $icon || $message ) {
+        if ( $message ) {
             return '
             <span style="'.($color ? ('color: '.$color) : '' ).'">
-                '.($this->delivery_message ? ('<i class="fa fa-info-circle mr-1" data-toggle="tooltip" title="'.e($this->delivery_message).'"></i>') : '').'
                 <span data-toggle="tooltip" title="'.e($tooltip).'">
                     '.e($message).'
                 </span>

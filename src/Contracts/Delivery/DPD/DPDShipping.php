@@ -213,13 +213,15 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
             && $response['result']['result'][0]['success']
             && $package = $response['result']['result'][0]
         ){
-            if ( in_array(@$package['ackCode'], ['success', 'successWithWarning']) === false ) {
-                throw new CreatePackageException($package['ackCode'].' - '.is_array($package['messages']) ? implode(' ', $package['messages']) : null);
+            $message = is_array($package['messages']) ? implode(' ', $package['messages']) : null;
+
+            if ( in_array($package['ackCode'] ?? null, ['success', 'successWithWarning']) === false ) {
+                throw new CreatePackageException($package['ackCode'].' - '.$message);
             }
 
             return new ShippingResponse(
-                @$package['mpsid'],
-                is_array($package['messages']) ? implode(' ', $package['messages']) : null,
+                $package['mpsid'],
+                $message,
                 $package
             );
         }
