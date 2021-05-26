@@ -165,7 +165,7 @@ class PaymentMethodMutator extends Mutator
 
         return $this->getPaymentMethods()->filter(function($item) use ($allowedPaymentMethods) {
             return in_array($item->getKey(), $allowedPaymentMethods);
-        });
+        })->values();
     }
 
     /**
