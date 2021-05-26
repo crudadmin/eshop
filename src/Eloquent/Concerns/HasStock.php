@@ -75,6 +75,10 @@ trait HasStock
      */
     public function getOnStockTextAttribute()
     {
+        if ( $this->canOrderEverytime == false && config('admineshop.stock.status_with_quantity') === true ) {
+            return sprintf(_('Skladom %sks'), $this->stockNumber);
+        }
+
         return _('Skladom');
     }
 
@@ -85,14 +89,21 @@ trait HasStock
      */
     public function getOffStockTextAttribute()
     {
+        //If is custom message for sold product which are able to order anytime.
+        if ( $this->canOrderEverytime && $soldText = $this->soldStockToSale ) {
+            return $soldText;
+        }
+
         return _('Nie je skladom');
     }
 
     /*
      * Get product value or value from global settings of sold product which is able to order
      */
-    public function getStockSoldAttribute($value)
+    public function getSoldStockToSaleAttribute($value)
     {
+        $stockSoldText = $this->stock_sold;
+
         //Overide default value by global settings
         if ( ! $value ) {
             $settings = Store::getSettings();
@@ -102,7 +113,7 @@ trait HasStock
             }
         }
 
-        return $value;
+        return $stockSoldText;
     }
 
     /**
@@ -113,16 +124,7 @@ trait HasStock
     public function getStockTextAttribute()
     {
         if ( $this->hasStock ) {
-            if ( $this->canOrderEverytime == false && config('admineshop.stock.status_with_quantity') === true ) {
-                return sprintf(_('Skladom %sks'), $this->stockNumber);
-            }
-
             return $this->onStockText;
-        }
-
-        //If is custom message for sold product which are able to order anytime.
-        if ( $this->canOrderEverytime && $soldText = $this->stock_sold ) {
-            return $soldText;
         }
 
         return $this->offStockText;
