@@ -50,5 +50,13 @@ trait HasRoutes
             Route::get('/_store/payments/create/{payment}/{type}/{hash}', 'PaymentController@paymentStatus');
             Route::get('/_store/payments/post-payment/{order}/{hash}', 'PaymentController@postPayment');
         });
+
+    }
+
+    public function routesForPacketaShipping()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers\Shipping'], function(){
+            Route::post('/cart/shipping/packeta/point', 'PacketaController@setPoint')->visible();
+        });
     }
 }

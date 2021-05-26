@@ -165,6 +165,12 @@ class Order extends AdminModel
             $fields->remove(['delivery_location']);
         }
 
+        if ( config('admineshop.delivery.packeta') == true ){
+            $fields->push([
+                'packeta_point' => 'name:Packeta point|type:json|inaccessible',
+            ]);
+        }
+
         //If discount code is not registred, we can remove it from order
         if ( Discounts::isRegistredDiscount(DiscountCode::class) === false ){
             $fields->remove(['discount_code']);

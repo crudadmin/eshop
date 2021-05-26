@@ -8,13 +8,10 @@ class ShippingResponse
 
     protected $shippingId;
 
-    protected $success;
-
     protected $message;
 
-    public function __construct(bool $success, $shippingId = null, string $message = null, $data = [])
+    public function __construct($shippingId, string $message = null, $data = [])
     {
-        $this->success = $success;
         $this->shippingId = $shippingId;
         $this->message = $message;
         $this->data = $data;
@@ -28,11 +25,6 @@ class ShippingResponse
     public function shippingId()
     {
         return $this->shippingId;
-    }
-
-    public function isSuccess()
-    {
-        return $this->success ? true : false;
     }
 
     public function getData()

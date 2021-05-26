@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Order\Mutators;
 use Admin;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\PaymentMethodValidator;
+use AdminEshop\Events\PaymentSelected;
 use AdminEshop\Models\Orders\Order;
 use Cart;
 use Store;
@@ -177,6 +178,8 @@ class PaymentMethodMutator extends Mutator
     public function setPaymentMethod($id = null, $persist = true)
     {
         $this->getDriver()->set(self::PAYMENT_METHOD_KEY, $id, $persist);
+
+        event(new PaymentSelected($this->getSelectedPaymentMethod()));
 
         return $this;
     }

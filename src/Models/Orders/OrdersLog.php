@@ -46,6 +46,7 @@ class OrdersLog extends AdminModel
             'info' => 'Informácia',
             'error' => 'Chyba',
             'success' => 'Úspech',
+            'delivery' => 'Informácia o doprave',
         ],
         'code' => [
             'email-client-error' => 'Neúspešne odoslaný email zázkazníkovy',

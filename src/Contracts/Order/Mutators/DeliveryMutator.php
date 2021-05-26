@@ -6,6 +6,7 @@ use Admin;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\DeliveryLocationValidator;
 use AdminEshop\Contracts\Order\Validation\DeliveryValidator;
+use AdminEshop\Events\DeliverySelected;
 use AdminEshop\Models\Orders\Order;
 use Cart;
 use Store;
@@ -149,7 +150,7 @@ class DeliveryMutator extends Mutator
 
     private function getFilteredDeliveriesWithDiscounts()
     {
-        $deliveries = $this->getDeliveries();
+        $deliveries = $this->getDeliveries()->each->setCartResponse();
 
         //If countries filter support is enabled,
         //and country has been selected
@@ -210,7 +211,9 @@ class DeliveryMutator extends Mutator
         $id = $this->getDriver()->get(self::DELIVERY_KEY);
 
         return $this->cache('selectedDelivery.'.$id, function() use ($id) {
-            return Cart::addCartDiscountsIntoModel($this->getDeliveries()->where('id', $id)->first());
+            if ( $delivery = $this->getDeliveries()->where('id', $id)->first() ) {
+                return Cart::addCartDiscountsIntoModel($delivery->setCartResponse());
+            }
         });
     }
 
@@ -240,6 +243,8 @@ class DeliveryMutator extends Mutator
     public function setDelivery($id = null, $persist = true)
     {
         $this->getDriver()->set(self::DELIVERY_KEY, $id, $persist);
+
+        event(new DeliverySelected($this->getSelectedDelivery()));
 
         return $this;
     }

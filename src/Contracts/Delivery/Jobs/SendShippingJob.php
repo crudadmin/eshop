@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Delivery\Jobs;
 
+use AdminEshop\Contracts\Delivery\CreatePackageException;
 use AdminEshop\Contracts\Delivery\ShipmentException;
 use AdminEshop\Models\Orders\Order;
 use Illuminate\Bus\Queueable;
@@ -56,19 +57,25 @@ class SendShippingJob implements ShouldQueue
                 throw new ShipmentException('Doprava nebola zaregistrovaná.');
             }
 
-            //Save error response
-            if ( $package->isSuccess() == false ){
-                Log::error($package->getData());
-            }
-
-            $order->delivery_status = $package->isSuccess() ? 'ok' : 'error';
+            $order->delivery_status = 'ok';
             $order->delivery_identifier = $package->shippingId();
             $order->addDeliveryMessage($package->getMessage());
-            $order->save();
-        } catch (ShipmentException $error){
+        }
+
+        catch (CreatePackageException $error){
+            if ( $response = $error->getResponse() ) {
+                Log::channel('store')->error($response);
+            }
+
             $order->delivery_status = 'error';
             $order->addDeliveryMessage($error->getMessage());
-            $order->save();
         }
+
+        catch (ShipmentException $error){
+            $order->delivery_status = 'error';
+            $order->addDeliveryMessage($error->getMessage());
+        }
+
+        $order->save();
     }
 }

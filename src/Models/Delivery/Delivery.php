@@ -8,6 +8,7 @@ use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use OrderService;
 use Discounts;
 use Store;
 
@@ -35,8 +36,6 @@ class Delivery extends AdminModel implements DiscountSupport
     protected $group = 'store';
 
     protected $reversed = true;
-
-    protected $hidden = ['created_at', 'published_at', 'deleted_at', 'updated_at'];
 
     protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 
@@ -171,5 +170,22 @@ class Delivery extends AdminModel implements DiscountSupport
     public function buildCartItem()
     {
 
+    }
+
+    public function getShippingProviderAttribute()
+    {
+        if ( $this->exists && $provider = OrderService::getShippingProvider($this->getKey()) ) {
+            return [
+                'name' => class_basename(get_class($provider)),
+                'options' => $provider->getOptions(),
+            ];
+        }
+    }
+
+    public function setCartResponse()
+    {
+        return $this->append('shippingProvider')
+                    ->makeHidden(['created_at', 'published_at', 'deleted_at', 'updated_at'])
+                    ->makeVisible('shippingProvider');
     }
 }

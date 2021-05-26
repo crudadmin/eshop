@@ -51,6 +51,17 @@ class ConfigServiceProvider extends ServiceProvider
         $this->turnOfCacheForAdmin();
 
         $this->pushComponentsPaths();
+
+        $this->addStoreLogChannel();
+    }
+
+    private function addStoreLogChannel()
+    {
+        $this->app['config']->set('logging.channels.store', [
+            'driver' => 'single',
+            'path' => storage_path('logs/store.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ]);
     }
 
     /*
@@ -113,8 +124,9 @@ class ConfigServiceProvider extends ServiceProvider
     private function turnOfCacheForAdmin()
     {
         view()->composer('*', function ($view) {
-            if ( admin() )
+            if ( admin() ) {
                 $this->app['config']->set('admin.cache_time', 1);
+            }
         });
     }
 }

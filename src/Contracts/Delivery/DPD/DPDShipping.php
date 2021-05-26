@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Delivery\DPD;
 
+use AdminEshop\Contracts\Delivery\CreatePackageException;
 use AdminEshop\Contracts\Delivery\ShipmentException;
 use AdminEshop\Contracts\Delivery\ShippingInterface;
 use AdminEshop\Contracts\Delivery\ShippingProvider;
@@ -212,8 +213,11 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
             && $response['result']['result'][0]['success']
             && $package = $response['result']['result'][0]
         ){
+            if ( in_array(@$package['ackCode'], ['success', 'successWithWarning']) === false ) {
+                throw new CreatePackageException($package['ackCode'].' - '.is_array($package['messages']) ? implode(' ', $package['messages']) : null);
+            }
+
             return new ShippingResponse(
-                in_array(@$package['ackCode'], ['success', 'successWithWarning']),
                 @$package['mpsid'],
                 is_array($package['messages']) ? implode(' ', $package['messages']) : null,
                 $package
@@ -228,8 +232,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
             $message = $response['error']['message'];
         }
 
-        //Returns error message
-        return new ShippingResponse(false, null, $message, $response);
+        throw new CreatePackageException($message, $response);
     }
 
     public function importLocations()

@@ -85,12 +85,20 @@ return [
         'multiple_locations_autoload' => false, //Automatically load multiple locations into cart response
         'payments' => false, //Payment rules for each delivery method
         'countries' => false, //Country rules for delivery
+        'packeta' => false, //Is packeta enabled?
         'providers' => [
-            // 3 => [
+            // env('DELIVERY_DPD_ID') => [
             //     'provider' => AdminEshop\Contracts\Delivery\DPD\DPDShipping::class,
             //     'options' => [
             //         'type' => 'parcelshop',
             //         'import_locations' => true,
+            //     ],
+            // ],
+            // env('DELIVERY_PACKETA_ID') => [
+            //     'provider' => AdminEshop\Contracts\Delivery\Packeta\PacketaShipping::class,
+            //     'options' => [
+            //         'API_KEY' => env('PACKETA_API_KEY'),
+            //         'HOST' => 'http://www.zasilkovna.cz',
             //     ],
             // ],
         ],
@@ -149,6 +157,7 @@ return [
             AdminEshop\Contracts\Order\Mutators\CountryMutator::class,
             AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
             AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
+            AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
         ],
 
         'order' => [
