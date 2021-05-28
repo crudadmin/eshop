@@ -9,7 +9,7 @@ use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
 use Store;
 
-class ClientPercentageDiscount extends Discount implements Discountable
+class ClientPercentage extends Discount implements Discountable
 {
     /*
      * We does not want cache this response

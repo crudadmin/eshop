@@ -145,7 +145,7 @@ class CartController extends Controller
 
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
-        $discount = new DiscountCode;
+        $discount = OrderService::getDiscountCodeDiscount();
 
         $code = $discount->getDiscountCode($code);
 
@@ -175,7 +175,7 @@ class CartController extends Controller
 
     public function removeDiscountCode()
     {
-        (new DiscountCode)->removeDiscountCode();
+        OrderService::getDiscountCodeDiscount()->removeDiscountCode();
 
         return Cart::baseResponse();
     }

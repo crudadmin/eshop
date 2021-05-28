@@ -170,6 +170,11 @@ class Discounts
         return $discounts;
     }
 
+    public function getRegistredDiscounts()
+    {
+        return $this->discounts;
+    }
+
     public function get(string $discountClass)
     {
         return $this->cache('discount_class.'.$discountClass, function() use ($discountClass) {

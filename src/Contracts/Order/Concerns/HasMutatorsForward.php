@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Order\Concerns;
 
 use BadMethodCallException;
 use Store;
+use Discounts;
 
 trait HasMutatorsForward
 {
@@ -11,6 +12,10 @@ trait HasMutatorsForward
     {
         if ( $mutator = $this->getMutatorFromCall($method) ){
             return $mutator;
+        }
+
+        if ( $discount = $this->getDiscountFromCall($method) ){
+            return $discount;
         }
 
         if ( method_exists($this, $method) == false ){
@@ -38,6 +43,19 @@ trait HasMutatorsForward
         }
     }
 
+    private function getDiscountFromCall($method)
+    {
+        if ( substr($method, 0, 3) == 'get' && strtolower(substr($method, -8)) == 'discount' ) {
+            $lowerCaseMethod = strtolower(substr($method, 3, -8));
+
+            $classess = $this->getDiscountsNames();
+
+            if ( array_key_exists($lowerCaseMethod, $classess) ) {
+                return $classess[$lowerCaseMethod];
+            }
+        }
+    }
+
     private function getMutatorNames()
     {
         return Store::cache('mutators.classmap', function(){
@@ -47,6 +65,24 @@ trait HasMutatorsForward
 
             foreach ($mutators as $classname) {
                 $name = strtolower(class_basename($classname));
+
+                $classmap[$name] = new $classname;
+            }
+
+            return $classmap;
+        });
+    }
+
+    private function getDiscountsNames()
+    {
+        return Store::cache('discounts.classmap', function(){
+            $discounts = Discounts::getRegistredDiscounts();
+
+            $classmap = [];
+
+            foreach ($discounts as $classname) {
+                $classBasename = class_basename($classname);
+                $name = strtolower($classBasename);
 
                 $classmap[$name] = new $classname;
             }

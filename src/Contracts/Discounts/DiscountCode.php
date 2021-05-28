@@ -49,7 +49,7 @@ class DiscountCode extends Discount implements Discountable
         if ( Admin::isAdmin() ) {
             $identifier = ($order = $this->getOrder()) ? $order->discount_code_id : '-';
         } else {
-            $identifier = self::getCodeName();
+            $identifier = $this->getCodeName();
         }
 
         return $this->getKey().($identifier?:'');
@@ -60,7 +60,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public function isActive()
     {
-        $code = self::getDiscountCode();
+        $code = $this->getDiscountCode();
 
         return $code && !$this->getCodeError($code) ? $code : false;
     }
@@ -203,9 +203,9 @@ class DiscountCode extends Discount implements Discountable
      *
      * @return  string|null
      */
-    public static function getCodeName()
+    public function getCodeName()
     {
-        return (new static)->getDriver()->get(self::DISCOUNT_CODE_KEY);
+        return $this->getDriver()->get(self::DISCOUNT_CODE_KEY);
     }
 
     /**
@@ -214,11 +214,11 @@ class DiscountCode extends Discount implements Discountable
      * @param  string|null  $code
      * @return bool
      */
-    public static function getDiscountCode($code = null)
+    public function getDiscountCode($code = null)
     {
         //If code is not present, use code from session
         if ( $code === null ) {
-            $code = self::getCodeName();
+            $code = $this->getCodeName();
         }
 
         //If any code is present
@@ -240,9 +240,11 @@ class DiscountCode extends Discount implements Discountable
      * @param  string  $code
      * @return this
      */
-    public static function setDiscountCode(string $code)
+    public function setDiscountCode(string $code)
     {
-        (new static)->getDriver()->set(self::DISCOUNT_CODE_KEY, $code);
+        $this->getDriver()->set(self::DISCOUNT_CODE_KEY, $code);
+
+        return $this;
     }
 
     /**
@@ -250,9 +252,11 @@ class DiscountCode extends Discount implements Discountable
      *
      * @return  this
      */
-    public static function removeDiscountCode()
+    public function removeDiscountCode()
     {
-        (new static)->getDriver()->forget(self::DISCOUNT_CODE_KEY);
+        $this->getDriver()->forget(self::DISCOUNT_CODE_KEY);
+
+        return $this;
     }
 }
 

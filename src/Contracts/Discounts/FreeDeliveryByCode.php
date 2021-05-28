@@ -6,6 +6,7 @@ use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
+use OrderService;
 use Store;
 
 class FreeDeliveryByCode extends Discount implements Discountable
@@ -54,7 +55,7 @@ class FreeDeliveryByCode extends Discount implements Discountable
      */
     public function isActive()
     {
-        $code = DiscountCode::getDiscountCode();
+        $code = OrderService::getDiscountCodeDiscount()->getDiscountCode();
 
         return $this->hasCodeFreeDelivery($code);
     }
