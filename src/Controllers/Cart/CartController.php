@@ -145,18 +145,18 @@ class CartController extends Controller
 
         validator()->make(request()->all(), ['code' => 'required'])->validate();
 
-        $discountMutator = new DiscountCode;
+        $discount = new DiscountCode;
 
-        $code = $discountMutator->getDiscountCode($code);
+        $code = $discount->getDiscountCode($code);
 
         //Validate code and throw error
-        if ( $errorMessage = $discountMutator->getCodeError($code) ){
+        if ( $errorMessage = $discount->getCodeError($code) ){
             throw ValidationException::withMessages([
                 'code' => $errorMessage,
             ]);
         }
 
-        $discountMutator->setDiscountCode($code->code);
+        $discount->setDiscountCode($code->code);
 
         //Event for added discount code
         event(new DiscountCodeAdded($code));

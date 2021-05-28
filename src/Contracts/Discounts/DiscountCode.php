@@ -240,7 +240,7 @@ class DiscountCode extends Discount implements Discountable
      * @param  string  $code
      * @return this
      */
-    public static function saveDiscountCode(string $code)
+    public static function setDiscountCode(string $code)
     {
         (new static)->getDriver()->set(self::DISCOUNT_CODE_KEY, $code);
     }
