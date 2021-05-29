@@ -12,8 +12,10 @@ class GopayPayment extends PaymentHelper
 {
     private $gopay;
 
-    public function __construct()
+    public function __construct($options = null)
     {
+        parent::__construct($options);
+
         if ( !is_array($config = config('gopay')) ) {
             abort(500, 'Gopay configuration does not exists');
 
@@ -34,7 +36,7 @@ class GopayPayment extends PaymentHelper
     {
         $payment = $this->getPayment();
 
-        $defaultPayment = env('GOPAY_DEFAULT_PAYMENT', 'PAYMENT_CARD');
+        $defaultPayment = $this->getOption('default_payment_instrument') ?: env('GOPAY_DEFAULT_PAYMENT', 'PAYMENT_CARD');
 
         //Set default payment by card, if limit is not over
         if ( $payment->price <= $this->getPaymentLimits($defaultPayment) ) {
@@ -54,11 +56,11 @@ class GopayPayment extends PaymentHelper
     private function getPaymentLimits($key = null)
     {
         $limits = [
-            'PAYMENT_CARD' => env('GOPAY_PAYMENT_CARD_LIMIT', 2000),
-            'BANK_ACCOUNT' => env('GOPAY_BANK_ACCOUNT_LIMIT', 4000),
-            'PAYPAL' => env('GOPAY_PAYPAL_LIMIT', 1000),
-            'BITCOIN' => env('GOPAY_BITCOIN_LIMIT', 1000),
-            'PRSMS' => env('GOPAY_PRSMS_LIMIT', 20),
+            'PAYMENT_CARD' => env('GOPAY_LIMIT_PAYMENT_CARD', 2000),
+            'BANK_ACCOUNT' => env('GOPAY_LIMIT_BANK_ACCOUNT', 4000),
+            'PAYPAL' => env('GOPAY_LIMIT_PAYPAL', 1000),
+            'BITCOIN' => env('GOPAY_LIMIT_BITCOIN', 1000),
+            'PRSMS' => env('GOPAY_LIMIT_PRSMS', 20),
         ];
 
         return $key === null ? $limits : @$limits[$key];
@@ -119,6 +121,7 @@ class GopayPayment extends PaymentHelper
         return array_filter([
             "default_payment_instrument" => $this->getDefaultPayment(),
             "allowed_payment_instruments" => $this->getAllowedPayments(),
+            "default_swift" => $this->getOption('default_swift'),
             "contact" => array_filter([
                 "first_name" => $order->firstname,
                 "last_name" => $order->lastname,

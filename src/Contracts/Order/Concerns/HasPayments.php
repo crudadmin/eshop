@@ -10,19 +10,10 @@ use Log;
 
 trait HasPayments
 {
+    protected $paymentTypesConfigKey = 'admineshop.payment_providers';
+
     protected $onPaymentSuccessCallback = null;
     protected $onPaymentErrorCallback = null;
-
-    /**
-     * Return all registred payment providers. Key in array belongs to id in table payments_methods and value is represented
-     * as payment provider
-     *
-     * @return  array
-     */
-    public function getPaymentProviders()
-    {
-        return config('admineshop.payment_providers', []);
-    }
 
     public function setOnPaymentSuccess(callable $callback)
     {
@@ -69,17 +60,15 @@ trait HasPayments
 
     public function getPaymentClass($paymentMethodId = null)
     {
-        $providers = $this->getPaymentProviders();
-
         $order = $this->getOrder();
 
-        $paymentMethodId = $paymentMethodId ?: $order->payment_method_id;
-
-        if ( array_key_exists($paymentMethodId, $providers) ) {
-            $paymentClass = new $providers[$paymentMethodId];
-
-            return $paymentClass->setOrder($order);
+        if ( !($paymentMethodId = $paymentMethodId ?: $order->payment_method_id) ){
+            return;
         }
+
+        $paymentClass = $this->getProviderById($this->paymentTypesConfigKey, $paymentMethodId);
+
+        return $paymentClass;
     }
 
     /*

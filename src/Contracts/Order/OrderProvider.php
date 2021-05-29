@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Order;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Store\PaymentsMethod;
+use Arr;
 
 class OrderProvider
 {
@@ -41,6 +42,13 @@ class OrderProvider
     public function getOptions()
     {
         return $this->options;
+    }
+
+    public function getOption($key)
+    {
+        $options = $this->options ?: [];
+
+        return Arr::get($options, $key);
     }
 
     public function getPaymentMethod()

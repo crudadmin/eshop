@@ -18,8 +18,10 @@ class GPWebPayment extends PaymentHelper
 {
     private $webpay;
 
-    public function __construct()
+    public function __construct($options = null)
     {
+        parent::__construct($options);
+
         if ( !is_array($config = config('webpay')) ) {
             abort(500, 'Webpay configuration does not exists');
 

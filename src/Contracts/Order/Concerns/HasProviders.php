@@ -22,7 +22,7 @@ trait HasProviders
         if ( is_string($data[$id]) ){
             $class = new $data[$id];
         } else {
-            $class = new $data[$id]['provider'](@$data[$id]['options']);
+            $class = new $data[$id]['provider']($data[$id]['options'] ?? []);
         }
 
         $order = $this->getOrder();
