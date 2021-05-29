@@ -44,11 +44,13 @@ class OrderProvider
         return $this->options;
     }
 
-    public function getOption($key)
+    public function getOption($key, $default = null)
     {
         $options = $this->options ?: [];
 
-        return Arr::get($options, $key);
+        $value = Arr::get($options, $key);
+
+        return is_null($value) ? $default : $value;
     }
 
     public function getPaymentMethod()

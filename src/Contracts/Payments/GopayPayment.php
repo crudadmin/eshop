@@ -32,47 +32,59 @@ class GopayPayment extends PaymentHelper
         ]);
     }
 
-    private function getDefaultPayment()
+    private function getDefaultInstrument()
     {
-        $payment = $this->getPayment();
-
         $defaultPayment = $this->getOption('default_payment_instrument') ?: env('GOPAY_DEFAULT_PAYMENT', 'PAYMENT_CARD');
 
         //Set default payment by card, if limit is not over
-        if ( $payment->price <= $this->getPaymentLimits($defaultPayment) ) {
+        if ( $this->isPaymentInLimit($defaultPayment) ) {
             return $defaultPayment;
         }
     }
 
-    private function getAllowedPayments()
+    private function getAllowedInstruments()
     {
-        return array_values(array_filter([
-            $this->isPaymentInLimit('PAYMENT_CARD') ? "PAYMENT_CARD" : null,
-            $this->isPaymentInLimit('PAYPAL') ? "PAYPAL" : null,
-            $this->isPaymentInLimit('BANK_ACCOUNT') ? "BANK_ACCOUNT" : null,
-        ]));
+        $allowedInstruments = $this->getOption('allowed_payment_instruments', [
+            'PAYMENT_CARD',
+            'BANK_ACCOUNT',
+            'MPAYMENT',
+            'PAYSAFECARD',
+            'GOPAY',
+            'PAYPAL',
+            'BITCOIN',
+            'MASTERPASS',
+            'GPAY'
+        ]);
+
+        return array_values(array_filter($allowedInstruments, function($type){
+            return $this->isPaymentInLimit($type);
+        }));
     }
 
-    private function getPaymentLimits($key = null)
+    public function getPaymentLimits()
     {
-        $limits = [
+        return [
             'PAYMENT_CARD' => env('GOPAY_LIMIT_PAYMENT_CARD', 2000),
             'BANK_ACCOUNT' => env('GOPAY_LIMIT_BANK_ACCOUNT', 4000),
             'PAYPAL' => env('GOPAY_LIMIT_PAYPAL', 1000),
             'BITCOIN' => env('GOPAY_LIMIT_BITCOIN', 1000),
             'PRSMS' => env('GOPAY_LIMIT_PRSMS', 20),
         ];
-
-        return $key === null ? $limits : @$limits[$key];
     }
 
     public function isPaymentInLimit($key)
     {
         $payment = $this->getPayment();
 
-        if ( $payment->price <= $this->getPaymentLimits($key) ) {
-            return $key;
+        $limits = $this->getPaymentLimits();
+
+        //If limit is not set. Allow given payment
+        if ( !array_key_exists($key, $limits) ){
+            return true;
         }
+
+        //Check if limit is
+        return $payment->price <= $limits[$key];
     }
 
     private function getItems()
@@ -114,13 +126,13 @@ class GopayPayment extends PaymentHelper
         $payment = $this->getPayment();
         $order = $this->getOrder();
 
-        if ( count($this->getAllowedPayments()) == 0 ){
+        if ( count($this->getAllowedInstruments()) == 0 ){
             return false;
         }
 
         return array_filter([
-            "default_payment_instrument" => $this->getDefaultPayment(),
-            "allowed_payment_instruments" => $this->getAllowedPayments(),
+            "default_payment_instrument" => $this->getDefaultInstrument(),
+            "allowed_payment_instruments" => $this->getAllowedInstruments(),
             "default_swift" => $this->getOption('default_swift'),
             "contact" => array_filter([
                 "first_name" => $order->firstname,
