@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Models\Clients;
 
-use AdminEshop\Contracts\Discounts\ClientPercentageDiscount;
+use AdminEshop\Contracts\Discounts\ClientPercentage;
 use Admin\Eloquent\Authenticatable;
 use Admin\Fields\Group;
 use Illuminate\Notifications\Notifiable;
@@ -78,7 +78,7 @@ class Client extends Authenticatable
 
     public function mutateFields($fields)
     {
-        if ( Discounts::isRegistredDiscount(ClientPercentageDiscount::class) ) {
+        if ( Discounts::isRegistredDiscount(ClientPercentage::class) ) {
             $fields->group('discounts', function($group){
                 $group->push([
                     'percentage_discount' => 'name:Zľava na všetky produkty|type:decimal|default:0',
