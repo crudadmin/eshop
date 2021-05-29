@@ -21,7 +21,7 @@ class ClientPercentage extends Discount implements Discountable
      */
     public function getName()
     {
-        return __('Klientska zľava');
+        return __('Zákaznícka zľava');
     }
 
     /*
@@ -29,7 +29,13 @@ class ClientPercentage extends Discount implements Discountable
      */
     public function isActive()
     {
-        return $this->getActiveDiscountLevel() ?: false;
+        $discount = $this->getActiveDiscount();
+
+        if ( !$discount || $discount <= 0 ){
+            return false;
+        }
+
+        return $discount;
     }
 
     /*
@@ -37,19 +43,29 @@ class ClientPercentage extends Discount implements Discountable
      */
     public function isActiveInAdmin($order)
     {
-        return $this->getActiveDiscountLevel() ?: false;
+        $discount = $this->getActiveDiscount();
+
+        if ( !$discount || $discount <= 0 ){
+            return false;
+        }
+
+        return $discount;
     }
 
-    public function boot($discountLevel)
+    public function boot($discount)
     {
         $this->operator = '-%';
 
-        $this->value = $this->getClient()->percentage_discount;
+        $this->value = $discount;
     }
 
-    public function getActiveDiscountLevel($price = null)
+    private function getActiveDiscount($price = null)
     {
-        return $this->getClient() && $this->getClient()->percentage_discount > 0;
+        if ( !$this->getClient() ) {
+            return 0;
+        }
+
+        return $this->getClient()->percentage_discount;
     }
 }
 
