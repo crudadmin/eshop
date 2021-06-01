@@ -113,13 +113,18 @@ class ProductsIdentifier extends Identifier
      */
     public function hasQuantityOnStock($item)
     {
-        //If item product is not present
         if ( ! ($model = $item->getItemModel('product')) ) {
             return true;
         }
 
-        //We can skip checking products which all allowed all the time
+        //We can skip checking products which all allowed all the time.
+        //This rule will check only parent Product model.
         if ( $model->canOrderEverytime ) {
+            return true;
+        }
+
+        //Check final assigned item, for example ProductVariant.
+        if ( ($model = $item->getItemModel()) && $model->canOrderEverytime ){
             return true;
         }
 
