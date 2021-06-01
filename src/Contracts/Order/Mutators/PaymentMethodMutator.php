@@ -112,7 +112,9 @@ class PaymentMethodMutator extends Mutator
     public function mutateFullCartResponse($response) : array
     {
         return array_merge($response, [
-            'paymentMethods' => Cart::addCartDiscountsIntoModel($this->getPaymentMethodsByDelivery()),
+            'paymentMethods' => Cart::addCartDiscountsIntoModel(
+                $this->getPaymentMethodsByDelivery()
+            ),
             'selectedPaymentMethod' => $this->getSelectedPaymentMethod(),
         ]);
     }
@@ -140,7 +142,11 @@ class PaymentMethodMutator extends Mutator
         $delivery = $this->getDeliveryMutator()->getSelectedDelivery();
 
         return $this->cache('selectedPaymentMethod'.$id.'-'.($delivery ? $delivery->getKey() : 0), function() use ($id) {
-            return Cart::addCartDiscountsIntoModel($this->getPaymentMethodsByDelivery()->where('id', $id)->first());
+            if ( $paymentMethod = $this->getPaymentMethodsByDelivery()->where('id', $id)->first() ) {
+                return Cart::addCartDiscountsIntoModel(
+                    $paymentMethod->setCartResponse()
+                );
+            }
         });
     }
 
@@ -158,12 +164,14 @@ class PaymentMethodMutator extends Mutator
                                         ? $delivery->payments->pluck('id')->toArray()
                                         : [];
 
+        $paymentMethods = $this->getPaymentMethods()->each->setCartResponse();
+
         //If any rule is present, allow all payment methods
         if ( count($allowedPaymentMethods) == 0 ) {
-            return $this->getPaymentMethods();
+            return $paymentMethods;
         }
 
-        return $this->getPaymentMethods()->filter(function($item) use ($allowedPaymentMethods) {
+        return $paymentMethods->filter(function($item) use ($allowedPaymentMethods) {
             return in_array($item->getKey(), $allowedPaymentMethods);
         })->values();
     }
