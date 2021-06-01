@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Order\Mutators;
 
+use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Concerns\ActiveInterface;
 use AdminEshop\Contracts\Cart\Concerns\ActiveResponse;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
@@ -66,6 +67,14 @@ class Mutator implements ActiveInterface
     public function mutateOrder(Order $order, $activeResponse)
     {
 
+    }
+
+    /**
+     * Mutate OrderItem before create
+     */
+    public function mutateOrderItem(CartItem $item, array $data) : array
+    {
+        return $data;
     }
 
     /**

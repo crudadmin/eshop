@@ -170,6 +170,13 @@ class OrderService
 
             $this->assignParentCartItem($data, $items, $item);
 
+            foreach ($this->getActiveMutators() as $mutator) {
+                //Mutate price by anonymous price mutators
+                if ( method_exists($mutator, 'mutateOrderItem') ) {
+                    $data = $mutator->mutateOrderItem($item, $data);
+                }
+            }
+
             $item->order_item_id = $this->order->items()->create($data);
         }
 
