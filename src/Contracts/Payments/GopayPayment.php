@@ -53,6 +53,7 @@ class GopayPayment extends PaymentHelper
             'PAYPAL',
             'BITCOIN',
             'MASTERPASS',
+            'APPLE_PAY',
             'GPAY'
         ]);
 
