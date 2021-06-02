@@ -35,6 +35,19 @@ class PaymentsMethod extends BasePaymentsMethod
             'image' => 'name:Ikona dopravy|type:file|image',
             'description' => 'name:Popis platby|type:text',
         ]);
+
+        $restrictionFields = [];
+
+        //Add payments rules
+        if ( config('admineshop.payment_methods.price_limit') == true ) {
+            $restrictionFields['price_limit'] = 'name:Limit ceny objednávky pre platobnú metódu|type:decimal|title:S DPH - Po presiahnutí ceny objednávky bude platobná metóda odobraná z objednávkoveho košíku|hidden';
+        }
+
+        if ( count($restrictionFields) > 0 ) {
+            $fields->push(
+                Group::tab($restrictionFields)->name('Obmedzenia')->icon('fa-gear')->id('restrictions')
+            );
+        }
     }
 
     protected $hidden = ['created_at', 'deleted_at', 'updated_at'];

@@ -150,7 +150,7 @@ class DeliveryMutator extends Mutator
 
     private function getFilteredDeliveriesWithDiscounts()
     {
-        $deliveries = $this->getDeliveries()->each->setCartResponse();
+        $deliveries = $this->getDeliveries();
 
         //If countries filter support is enabled,
         //and country has been selected
@@ -170,7 +170,22 @@ class DeliveryMutator extends Mutator
             });
         }
 
-        return Cart::addCartDiscountsIntoModel($deliveries);
+        //If is price limiter available
+        if ( config('admineshop.delivery.price_limit') ) {
+            $priceWithVat = Cart::all()->getSummary()['priceWithVat'] ?? 0;
+
+            $deliveries = $deliveries->filter(function($delivery) use ($priceWithVat) {
+                if ( !$delivery->price_limit ){
+                    return true;
+                }
+
+                return $priceWithVat <= $delivery->price_limit;
+            });
+        }
+
+        return Cart::addCartDiscountsIntoModel(
+            $deliveries->values()->each->setCartResponse()
+        );
     }
 
     /*

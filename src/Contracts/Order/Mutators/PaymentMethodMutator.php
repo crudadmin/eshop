@@ -164,16 +164,31 @@ class PaymentMethodMutator extends Mutator
                                         ? $delivery->payments->pluck('id')->toArray()
                                         : [];
 
-        $paymentMethods = $this->getPaymentMethods()->each->setCartResponse();
+        $paymentMethods = $this->getPaymentMethods();
 
-        //If any rule is present, allow all payment methods
-        if ( count($allowedPaymentMethods) == 0 ) {
-            return $paymentMethods;
+        $paymentMethods = $paymentMethods->filter(function($item) use ($allowedPaymentMethods) {
+            //If any rule is present, allow all payment methods
+            if ( count($allowedPaymentMethods) == 0 ) {
+                return true;
+            }
+
+            return in_array($item->getKey(), $allowedPaymentMethods);
+        });
+
+        //If is price limiter available
+        if ( config('admineshop.payment_methods.price_limit') ) {
+            $priceWithVat = Cart::all()->getSummary()['priceWithVat'] ?? 0;
+
+            $paymentMethods = $paymentMethods->filter(function($paymentMethod) use ($priceWithVat) {
+                if ( !$paymentMethod->price_limit ){
+                    return true;
+                }
+
+                return $priceWithVat <= $paymentMethod->price_limit;
+            });
         }
 
-        return $paymentMethods->filter(function($item) use ($allowedPaymentMethods) {
-            return in_array($item->getKey(), $allowedPaymentMethods);
-        })->values();
+        return $paymentMethods->values()->each->setCartResponse();
     }
 
     /**

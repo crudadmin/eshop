@@ -10,7 +10,7 @@ use Log;
 
 trait HasPayments
 {
-    protected $paymentTypesConfigKey = 'admineshop.payment_providers';
+    protected $paymentTypesConfigKey = 'admineshop.payment_methods.providers';
 
     protected $onPaymentSuccessCallback = null;
     protected $onPaymentErrorCallback = null;

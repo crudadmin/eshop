@@ -83,6 +83,11 @@ class Delivery extends AdminModel implements DiscountSupport
             $restrictionFields['countries'] = 'name:Dostupné krajiny|belongsToMany:countries,name|title:Pri žiadnej vybranej platia všetký|canAdd';
         }
 
+        //Add payments rules
+        if ( config('admineshop.delivery.price_limit') == true ) {
+            $restrictionFields['price_limit'] = 'name:Limit ceny objednávky pre dopravu|type:decimal|title:S DPH - Po presiahnutí ceny objednávky bude doprava odobraná z objednávkoveho košíku|hidden';
+        }
+
         if ( count($restrictionFields) > 0 ) {
             $fields->push(
                 Group::tab($restrictionFields)->name('Obmedzenia')->icon('fa-gear')->id('restrictions')

@@ -85,6 +85,7 @@ return [
         'multiple_locations_autoload' => false, //Automatically load multiple locations into cart response
         'payments' => false, //Payment rules for each delivery method
         'countries' => false, //Country rules for delivery
+        'price_limit' => false, //Deny deliveries over price
         'packeta' => false, //Is packeta enabled?
         'providers' => [
             // env('DELIVERY_DPD_ID') => [
@@ -104,6 +105,20 @@ return [
         ],
     ],
 
+    /**
+     * Payment methods settings
+     */
+    'payments_methods' => [
+        'price_limit' => true,
+
+        /*
+         * Available payment methods
+         */
+        'providers' => [
+            1 => AdminEshop\Contracts\Payments\GopayPayment::class,
+        ],
+    ],
+
     /*
      * Discount settings
      */
@@ -119,13 +134,6 @@ return [
      * Enable invoices support
      */
     'invoices' => false,
-
-    /*
-     * Available payment methods
-     */
-    'payment_providers' => [
-        1 => AdminEshop\Contracts\Payments\GopayPayment::class,
-    ],
 
     /*
      * Does not round decimals for vat price in products. For multiple quantity total price may be different
