@@ -112,7 +112,7 @@ trait IdentifierSupport
      *
      * @return  AdminModel|null
      */
-    public function getOriginalitemModel($type = null)
+    public function getOriginalItemModel($type = null)
     {
         return $this->getItemModel($type, false);
     }

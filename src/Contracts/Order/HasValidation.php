@@ -23,6 +23,13 @@ trait HasValidation
     protected $errorMessages = [];
 
     /**
+     * Error validators
+     *
+     * @var  array
+     */
+    protected $invalidValidators = [];
+
+    /**
      * Add order validator
      *
      * @param  string  $class
@@ -40,6 +47,16 @@ trait HasValidation
     public function getErrorMessages()
     {
         return $this->errorMessages ?: [];
+    }
+
+    /**
+     * Returns error validators
+     *
+     * @return  array
+     */
+    public function getInvalidValidators()
+    {
+        return $this->invalidValidators ?: [];
     }
 
     /**
@@ -88,6 +105,7 @@ trait HasValidation
 
                 if ( ! $validator->pass() )  {
                     $this->errorMessages[] = $validator->getMessage();
+                    $this->invalidValidators[] = $validator;
                 }
             }
         }

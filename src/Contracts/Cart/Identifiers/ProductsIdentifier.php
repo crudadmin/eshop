@@ -108,12 +108,16 @@ class ProductsIdentifier extends Identifier
 
     /**
      * Returns if product in cart item is on stock
+     * (we need ask originalItem model, and not cached one, because quantity may change.
+     *  so we does not want cached eloquent.)
      *
      * @return  bool
      */
     public function hasQuantityOnStock($item)
     {
-        if ( ! ($model = $item->getItemModel('product')) ) {
+        //TODO: this rule is probably uneccessary if variant is ordered.
+        //May be worth of refactoring
+        if ( ! ($model = $item->getOriginalItemModel('product')) ) {
             return true;
         }
 
@@ -124,12 +128,15 @@ class ProductsIdentifier extends Identifier
         }
 
         //Check final assigned item, for example ProductVariant.
-        if ( ($model = $item->getItemModel()) && $model->canOrderEverytime ){
+        $model = $item->getOriginalItemModel();
+
+        //Check orderable status
+        if ( $model && $model->canOrderEverytime ){
             return true;
         }
 
         //Check if quantity in cart is lower that quantity on stock
-        return $item->quantity <= $item->getItemModel()->stock_quantity;
+        return $item->quantity <= $model->stock_quantity;
     }
 
     /**
