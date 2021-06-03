@@ -207,10 +207,14 @@ class GopayPayment extends PaymentHelper
             throw new Exception('Gopay ID is missing.');
         }
 
-        $status = $this->gopay->getStatus($id);
+        $response = $this->gopay->getStatus($id);
 
-        if ( $status->json['state'] == 'PAID' ) {
-            return true;
+        if ( isset($response->json['state']) ) {
+            if ( $response->json['state'] == 'PAID' ) {
+                return true;
+            }
+        } else {
+            Log::error('Wrong GOPAY Payment response: '.(string)$response);
         }
 
         throw new PaymentResponseException('Payment not verified.');
