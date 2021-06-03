@@ -94,7 +94,7 @@ class PaymentsMethod extends BasePaymentsMethod
 
     public function getPaymentProviderAttribute()
     {
-        if ( $this->exists && $provider = OrderService::getPaymentClass($this->getKey()) ) {
+        if ( $this->exists && $provider = OrderService::getPaymentProvider($this->getKey()) ) {
             return [
                 'name' => class_basename(get_class($provider)),
                 'options' => $provider->getOptions(),

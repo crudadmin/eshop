@@ -55,10 +55,10 @@ trait HasPayments
 
     public function hasOnlinePayment($paymentMethodId = null)
     {
-        return $this->getPaymentClass($paymentMethodId) ? true : false;
+        return $this->getPaymentProvider($paymentMethodId) ? true : false;
     }
 
-    public function getPaymentClass($paymentMethodId = null)
+    public function getPaymentProvider($paymentMethodId = null)
     {
         $order = $this->getOrder();
 
@@ -106,7 +106,7 @@ trait HasPayments
         ]);
     }
 
-    public function bootPaymentClass($paymentMethodId)
+    public function bootPaymentProvider($paymentMethodId)
     {
         if ( !$this->hasOnlinePayment($paymentMethodId) ){
             return false;
@@ -116,7 +116,7 @@ trait HasPayments
             try {
                 $payment = $this->makePayment($paymentMethodId);
 
-                $paymentClass = $this->getPaymentClass($paymentMethodId);
+                $paymentClass = $this->getPaymentProvider($paymentMethodId);
 
                 $paymentClass->setPayment($payment);
 

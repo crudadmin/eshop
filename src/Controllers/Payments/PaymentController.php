@@ -4,13 +4,14 @@ namespace AdminEshop\Controllers\Payments;
 
 use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
+use AdminEshop\Mail\OrderPaid;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\Payment;
-use AdminEshop\Notifications\OrderPaid;
 use Admin\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
 use Log;
+use Mail;
 use OrderService;
 
 class PaymentController extends Controller
@@ -20,7 +21,7 @@ class PaymentController extends Controller
         $order = $payment->order;
 
         $paymentClass = OrderService::setOrder($order)
-                                    ->getPaymentClass($payment->payment_method_id)
+                                    ->getPaymentProvider($payment->payment_method_id)
                                     ->setPayment($payment);
 
         //Check if is payment hash correct hash and ids
@@ -45,7 +46,7 @@ class PaymentController extends Controller
 
                 //Send invoice email
                 try {
-                    $order->notify(
+                    Mail::to($order->email)->send(
                         new OrderPaid($order, $invoice)
                     );
                 } catch (Exception $e){

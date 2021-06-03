@@ -22,13 +22,13 @@ trait OrderPayments
 
         $this->bootOrderIntoOrderService();
 
-        if ( !($paymentClass = OrderService::bootPaymentClass($paymentMethodId)) ){
+        if ( !($paymentClass = OrderService::bootPaymentProvider($paymentMethodId)) ){
             return [];
         }
 
         return array_merge(
             [
-                'provider' => class_basename(get_class(OrderService::getPaymentClass()))
+                'provider' => class_basename(get_class($this->getPaymentProvider($paymentMethodId)))
             ],
             $paymentClass->getPaymentData(
                 $paymentClass->getResponse()
@@ -36,11 +36,16 @@ trait OrderPayments
         );
     }
 
+    public function getPaymentProvider($paymentMethodId = null)
+    {
+        return OrderService::getPaymentProvider($paymentMethodId);
+    }
+
     public function getPaymentUrl($paymentMethodId = null)
     {
         $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
 
-        if ( !($paymentClass = OrderService::bootPaymentClass($paymentMethodId)) ){
+        if ( !($paymentClass = OrderService::bootPaymentProvider($paymentMethodId)) ){
             return [];
         }
 
@@ -53,7 +58,7 @@ trait OrderPayments
     {
         $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
 
-        if ( !($paymentClass = OrderService::bootPaymentClass($paymentMethodId)) ){
+        if ( !($paymentClass = OrderService::bootPaymentProvider($paymentMethodId)) ){
             return;
         }
 
