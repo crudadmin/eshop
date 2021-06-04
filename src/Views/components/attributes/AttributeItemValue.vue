@@ -1,5 +1,5 @@
 <template>
-    <div class="form-group">
+    <div class="form-group" :class="{ disabled : field.disabled || field.readonly }">
         <label>{{ field.name }} <span v-if="unit && unit.unit">{{ unit ? '('+unit.unit+')' : '' }}</span></label>
 
         <input type="hidden" name="unit_id" v-if="unit" :value="unit.id">
@@ -11,6 +11,8 @@
             @keyup="onChange"
             :step="unitFormat == 'decimal' ? 'any' : ''"
             :placeholder="field.placeholder||field.name"
+            :readonly="field.readonly||false"
+            :disabled="field.disabled||false"
             class="form-control">
     </div>
 </template>
