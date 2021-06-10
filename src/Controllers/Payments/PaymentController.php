@@ -4,6 +4,7 @@ namespace AdminEshop\Controllers\Payments;
 
 use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
+use AdminEshop\Events\OrderPaid as OrderPaidEvent;
 use AdminEshop\Mail\OrderPaid;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\Payment;
@@ -36,6 +37,8 @@ class PaymentController extends Controller
 
             //If order is not paid
             if ( ! $order->paid_at ) {
+                event(new OrderPaidEvent($order));
+
                 //Update order status paid
                 $order->update([
                     'paid_at' => \Carbon\Carbon::now()
