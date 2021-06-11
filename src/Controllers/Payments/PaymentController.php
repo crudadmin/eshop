@@ -44,6 +44,11 @@ class PaymentController extends Controller
                     'paid_at' => \Carbon\Carbon::now()
                 ]);
 
+                //Update payment status
+                $payment->update([
+                    'status' => 'paid',
+                ]);
+
                 //Generate invoice
                 $invoice = OrderService::makeInvoice('invoice');
 
