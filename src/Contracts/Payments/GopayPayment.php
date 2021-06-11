@@ -163,7 +163,7 @@ class GopayPayment extends PaymentHelper
             "payer" => $payer,
             "amount" => round($payment->price * 100),
             "currency" => "EUR",
-            "order_number" => $order->getKey(),
+            "order_number" => $order->number,
             "order_description" => sprintf(_('Platba %s'), env('APP_NAME')),
             "items" => $this->getItems(),
             "callback" => [
