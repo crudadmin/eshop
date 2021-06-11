@@ -19,6 +19,10 @@ class Payment extends AdminModel
 
     protected $active = false;
 
+    protected $sortable = false;
+
+    protected $publishable = false;
+
     /*
      * Automatic form and database generation
      * @name - field name
