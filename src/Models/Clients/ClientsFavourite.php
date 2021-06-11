@@ -73,7 +73,7 @@ class ClientsFavourite extends AdminModel
         $query->with([
             'product',
             'variant'
-        ]);
+        ])->whereHas('product');
     }
 
     public function toResponseFormat()

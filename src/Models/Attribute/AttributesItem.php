@@ -131,4 +131,9 @@ class AttributesItem extends AdminModel
     {
         return $this;
     }
+
+    public function getAttributeItemValue($attribute)
+    {
+        return $this->getValue('name');
+    }
 }

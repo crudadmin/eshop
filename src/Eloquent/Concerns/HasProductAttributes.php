@@ -64,7 +64,7 @@ trait HasProductAttributes
                     return;
                 }
 
-                return ($attrItem ? $attrItem->name : '').($attribute ? (' '.$attribute->unitName) : '');
+                return ($attrItem ? $attrItem->getAttributeItemValue($attribute) : '').($attribute ? (' '.$attribute->unitName) : '');
             })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 
@@ -89,7 +89,7 @@ trait HasProductAttributes
                     return;
                 }
 
-                return ($attrItem ? $attrItem->name : '').($attribute ? (' '.$attribute->unitName) : '');
+                return ($attrItem ? $attrItem->getAttributeItemValue($attribute) : '').($attribute ? (' '.$attribute->unitName) : '');
             })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 
