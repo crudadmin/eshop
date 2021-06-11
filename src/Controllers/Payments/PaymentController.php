@@ -27,7 +27,7 @@ class PaymentController extends Controller
 
         //Check if is payment hash correct hash and ids
         if ( $hash != $paymentClass->getOrderHash($type) ) {
-            abort(500);
+            abort(401);
         }
 
         //Check payment
@@ -53,7 +53,7 @@ class PaymentController extends Controller
                         new OrderPaid($order, $invoice)
                     );
                 } catch (Exception $e){
-                    Log::error($e);
+                    Log::channel('store')->error($e);
 
                     $order->log()->create([
                         'type' => 'error',
@@ -78,7 +78,7 @@ class PaymentController extends Controller
         }
 
         catch (Exception $e) {
-            Log::error($e);
+            Log::channel('store')->error($e);
 
             $order->log()->create([
                 'type' => 'error',

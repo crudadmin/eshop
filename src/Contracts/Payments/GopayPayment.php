@@ -209,15 +209,19 @@ class GopayPayment extends PaymentHelper
 
         $response = $this->gopay->getStatus($id);
 
+        $errorResponse = '';
+
         if ( isset($response->json['state']) ) {
             if ( $response->json['state'] == 'PAID' ) {
                 return true;
+            } else {
+                $errorResponse = 'Wrong GOPAY Payment status: '.(string)$response;
             }
         } else {
-            Log::error('Wrong GOPAY Payment response: '.(string)$response);
+           $errorResponse = 'Wrong GOPAY Payment response: '.(string)$response;
         }
 
-        throw new PaymentResponseException('Payment not verified.');
+        throw new PaymentResponseException($errorResponse);
     }
 }
 
