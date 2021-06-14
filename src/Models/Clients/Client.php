@@ -70,21 +70,11 @@ class Client extends Authenticatable
                 'company_tax_id' => 'name:DIČ|required_with:is_company',
                 'company_vat_id' => 'name:IČ DPH',
             ])->add('hidden'),
-            'Zľavy' => Group::tab([
-
-            ])->id('discounts')->icon('fa-percentage'),
+            'Zľavy' => Group::tab(array_merge(
+                Discounts::isRegistredDiscount(ClientPercentage::class)
+                    ? ['percentage_discount' => 'name:Zľava na všetky produkty|type:decimal|default:0'] : []
+            ))->id('discounts')->icon('fa-percentage'),
         ];
-    }
-
-    public function mutateFields($fields)
-    {
-        if ( Discounts::isRegistredDiscount(ClientPercentage::class) ) {
-            $fields->group('discounts', function($group){
-                $group->push([
-                    'percentage_discount' => 'name:Zľava na všetky produkty|type:decimal|default:0',
-                ]);
-            });
-        }
     }
 
     public function getClientNameAttribute()
