@@ -96,7 +96,6 @@ class Order extends AdminModel
             'title.update' => 'Objednávka č. :number - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',
-            'table.onclickopen' => true,
             'columns.price.add_after' => ' '.Store::getCurrency(),
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
