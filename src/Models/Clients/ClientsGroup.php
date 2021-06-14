@@ -23,6 +23,11 @@ class ClientsGroup extends AdminModel
 
     protected $icon = 'fa-group';
 
+    public function active()
+    {
+        return config('admineshop.client.groups', false);
+    }
+
     /*
      * Automatic form and database generation
      * @name - field name

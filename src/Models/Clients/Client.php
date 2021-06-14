@@ -48,16 +48,19 @@ class Client extends Authenticatable
     public function fields($row)
     {
         return [
-            'Osobné údaje' => Group::fields([
-                Group::fields([
-                    'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
-                    'photo' => 'name:Fotografia|type:file|image',
-                ])->inline(),
-                'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
-                'username' => 'name:Meno a priezvisko',
-                'phone' => 'name:Telefon|'.phoneValidatorRule(),
-                'groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd',
-            ])->id('personal'),
+            'Osobné údaje' => Group::fields(array_merge(
+                [
+                    Group::fields([
+                        'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
+                        'photo' => 'name:Fotografia|type:file|image',
+                    ])->inline(),
+                    'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
+                    'username' => 'name:Meno a priezvisko',
+                    'phone' => 'name:Telefon|'.phoneValidatorRule(),
+                ],
+                config('admineshop.client.groups', false)
+                    ? ['groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd'] : []
+            ))->id('personal'),
             'Fakturačné údaje' => Group::half([
                 'street' => 'name:Ulica a č.p.',
                 'city' => 'name:Mesto',

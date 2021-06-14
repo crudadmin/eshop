@@ -214,6 +214,7 @@ return [
     'client' => [
         'addresses' => false,
         'favourites' => false,
+        'groups' => false,
     ],
 
     /*
