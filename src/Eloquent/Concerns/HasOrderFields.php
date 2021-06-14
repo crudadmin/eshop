@@ -2,16 +2,38 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use AdminEshop\Contracts\Discounts\DiscountCode;
 use Admin\Fields\Group;
+use Discounts;
 use Store;
 
-trait HasOrderFields {
+trait HasOrderFields
+{
+    /**
+     * Order helper fields for features support
+     *
+     * @return  Group
+     */
+    public function getOrderHelperFields()
+    {
+        return Group::fields(array_merge(
+            [
+                'number' => 'name:Č. obj.|max:20|hideFromForm',
+                'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
+                'client' => 'name:Klient|belongsTo:clients|invisible',
+                'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible'
+            ],
+            config('admineshop.delivery.packeta', false)
+                ? ['packeta_point' => 'name:Packeta point|type:json|inaccessible'] : [],
+        ));
+    }
+
     /**
      * Billing user details
      *
      * @return  Group
      */
-    protected function getBillingDetails()
+    protected function getBillingFields()
     {
         return Group::fields([
             'username' => 'name:Meno a priezvisko|required|hidden',
@@ -29,7 +51,7 @@ trait HasOrderFields {
      *
      * @return  Group
      */
-    protected function getDeliveryDetails()
+    protected function getDeliveryFields()
     {
         return Group::fields([
             'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|type:checkbox|default:0',
@@ -49,7 +71,7 @@ trait HasOrderFields {
      *
      * @return  Group
      */
-    protected function getCompanyDetails()
+    protected function getCompanyFields()
     {
         return Group::fields([
             'is_company' => 'name:Nákup na firmu|type:checkbox|default:0',
@@ -67,7 +89,7 @@ trait HasOrderFields {
      *
      * @return  Group
      */
-    protected function getAdditionalDetails()
+    protected function getAdditionalFields()
     {
         return Group::fields([
             Group::fields([
@@ -87,7 +109,7 @@ trait HasOrderFields {
      *
      * @return  Group
      */
-    protected function getShippingAndPaymentDetails()
+    protected function getShippingAndPaymentFields()
     {
         return Group::fields([
             'Doprava' => Group::fields([
@@ -114,18 +136,22 @@ trait HasOrderFields {
     }
 
     /**
-     * Order helper fields for features support
+     * Order price fields for features support
      *
      * @return  Group
      */
-    public function getOrderHelperFields()
+    public function getPriceFields()
     {
-        return Group::fields(array_merge(
-            [
-                'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible'
-            ],
-            config('admineshop.delivery.packeta', false)
-                ? ['packeta_point' => 'name:Packeta point|type:json|inaccessible'] : [],
-        ));
+        return Group::fields([
+            'Cena objednávky' => Group::half([
+                'price' => 'name:Cena bez DPH|disabled|type:decimal',
+                'price_vat' => 'name:Cena s DPH|disabled|type:decimal',
+                'paid_at' => 'name:Zaplatené dňa|type:datetime',
+            ])->id('price')->inline(),
+            'Zľavy' => Group::half(array_merge(
+                Discounts::isRegistredDiscount(DiscountCode::class)
+                    ? ['discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|hidden|canAdd'] : []
+            ))->id('discounts')->inline(),
+        ])->inline()->id('orderPrices');
     }
 }

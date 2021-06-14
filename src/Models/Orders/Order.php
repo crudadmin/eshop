@@ -7,7 +7,6 @@ use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
-use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderFields;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
@@ -21,7 +20,6 @@ use AdminEshop\Models\Store\PaymentsMethod;
 use AdminEshop\Requests\SubmitOrderRequest;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Discounts;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Store;
@@ -77,30 +75,15 @@ class Order extends AdminModel
      */
     public function fields()
     {
-        return array_merge(
-            [
-                'number' => 'name:Č. obj.|max:20|hideFromForm',
-                'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
-                'client' => 'name:Klient|belongsTo:clients|invisible',
-                $this->getBillingDetails(),
-                $this->getDeliveryDetails(),
-                $this->getCompanyDetails(),
-                $this->getAdditionalDetails(),
-                $this->getShippingAndPaymentDetails(),
-                Group::fields([
-                    'Cena objednávky' => Group::half([
-                        'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                        'price_vat' => 'name:Cena s DPH|disabled|type:decimal',
-                        'paid_at' => 'name:Zaplatené dňa|type:datetime',
-                    ])->id('price')->inline(),
-                    'Zľavy' => Group::half(array_merge(
-                        Discounts::isRegistredDiscount(DiscountCode::class)
-                            ? ['discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|hidden|canAdd'] : []
-                    ))->id('discounts')->inline(),
-                ])->inline()->id('orderPrices'),
-                $this->getOrderHelperFields(),
-            ],
-        );
+        return [
+            $this->getOrderHelperFields(),
+            $this->getBillingFields(),
+            $this->getDeliveryFields(),
+            $this->getCompanyFields(),
+            $this->getAdditionalFields(),
+            $this->getShippingAndPaymentFields(),
+            $this->getPriceFields(),
+        ];
     }
 
     public function settings()
@@ -185,7 +168,7 @@ class Order extends AdminModel
 
         $attributes['client_name'] = $this->getClientName();
 
-        $attributes['delivery_address'] = $this->getDeliveryDetails();
+        $attributes['delivery_address'] = $this->getDeliveryAddress();
 
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
 
