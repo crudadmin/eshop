@@ -18,6 +18,11 @@ class PaymentsMethod extends BasePaymentsMethod
 
     protected $publishable = true;
 
+    public function active()
+    {
+        return config('admineshop.payments_methods.enabled', true);
+    }
+
     public function reserved()
     {
         return array_filter([

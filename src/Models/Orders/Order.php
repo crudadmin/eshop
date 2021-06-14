@@ -9,7 +9,9 @@ use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
+use AdminEshop\Eloquent\Concerns\HasOrderFields;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
+use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\OrderPayments;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
@@ -22,7 +24,6 @@ use Admin\Fields\Group;
 use Discounts;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
-use OrderService;
 use Store;
 
 class Order extends AdminModel
@@ -30,9 +31,11 @@ class Order extends AdminModel
     use Notifiable,
         OrderTrait,
         OrderPayments,
+        HasOrderInvoice,
         HasOrderHashes,
         HasOrderEmails,
-        HasOrderNumber;
+        HasOrderNumber,
+        HasOrderFields;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -74,106 +77,30 @@ class Order extends AdminModel
      */
     public function fields()
     {
-        return [
-            'number' => 'name:Č. obj.|max:20|hideFromForm',
-            'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
-            'client' => 'name:Klient|belongsTo:clients|invisible',
-            'Fakturačné údaje' => Group::fields([
-                'username' => 'name:Meno a priezvisko|required|hidden',
-                'email' => 'name:Email|email|required',
-                'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
-                'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
-                'city' => 'name:Mesto|required|hidden',
-                'zipcode' => 'name:PSČ|max:6|zipcode|required|hidden',
-                'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|required|exists:countries,id',
-            ])->grid(4),
-            'Dodacie údaje' => Group::fields([
-                'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|type:checkbox|default:0',
+        return array_merge(
+            [
+                'number' => 'name:Č. obj.|max:20|hideFromForm',
+                'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
+                'client' => 'name:Klient|belongsTo:clients|invisible',
+                $this->getBillingDetails(),
+                $this->getDeliveryDetails(),
+                $this->getCompanyDetails(),
+                $this->getAdditionalDetails(),
+                $this->getShippingAndPaymentDetails(),
                 Group::fields([
-                    'delivery_username' => 'name:Meno a priezvisko / Firma|required_if_checked:delivery_different',
-                    'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
-                    'delivery_street' => 'name:Ulica a č.p.|required_if_checked:delivery_different',
-                    'delivery_city' => 'name:Mesto|required_if_checked:delivery_different',
-                    'delivery_zipcode' => 'name:PSČ|required_if_checked:delivery_different|zipcode',
-                    'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1|required_if_checked:delivery_different',
-                ])->attributes('hideFieldIfNot:delivery_different,1')->id('delivery_fields'),
-            ])->add('hidden')->grid(4),
-            Group::fields([
-                'Firemné údaje' => Group::fields([
-                    'is_company' => 'name:Nákup na firmu|type:checkbox|default:0',
-                    Group::fields([
-                        'company_name' => 'name:Názov firmy|required_if_checked:is_company',
-                        'company_id' => 'name:IČ|company_id|required_if_checked:is_company',
-                        'company_tax_id' => 'name:DIČ|required_if_checked:is_company',
-                        'company_vat_id' => 'name:IČ DPH',
-                    ])->attributes('hideFieldIfNot:is_company,1')->id('company_fields'),
-                ])->add('hidden'),
-            ])->grid(4),
-            'Nastavenia objednávky' => Group::fields([
-                Group::fields([
-                    'note' => 'name:Poznámka|type:text|hidden',
-                    'internal_note' => 'name:Interná poznámka|type:text|hidden',
-                ])->inline()
-            ])->id('additional'),
-            'Doprava' => Group::fields([
-                Group::inline([
-                    'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
-                    'delivery_location' => 'name:Predajňa|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:deliveries_locations,name',
-                ]),
-                Group::inline([
-                    'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
-                    'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
-                ]),
-                'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
-            ])->grid(6)->id('delivery'),
-            'Platobná metóda' => Group::fields([
-                Group::fields([
-                    'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
-                    'payment_method_vat' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.vat|hidden|required|type:select|default:'.Store::getDefaultVat(),
-                    'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
-                ])->inline(),
-                'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
-            ])->grid(6)->id('payment'),
-            Group::fields([
-                'Cena objednávky' => Group::fields([
-                    Group::fields([
-                        'status' => 'name:Stav objednávky|column_name:Stav|type:select|required|default:new',
-                        'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
-                        'delivery_identifier' => 'name:Identifikátor zvozu dopravy|invisible',
-                    ])->inline(),
-                    Group::fields([
+                    'Cena objednávky' => Group::half([
                         'price' => 'name:Cena bez DPH|disabled|type:decimal',
                         'price_vat' => 'name:Cena s DPH|disabled|type:decimal',
                         'paid_at' => 'name:Zaplatené dňa|type:datetime',
-                    ])->inline(),
-                ])->width(6),
-                'Zľavy' => Group::fields([
-                    'discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|hidden|canAdd',
-                    'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible',
-                ])->width(6)->id('discounts'),
-            ])
-        ];
-    }
-
-    public function mutateFields($fields)
-    {
-        parent::mutateFields($fields);
-
-        //Remove delivery location if multiple delivery locations are disabled
-        if ( config('admineshop.delivery.multiple_locations') !== true ){
-            $fields->remove(['delivery_location']);
-        }
-
-        if ( config('admineshop.delivery.packeta') == true ){
-            $fields->push([
-                'packeta_point' => 'name:Packeta point|type:json|inaccessible',
-            ]);
-        }
-
-        //If discount code is not registred, we can remove it from order
-        if ( Discounts::isRegistredDiscount(DiscountCode::class) === false ){
-            $fields->remove(['discount_code']);
-        }
+                    ])->id('price')->inline(),
+                    'Zľavy' => Group::half(array_merge(
+                        Discounts::isRegistredDiscount(DiscountCode::class)
+                            ? ['discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|hidden|canAdd'] : []
+                    ))->id('discounts')->inline(),
+                ])->inline()->id('orderPrices'),
+                $this->getOrderHelperFields(),
+            ],
+        );
     }
 
     public function settings()
@@ -211,18 +138,8 @@ class Order extends AdminModel
     {
         $countries = Store::getCountries();
 
-        $vatOptions = Store::getVats()->map(function($item){
-            $item->vatValue = $item->vat.'%';
-            return $item;
-        })->pluck('vatValue', 'vat');
-
-        return [
-            'delivery_vat' => $vatOptions,
-            'payment_method_vat' => $vatOptions,
+        $options = [
             'country_id' => $countries,
-            'delivery_country_id' => $countries,
-            'delivery_id' => $this->getDeliveries(),
-            'payment_method_id' => $this->getPaymentMethods(),
             'status' => [
                 'new' => 'Prijatá',
                 'waiting' => 'Čaká za spracovaním',
@@ -236,6 +153,25 @@ class Order extends AdminModel
                 'error' => 'Neprijatá (chyba)',
             ],
         ];
+
+        //Add delivery feature options
+        if ( config('admineshop.delivery.enabled', true) === true ) {
+            $options = array_merge($options, [
+                'delivery_country_id' => $countries,
+                'delivery_id' => $this->getDeliveries(),
+                'delivery_vat' => $this->getVatOptions(),
+            ]);
+        }
+
+        //Add payment method feature options
+        if ( config('admineshop.payments_methods.enabled', true) === true ) {
+            $options = array_merge($options, [
+                'payment_method_vat' => $this->getVatOptions(),
+                'payment_method_id' => $this->getPaymentMethods(),
+            ]);
+        }
+
+        return $options;
     }
 
     public function scopeAdminRows($query)
@@ -249,7 +185,7 @@ class Order extends AdminModel
 
         $attributes['client_name'] = $this->getClientName();
 
-        $attributes['delivery_address'] = $this->getDeliveryAddress();
+        $attributes['delivery_address'] = $this->getDeliveryDetails();
 
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
 
@@ -290,17 +226,6 @@ class Order extends AdminModel
         return $this->getOptionValue('status', $this->status);
     }
 
-    public function getInvoiceUrlAttribute()
-    {
-        if ( OrderService::hasInvoices() == false ){
-            return;
-        }
-
-        return ($invoice = $this->invoice->last())
-                ? $invoice->getPdf()->url
-                : null;
-    }
-
     /**
      * This scope will be applied in order detail
      *
@@ -313,12 +238,12 @@ class Order extends AdminModel
         };
 
         $query->with(array_filter([
-            'discount_code',
-            'delivery',
-            config('admineshop.delivery.multiple_locations') ? 'delivery_location' : null,
-            'payment_method',
-            'country',
-            'delivery_country',
+            $this->getField('discount_code_id') ? 'discount_code' : null,
+            $this->getField('delivery_id') ? 'delivery' : null,
+            $this->getField('delivery_location_id') ? 'delivery_location' : null,
+            $this->getField('payment_method_id') ? 'payment_method' : null,
+            $this->getField('country_id') ? 'country' : null,
+            $this->getField('delivery_country_id') ? 'delivery_country' : null,
             'items.product' => $withAll,
             'items.variant' => $withAll,
         ]));

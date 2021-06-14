@@ -81,6 +81,7 @@ return [
      * Delivery settings
      */
     'delivery' => [
+        'enabled' => true,
         'multiple_locations' => false, //Multiple locations for one delivery method
         'multiple_locations_autoload' => false, //Automatically load multiple locations into cart response
         'payments' => false, //Payment rules for each delivery method
@@ -109,6 +110,7 @@ return [
      * Payment methods settings
      */
     'payments_methods' => [
+        'enabled' => true,
         'price_limit' => true,
 
         /*
