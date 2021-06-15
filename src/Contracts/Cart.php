@@ -161,6 +161,7 @@ class Cart
         $items = $this->all();
 
         $response = [
+            'cartToken' => $this->getDriver()->getToken(),
             'items' => $items,
             'discounts' => array_map(function($discount){
                 return $discount->toArray();

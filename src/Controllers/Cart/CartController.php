@@ -61,7 +61,9 @@ class CartController extends Controller
      */
     public function getSummary()
     {
-        return Cart::baseResponse();
+        return api(
+            Cart::baseResponse()
+        );
     }
 
     /**
@@ -71,7 +73,9 @@ class CartController extends Controller
      */
     public function getFullSummary()
     {
-        return Cart::fullCartResponse();
+        return api(
+            Cart::fullCartResponse()
+        );
     }
 
     public function addItem()
@@ -88,7 +92,9 @@ class CartController extends Controller
             $parentIdentifier
         );
 
-        return Cart::baseResponse();
+        return api(
+            Cart::baseResponse()
+        );
     }
 
     public function toggleItems()
@@ -106,7 +112,9 @@ class CartController extends Controller
             );
         }
 
-        return Cart::baseResponse();
+        return api(
+            Cart::baseResponse()
+        );
     }
 
     public function updateQuantity()
@@ -123,7 +131,9 @@ class CartController extends Controller
             $parentIdentifier
         );
 
-        return Cart::baseResponse();
+        return api(
+            Cart::baseResponse()
+        );
     }
 
     public function removeItem()
@@ -136,7 +146,9 @@ class CartController extends Controller
 
         Cart::remove($identifier, $parentIdentifier);
 
-        return Cart::baseResponse();
+        return api(
+            Cart::baseResponse()
+        );
     }
 
     public function addDiscountCode()
@@ -161,7 +173,9 @@ class CartController extends Controller
         //Event for added discount code
         event(new DiscountCodeAdded($code));
 
-        return Cart::baseResponse();
+        return api(
+            Cart::baseResponse()
+        );
     }
 
     public function getDeliveryLocations($id)
@@ -177,7 +191,9 @@ class CartController extends Controller
     {
         OrderService::getDiscountCodeDiscount()->removeDiscountCode();
 
-        return Cart::baseResponse();
+        return api(
+            Cart::baseResponse()
+        );
     }
 
     public function setDelivery()
@@ -210,7 +226,9 @@ class CartController extends Controller
             OrderService::getPaymentMethodMutator()->setPaymentMethod(null);
         }
 
-        return Cart::fullCartResponse();
+        return api(
+            Cart::fullCartResponse()
+        );
     }
 
     public function setPaymentMethod()
@@ -221,7 +239,9 @@ class CartController extends Controller
 
         OrderService::getPaymentMethodMutator()->setPaymentMethod($paymentMethod->getKey());
 
-        return Cart::fullCartResponse();
+        return api(
+            Cart::fullCartResponse()
+        );
     }
 
     public function setCountry()
@@ -230,7 +250,9 @@ class CartController extends Controller
 
         (new CountryMutator)->setCountry($countryId);
 
-        return Cart::fullCartResponse();
+        return api(
+            Cart::fullCartResponse()
+        );
     }
 
     public function submitOrder()

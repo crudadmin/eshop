@@ -111,28 +111,32 @@ trait HasOrderFields
      */
     protected function getShippingAndPaymentFields()
     {
-        return Group::fields([
-            'Doprava' => Group::fields([
-                Group::inline(array_merge(
-                    ['delivery' => 'name:Doprava|belongsTo:deliveries,name|required'],
-                    config('admineshop.delivery.multiple_locations', false)
-                        ? ['delivery_location' => 'name:Predajňa|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:deliveries_locations,name'] : []
-                )),
-                Group::inline([
-                    'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
-                    'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
-                ]),
-                'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
-            ])->id('delivery')->if(config('admineshop.delivery.enabled', true)),
-            'Platobná metóda' => Group::fields([
-                Group::fields([
-                    'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
-                    'payment_method_vat' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.vat|hidden|required|type:select|default:'.Store::getDefaultVat(),
-                    'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
-                ])->inline(),
-                'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
-            ])->id('payment')->if(config('admineshop.payments_methods.enabled', true))
-        ])->id('shippingAndPayments')->inline();
+        return Group::fields(array_merge(
+            config('admineshop.delivery.enabled', true) ? [
+                'Doprava' => Group::fields([
+                    Group::inline(array_merge(
+                        ['delivery' => 'name:Doprava|belongsTo:deliveries,name|required'],
+                        config('admineshop.delivery.multiple_locations', false)
+                            ? ['delivery_location' => 'name:Predajňa|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:deliveries_locations,name'] : []
+                    )),
+                    Group::inline([
+                        'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
+                        'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
+                    ]),
+                    'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
+                ])->id('delivery'),
+            ] : [],
+            config('admineshop.payments_methods.enabled', true) ? [
+                'Platobná metóda' => Group::fields([
+                    Group::fields([
+                        'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
+                        'payment_method_vat' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.vat|hidden|required|type:select|default:'.Store::getDefaultVat(),
+                        'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
+                    ])->inline(),
+                    'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
+                ])->id('payment')
+            ] : [],
+        ))->id('shippingAndPayments')->inline();
     }
 
     /**

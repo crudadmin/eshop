@@ -1,4 +1,16 @@
 <?php
+
+use AdminEshop\Http\Resources\NuxtApiResponse;
+
+if ( !function_exists('api') ) {
+    function api()
+    {
+        return new NuxtApiResponse(
+            ...func_get_args()
+        );
+    }
+}
+
 function operator_types($except = [])
 {
     $operators = [

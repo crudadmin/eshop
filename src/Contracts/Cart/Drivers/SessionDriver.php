@@ -10,7 +10,7 @@ class SessionDriver extends BaseDriver implements DriverInterface
     /*
      * Session key for basket items
      */
-    private $key = 'cart';
+    const SESSION_KEY = 'cart';
 
     /**
      * On create session driver. We need define default params
@@ -20,8 +20,8 @@ class SessionDriver extends BaseDriver implements DriverInterface
     public function __construct(array $initialData = [])
     {
         //Boot session driver with default values
-        if ( session()->has($this->key) === false ){
-            session()->put($this->key, $initialData);
+        if ( session()->has(self::SESSION_KEY) === false ){
+            session()->put(self::SESSION_KEY, $initialData);
             session()->save();
         }
     }
@@ -34,7 +34,7 @@ class SessionDriver extends BaseDriver implements DriverInterface
      */
     public function set($key, $value)
     {
-        session()->put($this->key.'.'.$key, $value);
+        session()->put(self::SESSION_KEY.'.'.$key, $value);
         session()->save();
 
         return $this;
@@ -49,7 +49,7 @@ class SessionDriver extends BaseDriver implements DriverInterface
      */
     public function replace(array $data)
     {
-        session()->put($this->key, $data);
+        session()->put(self::SESSION_KEY, $data);
         session()->save();
 
         return $this;
@@ -64,7 +64,7 @@ class SessionDriver extends BaseDriver implements DriverInterface
      */
     public function get($key = '', $default = null)
     {
-        return session($this->key.($key ? ('.'.$key) : ''), $default);
+        return session(self::SESSION_KEY.($key ? ('.'.$key) : ''), $default);
     }
 
     /**
@@ -76,7 +76,7 @@ class SessionDriver extends BaseDriver implements DriverInterface
      */
     public function forget($key = null)
     {
-        session()->forget($this->key.($key ? ('.'.$key) : ''));
+        session()->forget(self::SESSION_KEY.($key ? ('.'.$key) : ''));
         session()->save();
     }
 }

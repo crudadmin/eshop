@@ -27,7 +27,7 @@ trait HasRoutes
     public function routesForCart()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
-            Route::get('/cart/fullSummary', 'Cart\CartController@getFullSummary')->name('cart::fullSummary')->visible();
+            Route::get('/cart', 'Cart\CartController@getFullSummary')->name('cart::fullSummary')->visible();
             Route::get('/cart/delivery-locations/{id}', 'Cart\CartController@getDeliveryLocations')->name('cart::getDeliveryLocations')->visible();
 
             Route::post('/cart/setDelivery', 'Cart\CartController@setDelivery')->name('cart::setDelivery')->visible();
