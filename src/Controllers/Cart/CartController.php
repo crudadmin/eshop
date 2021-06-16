@@ -180,10 +180,10 @@ class CartController extends Controller
 
     public function getDeliveryLocations($id)
     {
-        $delivery = Delivery::findOrFail($id);
+        $delivery = Admin::getModel('Delivery')->findOrFail($id);
 
         return api([
-            'locations' => $delivery->locations,
+            'locations' => $delivery->getDeliveryLocations()->get(),
         ]);
     }
 
@@ -203,11 +203,11 @@ class CartController extends Controller
 
         //Find by delivery id
         if ( $deliveryId ) {
-            $delivery = Delivery::findOrFail($deliveryId);
+            $delivery = Admin::getModel('Delivery')->findOrFail($deliveryId);
 
             //Find by location under given delivery
             if ( $locationId ) {
-                $location = $delivery->locations()->findOrFail($locationId);
+                $location = $delivery->getDeliveryLocations()->findOrFail($locationId);
             }
         }
 

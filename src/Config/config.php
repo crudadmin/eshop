@@ -82,8 +82,13 @@ return [
      */
     'delivery' => [
         'enabled' => true,
-        'multiple_locations' => false, //Multiple locations for one delivery method
-        'multiple_locations_autoload' => false, //Automatically load multiple locations into cart response
+        //Multiple locations for one delivery method
+        'multiple_locations' => [
+            'enabled' => false,
+            'autoload' => false, //Automatically load multiple locations into cart response
+            'table' => 'deliveries_locations',
+            'field_name' => 'name',
+        ],
         'payments' => false, //Payment rules for each delivery method
         'countries' => false, //Country rules for delivery
         'price_limit' => false, //Deny deliveries over price

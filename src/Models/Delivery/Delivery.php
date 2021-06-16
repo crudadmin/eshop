@@ -69,7 +69,7 @@ class Delivery extends AdminModel implements DiscountSupport
         $restrictionFields = [];
 
         //Add multiple locations model
-        if ( config('admineshop.delivery.multiple_locations') == true ) {
+        if ( config('admineshop.delivery.multiple_locations.enabled') == true ) {
             $restrictionFields['multiple_locations'] = 'name:Viacero doručovacích adries/predajní|type:checkbox|default:0';
         }
 
@@ -187,10 +187,42 @@ class Delivery extends AdminModel implements DiscountSupport
         }
     }
 
+    public function scopeWithCartResponse($query)
+    {
+        $with = [];
+
+        //Autoload default delivery locations
+        if (
+            config('admineshop.delivery.multiple_locations.enabled') == true
+            && config('admineshop.delivery.multiple_locations.autoload', false) == true
+            && config('admineshop.delivery.multiple_locations.table') == 'deliveries_locations'
+        ) {
+            $with[] = 'locations:id,delivery_id,name';
+        }
+
+        if ( config('admineshop.delivery.countries') == true ) {
+            $with[] = 'countries';
+        }
+
+        if ( config('admineshop.delivery.payments') == true ) {
+            $with[] = 'payments';
+        }
+
+        $query->with($with);
+    }
+
     public function setCartResponse()
     {
         return $this->append('shippingProvider')
                     ->makeHidden(['created_at', 'published_at', 'deleted_at', 'updated_at'])
                     ->makeVisible('shippingProvider');
+    }
+
+    /*
+     * We can switch available locations for each delivery if neccessary
+     */
+    public function getDeliveryLocations()
+    {
+        return $this->locations();
     }
 }

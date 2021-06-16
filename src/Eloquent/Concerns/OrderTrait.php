@@ -139,7 +139,7 @@ trait OrderTrait
                                 'deliveries.id',
                                 'deliveries.name',
                                 'deliveries.price',
-                                config('admineshop.delivery.multiple_locations') ? 'deliveries.multiple_locations' : null,
+                                config('admineshop.delivery.multiple_locations.enabled') ? 'deliveries.multiple_locations' : null,
                                 'vats.vat'
                             ]))
                             ->get();

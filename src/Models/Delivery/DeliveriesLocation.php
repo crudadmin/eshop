@@ -27,8 +27,16 @@ class DeliveriesLocation extends AdminModel
 
     protected $hidden = ['created_at', 'updated_at', 'published_at', 'deleted_at', '_order'];
 
-    public function active() {
-        return config('admineshop.delivery.multiple_locations') === true;
+    protected $settings = [
+        'grid.enabled' => false,
+        'grid.default' => 'full',
+    ];
+
+    public function active()
+    {
+        //If delivery default delivery locations model is enabled
+        return config('admineshop.delivery.multiple_locations.enabled') === true
+                && $this->getTable() == config('admineshop.delivery.multiple_locations.table');
     }
 
     /*
@@ -46,9 +54,4 @@ class DeliveriesLocation extends AdminModel
             'data' => 'name:Data Pobočky|type:json|invisible',
         ];
     }
-
-    protected $settings = [
-        'grid.enabled' => false,
-        'grid.default' => 'full',
-    ];
 }

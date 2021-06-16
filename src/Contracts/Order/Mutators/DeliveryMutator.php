@@ -194,26 +194,9 @@ class DeliveryMutator extends Mutator
     public function getDeliveries()
     {
         return $this->cache('deliveries', function(){
-            $with = [];
-
-            if (
-                config('admineshop.delivery.multiple_locations') == true
-                && config('admineshop.delivery.multiple_locations_autoload', false) == true
-            ) {
-                $with[] = 'locations:id,delivery_id,name';
-            }
-
-            if ( config('admineshop.delivery.countries') == true ) {
-                $with[] = 'countries';
-            }
-
-            if ( config('admineshop.delivery.payments') == true ) {
-                $with[] = 'payments';
-            }
-
             return Admin::getModel('Delivery')
                         ->onlyAvailable()
-                        ->with($with)
+                        ->withCartResponse()
                         ->get();
         });
     }
@@ -246,7 +229,7 @@ class DeliveryMutator extends Mutator
                 return;
             }
 
-            return $delivery->locations()->where('id', $id)->first();
+            return $delivery->getDeliveryLocations()->where('id', $id)->first();
         });
     }
 

@@ -2,7 +2,7 @@
 | {{ _('Informácie o objednávke') }} | |
 | :------------- | ----------:|
 | {{ _('Spôsob platby') }}: | {{ $payment_method->name }} |
-| {{ _('Doprava') }}: | {{ $delivery->name }} {{ $location ? '('.$location->name.')' : '' }} |
+| {{ _('Doprava') }}: | {{ $delivery->name }} {{ $location ? '('.$location->{config('admineshop.delivery.multiple_locations.field_name')}.')' : '' }} |
 @if ( $location && $location->address )
 | {{ _('Adresa zvolenej dopravy') }}: | {{ $location->address }} |
 @endif
