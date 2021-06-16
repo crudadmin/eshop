@@ -41,7 +41,7 @@ class SynchronizerReport extends AdminModel
             Group::fields([
                 'name' => 'name:Názov synchronizácie|index',
                 'messages' => 'name:Úspešna aktivita|type:longtext|required',
-                'errors' => 'name:Chyby|type:text|required',
+                'errors' => 'name:Chyby|type:longtext|required',
                 'duration' => 'name:Trvanie synchronizácie (sek.)|type:integer|min:0|required',
             ])->add('disabled'),
         ];
