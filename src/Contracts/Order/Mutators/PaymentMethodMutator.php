@@ -62,6 +62,7 @@ class PaymentMethodMutator extends Mutator
             $order->fill([
                 'payment_method_vat' => Store::getVatValueById($paymentMethod->vat_id),
                 'payment_method_price' => $paymentMethod->priceWithoutVat,
+                'payment_method_price_vat' => $paymentMethod->priceWithVat,
                 'payment_method_id' => $paymentMethod->getKey(),
             ]);
         }

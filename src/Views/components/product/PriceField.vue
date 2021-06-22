@@ -11,7 +11,7 @@
             </div>
             <div class="col-md-4">
                 <label>Cena s DPH</label>
-                <input type="number" step=".01" :value="vatPrice" @keyup="changePrice" @change="recalculateWithoutVatPrice" class="form-control" :readonly="disabled || readonly">
+                <input type="number" step=".01" :name="field_key+'_vat'" :value="vatPrice" @keyup="changePrice" @change="recalculateWithoutVatPrice" class="form-control" :readonly="disabled || readonly">
             </div>
         </div>
     </div>

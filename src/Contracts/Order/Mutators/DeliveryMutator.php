@@ -86,6 +86,7 @@ class DeliveryMutator extends Mutator
             $order->fill([
                 'delivery_vat' => Store::getVatValueById($delivery->vat_id),
                 'delivery_price' => $delivery->priceWithoutVat,
+                'delivery_price_vat' => $delivery->priceWithVat,
                 'delivery_id' => $delivery->getKey(),
                 'delivery_location_id' => $location ? $location->getKey() : null,
             ]);
