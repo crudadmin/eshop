@@ -50,10 +50,6 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     protected $sluggable = 'name';
 
-    protected $layouts = [
-        'form-top' => 'setProductTabs',
-    ];
-
     /*
      * This items will be selected from db for cart items
      */
@@ -74,6 +70,11 @@ class Product extends CartEloquent implements HasAttributesSupport
         parent::__construct($options);
     }
 
+    public function belongsToModel()
+    {
+        return self::class;
+    }
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -87,13 +88,13 @@ class Product extends CartEloquent implements HasAttributesSupport
             Group::tab([
                 Group::fields([
                     'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : '|index'),
-                    'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|required',
+                    'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|hideFromFormIf:product_type,variant|sub_component:setProductType|required',
                 ])->inline(),
                 'image' => 'name:Obrázok|type:file|image',
-                Group::fields([
+                Group::inline([
                     'ean' => 'name:EAN|hidden',
                     'code' => 'name:Kód produktu',
-                ])->inline(),
+                ])->attributes('hideFromFormIf:product_type,variant'),
             ])->icon('fa-pencil')->id('general'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
@@ -104,16 +105,17 @@ class Product extends CartEloquent implements HasAttributesSupport
                     'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
                     'discount' => 'name:Výška zľavy|type:decimal|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
                 ])->id('discount')->width(4),
-            ])->icon('fa-money')->id('price-tab'),
+            ])->icon('fa-money')->id('priceTab')->attributes('hideFromFormIf:product_type,variants'),
             'Popis' => Group::tab([
                 'description' => 'name:Popis produktu|type:editor|hidden'.(Store::isEnabledLocalization() ? '|locale' : ''),
             ])->icon('fa-file-text-o'),
             'Sklad' => Group::tab([
-                'stock_quantity' => 'name:Sklad|type:integer|default:0',
+                'stock_quantity' => 'name:Sklad|type:integer|default:0|hideFromFormIf:product_type,variants',
                 'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
                 'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
             ])->icon('fa-bars')->add('hidden'),
-            $this->hasAttributesEnabled() ? Group::tab( ProductsAttribute::class ) : [],
+            Group::tab(self::class)->attributes('hideFromFormIfNot:product_type,variants'),
+            $this->hasAttributesEnabled() ? Group::tab(ProductsAttribute::class) : [],
             'Ostatné nastavenia' => Group::tab([
                 'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
                 'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
@@ -126,7 +128,7 @@ class Product extends CartEloquent implements HasAttributesSupport
         if ( config('admineshop.categories.enabled') ){
             $fields->group('general', function($group){
                 $group->push([
-                    'categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd',
+                    'categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd|removeFromFormIfNot:product_id,NULL',
                 ]);
             });
         }
@@ -159,6 +161,8 @@ class Product extends CartEloquent implements HasAttributesSupport
             'title.insert' => 'Nový produkt',
             'title.update' => ':name',
             'grid.default' => 'full',
+            'recursivity.name' => 'Varianty produktu',
+            'recursivity.max_depth' => 1,
             'columns.attributes' => [
                 'hidden' => $this->hasAttributesEnabled() ? false : true,
                 'name' => 'Atribúty',

@@ -88,7 +88,7 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
     {
         return [
             'Nastavenie varianty' => Group::tab([
-                'product_type' => 'type:imaginary|component:AddTypeFieldIntoRequest',
+                'product_type' => 'type:imaginary',
                 Group::fields([
                     'name' => 'name:Názov varianty|limit:40|required'.(Store::isEnabledLocalization() ? '|locale' : ''),
                     'image' => 'name:Obrázok|image',
