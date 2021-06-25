@@ -18,6 +18,7 @@ use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
+use Admin;
 
 class Product extends CartEloquent implements HasAttributesSupport
 {
@@ -111,8 +112,10 @@ class Product extends CartEloquent implements HasAttributesSupport
             ])->icon('fa-file-text-o'),
             'Sklad' => Group::tab([
                 'stock_quantity' => 'name:Sklad|type:integer|default:0|hideFromFormIf:product_type,variants',
-                'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
-                'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
+                Group::fields([
+                    'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
+                    'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
+                ])->attributes('hideFromFormIf:product_type,variant'),
             ])->icon('fa-bars')->add('hidden'),
             Group::tab(self::class)->attributes('hideFromFormIfNot:product_type,variants'),
             $this->hasAttributesEnabled() ? Group::tab(ProductsAttribute::class) : [],
@@ -255,5 +258,10 @@ class Product extends CartEloquent implements HasAttributesSupport
         $attributes['attributes'] = $this->attributesText;
 
         return $attributes;
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(get_class(Admin::getModel('Product')), 'product_id');
     }
 }
