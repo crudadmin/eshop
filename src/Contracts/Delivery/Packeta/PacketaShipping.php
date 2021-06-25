@@ -98,7 +98,7 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
                 'phone' => $order->delivery_phone ?: $order->phone,
                 'addressId' => $order->packeta_point['id'],
                 'value' => $order->price_vat,
-                'eshop' => env('APP_NAME')
+                'eshop' => env('PACKETA_API_ESHOP')
             ];
 
             $packet = $gw->createPacket($apiPassword, $data);
@@ -107,7 +107,7 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
         }
 
         catch(SoapFault $error) {
-            throw new CreatePackageException($error->getMessage());
+            throw new CreatePackageException($error->getMessage().' - '.json_encode($error->detail ?? '{}', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         }
     }
 }
