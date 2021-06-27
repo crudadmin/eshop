@@ -36,15 +36,20 @@ class Store extends AdminModel
      */
     public function fields()
     {
-        return [
-            'email' => 'name:Email obchodu|title:Slúži pre obdržanie kópie emailov z objednávok|email',
-            'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
-            'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
-            'Nastavenia skladu' => Group::tab([
-                'stock_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',
-                'stock_sold' => 'name:Globálny text dostupnosti tovaru s nulovou skladovosťou|removeFromFormIfNot:stock_type,everytime'
-            ])->icon('fa-bars')->add('hidden'),
-        ];
+        return array_filter(array_merge(
+            [
+                'email' => 'name:Email obchodu|title:Slúži pre obdržanie kópie emailov z objednávok|email',
+                'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
+                'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
+            ],
+            config('admineshop.stock.store_rules', true) ?
+                [
+                    'Nastavenia skladu' => Group::tab([
+                        'stock_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',
+                        'stock_sold' => 'name:Globálny text dostupnosti tovaru s nulovou skladovosťou|removeFromFormIfNot:stock_type,everytime'
+                    ])->icon('fa-bars')->add('hidden'),
+                ] : []
+        ));
     }
 
     public function options()

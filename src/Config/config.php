@@ -43,7 +43,6 @@ return [
         //Allowed models with attributes
         'eloquents' => [
             AdminEshop\Models\Products\Product::class,
-            AdminEshop\Models\Products\ProductsVariant::class,
         ],
         'load_in_cart' => true, //Load attributes data in cart responses
         'filtrable' => true, //Toggle if attribute should be presnet in filter
@@ -63,7 +62,6 @@ return [
         //Allowed models with gallery
         'eloquents' => [
             AdminEshop\Models\Products\Product::class,
-            // AdminEshop\Models\Products\ProductsVariant::class,
         ],
     ],
 
@@ -71,6 +69,7 @@ return [
      * Product stocks properties
      */
     'stock' => [
+        'store_rules' => true, //Enable different rules by product stock settings or general store settings
         'status_with_quantity' => true, //Show detailed stock status with quantity text: Skladom 5ks, Skladom 10+ks
         'rounding' => [100, 50, 20, 10], //10+, 50+ items...
         'rounding_less_than_char' => '<',

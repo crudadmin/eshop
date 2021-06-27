@@ -4,7 +4,9 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Contracts\ImageResponse;
 use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Products\ProductsGallery;
 use Admin\Helpers\SEO;
+use DB;
 use Store;
 
 trait HasProductImage
@@ -31,15 +33,24 @@ trait HasProductImage
 
     public function getImageOrDefaultAttribute()
     {
-        if ( $this->image ){
-            return $this->image;
+        if ( $image = $this->image ){
+            return $image;
+        }
+
+        //Default gallery image for ProductVariant has higher priority priority than main product image
+        if ( $galleryMainImage = $this->getAttribute('galery_main_image') ) {
+            return (new ProductsGallery([
+                'image' => $galleryMainImage,
+            ]))->image;
         }
 
         //Return parent product image, if variant does not have set image, but parent product has...
-        if ( $this->product_image ){
-            return (new Product([
-                'image' => $this->product_image,
-            ]))->image;
+        if ( $mainProductImage = $this->main_image ){
+            $this->setRawAttributes([
+                'image' => $mainProductImage,
+            ]);
+
+            return $this->image;
         }
 
         return Store::getSettings()->default_image;
@@ -100,5 +111,30 @@ trait HasProductImage
         return collect($seo->getImages())->map(function($image){
             return $image->url;
         });
+    }
+
+    public function scopeWithMainGalleryImage($query, $withMainProductInVariants = false)
+    {
+        if ( !$this->hasGalleryEnabled() ){
+            return;
+        }
+
+        $mainGallery = DB::table('products_galleries')
+                        ->selectRaw('products_galleries.image, products_galleries.product_id')
+                        ->where('products_galleries.default', 1)
+                        ->whereNotNull('products_galleries.published_at')
+                        ->groupBy('product_id')
+                        //Variant must be accessible before main product ID
+                        ->orderBy('product_id', 'ASC');
+
+        $query->leftJoinSub($mainGallery, 'products_galleries', function($join) use ($withMainProductInVariants) {
+            $join->on('products_galleries.product_id', '=', 'products.id');
+
+            if ( $withMainProductInVariants === true ){
+                $join->orOn('products_galleries.product_id', '=', 'products.product_id');
+            }
+        });
+
+        $query->addSelect(DB::raw('SUBSTRING_INDEX(GROUP_CONCAT(products_galleries.image), ",", 1) as galery_main_image'));
     }
 }

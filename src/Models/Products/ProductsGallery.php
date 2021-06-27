@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Admin\Rules\SetDefaultGalleryImage;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use Admin\Eloquent\AdminModel;
 
@@ -22,6 +23,10 @@ class ProductsGallery extends AdminModel
     protected $inTab = true;
     protected $withoutParent = true;
 
+    protected $rules = [
+        SetDefaultGalleryImage::class,
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -31,6 +36,7 @@ class ProductsGallery extends AdminModel
      */
     protected $fields = [
         'image' => 'name:Obrázok|image|multirows',
+        'default' => 'name:Hlavná fotografia produktu|type:checkbox|default:0',
     ];
 
     protected $settings = [

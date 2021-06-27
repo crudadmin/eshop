@@ -25,7 +25,7 @@ trait HasProductFilter
         });
     }
 
-    public function scopeApplyQueryFilter($query, $params)
+    public function scopeApplyQueryFilter($query, $params, $filterVariants = false)
     {
         $params = is_array($params) ? $params : [];
 
@@ -45,10 +45,8 @@ trait HasProductFilter
             }
         }
 
-        $query->where(function($query) use ($filter) {
-            $model = $query->getModel();
-
-            if ( $model instanceof Product ) {
+        $query->where(function($query) use ($filter, $filterVariants) {
+            if ( $filterVariants === false ) {
                 $query
                     //Filter by basic product type
                     ->where(function($query) use ($filter) {
@@ -71,7 +69,7 @@ trait HasProductFilter
             }
 
             //If actual object is already variant, we need filter only attributes
-            else if ( $model instanceof ProductsVariant ) {
+            else {
                 $query->withoutGlobalScope('order');
 
                 foreach ($filter as $attributeId => $itemIds) {

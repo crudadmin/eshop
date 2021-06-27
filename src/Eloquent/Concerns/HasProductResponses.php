@@ -5,12 +5,37 @@ namespace AdminEshop\Eloquent\Concerns;
 use Admin;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\Modules\SeoModule;
 use Store;
 
 trait HasProductResponses
 {
+    /**
+     * Which price fields should be exposed into request
+     *
+     * @return  array
+     */
+    public function getVisiblePriceAttributes()
+    {
+        return ['initialPriceWithVat', 'defaultPriceWithVat', 'priceWithVat', 'priceWithoutVat'];
+    }
+
+    /**
+     * Which stock attributes should be exposed into request
+     *
+     * @return  array
+     */
+    public function getVisibleStockAttributes()
+    {
+        $columns = ['stock_quantity', 'stockText', 'stockNumber', 'hasStock'];
+
+        if ( config('admineshop.stock.store_rules', true) ) {
+            $columns[] = 'canOrderEverytime';
+        }
+
+        return $columns;
+    }
+
     /**
      * This columns are shared between product an variant.
      * You can replace this method in model.
@@ -19,20 +44,21 @@ trait HasProductResponses
      */
     public function visibleOrderableColumns()
     {
-        $columns = [
-            'id', 'slug', 'name', 'stock_type',
-        ];
+        $columns = ['id', 'slug', 'name', 'thumbnail'];
+
+        if ( config('admineshop.stock.store_rules', true) ) {
+            $columns[] = 'stock_type';
+        }
+
+        if ( config('admineshop.attributes.attributesText', false) == true ) {
+            $columns[] = 'attributesText';
+        }
 
         //In main product we does not need this properties, because they are present in each variant
         if ( in_array($this->getAttribute('product_type'), Store::variantsProductTypes()) === false ){
-            $columns = array_merge($columns, ['initialPriceWithVat', 'defaultPriceWithVat', 'priceWithVat', 'priceWithoutVat']);
-            $columns = array_merge($columns, ['stock_quantity', 'stockText', 'stockNumber', 'hasStock', 'canOrderEverytime']);
+            $columns = array_merge($columns, $this->getVisiblePriceAttributes());
+            $columns = array_merge($columns, $this->getVisibleStockAttributes());
         }
-
-        $columns = array_merge($columns, array_filter([
-            'thumbnail',
-            'attributesText',
-        ]));
 
         return $columns;
     }
@@ -140,7 +166,12 @@ trait HasProductResponses
      */
     public function scopeWithCategoryResponse($query, $filterParams = [])
     {
+        //We need specify select for
+        $query->addSelect('products.*');
+
         $query->applyQueryFilter($filterParams);
+
+        $query->withMainGalleryImage();
 
         if ( $this->hasAttributesEnabled() ) {
             $query->with([
@@ -148,16 +179,22 @@ trait HasProductResponses
             ]);
         }
 
-        if ( $this instanceof Product && count(Store::variantsProductTypes()) ){
+        if ( count(Store::variantsProductTypes()) ){
             $query->extendWith(['variants' => function($query) use ($filterParams) {
+                $model = $query->getModel();
+
                 $query->withParentProductData();
 
+                $query->withMainGalleryImage(true);
+
                 //We can deside if filter should be applied also on selected variants
-                if ( Admin::getModel('ProductsVariant')->getProperty('applyFilterOnVariants') == true ) {
-                    $query->applyQueryFilter($filterParams);
+                if ( $model->getProperty('applyFilterOnVariants') == true ) {
+                    $query->applyQueryFilter($filterParams, true);
                 }
 
-                if ( $query->getModel()->hasAttributesEnabled() ) {
+                //TODO: variants has all the time attributes enabled, because same model is shared
+                //we need solve this in future.
+                if ( $model->hasAttributesEnabled() ) {
                     $query->with(['attributesItems']);
                 }
             }]);
@@ -174,7 +211,10 @@ trait HasProductResponses
         //We need rewrite eagerLoads and keep existing variants scope if is present
         //because if withCategoryResponse has been called before, we will throw all nested withs if we would
         //call simple with("variants.gallery")
-        if ( Admin::getModel('ProductsVariant')->hasGalleryEnabled() ) {
+        //
+        //TODO: change comment, gallery is now shared accross same model. So we need find other way to define gallery
+        //state in variants. Because rule will be alyaws true if parent has enabled pagllery.
+        if ( Admin::getModel('Product')->hasGalleryEnabled() ) {
             $query->extendWith([
                 'variants' => function($query) {
                     $query->with('gallery');
@@ -217,10 +257,15 @@ trait HasProductResponses
         if ( count(Store::variantsProductTypes()) ) {
             $products->with([
                 'variants' => function($query) use ($filterParams){
-                    $query->select(...$query->getModel()->getPriceSelectColumns())->addSelect('product_id')->withoutGlobalScope('order');
+                    $model = $query->getModel();
+
+                    $query
+                        ->select(...$model->getPriceSelectColumns())
+                        ->addSelect('product_id')
+                        ->withoutGlobalScope('order');
 
                     //We can deside if filter should be applied also on selected variants
-                    if ( Admin::getModel('ProductsVariant')->getProperty('applyFilterOnVariants') == true ) {
+                    if ( $model->getProperty('applyFilterOnVariants') == true ) {
                         $query->applyQueryFilter($filterParams);
                     }
                 }

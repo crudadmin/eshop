@@ -55,11 +55,6 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
         'id', 'product_id', 'name', 'image', 'code', 'stock_quantity',
     ];
 
-    /*
-     * Should be filter in caregory response applied also for selected variants?
-     */
-    protected $applyFilterOnVariants = true;
-
     /**
      * Model constructor
      *
@@ -175,17 +170,6 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
     public function isType($type)
     {
         return 'regular' == $type;
-    }
-
-    /**
-     * Returns on stock variants with product table
-     *
-     * @return  void
-     */
-    public function scopeWithParentProductData($query)
-    {
-        $query->select('products_variants.*', 'products.stock_type', 'products.stock_sold', 'products.image as product_image')
-              ->leftJoin('products', 'products.id', '=', 'products_variants.product_id');
     }
 
     public function mutateCategoryResponse()

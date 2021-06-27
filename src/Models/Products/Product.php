@@ -30,7 +30,6 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasProductResponses,
         HasCategoryTree;
 
-
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -58,6 +57,11 @@ class Product extends CartEloquent implements HasAttributesSupport
         'id', 'product_type', 'slug', 'name', 'image', 'code',
         'stock_quantity', 'stock_type', 'stock_sold',
     ];
+
+    /*
+     * Should be filter in caregory response applied also for selected variants?
+     */
+    protected $applyFilterOnVariants = true;
 
     /**
      * Model constructor
@@ -88,7 +92,7 @@ class Product extends CartEloquent implements HasAttributesSupport
         return [
             Group::tab([
                 Group::fields([
-                    'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : '|index'),
+                    'name' => 'name:Názov produktu|limit:30|required_unless:product_type,variant|'.(Store::isEnabledLocalization() ? '|locale' : '|index'),
                     'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|hideFromFormIf:product_type,variant|sub_component:setProductType|required',
                 ])->inline(),
                 'image' => 'name:Obrázok|type:file|image',
@@ -110,13 +114,16 @@ class Product extends CartEloquent implements HasAttributesSupport
             'Popis' => Group::tab([
                 'description' => 'name:Popis produktu|type:editor|hidden'.(Store::isEnabledLocalization() ? '|locale' : ''),
             ])->icon('fa-file-text-o'),
-            'Sklad' => Group::tab([
-                'stock_quantity' => 'name:Sklad|type:integer|default:0|hideFromFormIf:product_type,variants',
-                Group::fields([
-                    'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
-                    'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
-                ])->attributes('hideFromFormIf:product_type,variant'),
-            ])->icon('fa-bars')->add('hidden'),
+            'Sklad' => Group::tab(array_filter(array_merge(
+                [
+                    'stock_quantity' => 'name:Sklad|type:integer|default:0|hideFromFormIf:product_type,variants',
+                ],
+                config('admineshop.stock.store_rules', true)
+                    ? Group::fields([
+                        'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
+                        'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
+                    ])->attributes('hideFromFormIf:product_type,variant') : [],
+            )))->icon('fa-bars')->add('hidden')->attributes(config('admineshop.stock.store_rules', true) ? '' : 'hideFromFormIf:product_type,variants'),
             Group::tab(self::class)->attributes('hideFromFormIfNot:product_type,variants'),
             $this->hasAttributesEnabled() ? Group::tab(ProductsAttribute::class) : [],
             'Ostatné nastavenia' => Group::tab([
@@ -242,6 +249,10 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function getCheapestVariantClientPriceAttribute()
     {
+        if ( !$this->relationLoaded('variants') ){
+            return 0;
+        }
+
         $prices = [];
 
         foreach ($this->variants as $variant) {
@@ -263,5 +274,27 @@ class Product extends CartEloquent implements HasAttributesSupport
     public function variants()
     {
         return $this->hasMany(get_class(Admin::getModel('Product')), 'product_id');
+    }
+
+    /**
+     * TODO: complete
+     * Returns on stock variants with product table
+     *
+     * @return  void
+     */
+    public function scopeWithParentProductData($query)
+    {
+        $selectColumns = ['products.*'];
+
+        $selectColumns[] = 'pm.image as main_image';
+
+        if ( config('admineshop.stock.store_rules', true) ) {
+            $selectColumns = array_merge($selectColumns, [
+                'pm.stock_type as main_stock_type', 'pm.stock_sold as main_stock_sold',
+            ]);
+        }
+
+        $query->addSelect($selectColumns)
+              ->leftJoin('products as pm', 'products.product_id', '=', 'pm.id');
     }
 }
