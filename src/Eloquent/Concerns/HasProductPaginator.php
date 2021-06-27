@@ -105,7 +105,9 @@ trait HasProductPaginator
 
     private function getVariantsKey($product)
     {
-        return $product->getKey().'-'.$product->getAttribute('variants')->pluck('id')->join('-');
+        $variantsKey = $product->relationLoaded('variants') ? $product->getAttribute('variants')->pluck('id')->join('-') : 0;
+
+        return $product->getKey().'-'.$variantsKey;
     }
 
     private function filterItemsByPrice(&$items)
