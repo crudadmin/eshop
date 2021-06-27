@@ -27,6 +27,20 @@ trait HasProductAttributes
                     ->whereNull('attributes_items.deleted_at');
     }
 
+    public function variantsAttributesItems()
+    {
+        //We need return not model from package, but end model which may extend features
+        $relationClass = get_class(Admin::getModel('ProductsAttribute'));
+
+        return $this->hasManyDeep(ProductsAttributesItem::class, [self::class, $relationClass])
+                    ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_products_attribute_items.attributes_item_id')
+                    ->select(
+                        'products_attributes.attribute_id',
+                        'attributes_item_products_attribute_items.attributes_item_id'
+                    )
+                    ->whereNull('attributes_items.deleted_at');
+    }
+
     public function getAttributesListAttribute()
     {
         $attributes = [];

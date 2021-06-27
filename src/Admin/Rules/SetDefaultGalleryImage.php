@@ -23,14 +23,4 @@ class SetDefaultGalleryImage extends AdminRule
             $row->default = 1;
         }
     }
-
-    /*
-     * Firing callback on delete row
-     */
-    public function delete(AdminModel $row)
-    {
-        if ( $row->default == true ) {
-            Ajax::error(_('Nie je možné vymazať predvolený záznam.'));
-        }
-    }
 }

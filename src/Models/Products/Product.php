@@ -17,12 +17,14 @@ use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Store;
 use Admin;
 
 class Product extends CartEloquent implements HasAttributesSupport
 {
-    use HasProductImage,
+    use HasRelationships,
+        HasProductImage,
         HasProductAttributes,
         HasStock,
         HasProductFilter,
@@ -59,9 +61,24 @@ class Product extends CartEloquent implements HasAttributesSupport
     ];
 
     /*
+     * Should be variants loaded automatically
+     */
+    public $loadVariants = true;
+
+    /*
      * Should be filter in caregory response applied also for selected variants?
      */
-    protected $applyFilterOnVariants = true;
+    public $applyFilterOnVariants = true;
+
+    /*
+     * Attributes for main product
+     */
+    public $attributesMainProduct = true;
+
+    /*
+     * Attributes for variants
+     */
+    public $attributesVariants = true;
 
     /**
      * Model constructor
@@ -148,7 +165,9 @@ class Product extends CartEloquent implements HasAttributesSupport
     {
         $options = [
             'vat_id' => Store::getVats(),
-            'product_type' => config('admineshop.product_types', []),
+            'product_type' => array_merge(config('admineshop.product_types', []), [
+                'variant' => 'Varianta',
+            ]),
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
             'stock_type' => [
                 'default' => 'Preberať z globalných nastavení eshopu',

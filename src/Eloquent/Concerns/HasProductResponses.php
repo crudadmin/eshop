@@ -98,7 +98,7 @@ trait HasProductResponses
             $this->makeVisible(['gallery']);
         }
 
-        if ( $this->hasAttributesEnabled() && $this->relationLoaded('attributesItems') ) {
+        if ( $this->relationLoaded('attributesItems') ) {
             $this->makeVisible(['attributesList']);
             $this->append(['attributesList']);
 
@@ -173,13 +173,13 @@ trait HasProductResponses
 
         $query->withMainGalleryImage();
 
-        if ( $this->hasAttributesEnabled() ) {
+        if ( $this->attributesMainProduct === true ) {
             $query->with([
                 'attributesItems',
             ]);
         }
 
-        if ( count(Store::variantsProductTypes()) ){
+        if ( $this->loadVariants == true && count(Store::variantsProductTypes()) ){
             $query->extendWith(['variants' => function($query) use ($filterParams) {
                 $model = $query->getModel();
 
@@ -188,13 +188,13 @@ trait HasProductResponses
                 $query->withMainGalleryImage(true);
 
                 //We can deside if filter should be applied also on selected variants
-                if ( $model->getProperty('applyFilterOnVariants') == true ) {
+                if ( $model->applyFilterOnVariants == true ) {
                     $query->applyQueryFilter($filterParams, true);
                 }
 
                 //TODO: variants has all the time attributes enabled, because same model is shared
                 //we need solve this in future.
-                if ( $model->hasAttributesEnabled() ) {
+                if ( $model->attributesVariants ) {
                     $query->with(['attributesItems']);
                 }
             }]);
@@ -236,15 +236,6 @@ trait HasProductResponses
         if ( count($variantsIntoCart) == 0 ){
             $query->without('variants');
         }
-
-        //Add attributes support into cart
-        if (
-            config('admineshop.attributes.load_in_cart') === true
-            && $query->getModel() instanceof HasAttributesSupport
-            && $query->getModel()->hasAttributesEnabled()
-        ) {
-            $query->with(['attributesItems']);
-        }
     }
 
     public function scopeGetPriceRange($query, $filterParams)
@@ -265,7 +256,7 @@ trait HasProductResponses
                         ->withoutGlobalScope('order');
 
                     //We can deside if filter should be applied also on selected variants
-                    if ( $model->getProperty('applyFilterOnVariants') == true ) {
+                    if ( $model->applyFilterOnVariants == true ) {
                         $query->applyQueryFilter($filterParams);
                     }
                 }
