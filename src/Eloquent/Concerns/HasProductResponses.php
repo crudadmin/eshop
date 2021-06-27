@@ -173,7 +173,7 @@ trait HasProductResponses
 
         $query->withMainGalleryImage();
 
-        if ( $this->attributesMainProduct === true ) {
+        if ( $this->mainProductAttributes === true ) {
             $query->with([
                 'attributesItems',
             ]);
@@ -192,9 +192,7 @@ trait HasProductResponses
                     $query->applyQueryFilter($filterParams, true);
                 }
 
-                //TODO: variants has all the time attributes enabled, because same model is shared
-                //we need solve this in future.
-                if ( $model->attributesVariants ) {
+                if ( $model->variantsAttributes ) {
                     $query->with(['attributesItems']);
                 }
             }]);
@@ -203,7 +201,7 @@ trait HasProductResponses
 
     public function scopeWithDetailResponse($query)
     {
-        if ( $this->hasGalleryEnabled() ) {
+        if ( $this->mainProductGallery ) {
             $query->with(['gallery']);
         }
 
@@ -211,10 +209,7 @@ trait HasProductResponses
         //We need rewrite eagerLoads and keep existing variants scope if is present
         //because if withCategoryResponse has been called before, we will throw all nested withs if we would
         //call simple with("variants.gallery")
-        //
-        //TODO: change comment, gallery is now shared accross same model. So we need find other way to define gallery
-        //state in variants. Because rule will be alyaws true if parent has enabled pagllery.
-        if ( Admin::getModel('Product')->hasGalleryEnabled() ) {
+        if ( $this->variantsGallery ) {
             $query->extendWith([
                 'variants' => function($query) {
                     $query->with('gallery');

@@ -71,14 +71,16 @@ class Product extends CartEloquent implements HasAttributesSupport
     public $applyFilterOnVariants = true;
 
     /*
-     * Attributes for main product
+     * Extensions for main product
      */
-    public $attributesMainProduct = true;
+    public $mainProductAttributes = true;
+    public $mainProductGallery = true;
 
     /*
-     * Attributes for variants
+     * Extension for variants
      */
-    public $attributesVariants = true;
+    public $variantsAttributes = true;
+    public $variantsGallery = true;
 
     /**
      * Model constructor
