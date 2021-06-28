@@ -59,7 +59,7 @@ trait HasImporter
         return $model instanceof AdminModel && $model->isSortable();
     }
 
-    public function bootExistingRows(Model $model, $fieldKey, $allIdentifiers)
+    public function bootExistingRows(Model $model, $fieldKey, $allIdentifiers, $closure)
     {
         $selectcolumn = $this->isMultiKey($fieldKey)
                             ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $fieldKey).', \'\')) as _identifier')
@@ -75,6 +75,9 @@ trait HasImporter
             ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $allIdentifiers) {
                 $query->whereIn($fieldKey, $allIdentifiers);
             })
+            ->when($closure, function($query, $closure){
+                $closure($query);
+            })
             //We can use where in clause with conat support, but this is slow. Faster is to load all data...
             // ->when($this->isMultiKey($fieldKey), function($query) use ($fieldKey, $allIdentifiers) {
             //     $query->havingRaw('_identifier in (? '.str_repeat(', ?', count($allIdentifiers) - 1).')', $allIdentifiers);
@@ -84,7 +87,7 @@ trait HasImporter
         $this->existingRows[$model->getTable()] = $existingRows->pluck(
             $model->getKeyName(),
             $this->getIdentifierName($fieldKey)
-        )->toArray();
+        )->toArray() + ($this->existingRows[$model->getTable()] ?? []);
 
         if ( $this->isPublishable($model) ) {
             $rowsToPublish = $existingRows->whereNull('published_at')->filter(function($row) use ($fieldKey, $allIdentifiers) {
@@ -193,7 +196,7 @@ trait HasImporter
         };
     }
 
-    public function synchronize(Model $model, $fieldKey, $rows)
+    public function synchronize(Model $model, $fieldKey, $rows, $closure = null)
     {
         $totalStart = Admin::start();
         $this->message('************* '.$model->getTable());
@@ -204,7 +207,7 @@ trait HasImporter
 
         $allIdentifiers = $rows->keys()->toArray();
 
-        $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
+        $this->bootExistingRows($model, $fieldKey, $allIdentifiers, $closure);
 
         //Identify which rows should be updated and which created
         $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model->getTable())));
@@ -223,16 +226,16 @@ trait HasImporter
         $this->createRows($model, $rows, $fieldKey);
 
         //Update existing rows
-        $this->updateRows($model, $rows, $fieldKey);
+        $this->updateRows($model, $rows, $fieldKey, $closure);
 
-        $this->hideOrUnpublish($model);
+        $this->hideOrUnpublish($model, $closure);
 
-        $this->publishMissing($model);
+        $this->publishMissing($model, $closure);
 
         $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
     }
 
-    public function synchronizeUpdateOnly(Model $model, $fieldKey, $rows)
+    public function synchronizeUpdateOnly(Model $model, $fieldKey, $rows, $closure)
     {
         $totalStart = Admin::start();
         $this->message('************* '.$model->getTable());
@@ -243,7 +246,7 @@ trait HasImporter
 
         $allIdentifiers = $rows->keys()->toArray();
 
-        $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
+        $this->bootExistingRows($model, $fieldKey, $allIdentifiers, $closure);
 
         //Identify which rows should be updated and which created
         $this->onUpdate[$model->getTable()] = array_intersect(
@@ -254,7 +257,7 @@ trait HasImporter
         $this->message('Existing rows: '.count($this->onUpdate[$model->getTable()])."\n");
 
         //Update existing rows
-        $this->updateRows($model, $rows, $fieldKey);
+        $this->updateRows($model, $rows, $fieldKey, $closure);
 
         $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
     }
@@ -334,7 +337,7 @@ trait HasImporter
         }, $model->getProperty('reserved')) : [];
     }
 
-    private function hideOrUnpublish($model)
+    private function hideOrUnpublish($model, $closure)
     {
         $toRemove = array_keys($this->onDeleteOrHide[$model->getTable()]);
 
@@ -346,7 +349,11 @@ trait HasImporter
         $reserved = $this->getReservedIds($model);
         $toRemove = array_diff($toRemove, $reserved);
 
-        $query = DB::table($model->getTable())->whereIn($model->getKeyName(), $toRemove);
+        $query = DB::table($model->getTable())
+                    ->when($closure, function($query, $closure){
+                        $closure($query);
+                    })
+                    ->whereIn($model->getKeyName(), $toRemove);
 
         if ( $this->isPublishable($model) ){
             $query->update([
@@ -363,7 +370,7 @@ trait HasImporter
         $this->message('> '.($this->isPublishable($model) ? 'Unpublished' : 'Deleted').' '.count($toRemove).' successfully.');
     }
 
-    private function publishMissing($model)
+    private function publishMissing($model, $closure)
     {
         $toPublish = $this->unpublishedRowsToPublish[$model->getTable()];
 
@@ -371,9 +378,13 @@ trait HasImporter
             return;
         }
 
-        $query = DB::table($model->getTable())->whereIn($model->getKeyName(), $toPublish)->update([
-            'published_at' => Carbon::now()
-        ]);
+        $query = DB::table($model->getTable())
+            ->when($closure, function($query, $closure){
+                $closure($query);
+            })
+            ->whereIn($model->getKeyName(), $toPublish)->update([
+                'published_at' => Carbon::now()
+            ]);
 
         $this->message('- Missing '.count($toPublish).' rows published successfully.');
     }
@@ -399,7 +410,7 @@ trait HasImporter
         return $columns;
     }
 
-    private function updateRows(Model $model, $rows, $fieldKey)
+    private function updateRows(Model $model, $rows, $fieldKey, $closure)
     {
         $start = Admin::start();
 
@@ -428,6 +439,9 @@ trait HasImporter
                 $dbRows = DB::table($model->getTable())->select(
                     $this->getUpdateColumns($model, $rowsDataWithIdsKeys)
                 )
+                ->when($closure, function($query, $closure){
+                    $closure($query);
+                })
                 ->when($this->hasSoftDeletes($model), function($query){
                     $query->whereNull('deleted_at');
                 })

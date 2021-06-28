@@ -138,10 +138,10 @@ class Product extends CartEloquent implements HasAttributesSupport
                     'stock_quantity' => 'name:Sklad|type:integer|default:0|hideFromFormIf:product_type,variants',
                 ],
                 config('admineshop.stock.store_rules', true)
-                    ? Group::fields([
+                    ? [ Group::fields([
                         'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
                         'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
-                    ])->attributes('hideFromFormIf:product_type,variant') : [],
+                    ])->attributes('hideFromFormIf:product_type,variant') ] : [],
             )))->icon('fa-bars')->add('hidden')->attributes(config('admineshop.stock.store_rules', true) ? '' : 'hideFromFormIf:product_type,variants'),
             Group::tab(self::class)->attributes('hideFromFormIfNot:product_type,variants'),
             $this->hasAttributesEnabled() ? Group::tab(ProductsAttribute::class) : [],

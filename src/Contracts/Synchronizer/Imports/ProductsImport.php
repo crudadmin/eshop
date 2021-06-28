@@ -27,7 +27,6 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     {
         return array_filter([
             'product_id',
-            $this->hasVariantsGallery() ? 'products_variant_id' : null,
             'code'
         ]);
     }
@@ -49,7 +48,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
     public function getProductsAttributeIdentifier()
     {
-        return ['product_id', 'products_variant_id', 'attribute_id'];
+        return ['product_id', 'attribute_id'];
     }
 
     public function handle(array $rows = null)
@@ -57,13 +56,19 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         $this->synchronize(
             Admin::getModel('Product'),
             $this->getProductIdentifier(),
-            $rows
+            $rows,
+            function($query){
+                $query->whereNull('product_id');
+            }
         );
 
         $this->synchronize(
-            Admin::getModel('ProductsVariant'),
+            Admin::getModel('Product'),
             $this->getProductsVariantIdentifier(),
-            $this->getPreparedVariants($rows)
+            $this->getPreparedVariants($rows),
+            function($query){
+                $query->whereNotNull('product_id');
+            }
         );
 
         $this->synchronize(
@@ -162,28 +167,19 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return $categories;
     }
 
-    private function hasVariantsGallery()
+    private function getPreparedGallery($rows, $gallery = [], $relationIdentifier = 'getProductIdentifier')
     {
-        return (new ProductsGallery)->hasGalleryEnabled(ProductsVariant::class);
-    }
-
-    private function getPreparedGallery($rows, $gallery = [], $relationTable = 'products', $relationName = 'product_id', $relationIdentifier = 'getProductIdentifier')
-    {
-        $hasVariantsGallery = $this->hasVariantsGallery();
-
         foreach ($rows as $row) {
-            if ( $hasVariantsGallery && isset($row['$variants']) && count($row['$variants']) ) {
+            if ( isset($row['$variants']) && count($row['$variants']) ) {
                 $gallery = $this->getPreparedGallery(
                     $row['$variants'],
                     $gallery,
-                    'products_variants',
-                    'products_variant_id',
                     'getProductsVariantIdentifier'
                 );
             }
 
             foreach ($row['$gallery'] ?? [] as $image) {
-                $image[$relationName] = $this->getExistingRows($relationTable)[
+                $image['product_id'] = $this->getExistingRows('products')[
                     $row[$this->{$relationIdentifier}()]
                 ];
 
@@ -238,7 +234,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return $items;
     }
 
-    private function getPreparedProductsAttribute($rows, $productsAttribute = [], $relationTable = 'products', $relationName = 'product_id', $relationIdentifier = 'getProductIdentifier')
+    private function getPreparedProductsAttribute($rows, $productsAttribute = [], $relationIdentifier = 'getProductIdentifier')
     {
         foreach ($rows as $row) {
             foreach ($row['$attributes'] ?? [] as $attribute) {
@@ -248,7 +244,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                 $itemHash = crc32($itemString);
 
                 $item = [
-                    $relationName => $this->getExistingRows($relationTable)[$row[$this->{$relationIdentifier}()]],
+                    'product_id' => $this->getExistingRows('products')[$row[$this->{$relationIdentifier}()]],
                     'attribute_id' => $this->getExistingRows('attributes')[$attribute[$this->getAttributeIdentifier()]],
                     'items_hash' => $itemHash,
                     '$items' => $attribute['$items'],
@@ -261,8 +257,6 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                 $productsAttribute = $this->getPreparedProductsAttribute(
                     $row['$variants'],
                     $productsAttribute,
-                    'products_variants',
-                    'products_variant_id',
                     'getProductsVariantIdentifier'
                 );
             }
