@@ -37,8 +37,8 @@ trait HasProductImage
             return $image;
         }
 
-        //Default gallery image for ProductVariant has higher priority priority than main product image
-        if ( $galleryMainImage = $this->getAttribute('galery_main_image') ) {
+        //Default image from actual gallery
+        if ( $galleryMainImage = $this->getAttribute('galery_default_image') ) {
             return (new ProductsGallery([
                 'image' => $galleryMainImage,
             ]))->image;
@@ -51,6 +51,13 @@ trait HasProductImage
             ]);
 
             return $this->image;
+        }
+
+        //Default gallery image for ProductVariant has higher priority priority than main product image
+        if ( $galleryMainImage = $this->getAttribute('galery_main_default_image') ) {
+            return (new ProductsGallery([
+                'image' => $galleryMainImage,
+            ]))->image;
         }
 
         return Store::getSettings()->default_image;
@@ -119,22 +126,25 @@ trait HasProductImage
             return;
         }
 
-        $mainGallery = DB::table('products_galleries')
+        $gallerySub = DB::table('products_galleries')
                         ->selectRaw('products_galleries.image, products_galleries.product_id')
                         ->where('products_galleries.default', 1)
                         ->whereNotNull('products_galleries.published_at')
-                        ->groupBy('product_id')
-                        //Variant must be accessible before main product ID
-                        ->orderBy('product_id', 'ASC');
+                        ->groupBy('product_id');
 
-        $query->leftJoinSub($mainGallery, 'products_galleries', function($join) use ($withMainProductInVariants) {
+        //Select default image from gallery row
+        $query->leftJoinSub($gallerySub, 'products_galleries', function($join) {
             $join->on('products_galleries.product_id', '=', 'products.id');
-
-            if ( $withMainProductInVariants === true ){
-                $join->orOn('products_galleries.product_id', '=', 'products.product_id');
-            }
         });
+        $query->addSelect('products_galleries.image as galery_default_image');
 
-        $query->addSelect(DB::raw('SUBSTRING_INDEX(GROUP_CONCAT(products_galleries.image), ",", 1) as galery_main_image'));
+        //Select default image from parent product gallery row
+        if ( $withMainProductInVariants ) {
+            $query->leftJoinSub($gallerySub, 'products_main_galleries', function($join) {
+                $join->on('products_main_galleries.product_id', '=', 'products.product_id');
+            });
+            $query->addSelect('products_main_galleries.image as galery_main_default_image');
+        }
+
     }
 }

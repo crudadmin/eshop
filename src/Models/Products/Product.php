@@ -210,24 +210,24 @@ class Product extends CartEloquent implements HasAttributesSupport
         }
     }
 
-    public function scopeNonVariantProducts($query)
+    public function scopeNonVariantProducts($query, $table = 'products')
     {
-        $query->whereIn('product_type', Store::nonVariantsProductTypes());
+        $query->whereIn(implode('.', array_filter([$table, 'product_type'])), Store::nonVariantsProductTypes());
     }
 
-    public function scopeVariantProducts($query)
+    public function scopeVariantProducts($query, $table = 'products')
     {
-        $query->whereIn('product_type', Store::variantsProductTypes());
+        $query->whereIn(implode('.', array_filter([$table, 'product_type'])), Store::variantsProductTypes());
     }
 
-    public function scopeOrderableProducts($query)
+    public function scopeOrderableProducts($query, $table = 'products')
     {
-        $query->whereIn('product_type', Store::orderableProductTypes());
+        $query->whereIn(implode('.', array_filter([$table, 'product_type'])), Store::orderableProductTypes());
     }
 
-    public function scopeNonOrderableProducts($query)
+    public function scopeNonOrderableProducts($query, $table = 'products')
     {
-        $query->whereNotIn('product_type', Store::orderableProductTypes());
+        $query->whereNotIn(implode('.', array_filter([$table, 'product_type'])), Store::orderableProductTypes());
     }
 
     /**
