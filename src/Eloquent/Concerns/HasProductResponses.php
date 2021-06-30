@@ -6,6 +6,7 @@ use Admin;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\Modules\SeoModule;
+use Illuminate\Support\Facades\DB;
 use Store;
 
 trait HasProductResponses
@@ -174,6 +175,8 @@ trait HasProductResponses
 
         $query->withMainGalleryImage();
 
+        $query->sortByParams($filterParams, $extractVariants);
+
         if ( $this->mainProductAttributes === true ) {
             $query->with([
                 'attributesItems',
@@ -231,6 +234,39 @@ trait HasProductResponses
         });
         if ( count($variantsIntoCart) == 0 ){
             $query->without('variants');
+        }
+    }
+
+    public function scopeSortByParams($query, $filterParams, $extractVariants = false)
+    {
+        if ( !($sortBy = $filterParams['_sort'] ?? null) ){
+            return;
+        }
+
+        if ( in_array($sortBy, ['expensive', 'cheapest', 'latest']) ) {
+            $expensive = $sortBy == 'expensive';
+            $latest = $sortBy == 'latest';
+            $agregatedColumn = $latest == true ? 'products.id' : 'products.price';
+
+            $isDesc = $expensive || $latest;
+
+            //Enabled variant extraction
+            if ( $extractVariants === false ) {
+                $variantsPrices = DB::table('products')
+                                    ->selectRaw(($isDesc ? 'max' : 'min').'('.$agregatedColumn.') as aggregator, product_id')
+                                    ->where('product_type', 'variant')
+                                    ->groupBy('product_id');
+
+                $query
+                    ->leftJoinSub($variantsPrices, 'pricedVariants', function($join){
+                        $join->on('products.id', '=', 'pricedVariants.product_id');
+                    })
+                    ->addSelect(DB::raw('IFNULL(pricedVariants.aggregator, '.$agregatedColumn.') as aggregator'));
+            } else {
+                $query->addSelect(DB::raw($agregatedColumn.' as aggregator'));
+            }
+
+            $query->orderBy('aggregator', $isDesc ? 'DESC' : 'ASC');
         }
     }
 }
