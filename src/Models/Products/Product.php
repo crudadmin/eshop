@@ -123,7 +123,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                     'ean' => 'name:EAN|hidden',
                     'code' => 'name:Kód produktu',
                 ])->attributes('hideFromFormIf:product_type,variant'),
-                'attributes_list' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name',
+                'attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name',
             ])->icon('fa-pencil')->id('general'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
@@ -182,7 +182,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
                 'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
             ],
-            'attributes_list' => $this->getAttributesList(),
+            'attributes_items' => $this->getAttributesList(),
         ];
 
         if ( config('admineshop.categories.enabled') ) {

@@ -21,7 +21,7 @@ trait HasProductFilter
     public function scopeFilterAttributeItems($query, int $attributeId, array $itemIds)
     {
         $query->whereHas('attributesItems', function($query) use ($attributeId, $itemIds) {
-            $query->whereIn('attributes_item_product_attributes_list.attributes_item_id', $itemIds);
+            $query->whereIn('attributes_item_product_attributes_items.attributes_item_id', $itemIds);
         });
     }
 
@@ -88,13 +88,13 @@ trait HasProductFilter
             return;
         }
 
-        $attributesList = DB::table('attributes_item_product_attributes_list')
+        $attributesList = DB::table('attributes_item_product_attributes_items')
                           ->selectRaw('
                             product_id,
                             CONCAT(product_id, "_", attributes_items.attribute_id) as variant_groupper,
                             CONCAT(attributes_items.attribute_id, "_", GROUP_CONCAT(attributes_item_id)) as attributes_groupper
                         ')
-                        ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_product_attributes_list.attributes_item_id')
+                        ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_product_attributes_items.attributes_item_id')
                         ->whereIn('attributes_items.attribute_id', $extractVariants)
                         ->groupBy('variant_groupper');
 

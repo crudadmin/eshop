@@ -13,9 +13,14 @@ trait HasProductAttributes
     /*
      * Return attributes items
      */
-    public function attributesItems()
+    public function attributesItemsPivot()
     {
         return $this->hasMany(ProductsAttributesItem::class);
+    }
+
+    public function variantsAttributesItemsPivot()
+    {
+        return $this->hasManyThrough(ProductsAttributesItem::class, Product::class);
     }
 
     public function getAttributesListAttribute()

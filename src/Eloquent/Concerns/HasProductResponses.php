@@ -163,11 +163,10 @@ trait HasProductResponses
      *
      * @param  Builder  $query
      * @param  array  $filterParams
+     * @param  bool|array  $extractVariants
      */
     public function scopeWithCategoryResponse($query, $filterParams = [], $extractVariants = false)
     {
-        $query->where('price', '>', 60)->where('price', '<', 100);
-
         //We need specify select for
         $query->addSelect('products.*');
 

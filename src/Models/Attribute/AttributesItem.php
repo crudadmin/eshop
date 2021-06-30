@@ -140,6 +140,6 @@ class AttributesItem extends AdminModel
 
     public function products()
     {
-        return $this->belongsToMany(Admin::getModel('Product'), 'attributes_item_product_attributes_list');
+        return $this->belongsToMany(Admin::getModel('Product'), 'attributes_item_product_attributes_items');
     }
 }

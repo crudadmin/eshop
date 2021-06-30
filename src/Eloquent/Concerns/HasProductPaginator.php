@@ -7,6 +7,7 @@ use AdminEshop\Eloquent\Paginator\ProductsPaginator;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 use Store;
 
 trait HasProductPaginator
@@ -36,45 +37,70 @@ trait HasProductPaginator
 
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
+        //TODO:
+        $extractVariants = false;
+
         $perPage = $perPage ?: $this->getPerPage();
 
-        $results = ($total = $query->toBase()->getCountForPagination())
-                            ? $query->forPage($page, $perPage)->get($columns)
-                            : $this->newCollection();
+        $totalResult = $this
+            ->newQuery()
+            ->selectRaw('count(*) as aggregate')
+            ->withMinAndMaxFilterPrices($extractVariants)
+            ->applyQueryFilter($filterParams, $extractVariants)
+            ->get();
 
-        // [
-        //     $items,
-        //     $options,
-        // ] = $this->filterItems($items);
+        $totalAttributes = $totalResult[0]->attributes;
+        $priceRanges = array_filter([$totalAttributes['min_filter_price'] ?? 0, $totalAttributes['max_filter_price'] ?? 0, $totalAttributes['min_filter_variant_price'] ?? 0, $totalAttributes['max_filter_variant_price'] ?? 0], function($number){
+            return is_numeric($number) && $number > 0;
+        });
+
+        $total = $totalAttributes['aggregate'];
+
+        $results = $total
+                    ? $query->forPage($page, $perPage)->get($columns)
+                    : $this->newCollection();
 
         $paginator = new ProductsPaginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
-            // 'pushIntoArray' => $options,
+            'pushIntoArray' => [
+                'price_range' => [min($priceRanges), max($priceRanges)],
+            ],
         ]);
 
         return $paginator;
     }
 
-    private function filterItems($items)
+    public function scopeWithMinAndMaxFilterPrices($query, $extractVariants)
     {
-        if ( $this->extractVariants !== false ){
-            // $this->extractVariants($items);
+        $query->addSelect(DB::raw('MIN(products.price) as min_filter_price, MAX(products.price) as max_filter_price'));
+
+        if ( $extractVariants === false ) {
+            $query->leftJoin('products as pv', 'pv.product_id', '=', 'products.id');
+
+            $query->addSelect(DB::raw('MIN(pv.price) as min_filter_variant_price, MAX(pv.price) as max_filter_variant_price'));
         }
-
-        $this->filterItemsByPrice($items);
-        $this->sortItems($items);
-
-        //Sort collected prices
-        $prices = collect($this->pricesTree)->sort()->values();
-
-        return [
-            $items,
-            [
-                'price_range' => [$prices->first() ?: 0, $prices->last() ?: 0],
-            ]
-        ];
     }
+
+    // private function filterItems($items)
+    // {
+    //     if ( $this->extractVariants !== false ){
+    //         // $this->extractVariants($items);
+    //     }
+
+    //     $this->filterItemsByPrice($items);
+    //     $this->sortItems($items);
+
+    //     //Sort collected prices
+    //     $prices = collect($this->pricesTree)->sort()->values();
+
+    //     return [
+    //         $items,
+    //         [
+    //             'price_range' => [$prices->first() ?: 0, $prices->last() ?: 0],
+    //         ]
+    //     ];
+    // }
 
     // private function extractVariants(&$items)
     // {
