@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
@@ -10,17 +11,24 @@ use Store;
 
 trait HasProductFilter
 {
+    public function categoriesPivot()
+    {
+        return $this->hasMany(ProductsCategoriesPivot::class);
+    }
+
     public function scopeFilterCategory($query, $category)
     {
-        $query->whereHas('categories', function($query) use ($category) {
-            $query->withoutGlobalScope('order');
-
+        $query->whereHas('categoriesPivot', function($query) use ($category) {
             if ( is_numeric($category) ) {
-                $query->where('categories.id', $category->getKey());
+                $query->where('category_product_categories.category_id', $category->getKey());
             } else if ( is_array($category) ){
-                $query->whereIn('categories.id', $category);
+                if ( count($category) == 1 ) {
+                    $query->where('category_product_categories.category_id', $category[0]);
+                } else {
+                    $query->whereIn('category_product_categories.category_id', $category);
+                }
             } else if ( $category instanceof AdminModel ) {
-                $query->where('categories.id', $category->getKey());
+                $query->where('category_product_categories.category_id', $category->getKey());
             }
         });
     }
