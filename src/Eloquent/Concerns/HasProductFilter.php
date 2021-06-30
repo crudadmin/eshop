@@ -4,17 +4,24 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsVariant;
-use Store;
+use Admin\Eloquent\AdminModel;
 use DB;
+use Store;
 
 trait HasProductFilter
 {
     public function scopeFilterCategory($query, $category)
     {
         $query->whereHas('categories', function($query) use ($category) {
-            $query
-                ->where('categories.id', $category->getKey())
-                ->withoutGlobalScope('order');
+            $query->withoutGlobalScope('order');
+
+            if ( is_numeric($category) ) {
+                $query->where('categories.id', $category->getKey());
+            } else if ( is_array($category) ){
+                $query->whereIn('categories.id', $category);
+            } else if ( $category instanceof AdminModel ) {
+                $query->where('categories.id', $category->getKey());
+            }
         });
     }
 
@@ -50,6 +57,8 @@ trait HasProductFilter
 
     public function scopeApplyQueryFilter($query, $params, $extractVariants = false)
     {
+        $query->applyCategoryFilter($params);
+
         //Filter whole products
         $query->where(function($query) use ($params, $extractVariants) {
             //Filter by basic product type
@@ -80,6 +89,20 @@ trait HasProductFilter
         });
 
         $this->extractDifferentVariants($extractVariants);
+    }
+
+    public function scopeApplyCategoryFilter($query, $params)
+    {
+        //Filter by category
+        if ( !($categoryFilter = $params['_categories'] ?? null) ) {
+            return;
+        }
+
+        $categoryFilter = is_array($categoryFilter)
+                            ? $categoryFilter
+                            : explode(',', $categoryFilter.'');
+
+        $query->filterCategory($categoryFilter);
     }
 
     public function scopeExtractDifferentVariants($query, $extractVariants)

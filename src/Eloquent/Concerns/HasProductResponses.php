@@ -233,43 +233,4 @@ trait HasProductResponses
             $query->without('variants');
         }
     }
-
-    public function scopeGetPriceRange($query, $filterParams)
-    {
-        $products = $query
-                        ->select(...$this->getPriceSelectColumns())
-                        ->addSelect('product_type', 'id')
-                        ->applyQueryFilter($filterParams);
-
-        if ( count(Store::variantsProductTypes()) ) {
-            $products->with([
-                'variants' => function($query) use ($filterParams){
-                    $model = $query->getModel();
-
-                    $query
-                        ->select(...$model->getPriceSelectColumns())
-                        ->addSelect('product_id')
-                        ->withoutGlobalScope('order');
-
-                    //We can deside if filter should be applied also on selected variants
-                    if ( $model->applyFilterOnVariants == true ) {
-                        $query->applyQueryFilter($filterParams);
-                    }
-                }
-            ]);
-        }
-
-        $prices = $products->get()->map(function($product){
-            if ( in_array($product->product_type, Store::variantsProductTypes()) ){
-                return $product->cheapestVariantClientPrice;
-            } else {
-                return $product->clientPrice;
-            }
-        })->sort()->values();
-
-        return [
-            $prices->first() ?: 0,
-            $prices->last() ?: 0
-        ];
-    }
 }
