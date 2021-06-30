@@ -7,7 +7,7 @@ use Store;
 
 class ProductsAttributesItem extends Pivot
 {
-    protected $table = 'attributes_item_products_attribute_items';
+    protected $table = 'attributes_item_product_attributes_list';
 
     public function getItemAttribute()
     {

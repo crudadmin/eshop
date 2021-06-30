@@ -103,19 +103,32 @@ class Attribute extends AdminModel
             'items' => function($query) use ($productsQuery) {
                 $query->select(
                     Admin::getModel('AttributesItem')->getAttributesItemsColumns()
-                )->whereHas('productsAttributes', function($query) use ($productsQuery) {
-                    if ( !$productsQuery ){
-                        return;
-                    }
+                );
+
+                if ( !$productsQuery ){
+                    return;
+                }
+
+                $query->where(function($query) use ($productsQuery) {
+                    $model = Admin::getModel('Product');
 
                     //Get attribute items from all products
-                    if ( Admin::getModel('Product')->hasAttributesEnabled() ) {
+                    if ( $model->mainProductAttributes ) {
                         $query->whereHas('products', $productsQuery);
                     }
 
                     //Get attribute items also from all variants
-                    if ( Admin::getModel('ProductsVariant')->hasAttributesEnabled() ) {
-                        $query->orWhereHas('variants.product', $productsQuery);
+                    if ( $model->variantsAttributes ) {
+                        $query->orWhereHas('products', function($query) use ($productsQuery) {
+                            //TODO: updated version for finding by category
+                            // $query
+                            //     ->variantProducts()
+                            //     ->join('category_product_categories', 'category_product_categories.product_id', '=', 'products.product_id')
+                            //     ->whereIn('category_product_categories.category_id', [171]);
+
+                            $query->variantProducts()
+                                  ->whereHas('product', $productsQuery);
+                        });
                     }
                 });
             }

@@ -164,12 +164,14 @@ trait HasProductResponses
      * @param  Builder  $query
      * @param  array  $filterParams
      */
-    public function scopeWithCategoryResponse($query, $filterParams = [])
+    public function scopeWithCategoryResponse($query, $filterParams = [], $extractVariants = false)
     {
+        $query->where('price', '>', 60)->where('price', '<', 100);
+
         //We need specify select for
         $query->addSelect('products.*');
 
-        $query->applyQueryFilter($filterParams);
+        $query->applyQueryFilter($filterParams, $extractVariants);
 
         $query->withMainGalleryImage();
 
@@ -179,7 +181,7 @@ trait HasProductResponses
             ]);
         }
 
-        if ( $this->loadVariants == true && count(Store::variantsProductTypes()) ){
+        if ( $extractVariants === false && $this->loadVariants == true && count(Store::variantsProductTypes()) ){
             $query->extendWith(['variants' => function($query) use ($filterParams) {
                 $model = $query->getModel();
 
@@ -189,7 +191,7 @@ trait HasProductResponses
 
                 //We can deside if filter should be applied also on selected variants
                 if ( $model->applyFilterOnVariants == true ) {
-                    $query->applyQueryFilter($filterParams, true);
+                    $query->filterProduct($filterParams);
                 }
 
                 if ( $model->variantsAttributes ) {

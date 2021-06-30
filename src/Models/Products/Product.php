@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
+use Admin;
 use AdminEshop\Contracts\Collections\ProductsCollection;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
@@ -15,11 +16,12 @@ use AdminEshop\Eloquent\Concerns\HasProductPaginator;
 use AdminEshop\Eloquent\Concerns\HasProductResponses;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Models\Attribute\Attribute;
+use AdminEshop\Models\Attribute\AttributesItem;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Store;
-use Admin;
 
 class Product extends CartEloquent implements HasAttributesSupport
 {
@@ -51,6 +53,8 @@ class Product extends CartEloquent implements HasAttributesSupport
     protected $group = 'products';
 
     protected $sluggable = 'name';
+
+    // protected $sortable = false;
 
     /*
      * This items will be selected from db for cart items
@@ -96,7 +100,7 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function belongsToModel()
     {
-        return self::class;
+        return static::class;
     }
 
     /*
@@ -119,6 +123,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                     'ean' => 'name:EAN|hidden',
                     'code' => 'name:Kód produktu',
                 ])->attributes('hideFromFormIf:product_type,variant'),
+                'attributes_list' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name',
             ])->icon('fa-pencil')->id('general'),
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
@@ -177,6 +182,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
                 'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
             ],
+            'attributes_list' => $this->getAttributesList(),
         ];
 
         if ( config('admineshop.categories.enabled') ) {
@@ -206,7 +212,7 @@ class Product extends CartEloquent implements HasAttributesSupport
     {
         //Load all attributes data
         if ( $this->hasAttributesEnabled() == true ) {
-            $query->with('attributesItems');
+            // $query->with('attributesItems');
         }
     }
 
@@ -215,9 +221,14 @@ class Product extends CartEloquent implements HasAttributesSupport
         $query->whereIn(implode('.', array_filter([$table, 'product_type'])), Store::nonVariantsProductTypes());
     }
 
-    public function scopeVariantProducts($query, $table = 'products')
+    public function scopeVariantsProducts($query, $table = 'products')
     {
         $query->whereIn(implode('.', array_filter([$table, 'product_type'])), Store::variantsProductTypes());
+    }
+
+    public function scopeVariantProducts($query, $table = 'products')
+    {
+        $query->where(implode('.', array_filter([$table, 'product_type'])), 'variant');
     }
 
     public function scopeOrderableProducts($query, $table = 'products')
@@ -287,7 +298,8 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['attributes'] = $this->attributesText;
+        //TODO: add attributes into table
+        // $attributes['attributes'] = $this->attributesText;
 
         return $attributes;
     }
@@ -317,5 +329,21 @@ class Product extends CartEloquent implements HasAttributesSupport
 
         $query->addSelect($selectColumns)
               ->leftJoin('products as pm', 'products.product_id', '=', 'pm.id');
+    }
+
+    private function getAttributesList()
+    {
+        $attribute = new Attribute;
+
+        return AttributesItem::select('attributes_items.id', 'attributes_items.name', 'attributes.name as attribute_name')
+                ->leftJoin('attributes', 'attributes_items.attribute_id', '=', 'attributes.id')
+                ->orderBy('attributes.id', 'ASC')
+                ->get()
+                ->each->setLocalizedResponse()
+                ->map(function($item) use ($attribute) {
+                    $item->attribute_name = $attribute->setRawAttributes([ 'name' => $item->attribute_name ])->name;
+
+                    return $item;
+                });
     }
 }

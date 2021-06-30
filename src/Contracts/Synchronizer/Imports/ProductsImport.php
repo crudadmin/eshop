@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Synchronizer\Imports;
 use Admin;
 use AdminEshop\Contracts\Synchronizer\Synchronizer;
 use AdminEshop\Contracts\Synchronizer\SynchronizerInterface;
+use AdminEshop\Models\Products\Pivot\ProductsAttributesItem;
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use AdminEshop\Models\Products\ProductsGallery;
 use AdminEshop\Models\Products\ProductsVariant;
@@ -96,8 +97,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         );
 
         $this->synchronize(
-            Admin::getModel('ProductsAttribute'),
-            $this->getProductsAttributeIdentifier(),
+            new ProductsAttributesItem,
+            ['product_id', 'attributes_item_id'],
             $this->getPreparedProductsAttribute($rows)
         );
     }
@@ -243,12 +244,14 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                 }, $attribute['$items']));
                 $itemHash = crc32($itemString);
 
-                $item = [
-                    'product_id' => $this->getExistingRows('products')[$row[$this->{$relationIdentifier}()]],
-                    'attribute_id' => $this->getExistingRows('attributes')[$attribute[$this->getAttributeIdentifier()]],
-                    'items_hash' => $itemHash,
-                    '$items' => $attribute['$items'],
-                ];
+                foreach ($attribute['$items'] as $item) {
+                    $identifier = $item[$this->getAttributesItemIdentifier()];
+
+                    $item = [
+                        'product_id' => $this->getExistingRows('products')[$row[$this->{$relationIdentifier}()]],
+                        'attributes_item_id' => $this->getExistingRows('attributes_items')[$identifier],
+                    ];
+                }
 
                 $productsAttribute[] = $item;
             }
@@ -273,32 +276,6 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     public function setProductsVariantVatNumberAttribute($value, &$row)
     {
         $row['vat_id'] = $this->getVatIdByValue($value);
-    }
-
-    public function setAfterProductsAttributeItemsHashAttribute($value, &$row, $dbRow)
-    {
-        $productsAttributeId = $dbRow->id;
-
-        //We need remove all previous attributes, and insert them again for correct order
-        DB::table('attributes_item_products_attribute_items')
-            ->where('products_attribute_id', $productsAttributeId)
-            ->delete();
-
-        $toInsert = array_map(function($item) use ($row) {
-            $identifier = $item[$this->getAttributesItemIdentifier()];
-
-            return $this->getExistingRows('attributes_items')[$identifier];
-        }, $row['$items']);
-
-        //Insert missing ids
-        if ( count($toInsert) ) {
-            DB::table('attributes_item_products_attribute_items')->insert(array_map(function($id) use($productsAttributeId){
-                return [
-                    'products_attribute_id' => $productsAttributeId,
-                    'attributes_item_id' => $id,
-                ];
-            }, $toInsert));
-        }
     }
 
     private function getVatIdByValue($value)

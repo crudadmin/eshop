@@ -6,6 +6,7 @@ use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Admin;
 use Store;
 
 class AttributesItem extends AdminModel
@@ -135,5 +136,10 @@ class AttributesItem extends AdminModel
     public function getAttributeItemValue($attribute)
     {
         return $this->getValue('name');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Admin::getModel('Product'), 'attributes_item_product_attributes_list');
     }
 }

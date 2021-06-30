@@ -15,30 +15,7 @@ trait HasProductAttributes
      */
     public function attributesItems()
     {
-        //We need return not model from package, but end model which may extend features
-        $relationClass = get_class(Admin::getModel('ProductsAttribute'));
-
-        return $this->hasManyThrough(ProductsAttributesItem::class, $relationClass)
-                    ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_products_attribute_items.attributes_item_id')
-                    ->select(
-                        'products_attributes.attribute_id',
-                        'attributes_item_products_attribute_items.attributes_item_id'
-                    )
-                    ->whereNull('attributes_items.deleted_at');
-    }
-
-    public function variantsAttributesItems()
-    {
-        //We need return not model from package, but end model which may extend features
-        $relationClass = get_class(Admin::getModel('ProductsAttribute'));
-
-        return $this->hasManyDeep(ProductsAttributesItem::class, [self::class, $relationClass])
-                    ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_products_attribute_items.attributes_item_id')
-                    ->select(
-                        'products_attributes.attribute_id',
-                        'attributes_item_products_attribute_items.attributes_item_id'
-                    )
-                    ->whereNull('attributes_items.deleted_at');
+        return $this->hasMany(ProductsAttributesItem::class);
     }
 
     public function getAttributesListAttribute()
@@ -62,6 +39,8 @@ trait HasProductAttributes
 
     public function getAttributesTextAttribute()
     {
+        //TODO
+        return;
         //If attributes for given model are not enabled, or fetched by developer
         if ( $this->hasAttributesEnabled() == false || !$this->relationLoaded('attributesItems') ){
             return;
