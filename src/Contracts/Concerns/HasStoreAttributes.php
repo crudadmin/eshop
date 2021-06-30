@@ -66,7 +66,7 @@ trait HasStoreAttributes
 
     public function getFilterAttributes()
     {
-        return $this->getAttributes()->where('filtrable', true);
+        return $this->getAttributes()->where('filtrable', true)->values();
     }
 
     private function getAttributesItems()

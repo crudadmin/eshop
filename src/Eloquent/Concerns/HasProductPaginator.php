@@ -64,7 +64,7 @@ trait HasProductPaginator
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
             'pushIntoArray' => [
-                'price_range' => [min($priceRanges), max($priceRanges)],
+                'price_range' => count($priceRanges) >= 1 ? [min($priceRanges), max($priceRanges)] : [],
             ],
         ]);
 
