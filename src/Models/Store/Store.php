@@ -38,7 +38,10 @@ class Store extends AdminModel
     {
         return [
             'email' => 'name:Email obchodu|title:Slúži pre obdržanie kópie emailov z objednávok|email',
-            'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
+            Group::inline([
+                'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
+                'decimal_separator' => 'name:Separator desatinných čísel|type:select|default:comma|required',
+            ]),
             'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
             'Nastavenia skladu' => Group::tab([
                 'stock_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',
@@ -54,6 +57,10 @@ class Store extends AdminModel
                 2 => 'na 2 desetinné miesta',
                 1 => 'na 1 desetinné miesto',
                 0 => 'na celé čísla',
+            ],
+            'decimal_separator' => [
+                'dot' => '. - Bodka',
+                'comma' => ', - Čiarka',
             ],
             'stock_type' => [
                 'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',

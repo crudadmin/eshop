@@ -166,16 +166,9 @@ class Store
      */
     public function numberFormat($number)
     {
-        return number_format($this->roundNumber($number), $this->getRounding(), '.', ' ');
-    }
+        $separator = $this->getSettings()->decimal_separator == 'comma' ? ',' : '.';
 
-    /*
-     * Returns prices in correct number format
-     * For cart we want fixed 2 decimals
-     */
-    public function numberFormatWithoutVat($number)
-    {
-        return number_format($this->roundNumber($number, 2), 2, '.', ' ');
+        return number_format($this->roundNumber($number), $this->getRounding(), $separator, ' ');
     }
 
     /*
