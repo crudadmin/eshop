@@ -5,7 +5,6 @@ namespace AdminEshop\Contracts\Cart\Identifiers;
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
-use AdminEshop\Models\Products\ProductsVariant;
 use Store;
 use Admin;
 
@@ -46,7 +45,7 @@ class ProductsIdentifier extends Identifier
                 'orders_items_column' => 'product_id',
             ],
             'variant_id' => [
-                'table' => 'products_variants',
+                'table' => 'products',
                 'modelKey' => 'variant',
                 'scope' => function($query){
                     return $query->cartSelect();
@@ -63,7 +62,7 @@ class ProductsIdentifier extends Identifier
      */
     public function bootFromModel($model)
     {
-        $isVariant = $model instanceof ProductsVariant;
+        $isVariant = $model->product_id;
 
         return $this->bindInKeysOrder(
             $isVariant ? $model->product_id : $model->getKey(),
@@ -202,7 +201,7 @@ class ProductsIdentifier extends Identifier
         }
 
         return Admin::cache('cart.variant_id.'.$request['variant_id'], function() use ($request) {
-            return Admin::getModelByTable('products_variants')
+            return Admin::getModelByTable('products')
                         ->select(['id'])
                         ->where('id', $request['variant_id'])
                         ->where('product_id', $this->getValidProductIdFromRequest($request))

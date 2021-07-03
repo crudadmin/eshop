@@ -251,7 +251,7 @@ trait CartTrait
                 $key = $identifier->tryOrderItemsColumn($key, $identifierItems->first());
 
                 $itemsIds = array_filter($identifierItems->pluck([ $key ])->toArray());
-                $alreadyFetched = $this->getFetchedModels($options['table'])->pluck(['id'])->toArray();
+                $alreadyFetched = $this->getFetchedModels($options)->pluck(['id'])->toArray();
 
                 $missingIdsToFetch = array_diff($itemsIds, $alreadyFetched);
 
@@ -268,7 +268,7 @@ trait CartTrait
 
                     $fetchedModels = $identifier->onFetchItems($query)->get();
 
-                    $this->addFetchedModels($options['table'], $fetchedModels);
+                    $this->addFetchedModels($options, $fetchedModels);
                 }
             }
         }
@@ -317,10 +317,12 @@ trait CartTrait
      *
      * @return  Collection
      */
-    public function getFetchedModels($table)
+    public function getFetchedModels($options)
     {
-        if ( array_key_exists($table, $this->fetchedModels) ){
-            return $this->fetchedModels[$table] ?: new EloquentCollection([]);
+        $key = $options['table'].'_'.$options['modelKey'];
+
+        if ( array_key_exists($key, $this->fetchedModels) ){
+            return $this->fetchedModels[$key] ?: new EloquentCollection([]);
         }
 
         return new EloquentCollection([]);
@@ -329,18 +331,20 @@ trait CartTrait
     /**
      * Save fetched models from db
      *
-     * @var string  $table
+     * @var string  $options
      * @var Collection  $items
      *
      * @return  this
      */
-    public function addFetchedModels($table, $items)
+    public function addFetchedModels($options, $items)
     {
-        if ( !array_key_exists($table, $this->fetchedModels ?: []) ){
-            $this->fetchedModels[$table] = new EloquentCollection([]);
+        $key = $options['table'].'_'.$options['modelKey'];
+
+        if ( !array_key_exists($key, $this->fetchedModels ?: []) ){
+            $this->fetchedModels[$key] = new EloquentCollection([]);
         }
 
-        $this->fetchedModels[$table] = $this->fetchedModels[$table]->merge($items);
+        $this->fetchedModels[$key] = $this->fetchedModels[$key]->merge($items);
 
         return $this;
     }

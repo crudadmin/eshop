@@ -38,9 +38,10 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
         return array_unique($this->fixAmbiguousColumn($this->priceSelect ?: []));
     }
 
-    public function getCartSelectColumns()
+    public function getCartSelectColumns($columns = [])
     {
         return array_unique($this->fixAmbiguousColumn(array_merge(
+            $columns,
             $this->cartSelect ?: [],
             $this->priceSelect ?: [],
         )));

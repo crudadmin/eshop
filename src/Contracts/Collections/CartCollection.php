@@ -107,7 +107,8 @@ class CartCollection extends Collection
         return $this->map(function($item) use ($identifiers) {
             foreach ($identifiers as $identifier) {
                 foreach ($identifier->getIdentifyKeys() as $key => $options) {
-                    $fetchedModels = Cart::getFetchedModels($options['table']);
+
+                    $fetchedModels = Cart::getFetchedModels($options);
 
                     //If identifier is not present
                     if ( ! ($identifierValue = $identifier->getIdentifierValue($item, $key)) ) {

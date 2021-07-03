@@ -182,19 +182,20 @@ trait HasProductResponses
      * Also filter products and variants
      *
      * @param  Builder  $query
-     * @param  array  $filterParams
-     * @param  bool|array  $extractVariants
+     * @param  array    $options
      */
-    public function scopeWithCategoryResponse($query, $filterParams = [], $extractVariants = false)
+    public function scopeWithCategoryResponse($query, $options = [])
     {
         //We need specify select for
         $query->addSelect('products.*');
 
-        $query->applyQueryFilter($filterParams, $extractVariants);
+        if ( ($options['filter'] ?? []) !== false ) {
+            $query->applyQueryFilter($options);
+        }
 
         $query->withMainGalleryImage();
 
-        $query->sortByParams($filterParams, $extractVariants);
+        $query->sortByParams($options);
 
         if ( $this->mainProductAttributes === true ) {
             $query->with([
@@ -202,8 +203,8 @@ trait HasProductResponses
             ]);
         }
 
-        if ( $extractVariants === false && $this->loadVariants == true && count(Store::variantsProductTypes()) ){
-            $query->extendWith(['variants' => function($query) use ($filterParams) {
+        if ( ($options['extractVariants'] ?? false) === false && $this->loadVariants == true && count(Store::variantsProductTypes()) ){
+            $query->extendWith(['variants' => function($query) use ($options) {
                 $model = $query->getModel();
 
                 $query->withParentProductData();
@@ -212,7 +213,7 @@ trait HasProductResponses
 
                 //We can deside if filter should be applied also on selected variants
                 if ( $model->applyFilterOnVariants == true ) {
-                    $query->filterProduct($filterParams);
+                    $query->filterProduct($options['filter'] ?? []);
                 }
 
                 if ( $model->variantsAttributes ) {
@@ -256,7 +257,9 @@ trait HasProductResponses
 
     public function scopeWithCartResponse($query)
     {
-        $query->withCategoryResponse();
+        $query->withCategoryResponse([
+            'filter' => false,
+        ]);
 
         $query->select($this->getCartSelectColumns());
 
@@ -269,8 +272,11 @@ trait HasProductResponses
         }
     }
 
-    public function scopeSortByParams($query, $filterParams, $extractVariants = false)
+    public function scopeSortByParams($query, $options = [])
     {
+        $filterParams = $options['filter'] ?? [];
+        $extractVariants = $options['extractVariants'] ?? false;
+
         if ( !($sortBy = $filterParams['_sort'] ?? null) ){
             return;
         }

@@ -57,14 +57,6 @@ class Product extends CartEloquent implements HasAttributesSupport
     // protected $sortable = false;
 
     /*
-     * This items will be selected from db for cart items
-     */
-    protected $cartSelect = [
-        'id', 'product_type', 'slug', 'name', 'image', 'code',
-        'stock_quantity', 'stock_type', 'stock_sold',
-    ];
-
-    /*
      * Should be variants loaded automatically
      */
     public $loadVariants = true;
@@ -211,6 +203,20 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'before' => 'code',
             ],
         ];
+    }
+
+    public function getCartSelectColumns($columns = [])
+    {
+        $columns = [
+            'id', 'product_id', 'product_type', 'slug', 'name', 'image', 'code',
+            'stock_quantity',
+        ];
+
+        if ( config('admineshop.stock.store_rules', true) ) {
+            $columns = array_merge($columns, ['stock_type', 'stock_sold']);
+        }
+
+        return parent::getCartSelectColumns($columns);
     }
 
     public function scopeAdminRows($query)

@@ -74,7 +74,7 @@ trait IdentifierSupport
 
             //Return mounted given model type
             if ( $type ) {
-                $model = @$this->itemModels[$identifierHash][$type];
+                $model = $this->itemModels[$identifierHash][$type] ?? null;
             }
 
             //Return default by identifier type

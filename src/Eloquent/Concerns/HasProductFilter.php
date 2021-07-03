@@ -63,8 +63,11 @@ trait HasProductFilter
         return $filter;
     }
 
-    public function scopeApplyQueryFilter($query, $params, $extractVariants = false)
+    public function scopeApplyQueryFilter($query, $options = [])
     {
+        $params = $options['filter'] ?? [];
+        $extractVariants = $options['extractVariants'] ?? false;
+
         $query->applyCategoryFilter($params);
 
         //Filter whole products
