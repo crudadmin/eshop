@@ -28,7 +28,7 @@ trait HasProductAttributes
         $attributes = [];
 
         foreach ($this->attributesItems as $item) {
-            if ( !$item->attribute || !$item->item ){
+            if ( !$item->attribute ){
                 continue;
             }
 
@@ -36,7 +36,7 @@ trait HasProductAttributes
                 $attributes[$item->attribute_id] = $item->attribute->setRelation('items', collect());
             }
 
-            $attributes[$item->attribute_id]->items[] = $item->item;
+            $attributes[$item->attribute_id]->items[] = $item;
         }
 
         return collect(array_values($attributes));

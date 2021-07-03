@@ -76,7 +76,18 @@ trait HasProductResponses
             'thumbnail',
         ]);
 
-        $this->mutateCategoryResponse();
+        //If variants are enabled, and has been loaded before.
+        //We does not want to push variants into product, when developer did not fetch variants from database
+        if ( $this->relationLoaded('variants') && count(Store::variantsProductTypes()) ){
+            $this->makeVisible(['variants']);
+
+            $this->variants->each->setCategoryResponse();
+            $this->variants->each->setVariantCategoryResponse();
+        }
+
+        $this->makeVisible([
+            'product_type'
+        ]);
 
         return $this;
     }
@@ -91,12 +102,20 @@ trait HasProductResponses
     {
         $this->setCategoryResponse();
 
-        $this->mutateDetailResponse();
+        //If variants are enabled
+        if ( $this->relationLoaded('variants') && count(Store::variantsProductTypes()) ){
+            $this->variants->each->setDetailResponse();
+            $this->variants->each->setVariantDetailResponse();
+        }
+
+        $isVariant = $this->product_id ? true : false;
 
         if ( $this->hasGalleryEnabled() && $this->relationLoaded('gallery') ) {
-            $this->gallery->each->setDetailResponse();
+            if ( ($isVariant && $this->variantsGallery) || (!$isVariant && $this->mainProductGallery) ){
+                $this->gallery->each->setDetailResponse();
 
-            $this->makeVisible(['gallery']);
+                $this->makeVisible(['gallery']);
+            }
         }
 
         if ( $this->relationLoaded('attributesItems') ) {
@@ -136,6 +155,16 @@ trait HasProductResponses
         return $this;
     }
 
+    public function setVariantDetailResponse()
+    {
+
+    }
+
+    public function setVariantCategoryResponse()
+    {
+
+    }
+
     /**
      * We can set cart response... we can append() or make hidden fields in this method here
      *
@@ -146,16 +175,6 @@ trait HasProductResponses
         $this->setCategoryResponse();
 
         return $this;
-    }
-
-    public function mutateCategoryResponse()
-    {
-
-    }
-
-    public function mutateDetailResponse()
-    {
-
     }
 
     /**
@@ -209,17 +228,30 @@ trait HasProductResponses
             $query->with(['gallery']);
         }
 
-        //Extend variants with gallery
-        //We need rewrite eagerLoads and keep existing variants scope if is present
-        //because if withCategoryResponse has been called before, we will throw all nested withs if we would
-        //call simple with("variants.gallery")
-        if ( $this->variantsGallery ) {
-            $query->extendWith([
-                'variants' => function($query) {
+        //Load variants in detail
+        if ( $this->loadDetailVariants && count(Store::variantsProductTypes()) ){
+            $query->extendWith(['variants' => function($query){
+                //Load attributes items into variants
+                if ( $this->loadDetailVariantsAttributes ) {
+                    $query->with([
+                        'attributesItems' => function($query){
+                            $query->with(['attribute' => function($query){
+                                $query->select($query->getModel()->getAttributesColumns());
+                            }]);
+                        }
+                    ]);
+                }
+
+                //Extend variants with gallery
+                //We need rewrite eagerLoads and keep existing variants scope if is present
+                //because if withCategoryResponse has been called before, we will throw all nested withs if we would
+                //call simple with("variants.gallery")
+                if ( $this->variantsGallery && $this->loadDetailVariantsGallery ) {
                     $query->with('gallery');
-                },
-            ]);
+                }
+            }]);
         }
+
     }
 
     public function scopeWithCartResponse($query)

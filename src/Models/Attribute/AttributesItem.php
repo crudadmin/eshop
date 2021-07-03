@@ -125,11 +125,15 @@ class AttributesItem extends AdminModel
 
     public function setCategoryResponse()
     {
+        $this->makeHidden('attribute');
+
         return $this;
     }
 
     public function setDetailResponse()
     {
+        $this->makeHidden('attribute');
+
         return $this;
     }
 

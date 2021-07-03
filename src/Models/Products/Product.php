@@ -86,6 +86,11 @@ class Product extends CartEloquent implements HasAttributesSupport
     public $variantsAttributes = true;
     public $variantsGallery = true;
 
+    //Load variants in detail
+    public $loadDetailVariants = true;
+    public $loadDetailVariantsAttributes = true;
+    public $loadDetailVariantsGallery = true;
+
     /**
      * Model constructor
      *
@@ -254,29 +259,6 @@ class Product extends CartEloquent implements HasAttributesSupport
         }
 
         return $this->product_type == $type;
-    }
-
-    public function mutateCategoryResponse()
-    {
-        $visible = [ 'product_type' ];
-
-        //If variants are enabled, and has been loaded before.
-        //We does not want to push variants into product, when developer did not fetch variants from database
-        if ( count(Store::variantsProductTypes()) && $this->relationLoaded('variants') ){
-            $visible[] = 'variants';
-
-            $this->variants->each->setCategoryResponse();
-        }
-
-        $this->makeVisible($visible);
-    }
-
-    public function mutateDetailResponse()
-    {
-        //If variants are enabled
-        if ( count(Store::variantsProductTypes()) ){
-            $this->variants->each->setDetailResponse();
-        }
     }
 
     public function getCheapestVariantClientPriceAttribute()
