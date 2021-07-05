@@ -63,17 +63,17 @@ trait HasProductFilter
         return $filter;
     }
 
-    public function scopeApplyQueryFilter($query, $options = [])
+    public function scopeApplyQueryFilter($query)
     {
-        $params = $options['filter'] ?? [];
-        $extractVariants = $options['extractVariants'] ?? false;
+        $filter = $this->getFilterOption('filter', []);
+        $extractVariants = $this->getFilterOption('listing.variants.extract', false);
 
-        $query->applyCategoryFilter($params);
+        $query->applyCategoryFilter($filter);
 
         //Filter whole products
-        $query->where(function($query) use ($params, $extractVariants) {
+        $query->where(function($query) use ($filter, $extractVariants) {
             //Filter by basic product type
-            $query->where(function($query) use ($params, $extractVariants) {
+            $query->where(function($query) use ($filter, $extractVariants) {
                 $query->where(function($query) use ($extractVariants) {
                     $query->nonVariantProducts();
 
@@ -84,16 +84,16 @@ trait HasProductFilter
                     }
                 });
 
-                $query->filterProduct($params);
+                $query->filterProduct($filter);
             });
 
             if ( $extractVariants === false ) {
                 //Filter product by variant attributes
-                $query->orWhere(function($query) use ($params) {
+                $query->orWhere(function($query) use ($filter) {
                     $query
                         ->variantsProducts()
-                        ->whereHas('variants', function($query) use ($params) {
-                            $query->filterProduct($params);
+                        ->whereHas('variants', function($query) use ($filter) {
+                            $query->filterProduct($filter);
                         });
                 });
             }

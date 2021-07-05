@@ -57,31 +57,14 @@ class Product extends CartEloquent implements HasAttributesSupport
     // protected $sortable = false;
 
     /*
-     * Should be variants loaded automatically
-     */
-    public $loadVariants = true;
-
-    /*
-     * Should be filter in caregory response applied also for selected variants?
-     */
-    public $applyFilterOnVariants = true;
-
-    /*
      * Extensions for main product
      */
     public $mainProductAttributes = true;
-    public $mainProductGallery = true;
 
     /*
      * Extension for variants
      */
     public $variantsAttributes = true;
-    public $variantsGallery = true;
-
-    //Load variants in detail
-    public $loadDetailVariants = true;
-    public $loadDetailVariantsAttributes = true;
-    public $loadDetailVariantsGallery = true;
 
     /**
      * Model constructor

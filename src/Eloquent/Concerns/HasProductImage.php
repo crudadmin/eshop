@@ -122,10 +122,6 @@ trait HasProductImage
 
     public function scopeWithMainGalleryImage($query, $withMainProductInVariants = false)
     {
-        if ( !$this->hasGalleryEnabled() ){
-            return;
-        }
-
         $gallerySub = DB::table('products_galleries')
                         ->selectRaw('products_galleries.image, products_galleries.product_id')
                         ->where('products_galleries.default', 1)

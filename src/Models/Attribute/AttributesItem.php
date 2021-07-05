@@ -123,7 +123,7 @@ class AttributesItem extends AdminModel
         return $columns;
     }
 
-    public function setCategoryResponse()
+    public function setListingResponse()
     {
         $this->makeHidden('attribute');
 

@@ -40,7 +40,7 @@ class ProductsIdentifier extends Identifier
                 'table' => 'products',
                 'modelKey' => 'product',
                 'scope' => function($query){
-                    return $query->cartSelect();
+                    return $query->withCartResponse();
                 },
                 'orders_items_column' => 'product_id',
             ],
@@ -48,7 +48,7 @@ class ProductsIdentifier extends Identifier
                 'table' => 'products',
                 'modelKey' => 'variant',
                 'scope' => function($query){
-                    return $query->cartSelect();
+                    return $query->withCartResponse(true);
                 },
             ],
         ];

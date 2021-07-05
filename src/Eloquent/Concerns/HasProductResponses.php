@@ -11,6 +11,33 @@ use Store;
 
 trait HasProductResponses
 {
+    static $filterOptions = [
+        'filter' => [],
+        'listing.attributes' => false,
+        'listing.variants' => false,
+        'listing.variants.filter' => true,
+        'listing.variants.extract' => false,
+        'listing.variants.attributes' => false,
+        'detail.gallery' => false,
+        'detail.variants' => false,
+        'detail.variants.attributes' => false,
+        'detail.variants.gallery' => false,
+        'cart.attributes' => false,
+        'cart.variants.attributes' => false,
+    ];
+
+    public function scopeSetFilterOptions($query, $options)
+    {
+        self::$filterOptions = array_merge(self::$filterOptions, $options);
+    }
+
+    public function getFilterOption($key, $default = null)
+    {
+        $value = self::$filterOptions[$key] ?? null;
+
+        return is_null($value) ? $default : $value;
+    }
+
     /**
      * Which price fields should be exposed into request
      *
@@ -64,7 +91,7 @@ trait HasProductResponses
         return $columns;
     }
 
-    public function setCategoryResponse()
+    public function setListingResponse()
     {
         $this->append($this->getPriceAttributes());
 
@@ -76,13 +103,17 @@ trait HasProductResponses
             'thumbnail',
         ]);
 
-        //If variants are enabled, and has been loaded before.
-        //We does not want to push variants into product, when developer did not fetch variants from database
-        if ( $this->relationLoaded('variants') && count(Store::variantsProductTypes()) ){
+        if ( $this->relationLoaded('variants') ){
             $this->makeVisible(['variants']);
 
-            $this->variants->each->setCategoryResponse();
-            $this->variants->each->setVariantCategoryResponse();
+            $this->variants->each->setVariantListingResponse();
+        }
+
+        if ( $this->relationLoaded('attributesItems') ) {
+            $this->makeVisible(['attributesList']);
+            $this->append(['attributesList']);
+
+            $this->attributesList->each->setListingResponse();
         }
 
         $this->makeVisible([
@@ -100,22 +131,19 @@ trait HasProductResponses
      */
     public function setDetailResponse()
     {
-        $this->setCategoryResponse();
+        $this->setListingResponse();
 
         //If variants are enabled
-        if ( $this->relationLoaded('variants') && count(Store::variantsProductTypes()) ){
-            $this->variants->each->setDetailResponse();
+        if ( $this->relationLoaded('variants') ){
             $this->variants->each->setVariantDetailResponse();
         }
 
         $isVariant = $this->product_id ? true : false;
 
-        if ( $this->hasGalleryEnabled() && $this->relationLoaded('gallery') ) {
-            if ( ($isVariant && $this->variantsGallery) || (!$isVariant && $this->mainProductGallery) ){
-                $this->gallery->each->setDetailResponse();
+        if ( $this->relationLoaded('gallery') ) {
+            $this->gallery->each->setDetailResponse();
 
-                $this->makeVisible(['gallery']);
-            }
+            $this->makeVisible(['gallery']);
         }
 
         if ( $this->relationLoaded('attributesItems') ) {
@@ -157,12 +185,12 @@ trait HasProductResponses
 
     public function setVariantDetailResponse()
     {
-
+        $this->setDetailResponse();
     }
 
-    public function setVariantCategoryResponse()
+    public function setVariantListingResponse()
     {
-
+        $this->setListingResponse();
     }
 
     /**
@@ -172,7 +200,7 @@ trait HasProductResponses
      */
     public function setCartResponse()
     {
-        $this->setCategoryResponse();
+        $this->setListingResponse();
 
         return $this;
     }
@@ -184,98 +212,90 @@ trait HasProductResponses
      * @param  Builder  $query
      * @param  array    $options
      */
-    public function scopeWithCategoryResponse($query, $options = [])
+    public function scopeWithListingResponse($query)
     {
         //We need specify select for
         $query->addSelect('products.*');
 
-        if ( ($options['filter'] ?? []) !== false ) {
-            $query->applyQueryFilter($options);
-        }
+        $query->applyQueryFilter();
 
-        $query->withMainGalleryImage();
+        $query->sortByParams();
 
-        $query->sortByParams($options);
-
-        if ( $this->mainProductAttributes === true ) {
-            $query->with([
-                'attributesItems',
-            ]);
-        }
-
-        if ( ($options['extractVariants'] ?? false) === false && $this->loadVariants == true && count(Store::variantsProductTypes()) ){
-            $query->extendWith(['variants' => function($query) use ($options) {
-                $model = $query->getModel();
-
-                $query->withParentProductData();
-
-                $query->withMainGalleryImage(true);
-
-                //We can deside if filter should be applied also on selected variants
-                if ( $model->applyFilterOnVariants == true ) {
-                    $query->filterProduct($options['filter'] ?? []);
-                }
-
-                if ( $model->variantsAttributes ) {
-                    $query->with(['attributesItems']);
-                }
-            }]);
-        }
+        $query->withProductModules('listing');
     }
 
     public function scopeWithDetailResponse($query)
     {
-        if ( $this->mainProductGallery ) {
-            $query->with(['gallery']);
-        }
+        //We need specify select for
+        $query->addSelect('products.*');
 
-        //Load variants in detail
-        if ( $this->loadDetailVariants && count(Store::variantsProductTypes()) ){
-            $query->extendWith(['variants' => function($query){
-                //Load attributes items into variants
-                if ( $this->loadDetailVariantsAttributes ) {
-                    $query->with([
-                        'attributesItems' => function($query){
-                            $query->with(['attribute' => function($query){
-                                $query->select($query->getModel()->getAttributesColumns());
-                            }]);
-                        }
-                    ]);
-                }
-
-                //Extend variants with gallery
-                //We need rewrite eagerLoads and keep existing variants scope if is present
-                //because if withCategoryResponse has been called before, we will throw all nested withs if we would
-                //call simple with("variants.gallery")
-                if ( $this->variantsGallery && $this->loadDetailVariantsGallery ) {
-                    $query->with('gallery');
-                }
-            }]);
-        }
+        $query->withProductModules('detail');
 
     }
 
-    public function scopeWithCartResponse($query)
+    public function scopeWithProductModules($query, $key, $variants = false)
     {
-        $query->withCategoryResponse([
-            'filter' => false,
-        ]);
+        $query->withMainGalleryImage($variants ? true : false);
 
-        $query->select($this->getCartSelectColumns());
+        if (
+            $variants === false
+            && $this->getFilterOption($key.'.variants.extract', false) === false
+            && $this->getFilterOption($key.'.variants', true) === true
+            && count(Store::variantsProductTypes())
+        ){
+            $query->extendWith(['variants' => function($query) use ($key) {
+                $model = $query->getModel();
+
+                $query->withParentProductData();
+
+                //We can deside if filter should be applied also on selected variants
+                if ( $this->getFilterOption($key.'.variants.filter', false) ) {
+                    $query->filterProduct(
+                        $this->getFilterOption('filter')
+                    );
+                }
+
+                $query->withProductModules($key.'.variants', true);
+            }]);
+        }
+
+        if ( $this->getFilterOption($key.'.attributes', false) === true ) {
+            $query->with([
+                'attributesItems' => function($query){
+                    $query->with(['attribute' => function($query){
+                        $query->select($query->getModel()->getAttributesColumns());
+                    }]);
+                }
+            ]);
+        }
+
+        if ( $this->getFilterOption($key.'.gallery', false) === true ) {
+            $query->with(['gallery']);
+        }
+    }
+
+    public function scopeWithCartResponse($query, $variant = false)
+    {
+        $query->addSelect('products.*');
+        // $query->select($this->getCartSelectColumns());
+
+        $query->withProductModules($variant ? 'cart.variants' : 'cart');
+
 
         //If variants are not enabled in cart response, we need throw away relation
         $variantsIntoCart = array_filter(Store::variantsProductTypes(), function($key){
             return config('admineshop.product_types.'.$key.'.loadInCart', false) == true;
         });
+
         if ( count($variantsIntoCart) == 0 ){
             $query->without('variants');
         }
     }
 
-    public function scopeSortByParams($query, $options = [])
+    public function scopeSortByParams($query)
     {
-        $filterParams = $options['filter'] ?? [];
-        $extractVariants = $options['extractVariants'] ?? false;
+        $filterParams = $this->getFilterOption('filter');
+        $extractVariants = $this->getFilterOption('listing.extract');
 
         if ( !($sortBy = $filterParams['_sort'] ?? null) ){
             return;

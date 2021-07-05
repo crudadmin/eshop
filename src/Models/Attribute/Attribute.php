@@ -170,20 +170,20 @@ class Attribute extends AdminModel
         return $this->getAttribute('variants') == true;
     }
 
-    public function setCategoryResponse()
+    public function setListingResponse()
     {
         $this->append([
             'unitFormat',
         ]);
 
-        $this->items->each->setCategoryResponse();
+        $this->items->each->setListingResponse();
 
         return $this;
     }
 
     public function setDetailResponse()
     {
-        $this->setCategoryResponse();
+        $this->setListingResponse();
 
         $this->append([
             'unitName',

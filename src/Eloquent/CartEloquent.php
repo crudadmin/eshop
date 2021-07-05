@@ -57,15 +57,6 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
         return Cart::getIdentifierByClassName('ProductsIdentifier');
     }
 
-    public function scopeCartSelect($query)
-    {
-        if ( method_exists($this, 'scopeWithCartResponse') ) {
-            $query->withCartResponse();
-        }
-
-        return $query;
-    }
-
     public function addCartSelect(array $columns = [])
     {
         $this->cartSelect = array_merge($this->cartSelect ?: [], $columns);

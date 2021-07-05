@@ -168,8 +168,8 @@ class Cart
             }, Discounts::getDiscounts()),
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
-            'summary' => $items->getSummary($fullCartResponse),
-            'summary_without_mutators' => $items->getSummary(),
+            'summary' => $items->getSummary(),
+            'summaryTotal' => $items->getSummary($fullCartResponse),
         ];
 
         //Mutate cart response
