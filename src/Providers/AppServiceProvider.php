@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
     protected $routeMiddleware = [
         'client' => \AdminEshop\Middleware\Authenticate::class,
         'client.guest' => \AdminEshop\Middleware\RedirectIfAuthenticated::class,
-        'cart' => \AdminEshop\Middleware\CartMiddleware::class,
+        'store' => \AdminEshop\Middleware\StoreMiddleware::class,
     ];
 
     /**

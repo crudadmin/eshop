@@ -3,9 +3,8 @@
 namespace AdminEshop\Middleware;
 
 use Closure;
-use Cart;
 
-class CartMiddleware
+class StoreMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,9 +15,10 @@ class CartMiddleware
      */
     public function handle($request, Closure $next, $type = null)
     {
-        //If no items has been added
-        if ( Cart::all()->count() == 0 ){
-            return redirect('/');
+        $tokenName = config('admineshop.cart.header_token');
+
+        if ( config('admineshop.cart.session') === false && empty($request->header($tokenName)) ){
+            return abort(401, $tokenName.' header has not been set.');
         }
 
         return $next($request);
