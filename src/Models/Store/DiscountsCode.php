@@ -34,10 +34,6 @@ class DiscountsCode extends AdminModel
 
     protected $icon = 'fa-percent';
 
-    protected $visible = ['id', 'code', 'name', 'isActive'];
-
-    protected $appends = ['isActive', 'name'];
-
     protected $sortable = false;
 
     public function active()
@@ -207,5 +203,14 @@ class DiscountsCode extends AdminModel
     public function getIsExpiredAttribute()
     {
         return $this->expiration_date && Carbon::now()->setTime(0, 0, 0) > $this->expiration_date ? true : false;
+    }
+
+    public function setDiscountResponse()
+    {
+        $this->setVisible(['id', 'code', 'name', 'isActive']);
+
+        $this->append('isActive', 'name');
+
+        return $this;
     }
 }

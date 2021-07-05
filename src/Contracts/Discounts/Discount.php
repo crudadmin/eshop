@@ -10,7 +10,6 @@ use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Core\Contracts\DataStore;
 use Admin\Eloquent\AdminModel;
 use Cart;
@@ -39,6 +38,13 @@ class Discount implements Discountable, ActiveInterface
     public $value = null;
 
     /**
+     * Apply multiple operators and multiple discounts
+     *
+     * @var  array [ ['operator' => '%', 'value' => 50], ... ]
+     */
+    public $operators = [];
+
+    /**
      * Discount message
      *
      * @var  string
@@ -59,9 +65,15 @@ class Discount implements Discountable, ActiveInterface
      */
     public $applyOnModels = [
         Product::class,
-        ProductsVariant::class,
         OrdersItem::class,
     ];
+
+    /**
+     * Can be discount applied on whole cart price?
+     *
+     * @var  bool
+     */
+    public $applyOnWholeCart = false;
 
     /**
      * Can apply discount on items on whole ecommerce including cart
@@ -155,6 +167,50 @@ class Discount implements Discountable, ActiveInterface
     }
 
     /**
+     * One discount can register muliple price reductions
+     *
+     * @return  array
+     */
+    public function getAllOperators()
+    {
+        $operators = [];
+
+        if ( $this->operator && !is_null($this->value) ){
+            $operators[] = [
+                'operator' => $this->operator,
+                'value' => $this->value,
+                'applyOnModels' => $this->discountedModelsToBasename($this->applyOnModels),
+                'applyOnWholeCart' => $this->applyOnWholeCart,
+            ];
+        }
+
+        foreach ($this->operators as $data) {
+            $applyOnModels = $data['applyOnModels'] ?? null;
+            $applyOnModels = $applyOnModels === true || is_null($applyOnModels) ? $this->applyOnModels : $applyOnModels;
+
+            $operators[] = [
+                'operator' => $data['operator'],
+                'value' => $data['value'],
+                'applyOnModels' => $this->discountedModelsToBasename($applyOnModels),
+                'applyOnWholeCart' => $data['applyOnWholeCart'] ?? false,
+            ];
+        }
+
+        return $operators;
+    }
+
+    private function discountedModelsToBasename($models)
+    {
+        if ( is_array($models) ){
+            foreach ($models as $key => $model) {
+                $models[$key] = class_basename($model);
+            }
+        }
+
+        return $models;
+    }
+
+    /**
      * Boot discount parameters after isActive check
      *
      * @param  mixed  $isActiveResponse
@@ -192,45 +248,6 @@ class Discount implements Discountable, ActiveInterface
             return $this->value.' %';
 
         return '';
-    }
-
-    /**
-     * On which models can be applied this discount
-     *
-     * @return  array
-     */
-    public function applyOnModels()
-    {
-        return $this->applyOnModels;
-    }
-
-    /**
-     * Can be this discount applied on whole order?
-     *
-     * @return  bool
-     */
-    public function applyOnWholeCart()
-    {
-        return false;
-    }
-
-    /**
-     * If discount can be applied in specific/all product on whole website
-     *
-     * @param  Admin\Eloquent\AdminModel  $model
-     * @return  bool
-     */
-    public function canApplyOnModel(AdminModel $model)
-    {
-        return $this->cache('applyOnModels.'.$model->getTable(), function() use ($model) {
-            $item = get_class($model);
-
-            $models = array_map(function($item){
-                return class_basename($item);
-            }, $this->applyOnModels() ?: []);
-
-            return in_array(class_basename($item), $models);
-        });
     }
 
     /**
@@ -302,9 +319,9 @@ class Discount implements Discountable, ActiveInterface
      *
      * @return  bool
      */
-    public function hasSumPriceOperator()
+    public function hasSumPriceOperator($operator)
     {
-        return in_array($this->operator, ['-', '+']);
+        return in_array($operator, ['-', '+']);
     }
 
     /**

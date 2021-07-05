@@ -265,20 +265,29 @@ class CartCollection extends Collection
     public function addDiscountsIntoFinalSum($price, $discounts, $isVat = null)
     {
         foreach ($discounts as $discount) {
-            //If this discount is not applied on whole cart,
-            //Or is not discountableVat attribute
-            if ( $discount->applyOnWholeCart() !== true || $isVat === null ) {
+            //If is not discountableVat attribute
+            if ( $isVat === null ) {
                 continue;
             }
 
-            //If is vat attribute, and discount value is with + or - operator
-            //Then we need to apply vat to this discount
-            $discountValue = $isVat === true && $discount->hasSumPriceOperator()
-                                ? Store::priceWithVat($discount->value)
-                                : $discount->value;
+            foreach ($discount->getAllOperators() as $operatorProp) {
+                //Skip non-appliable discounts
+                if ( ($operatorProp['applyOnWholeCart'] ?? false) === false ){
+                    continue;
+                }
 
-            //Apply given discount
-            $price = operator_modifier($price, $discount->operator, $discountValue);
+                $operator = $operatorProp['operator'];
+                $value = $operatorProp['value'];
+
+                //If is vat attribute, and discount value is with + or - operator
+                //Then we need to apply vat to this discount
+                $discountValue = $isVat === true && $discount->hasSumPriceOperator($operator)
+                                    ? Store::priceWithVat($value)
+                                    : $value;
+
+                //Apply given discount
+                $price = operator_modifier($price, $operator, $discountValue);
+            }
         }
 
         return $price;

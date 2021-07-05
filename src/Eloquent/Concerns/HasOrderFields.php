@@ -156,7 +156,7 @@ trait HasOrderFields
             ])->id('price')->inline(),
             'Zľavy' => Group::half(array_merge(
                 Discounts::isRegistredDiscount(DiscountCode::class)
-                    ? ['discount_code' => 'name:Zľavový kód|belongsTo:discounts_codes,code|hidden|canAdd'] : []
+                    ? ['discount_codes' => 'name:Zľavové kódy|belongsToMany:discounts_codes,code|hidden|canAdd'] : []
             ))->id('discounts')->inline(),
         ])->inline()->id('orderPrices');
     }

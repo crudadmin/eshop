@@ -7,6 +7,7 @@ use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
+use AdminEshop\Models\Store\DiscountsCode;
 use Store;
 
 class DiscountCode extends Discount implements Discountable
@@ -29,6 +30,11 @@ class DiscountCode extends Discount implements Discountable
     public $cachableResponse = false;
 
     /*
+     * Discount code deliver ysetup
+     */
+    public $freeDelivery = false;
+
+    /*
      * Discount name
      */
     public function getName()
@@ -49,7 +55,7 @@ class DiscountCode extends Discount implements Discountable
         if ( Admin::isAdmin() ) {
             $identifier = ($order = $this->getOrder()) ? $order->discount_code_id : '-';
         } else {
-            $identifier = $this->getCodeName();
+            $identifier = implode(';', $this->getCodes());
         }
 
         return $this->getKey().($identifier?:'');
@@ -60,9 +66,15 @@ class DiscountCode extends Discount implements Discountable
      */
     public function isActive()
     {
-        $code = $this->getDiscountCode();
+        $codes = $this->getDiscountCodes()->reject(function($code){
+            return $this->getCodeError($code) ? true : false;
+        });
 
-        return $code && !$this->getCodeError($code) ? $code : false;
+        if ( count($codes) == 0 ){
+            return false;
+        }
+
+        return $codes;
     }
 
     /*
@@ -71,8 +83,12 @@ class DiscountCode extends Discount implements Discountable
     public function isActiveInAdmin(Order $order)
     {
         //Get discount code in order, if exists..
-        if ( $order->discount_code_id && $code = $order->discountCode ) {
-            return $code && !$this->getCodeError($code) ? $code : false;
+        if ( $codes = $order->discount_codes ) {
+            $codes = $codes->reject(function($code){
+                return $this->getCodeError($code) ? true : false;
+            });
+
+            return $codes;
         }
 
         return false;
@@ -84,15 +100,25 @@ class DiscountCode extends Discount implements Discountable
      * @param  mixed  $code
      * @return void
      */
-    public function boot($code)
+    public function boot($codes)
     {
-        $this->operator = $code->discount_percentage ? '-%' : '-';
+        //Apply multiple discounts
+        foreach ($codes as $code) {
+            $isPercentageCode = $code->discount_percentage && !$code->discount_price;
+            $isPriceCode = !$code->discount_percentage && $code->discount_price;
 
-        $this->value = $code->discount_percentage ?: $code->discount_price;
+            $this->operators[] = [
+                'applyOnWholeCart' => $isPriceCode ? true : false,
+                'applyOnModels' => $isPercentageCode ? true : false,
+                'operator' => $code->discount_percentage ? '-%' : '-',
+                'value' => $code->discount_percentage ?: $code->discount_price,
+            ];
+        }
 
-        $this->freeDelivery = $code->free_delivery ? true : false;
-
-        $this->code = $code;
+        //Setup delivery at once from all cupouns
+        $this->freeDelivery = $codes->filter(function($code){
+            return $code->free_delivery;
+        })->count() > 0;
     }
 
     /**
@@ -102,7 +128,7 @@ class DiscountCode extends Discount implements Discountable
      *
      * @return  string
      */
-    public function getCodeError($code = null)
+    public function getCodeError(DiscountsCode $code = null)
     {
         if ( $code ) {
             //This rules cannot be applied in administration
@@ -133,49 +159,29 @@ class DiscountCode extends Discount implements Discountable
     }
 
     /**
-     * Apply this discount on models
-     *
-     * @return  array|null
-     */
-    public function applyOnModels()
-    {
-        //Allow apply on models only if is percentage discount from orders
-        if ( $this->getResponse()->discount_percentage ) {
-            return parent::applyOnModels();
-        }
-    }
-
-    /**
-     * If is fix price discount, then apply on whole order
-     *
-     * @return  bool
-     */
-    public function applyOnWholeCart()
-    {
-        $code = $this->getResponse();
-
-        return $code->discount_price && !$code->discount_percentage ? true : false;
-    }
-
-    /**
      * Which field will be visible in the cart request
      *
      * @return  array
      */
     public function getVisible()
     {
-        return array_merge(parent::getVisible(), ['code', 'freeDelivery']);
+        return array_merge(parent::getVisible(), ['freeDelivery']);
     }
 
     /**
      * Return discount message
      *
      * @param  mixed  $code
-     * @return void
+     *
+     * @return array
      */
-    public function getMessage($code)
+    public function getMessage($codes)
     {
-        return $code->nameArray;
+        return $codes->map(function($code){
+            return $code->nameArray + [
+                'code' => $code->setDiscountResponse(),
+            ];
+        })->toArray();
     }
 
     /**
@@ -187,13 +193,17 @@ class DiscountCode extends Discount implements Discountable
      */
     public function mutateOrderRow(Order $order, CartCollection $items)
     {
-        if ( $code = $this->getResponse() ) {
+        if ( $codes = $this->getResponse() ) {
+            //TODO: complete, test, untested and unworking code.
+
             //If discount code has been changed, or is not set at all, we can assign response code and
             //count usage for given code
             if ( $order->getOriginal('discount_code_id') !== $code->getKey() ){
                 $code->update([ 'used' => $code->used + 1 ]);
 
-                $order->discount_code_id = $code->getKey();
+                $order->discount_codes->sync(
+                    $codes->pluck('id')->toArray()
+                );
             }
         }
     }
@@ -203,34 +213,36 @@ class DiscountCode extends Discount implements Discountable
      *
      * @return  string|null
      */
-    public function getCodeName()
+    public function getCodes()
     {
-        return $this->getDriver()->get(self::DISCOUNT_CODE_KEY);
+        return array_unique(array_filter(array_wrap(
+            $this->getDriver()->get(self::DISCOUNT_CODE_KEY)
+        )));
     }
 
     /**
      * Check if discount code does exists
      *
-     * @param  string|null  $code
+     * @param  string|array|null  $codes
      * @return bool
      */
-    public function getDiscountCode($code = null)
+    public function getDiscountCodes($codes = null)
     {
         //If code is not present, use code from session
-        if ( $code === null ) {
-            $code = $this->getCodeName();
+        if ( $codes === null ) {
+            $codes = $this->getCodes();
         }
 
         //If any code is present
-        if ( ! $code ) {
-            return;
+        if ( count($codes) == 0 ) {
+            return collect();
         }
 
         //Cache eloquent into class dataStore
-        return Admin::cache('code.'.$code, function() use ($code) {
+        return Admin::cache('code.'.implode(';', $codes), function() use ($codes) {
             $model = Admin::getModelByTable('discounts_codes');
 
-            return $model->where('code', $code)->first();
+            return $model->whereIn('code', $codes)->get();
         });
     }
 
@@ -238,11 +250,16 @@ class DiscountCode extends Discount implements Discountable
      * Save discount code into session
      *
      * @param  string  $code
+     *
      * @return this
      */
     public function setDiscountCode(string $code)
     {
-        $this->getDriver()->set(self::DISCOUNT_CODE_KEY, $code);
+        $codes = config('admineshop.discounts.codes.multiple', false) === true
+                    ? array_unique(array_merge($this->getCodes(), [ $code ]))
+                    : [ $code ];
+
+        $this->getDriver()->set(self::DISCOUNT_CODE_KEY, $codes);
 
         return $this;
     }
@@ -252,9 +269,22 @@ class DiscountCode extends Discount implements Discountable
      *
      * @return  this
      */
-    public function removeDiscountCode()
+    public function removeDiscountCode(string $code = null)
     {
-        $this->getDriver()->forget(self::DISCOUNT_CODE_KEY);
+        if ( config('admineshop.discounts.codes.multiple', false) === false ) {
+            $this->getDriver()->forget(self::DISCOUNT_CODE_KEY);
+        }
+
+        //Remove only given code
+        else if (!empty($code)) {
+            $codes = $this->getCodes();
+
+            if ( $index = array_search($code, $codes) ){
+                unset($codes[$index]);
+            }
+
+            $this->getDriver()->set(self::DISCOUNT_CODE_KEY, $codes);
+        }
 
         return $this;
     }

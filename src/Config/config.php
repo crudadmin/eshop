@@ -129,6 +129,10 @@ return [
      * Discount settings
      */
     'discounts' => [
+        'codes' => [
+            //Ability to use multiple discount codes at once
+            'multiple' => false,
+        ],
         'classes' => [
             // AdminEshop\Contracts\Discounts\DiscountCode::class,
             // AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice::class,

@@ -19,8 +19,8 @@ trait HasRoutes
     public function routesForDiscounts()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
-            Route::post('/cart/discount/add', 'Cart\CartController@addDiscountCode')->name('cart::addDiscountCode')->visible();
-            Route::post('/cart/discount/remove', 'Cart\CartController@removeDiscountCode')->name('cart::removeDiscountCode')->visible();
+            Route::post('/cart/discount/add', 'Cart\DiscountController@addDiscountCode')->name('cart::addDiscountCode')->visible();
+            Route::post('/cart/discount/remove', 'Cart\DiscountController@removeDiscountCode')->name('cart::removeDiscountCode')->visible();
         });
     }
 

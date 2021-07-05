@@ -55,9 +55,15 @@ class FreeDeliveryByCode extends Discount implements Discountable
      */
     public function isActive()
     {
-        $code = OrderService::getDiscountCodeDiscount()->getDiscountCode();
+        $codes = OrderService::getDiscountCodeDiscount()->getDiscountCodes();
 
-        return $this->hasCodeFreeDelivery($code);
+        foreach ($codes as $code) {
+            if ( $isActive = $this->hasCodeFreeDelivery($code) ){
+                return $isActive;
+            }
+        }
+
+        return false;
     }
 
     /*
@@ -66,8 +72,10 @@ class FreeDeliveryByCode extends Discount implements Discountable
     public function isActiveInAdmin(Order $order)
     {
         //Get discount code in order, if exists..
-        if ( $order->discount_code_id && $order->discountCode ) {
-            return $this->hasCodeFreeDelivery($order->discountCode);
+        foreach ($order->discountCodes as $code) {
+            if ( $hasDiscount = $this->hasCodeFreeDelivery($order->discountCode) ){
+                return $hasDiscount;
+            }
         }
 
         return false;

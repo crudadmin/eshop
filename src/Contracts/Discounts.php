@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts;
 
+use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Discounts\FreeDelivery;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
@@ -266,14 +267,47 @@ class Discounts
         $discounts = $discounts !== null ? $discounts : $this->getDiscounts();
 
         foreach ($discounts as $discount) {
+            $operators = $discount->getAllOperators();
 
             //If discount is allowed for cart items
-            if ( $discount->canApplyOnModel($item) && $canApplyDiscount($discount, $item) ) {
-                $item->addDiscount($discount);
+            if ( $this->canApplyOnModel($discount, $item, $operators) && $canApplyDiscount($discount, $item) ) {
+                $item->addDiscount(
+                    $discount->getKey(),
+                    $discount->getOrderIndex(),
+                    $operators
+                );
             }
         }
 
         return $item;
+    }
+
+
+    /**
+     * If discount can be applied in specific/all product on whole website
+     *
+     * @param  Discount  $discount
+     * @param  Admin\Eloquent\AdminModel  $model
+     * @param  array  $operators
+     *
+     * @return  bool
+     */
+    private function canApplyOnModel(Discount $discount, AdminModel $model, $operators)
+    {
+        return $this->cache('applyOnModels.'.$discount->getKey().'.'.$model->getTable(), function() use ($model, $operators) {
+            $item = get_class($model);
+            $itemClassName = class_basename($item);
+
+            foreach ($operators as $operator) {
+                $models = $operator['applyOnModels'] ?? false;
+
+                if ( $models === true || is_array($models) && in_array($itemClassName, $models) ) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 
     /**

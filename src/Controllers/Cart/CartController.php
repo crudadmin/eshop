@@ -4,14 +4,11 @@ namespace AdminEshop\Controllers\Cart;
 
 use Admin;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
-use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Controllers\Controller;
-use AdminEshop\Events\DiscountCodeAdded;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Cart;
-use Illuminate\Validation\ValidationException;
 use OrderService;
 
 class CartController extends Controller
@@ -151,33 +148,6 @@ class CartController extends Controller
         );
     }
 
-    public function addDiscountCode()
-    {
-        $code = request('code');
-
-        validator()->make(request()->all(), ['code' => 'required'])->validate();
-
-        $discount = OrderService::getDiscountCodeDiscount();
-
-        $code = $discount->getDiscountCode($code);
-
-        //Validate code and throw error
-        if ( $errorMessage = $discount->getCodeError($code) ){
-            throw ValidationException::withMessages([
-                'code' => $errorMessage,
-            ]);
-        }
-
-        $discount->setDiscountCode($code->code);
-
-        //Event for added discount code
-        event(new DiscountCodeAdded($code));
-
-        return api(
-            Cart::baseResponse()
-        );
-    }
-
     public function getDeliveryLocations($id)
     {
         $delivery = Admin::getModel('Delivery')->findOrFail($id);
@@ -185,15 +155,6 @@ class CartController extends Controller
         return api([
             'locations' => $delivery->getDeliveryLocations()->get(),
         ]);
-    }
-
-    public function removeDiscountCode()
-    {
-        OrderService::getDiscountCodeDiscount()->removeDiscountCode();
-
-        return api(
-            Cart::baseResponse()
-        );
     }
 
     public function setDelivery()

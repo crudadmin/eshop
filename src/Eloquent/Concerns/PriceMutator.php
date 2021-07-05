@@ -112,10 +112,14 @@ trait PriceMutator
      * Add product discount
      *
      * @param  AdminEshop\Contracts\Discounts\Discount  $discount
+     * @param  array  $operators
      */
-    public function addDiscount(Discount $discount)
+    public function addDiscount($key, $index, array $operators)
     {
-        $this->registredDiscounts[$discount->getKey()] = $discount;
+        $this->registredDiscounts[$key] = [
+            'index' => $index,
+            'operators' => $operators,
+        ];
     }
 
     /**
@@ -127,7 +131,7 @@ trait PriceMutator
     {
         //We want sort discounts by correct order
         uasort($this->registredDiscounts, function($a, $b){
-            return $a->getOrderIndex() - $b->getOrderIndex();
+            return $a['index'] - $b['index'];
         });
 
         return $this->registredDiscounts;
@@ -156,32 +160,60 @@ trait PriceMutator
         }, $discounts ?: []);
 
         //Apply all discounts into final price
-        foreach ($this->getRegistredDiscounts() as $discount) {
+        foreach ($this->getRegistredDiscounts() as $key => $registred) {
             //Skip non allowed discounts
-            if (
-                $discounts === null
-                || in_array($discount->getKey(), $allowedDiscounts)
-            ) {
-                $value = is_callable($callback = $discount->value) ? $this->runCallback($callback, $this, $price) : $discount->value;
+            if ( $discounts === null || in_array($key, $allowedDiscounts) ) {
+                foreach ($registred['operators'] as $operator) {
+                    if ( $this->canOperatorBeAppliedOnModel($operator) === false ){
+                        continue;
+                    }
 
-                //If discount operator is set
-                if ( $discount->operator && is_numeric($value) ) {
-                    $originalPrice = $price;
+                    $value = is_callable($value = $operator['value'])
+                                ? $this->runCallback($value, $this, $price)
+                                : $value;
 
-                    $price = operator_modifier($price, $discount->operator, $value);
+                    $operator = $operator['operator'];
 
-                    //Save all discounts applied on given model
-                    $this->appliedDiscounts[$discount->getKey()] = [
-                        'operator' => $discount->operator,
-                        'operator_value' => $discount->value,
-                        'old_price' => $originalPrice,
-                        'new_price' => $price,
-                    ];
+                    //If discount operator is set
+                    if ( $operator && is_numeric($value) ) {
+                        $originalPrice = $price;
+
+                        $price = operator_modifier($price, $operator, $value);
+
+                        //Save all discounts applied on given model
+                        $this->appliedDiscounts[] = [
+                            'discount' => $key,
+                            'operator' => $operator,
+                            'operator_value' => $value,
+                            'old_price' => $originalPrice,
+                            'new_price' => $price,
+                        ];
+                    }
                 }
             }
         }
 
         return $price;
+    }
+
+    private function canOperatorBeAppliedOnModel($operator)
+    {
+        $classBasename = class_basename(get_class($this));
+
+        $applyOnModels = $operator['applyOnModels'] ?? true;
+
+        //Skip adding specific operator
+        if (
+            $applyOnModels === false
+            || (
+                is_array($applyOnModels)
+                && in_array($classBasename, $applyOnModels) == false
+            )
+        ){
+            return false;
+        }
+
+        return true;
     }
 
     private function runCallback(callable $callback, DiscountSupport $item, $price)
