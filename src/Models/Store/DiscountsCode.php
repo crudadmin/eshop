@@ -143,17 +143,6 @@ class DiscountsCode extends AdminModel
     }
 
     /**
-     * Returns discount name by given client settings
-     * with vat, or without vat
-     *
-     * @return  string
-     */
-    public function getNameAttribute()
-    {
-        return Store::hasB2B() ? $this->nameWithVat : $this->nameWithoutVat;
-    }
-
-    /**
      * Returns discount text value indicator without vat
      * "10% + Doprava zdarma" or "10€ + Doprava zdarma"
      *
@@ -161,7 +150,7 @@ class DiscountsCode extends AdminModel
      */
     public function getNameWithoutVatAttribute()
     {
-        return @$this->nameArray['withoutVat'];
+        return $this->nameArray['withoutVat'] ?? null;
     }
 
     /**
@@ -172,7 +161,7 @@ class DiscountsCode extends AdminModel
      */
     public function getNameWithVatAttribute()
     {
-        return @$this->nameArray['withVat'];
+        return $this->nameArray['withVat'] ?? null;
     }
 
     /**
@@ -207,7 +196,7 @@ class DiscountsCode extends AdminModel
 
     public function setDiscountResponse()
     {
-        $this->setVisible(['id', 'code', 'name', 'isActive']);
+        $this->setVisible(['id', 'code', 'isActive']);
 
         $this->append('isActive', 'name');
 

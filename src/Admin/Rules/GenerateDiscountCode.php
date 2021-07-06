@@ -7,7 +7,12 @@ use Admin\Eloquent\AdminRule;
 
 class GenerateDiscountCode extends AdminRule
 {
-    public function fire(AdminModel $row)
+    public function creating(AdminModel $row)
+    {
+        $this->generateMissingCode($row);
+    }
+
+    public function updating(AdminModel $row)
     {
         $this->generateMissingCode($row);
     }

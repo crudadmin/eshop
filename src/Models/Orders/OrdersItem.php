@@ -93,7 +93,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
             ])->id('itemPrimary'),
             Group::half([
-                'variant' => 'name:Varianta produktu|belongsTo:products_variants,name|filterBy:product|hidden|required_with_values',
                 'name' => 'name:Popis položky|tooltip:Slúži pre položky bez priradeného produktu|hidden',
                 'order_item' => 'name:Patrí k položke|belongsTo:orders_items,id|inaccessible',
             ])->id('itemAdditional'),
@@ -116,7 +115,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
                 return $item;
             })->pluck('vatValue', 'vat'),
             'product_id' => $this->getAvailableProducts(),
-            'variant_id' => $this->getAvailableVariants(),
         ];
     }
 

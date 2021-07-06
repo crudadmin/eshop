@@ -155,7 +155,9 @@ class Discounts
                 //Set is active response
                 $discount->setActiveResponse($response);
                 $discount->boot($response);
-                $discount->setMessage($discount->getMessage($response));
+                $discount->setMessages(
+                    $discount->getMessages($response)
+                );
 
                 $this->removeDiscountFromBootState($discount);
 

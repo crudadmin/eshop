@@ -19,23 +19,19 @@ class DiscountController extends Controller
 
         $discount = OrderService::getDiscountCodeDiscount();
 
-        $codes = $discount->getDiscountCodes([
-            $codeName
-        ]);
+        $code = $discount->getDiscountCodes($codeName)[0] ?? null;
 
-        //Validate code and throw error
-        foreach ($codes as $code) {
-            if ( $errorMessage = $discount->getCodeError($code) ){
-                throw ValidationException::withMessages([
-                    'code' => $errorMessage,
-                ]);
-            }
-
-            $discount->setDiscountCode($code->code);
-
-            //Event for added discount code
-            event(new DiscountCodeAdded($code));
+        //Validate each code and throw errors
+        if ( $errorMessage = $discount->getCodeError($code) ){
+            throw ValidationException::withMessages([
+                'code' => $errorMessage,
+            ]);
         }
+
+        $discount->setDiscountCode($code->code);
+
+        //Event for added discount code
+        event(new DiscountCodeAdded($code));
 
         return api(
             Cart::baseResponse()

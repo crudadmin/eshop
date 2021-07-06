@@ -5,11 +5,17 @@
 @foreach( $items as $item )
 | {!! $item->emailItemName() !!} | {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
 @endforeach
+@if ( $delivery )
 | {{ $delivery->name }} | - | {{ $showNoVat ? Store::priceFormat($order->delivery_price) : '' }} | {{ Store::priceFormat($order->delivery_price_with_vat) }} |
+@endif
+@if ( $payment_method )
 | {{ $payment_method->name }} | - | {{ $showNoVat ? Store::priceFormat($order->payment_method_price) : '' }} | {{ Store::priceFormat($order->payment_method_price_with_vat) }} |
+@endif
 @foreach($discounts as $discount)
-@if ( $discount->message && $discount->canShowInEmail() )
-| {{ $discount->getName() }} | - |  | {{ is_array($discount->message) ? $discount->message['withVat'] : $discount->message }} |
+@if ( $discount->messages && $discount->canShowInEmail() )
+@foreach($discount->messages as $message)
+| {{ $message['name'] }} | - |  | {{ is_array($message['value']) ? $message['value']['withVat'] : $message['value'] }} |
+@endforeach
 @endif
 @endforeach
 | <strong><small>{{ _('Cena celkom') }}:</small></strong> | | {{ $showNoVat ? Store::priceFormat($summary['priceWithoutVat']) : '' }} | {{ Store::priceFormat($summary['priceWithVat']) }} |

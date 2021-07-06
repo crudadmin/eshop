@@ -42,7 +42,7 @@ class ProductsIdentifier extends Identifier
                 'scope' => function($query){
                     return $query->withCartResponse();
                 },
-                'orders_items_column' => 'product_id',
+                'orders_items_column' => false,
             ],
             'variant_id' => [
                 'table' => 'products',
@@ -50,6 +50,7 @@ class ProductsIdentifier extends Identifier
                 'scope' => function($query){
                     return $query->withCartResponse(true);
                 },
+                'orders_items_column' => false,
             ],
         ];
     }
@@ -161,7 +162,7 @@ class ProductsIdentifier extends Identifier
         $productOrVariant = $variant ?: $product;
 
         $items = [
-            $variant ? $variant->name : $product->name
+            $variant ? ($variant->name ?: $product->name) : $product->name
         ];
 
         if ( config('admineshop.attributes.attributesVariants', false) == true ) {
@@ -208,6 +209,22 @@ class ProductsIdentifier extends Identifier
                         ->firstOrFail()
                         ->getKey();
         });
+    }
+
+    /**
+     * Build product cart order item
+     *
+     * @param  CartItem  $item
+     * @return  array
+     */
+    public function onOrderItemCreate(CartItem $item)
+    {
+        $data = parent::onOrderItemCreate($item);
+
+        //Assign product of given service
+        $data['product_id'] = $item->variant_id ?: $item->product_id;
+
+        return $data;
     }
 }
 

@@ -169,17 +169,19 @@ class DiscountCode extends Discount implements Discountable
     }
 
     /**
-     * Return discount message
+     * Return discount messages
      *
      * @param  mixed  $code
      *
      * @return array
      */
-    public function getMessage($codes)
+    public function getMessages($codes)
     {
         return $codes->map(function($code){
-            return $code->nameArray + [
+            return [
+                'name' => $this->getName(),
                 'code' => $code->setDiscountResponse(),
+                'value' => $code->nameArray,
             ];
         })->toArray();
     }
@@ -191,20 +193,22 @@ class DiscountCode extends Discount implements Discountable
      * @param  array  $row
      * @return  array
      */
-    public function mutateOrderRow(Order $order, CartCollection $items)
+    public function mutateOrderRowAfter(Order $order, CartCollection $items)
     {
         if ( $codes = $this->getResponse() ) {
             //TODO: complete, test, untested and unworking code.
+            $existingCodes = $order->discountCodes->pluck('id')->toArray();
 
-            //If discount code has been changed, or is not set at all, we can assign response code and
-            //count usage for given code
-            if ( $order->getOriginal('discount_code_id') !== $code->getKey() ){
-                $code->update([ 'used' => $code->used + 1 ]);
-
-                $order->discount_codes->sync(
-                    $codes->pluck('id')->toArray()
-                );
+            //If code does not exists in order yet.
+            foreach ($codes as $code) {
+                if ( in_array($code->getKey(), $existingCodes) == false ) {
+                    $code->update([ 'used' => $code->used + 1 ]);
+                }
             }
+
+            $order->discountCodes()->sync(
+                $codes->pluck('id')->toArray()
+            );
         }
     }
 
@@ -232,6 +236,8 @@ class DiscountCode extends Discount implements Discountable
         if ( $codes === null ) {
             $codes = $this->getCodes();
         }
+
+        $codes = array_wrap($codes);
 
         //If any code is present
         if ( count($codes) == 0 ) {

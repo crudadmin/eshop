@@ -283,6 +283,10 @@ class Identifier
         ];
 
         foreach ($this->getIdentifyKeys() as $key => $options) {
+            if ( ($options['orders_items_column'] ?? null) === false ){
+                continue;
+            }
+
             $orderItemKey = $options['orders_items_column'] ?? $key;
 
             $identifierValue = $this->getIdentifierValue($item, $key);

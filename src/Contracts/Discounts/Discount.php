@@ -45,11 +45,11 @@ class Discount implements Discountable, ActiveInterface
     public $operators = [];
 
     /**
-     * Discount message
+     * Discount messages
      *
      * @var  string
      */
-    public $message = '';
+    public $messages = [];
 
     /**
      * Order will be applied in administration for order items prices calculations
@@ -239,15 +239,24 @@ class Discount implements Discountable, ActiveInterface
      * @param  mixed  $isActiveResponse
      * @return void
      */
-    public function getMessage($isActiveResponse)
+    private function getBaseDiscountMessage($isActiveResponse)
     {
-        if ( in_array($this->operator, ['+', '-', '*']) )
+        if ( in_array($this->operator, ['+', '-', '*']) ) {
             return $this->value.' '.Store::getCurrency();
+        }
 
-        if ( in_array($this->operator, ['+%', '-%']) )
+        if ( in_array($this->operator, ['+%', '-%']) ) {
             return $this->value.' %';
+        }
 
         return '';
+    }
+
+    public function getMessages($isActiveResponse)
+    {
+        return [
+            [ 'name' => $this->getName(), 'value' => $this->getBaseDiscountMessage($isActiveResponse) ],
+        ];
     }
 
     /**
@@ -359,13 +368,13 @@ class Discount implements Discountable, ActiveInterface
     }
 
     /**
-     * Set discount message
+     * Set discount messages
      *
-     * @param  mixed  $message
+     * @param  mixed  $messages
      */
-    public function setMessage($message)
+    public function setMessages($messages)
     {
-        $this->message = $message;
+        $this->messages = $messages;
     }
 
     /**
@@ -395,7 +404,7 @@ class Discount implements Discountable, ActiveInterface
         return [
             'key' => 'getKey',
             'name' => 'getName',
-            'message',
+            'messages',
             'operator',
             'value',
         ];
@@ -426,7 +435,7 @@ class Discount implements Discountable, ActiveInterface
             } else {
                 $key = $method;
 
-                $value = $this->{$key};
+                $value = $this->{$key} ?? null;
             }
 
             $data[$key] = $value;

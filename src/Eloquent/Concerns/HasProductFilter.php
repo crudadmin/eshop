@@ -68,6 +68,11 @@ trait HasProductFilter
         $filter = $this->getFilterOption('filter', []);
         $extractVariants = $this->getFilterOption('listing.variants.extract', false);
 
+        //Apply user filter scope
+        if ( $scope = $this->getFilterOption('scope') ){
+            $scope($query);
+        }
+
         $query->applyCategoryFilter($filter);
 
         //Filter whole products

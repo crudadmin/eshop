@@ -70,16 +70,13 @@ class OrderService
             clone Admin::getModelByTable('orders')
         );
 
+        //Todo:: check if here shouldn't go items with mutators, maybe price may be wrong without mutators if some are availeble
+        $cartItems = $this->getCartItems();
+
         //Build order with all attributes
-        $this->buildOrder(
-            //Todo:: check if here shouldn't go items with mutators, maybe price may be wrong without mutators if some are availeble
-            $this->getCartItems()
-        );
+        $this->buildOrder($cartItems);
 
-        $this->getOrder()->save();
-
-        //Add items into order
-        $this->addItemsIntoOrder();
+        $this->saveOrCreateOrder($cartItems);
 
         return $this;
     }
@@ -152,6 +149,16 @@ class OrderService
         return $this->order;
     }
 
+    private function saveOrCreateOrder(CartCollection $items)
+    {
+        $this->getOrder()->save();
+
+        //Add items into order
+        $this->addItemsIntoOrder();
+
+        $this->addDiscountsData($items, 'mutateOrderRowAfter');
+    }
+
     /**
      * Add items from cart into order
      *
@@ -220,19 +227,25 @@ class OrderService
         $order = $this->getOrder();
 
         foreach ($discounts as $discount) {
-            if ( ! $discount->hasSumPriceOperator() ) {
-                continue;
-            }
+            //TODO: support multiple operators
+            foreach ($discount->getAllOperators() as $operatorParam) {
+                $operator = $operatorParam['operator'];
+                $value = $operatorParam['value'];
 
-            $order->items()->create([
-                'identifier' => 'discount',
-                'discountable' => false,
-                'name' => $discount->getName() ?: _('Zľava'),
-                'quantity' => 1,
-                'price' => $discount->value * ($discount->operator == '-' ? -1 : 1),
-                'vat' => Store::getDefaultVat(),
-                'price_vat' => Store::priceWithVat($discount->value) * ($discount->operator == '-' ? -1 : 1),
-            ]);
+                if ( ! $discount->hasSumPriceOperator($operator) ) {
+                    continue;
+                }
+
+                $order->items()->create([
+                    'identifier' => 'discount',
+                    'discountable' => false,
+                    'name' => $discount->getName() ?: _('Zľava'),
+                    'quantity' => 1,
+                    'price' => $value * ($operator == '-' ? -1 : 1),
+                    'vat' => Store::getDefaultVat(),
+                    'price_vat' => Store::priceWithVat($value) * ($operator == '-' ? -1 : 1),
+                ]);
+            }
         }
 
         return $this;
@@ -349,6 +362,11 @@ class OrderService
                 'type' => 'error',
                 'code' => 'email-client-error'
             ]);
+
+            //Debug
+            if ( app()->environment('local') && env('APP_DEBUG') == true ) {
+                throw $error;
+            }
         }
 
         return $this;
@@ -387,15 +405,17 @@ class OrderService
      * Add discounts additional fields
      *
      * @param  CartCollection  $items
+     * @param  string  $callbackType
+     *
      * @return array
      */
-    public function addDiscountsData($items)
+    public function addDiscountsData($items, $callbackType = 'mutateOrderRow')
     {
         $data = [];
 
         foreach (Discounts::getDiscounts() as $discount) {
-            if ( method_exists($discount, 'mutateOrderRow') ) {
-                $discount->mutateOrderRow($this->getOrder(), $items);
+            if ( method_exists($discount, $callbackType) ) {
+                $discount->{$callbackType}($this->getOrder(), $items);
             }
 
             $data[$discount->getKey()] = $discount->getSerializedResponse();

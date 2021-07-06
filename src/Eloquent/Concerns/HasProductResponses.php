@@ -13,6 +13,7 @@ trait HasProductResponses
 {
     static $filterOptions = [
         'filter' => [],
+        'scope' => null,
         'listing.attributes' => false,
         'listing.variants' => false,
         'listing.variants.filter' => true,

@@ -50,22 +50,54 @@ trait OrderItemTrait
     {
         $productModel = Admin::getModel('Product');
 
-        $products = $productModel->select([
-            'id', 'name', 'price', 'vat_id', 'discount_operator', 'discount'
-        ])->when($productModel->hasAttributesEnabled() && config('admineshop.attributes.attributesText', false), function($query){
-            $query->with(['attributesItems']);
-        })->get();
+        $products = $productModel->selectRaw('
+                products.product_type,
+                products.id, products.name, products.price,
+                products.vat_id, products.discount_operator, products.discount,
+                parentProduct.name as parent_product_name
+            ')
+            ->where(function($query){
+                $query->where(function($query){
+                    $query->variantProducts();
+                })->orWhere(function($query){
+                    $query->nonVariantProducts();
+                });
+            })
+            ->leftJoin('products as parentProduct', function($join){
+                $join->on('parentProduct.id', '=', 'products.product_id');
+            })
+            ->with(['attributesItems' => function($query){
+                $query
+                    ->with('attribute')
+                    ->whereHas('attribute', function($query){
+                        if ( config('admineshop.attributes.attributesText', false) ) {
+                            $query->orWhere('product_info', 1);
+                        }
 
-        return $products->map(function($item) use ($productModel) {
-            //Extend name with attributes
-            if ( $productModel->hasAttributesEnabled() && config('admineshop.attributes.attributesText', false) ) {
-                $item->name .= $item->attributesText ? ' - '.$item->attributesText : '';
+                        if ( config('admineshop.attributes.attributesVariants', false) ) {
+                            $query->orWhere('variants', 1);
+                        }
+                    });
+            }])
+            ->get();
+
+        return $products->map(function($product) use ($productModel) {
+            $product->name = $product->name ?: $product->parent_product_name;
+
+            if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+                $attributesText = $product->attributesVariantsText;
+            } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+                $attributesText = $product->attributesText;
             }
 
-            $item->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue'])
-                 ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
+            //Extend name with attributes
+            $product->name .= $attributesText ? ' - '.$attributesText : '';
 
-            return $item;
+            $product
+                    ->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue', 'product_type'])
+                    ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
+
+            return $product;
         });
     }
 

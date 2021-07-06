@@ -1,4 +1,4 @@
-@if ( $delivery->description_email )
+@if ( $delivery && $delivery->description_email )
 @component('mail::panel')
 | {{ _('Podrobnosti k doprave') }} |
 | :------------- |

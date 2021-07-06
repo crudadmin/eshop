@@ -44,32 +44,19 @@ trait HasProductAttributes
 
     public function getAttributesTextAttribute()
     {
-        //TODO
-        return;
-        //If attributes for given model are not enabled, or fetched by developer
-        if ( $this->hasAttributesEnabled() == false || !$this->relationLoaded('attributesItems') ){
-            return;
-        }
-
-        $attributes = [];
-
-        foreach ($this->attributesItems->groupBy('products_attribute_id') as $attributeItems) {
-            $attributes[] = $attributeItems->map(function($item) {
-                $attribute = $item->attribute;
-                $attrItem = $item->item;
-
-                if ( $attribute && $attribute->displayableInTextAttributes() !== true ){
-                    return;
-                }
-
-                return ($attrItem ? $attrItem->getAttributeItemValue($attribute) : '').($attribute ? (' '.$attribute->unitName) : '');
-            })->filter()->join(config('admineshop.attributes.separator.item', ', '));
-        }
-
-        return implode(config('admineshop.attributes.separator.attribute', ', '), $attributes);
+        return $this->getAttributesTextList(function($item, $attribute){
+            return $attribute && $attribute->displayableInTextAttributes() === true;
+        });
     }
 
     public function getAttributesVariantsTextAttribute()
+    {
+        return $this->getAttributesTextList(function($item, $attribute){
+            return $attribute && $attribute->displayableInVariantsTextAttributes() === true;
+        });
+    }
+
+    public function getAttributesTextList(callable $filter)
     {
         //If attributes for given model are not enabled, or fetched by developer
         if ( $this->hasAttributesEnabled() == false || !$this->relationLoaded('attributesItems') ){
@@ -79,15 +66,14 @@ trait HasProductAttributes
         $attributes = [];
 
         foreach ($this->attributesItems->groupBy('products_attribute_id') as $attributeItems) {
-            $attributes[] = $attributeItems->map(function($item) {
+            $attributes[] = $attributeItems->map(function($item) use ($filter) {
                 $attribute = $item->attribute;
-                $attrItem = $item->item;
 
-                if ( $attribute && $attribute->displayableInVariantsTextAttributes() !== true ){
-                    return;
+                if ( $filter($item, $attribute) === false ){
+                    return false;
                 }
 
-                return ($attrItem ? $attrItem->getAttributeItemValue($attribute) : '').($attribute ? (' '.$attribute->unitName) : '');
+                return ($item ? $item->getAttributeItemValue($attribute) : '').($attribute && ($unitName = $attribute->unitName) ? (' '.$unitName) : '');
             })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 

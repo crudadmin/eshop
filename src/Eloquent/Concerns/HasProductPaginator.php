@@ -14,8 +14,6 @@ trait HasProductPaginator
 {
     private $pricesTree;
 
-    private $filterParams = [];
-
     private $extractVariants = false;
 
     /**
@@ -31,22 +29,17 @@ trait HasProductPaginator
      *
      * @throws \InvalidArgumentException
      */
-    public function scopeProductsPaginate($query, $perPage = null, $filterParams = [], $columns = ['*'], $pageName = 'page', $page = null)
+    public function scopeProductsPaginate($query, $perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $this->filterParams = is_array($filterParams) ? $filterParams : [];
-
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
-
-        //TODO:
-        $extractVariants = false;
 
         $perPage = $perPage ?: $this->getPerPage();
 
         $totalResult = $this
             ->newQuery()
-            ->selectRaw('count(*) as aggregate')
-            ->withMinAndMaxFilterPrices($extractVariants)
-            ->applyQueryFilter($filterParams, $extractVariants)
+            ->selectRaw('count(*) as aggregate_products')
+            ->withMinAndMaxFilterPrices()
+            ->applyQueryFilter()
             ->get();
 
         $totalAttributes = $totalResult[0]->attributes;
@@ -54,7 +47,7 @@ trait HasProductPaginator
             return is_numeric($number) && $number > 0;
         });
 
-        $total = $totalAttributes['aggregate'];
+        $total = $totalAttributes['aggregate_products'];
 
         $results = $total
                     ? $query->forPage($page, $perPage)->get($columns)
@@ -71,14 +64,25 @@ trait HasProductPaginator
         return $paginator;
     }
 
-    public function scopeWithMinAndMaxFilterPrices($query, $extractVariants)
+    public function scopeWithMinAndMaxFilterPrices($query)
     {
         $query->addSelect(DB::raw('MIN(products.price) as min_filter_price, MAX(products.price) as max_filter_price'));
 
-        if ( $extractVariants === false ) {
-            $query->leftJoin('products as pv', 'pv.product_id', '=', 'products.id');
+        if ( $this->getFilterOption('listing.variants.extract') === false ) {
+            $variants = DB::table('products')
+                            ->selectRaw('
+                                MIN(price) as min_filter_variant_price,
+                                MAX(price) as max_filter_variant_price,
+                                product_id
+                            ')
+                            ->whereNotNull('product_id')
+                            ->groupBy('product_id');
 
-            $query->addSelect(DB::raw('MIN(pv.price) as min_filter_variant_price, MAX(pv.price) as max_filter_variant_price'));
+            $query->leftJoinSub($variants, 'pvp', function($join){
+                $join->on('products.id', '=', 'pvp.product_id');
+            });
+
+            $query->addSelect(DB::raw('MIN(pvp.min_filter_variant_price) as min_filter_variant_price, MAX(pvp.max_filter_variant_price) as max_filter_variant_price'));
         }
     }
 
