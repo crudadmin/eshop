@@ -97,12 +97,15 @@ class ProductsIdentifier extends Identifier
      */
     public function getItemModel($item, $cache)
     {
+        $product = $cache['product'] ?? null;
+
         if ( $item->variant_id ) {
-            return @$cache['variant'];
+            //Product must be available also if is variant type
+            return $product ? ($cache['variant'] ?? null) : null;
         }
 
         if ( $item->id ) {
-            return @$cache['product'];
+            return $product;
         }
     }
 

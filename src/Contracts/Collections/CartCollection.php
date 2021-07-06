@@ -134,8 +134,10 @@ class CartCollection extends Collection
     public function rejectWithMissingProduct($rejectionCallback = null)
     {
         return $this->reject(function($item) use ($rejectionCallback) {
+            $itemModel = $item->getItemModel();
+
             //If product or variant is missing from cart item, remove this cart item
-            if ( ! $item->getItemModel() && $item->getItemModel() !== false ) {
+            if ( ! $itemModel && $itemModel !== false ) {
                 //If has callback on remove item
                 if ( is_callable($rejectionCallback) ) {
                     $rejectionCallback($item);
