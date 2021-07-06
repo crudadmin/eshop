@@ -15,6 +15,7 @@ trait HasProductResponses
         'filter' => [],
         'scope' => null,
         'listing.attributes' => false,
+        'listing.price_ranges' => false,
         'listing.variants' => false,
         'listing.variants.filter' => true,
         'listing.variants.extract' => false,
@@ -238,6 +239,10 @@ trait HasProductResponses
     {
         $query->withMainGalleryImage($variants ? true : false);
 
+        if ( $this->getFilterOption($key.'.price_ranges', false) === true ) {
+            $query->withMinAndMaxVariantPrices();
+        }
+
         if (
             $variants === false
             && $this->getFilterOption($key.'.variants.extract', false) === false
@@ -327,5 +332,14 @@ trait HasProductResponses
 
             $query->orderBy('aggregator', $isDesc ? 'DESC' : 'ASC');
         }
+    }
+
+    public function scopeWithMinAndMaxVariantPrices($query)
+    {
+        $query->leftJoin('products as pv', 'pv.product_id', '=', 'products.id');
+
+        $query->addSelect(DB::raw('MIN(pv.price) as min_price, MAX(pv.price) as max_price'));
+
+        $query->groupBy('products.id');
     }
 }
