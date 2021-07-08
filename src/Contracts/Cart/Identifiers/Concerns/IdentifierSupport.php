@@ -153,6 +153,9 @@ trait IdentifierSupport
 
             return $this->{$cacheKey}[$type];
         }
+
+        //If false has been returned
+        return $data;
     }
 
     /**

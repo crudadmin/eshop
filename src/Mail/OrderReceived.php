@@ -39,7 +39,7 @@ class OrderReceived extends Mailable
 
         $this->invoice = $invoice;
 
-        $this->cartItems = $items ? Cart::addItemsFromMutators($items) : null;
+        $this->cartItems = $items;
 
         $this->cartSummary = $items->getSummary(true);
 

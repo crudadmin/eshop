@@ -243,6 +243,10 @@ trait CartTrait
             $fetchConfig = $identifier->getIdentifyKeys();
 
             foreach ($fetchConfig as $key => $options) {
+                if ( !isset($options['table']) ){
+                    continue;
+                }
+
                 //If no identifier items has been found
                 if ( ($identifierItems = $items->where('identifier', $identifier->getName()))->count() == 0) {
                     continue;
@@ -319,10 +323,12 @@ trait CartTrait
      */
     public function getFetchedModels($options)
     {
-        $key = $options['table'].'_'.$options['modelKey'];
+        if ( isset($options['table']) ){
+            $key = $options['table'].'_'.$options['modelKey'];
 
-        if ( array_key_exists($key, $this->fetchedModels) ){
-            return $this->fetchedModels[$key] ?: new EloquentCollection([]);
+            if ( array_key_exists($key, $this->fetchedModels) ){
+                return $this->fetchedModels[$key] ?: new EloquentCollection([]);
+            }
         }
 
         return new EloquentCollection([]);

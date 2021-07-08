@@ -158,7 +158,7 @@ class Cart
      */
     public function response($fullCartResponse = false)
     {
-        $items = $this->all();
+        $items = $this->allWithMutators();
 
         $response = [
             'cartToken' => $this->getDriver()->getToken(),
@@ -274,17 +274,29 @@ class Cart
                     });
     }
 
-    public function addItemsFromMutators(CartCollection $items, $discounts = null)
+    /**
+     * Return items with additional mutators items
+     *
+     * @param  null|array  $discounts
+     * @param  string  $method
+     *
+     * @return  CartCollection
+     */
+    public function allWithMutators($discounts = null, $method = 'addCartItems')
     {
-        //Todo: test if we need clone this items, meybe this is uneccessary
-        $items = clone $items;
+        $items = $this->all();
 
+        return $this->addItemsFromMutators($items, $discounts, $method);
+    }
+
+    public function addItemsFromMutators(CartCollection $items, $discounts = null, $method)
+    {
         foreach ( OrderService::getActiveMutators() as $mutator ) {
-            if ( ! method_exists($mutator, 'addCartItems') ) {
+            if ( ! method_exists($mutator, $method) ) {
                 continue;
             }
 
-            $addItems = $mutator->addCartItems($mutator->getActiveResponse())
+            $addItems = $mutator->{$method}($mutator->getActiveResponse())
                                 ->toCartFormat($discounts);
 
             $items = $items->merge($addItems);
