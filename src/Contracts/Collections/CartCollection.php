@@ -226,12 +226,12 @@ class CartCollection extends Collection
     /**
      * Get all available cart summary prices with discounts
      *
-     * @param  Collection  $items
-     * @param  bool  $fullCartResponse - add payment and delivery prices into sum
-     * @param  array|null  $discounts
+     * @param  bool         $fullCartResponse - add payment and delivery prices into sum
+     * @param  array|null   $discounts
+     * @param  boolean      $withFixedDiscounts
      * @return array
      */
-    public function getSummary($fullCartResponse = false, $discounts = null)
+    public function getSummary($fullCartResponse = false, $discounts = null, $withFixedDiscounts = true)
     {
         //Set discounts if are missing
         //Sometimes we may want discounts without specific discount...
@@ -244,7 +244,9 @@ class CartCollection extends Collection
             $isVat = $this->isDiscountableVatSummaryKey($key);
 
             //Add statics discount into summary
-            $sum[$key] = $this->addDiscountsIntoFinalSum($sum[$key], $discounts, $isVat);
+            if ( $withFixedDiscounts == true ) {
+                $sum[$key] = $this->addFixedDiscountsIntoFinalSum($sum[$key], $discounts, $isVat);
+            }
 
             //Add delivery, payment method prices etc...
             if ( $fullCartResponse === true && $isVat !== null ) {
@@ -286,9 +288,9 @@ class CartCollection extends Collection
                     $addItems = $mutator->{$method}($mutator->getActiveResponse())
                                         ->toCartFormat();
 
-                    $addItemsSummary = $addItems->getSummary();
+                    $summaryFromAddedItems = $addItems->getSummary(false, null, false);
 
-                    $price += (@$addItemsSummary[$withVat ? 'priceWithVat' : 'priceWithoutVat'] ?: 0);
+                    $price += (@$summaryFromAddedItems[$withVat ? 'priceWithVat' : 'priceWithoutVat'] ?: 0);
                 }
             }
         }
@@ -305,7 +307,7 @@ class CartCollection extends Collection
      *
      * @return int/float
      */
-    public function addDiscountsIntoFinalSum($price, $discounts, $isVat = null)
+    public function addFixedDiscountsIntoFinalSum($price, $discounts, $isVat = null)
     {
         foreach ($discounts as $discount) {
             //If is not discountableVat attribute
