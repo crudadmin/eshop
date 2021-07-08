@@ -89,7 +89,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         return [
             Group::half([
                 'identifier' => 'name:Cart identifier|invisible|index',
-                'product' => 'name:Produkt|belongsTo:products,name|required_without:manual_price|disabledIf:identifier,discount|limit:50|hidden',
+                'product' => 'name:Produkt|belongsTo:products,name|required_without:manual_price|canEdit|disabledIf:identifier,discount|limit:50|hidden',
                 'quantity' => 'name:Množstvo|min:1|max:9999|default:1|type:integer|required',
             ])->id('itemPrimary'),
             Group::half([

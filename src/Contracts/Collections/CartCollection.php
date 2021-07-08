@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Collections;
 
 use AdminEshop\Contracts\CartItem;
+use AdminEshop\Models\Orders\Order;
 use Admin\Eloquent\AdminModel;
 use Cart;
 use Discounts;
@@ -247,7 +248,7 @@ class CartCollection extends Collection
 
             //Add delivery, payment method prices etc...
             if ( $fullCartResponse === true && $isVat !== null ) {
-                $sum[$key] = OrderService::addAdditionalPaymentsIntoSum($sum[$key], $isVat);
+                $sum[$key] = $this->addAdditionalPaymentsIntoSum($sum[$key], $isVat);
             }
 
             //Round numbers, and make sure all numbers are positive
@@ -256,6 +257,43 @@ class CartCollection extends Collection
         }
 
         return $sum;
+    }
+
+    /**
+     * Add additional prices into order sum.
+     *
+     * @param  int/float  $price
+     * @param  bool  $withVat
+     */
+    public function addAdditionalPaymentsIntoSum($price, bool $withVat)
+    {
+        $order = OrderService::getOrder() ?: new Order;
+
+        foreach (OrderService::getActiveMutators() as $mutator) {
+            //Mutate price by anonymous price mutators
+            if ( method_exists($mutator, 'mutatePrice') ) {
+                $price = $mutator->mutatePrice(
+                    $mutator->getActiveResponse(),
+                    $price,
+                    $withVat,
+                    $order
+                );
+            }
+
+            //Add price from additional cart items from mutators which will be inserted into order
+            foreach (['addHiddenCartItems', 'addCartItems'] as $method) {
+                if ( method_exists($mutator, $method) ) {
+                    $addItems = $mutator->{$method}($mutator->getActiveResponse())
+                                        ->toCartFormat();
+
+                    $addItemsSummary = $addItems->getSummary();
+
+                    $price += (@$addItemsSummary[$withVat ? 'priceWithVat' : 'priceWithoutVat'] ?: 0);
+                }
+            }
+        }
+
+        return $price;
     }
 
     /**

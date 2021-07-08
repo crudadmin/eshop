@@ -226,8 +226,8 @@ class Identifier
     {
         $key = $this->tryOrderItemsColumn($key, $item);
 
-        if ( property_exists($item, $key) || @$item->{$key} ) {
-            return $item->{$key};
+        if ( $value = ($item->{$key} ?? null) ) {
+            return $value;
         }
     }
 
@@ -300,7 +300,7 @@ class Identifier
     /*
      * Returns price of assigned model in CartItem
      */
-    public function getPricesArray(CartItem $item, $discounts = null)
+    public function getPricesArray(UsesIdentifier $item, $discounts = null)
     {
         $array = [];
 
@@ -317,6 +317,23 @@ class Identifier
         }
 
         return $array;
+    }
+
+    /**
+     * Returns item price
+     *
+     * @param CartItem  $item
+     * @param string    $priceKey
+     *
+     * @return  decimal
+     */
+    public function getPrice(CartItem $item, $priceKey = 'priceWithVat')
+    {
+        if ( $model = $item->getItemModel() ) {
+            return $model->getAttribute($priceKey);
+        }
+
+        return 0;
     }
 }
 

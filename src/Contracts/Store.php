@@ -203,12 +203,15 @@ class Store
     /**
      * Add given vat value into number
      *
-     * @param  float  $price
-     * @param  float  $vatValue
+     * @param  float    $price
+     * @param  float    $vatValue
+     * @param  boolean  $roudn
      */
-    public function addVat($price, $vat)
+    public function addVat($price, $vat, $round = true)
     {
-        return $this->roundNumber($price * ($vat ? (1 + ($vat / 100)) : 1));
+        $price = $price * ($vat ? (1 + ($vat / 100)) : 1);
+
+        return $round ? $this->roundNumber($price) : $price;
     }
 
     /*

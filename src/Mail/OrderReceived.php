@@ -39,9 +39,11 @@ class OrderReceived extends Mailable
 
         $this->invoice = $invoice;
 
-        $this->cartItems = $items;
-
+        //Summary must be before additional items are added into list. Because price of this items will be sumed 2 times.
+        //Becasuse true parameter in getSummary indicates that we should sum all available items.
         $this->cartSummary = $items->getSummary(true);
+
+        $this->cartItems = $items ? Cart::addItemsFromMutators($items, 'addHiddenCartItems') : null;
 
         $this->discounts = Discounts::getDiscounts();
     }

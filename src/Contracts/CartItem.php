@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts;
 
 use AdminEshop\Contracts\Cart\Concerns\HasOptionableDiscounts;
 use AdminEshop\Contracts\Cart\Concerns\HasParentIdentifier;
+use AdminEshop\Contracts\Cart\Concerns\HasPriceSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
@@ -17,7 +18,8 @@ class CartItem implements UsesIdentifier
     use IdentifierSupport,
         HasOptionableDiscounts,
         HasOrderItemNames,
-        HasParentIdentifier;
+        HasParentIdentifier,
+        HasPriceSupport;
 
     /**
      * Cart item identififer

@@ -42,7 +42,7 @@ class ProductsIdentifier extends Identifier
                 'scope' => function($query){
                     return $query->withCartResponse();
                 },
-                'orders_items_column' => false,
+                'orders_items_column' => 'product_id',
             ],
             'variant_id' => [
                 'table' => 'products',
@@ -50,7 +50,7 @@ class ProductsIdentifier extends Identifier
                 'scope' => function($query){
                     return $query->withCartResponse(true);
                 },
-                'orders_items_column' => false,
+                'orders_items_column' => 'product_id',
             ],
         ];
     }
@@ -224,7 +224,7 @@ class ProductsIdentifier extends Identifier
     {
         $data = parent::onOrderItemCreate($item);
 
-        //Assign product of given service
+        //rewrite and Assign correct product or variant
         $data['product_id'] = $item->variant_id ?: $item->product_id;
 
         return $data;

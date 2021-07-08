@@ -250,41 +250,6 @@ class OrderService
     }
 
     /**
-     * Add additional prices into order sum.
-     *
-     * @param  int/float  $price
-     * @param  bool  $withVat
-     */
-    public function addAdditionalPaymentsIntoSum($price, bool $withVat)
-    {
-        foreach ($this->getActiveMutators() as $mutator) {
-            //Mutate price by anonymous price mutators
-            if ( method_exists($mutator, 'mutatePrice') ) {
-                $price = $mutator->mutatePrice(
-                    $mutator->getActiveResponse(),
-                    $price,
-                    $withVat,
-                    $this->getOrder() ?: new Order
-                );
-            }
-
-            //Add price from additional cart items from mutators which will be inserted into order
-            foreach (['addHiddenCartItems', 'addCartItems'] as $method) {
-                if ( method_exists($mutator, $method) ) {
-                    $addItems = $mutator->addHiddenCartItems($mutator->getActiveResponse())
-                                        ->toCartFormat();
-
-                    $addItemsSummary = $addItems->getSummary();
-
-                    $price += (@$addItemsSummary[$withVat ? 'priceWithVat' : 'priceWithoutVat'] ?: 0);
-                }
-            }
-        }
-
-        return $price;
-    }
-
-    /**
      * Add prices into order
      *
      * @param  array  $row
@@ -351,7 +316,7 @@ class OrderService
 
         $message = $order->getClientEmailMessage();
 
-        $items = Cart::addItemsFromMutators($this->getCartItems(), 'addHiddenCartItems');
+        $items = $this->getCartItems();
 
         try {
             Mail::to($order->email)->send(
@@ -386,7 +351,7 @@ class OrderService
 
             $message = $order->getStoreEmailMessage();
 
-            $items = Cart::addItemsFromMutators($this->getCartItems(), 'addHiddenCartItems');
+            $items = $this->getCartItems();
 
             try {
                 Mail::to($email)->send(

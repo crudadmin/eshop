@@ -285,16 +285,6 @@ trait PriceMutator
         return $this->calculateVatPrice($this->getAttribute('priceWithoutVat'));
     }
 
-    /*
-     * Return price with vat & discounts
-     */
-    public function totalPriceWithVat(int $quantity)
-    {
-        return Store::roundNumber(
-            $this->calculateVatPrice($this->getAttribute('priceWithoutVat'), null) * $quantity
-        );
-    }
-
     /**
      * Return B2B or B2C initial product price by client settings
      *
@@ -361,7 +351,7 @@ trait PriceMutator
 
         $price = $price * ($vat ? (1 + ($vat / 100)) : 1);
 
-        return $round ? Store::roundNumber($price) : $price;
+        return Store::addVat($price, $vat, $round);
     }
 
     /**

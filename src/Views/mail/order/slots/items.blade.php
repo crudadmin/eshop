@@ -3,7 +3,7 @@
 | {{ _('Objednaný tovar') }}       | {{ _('Množstvo') }}      | {{ $showNoVat ? ('<span style="display: inline-block; width: 90px">'._('Cena bez dph').'</span>') : '' }} | <span style="display: inline-block; width: 90px">{{ _('Cena s dph') }}</span> |
 | :------------ |:-------------:| ----------:| ----------:|
 @foreach( $items as $item )
-| {!! $item->emailItemName() !!} | {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getItemModel()->priceWithoutVat * $item->quantity) : '' }} | {{ Store::priceFormat($item->getItemModel()->totalPriceWithVat($item->quantity)) }} |
+| {!! $item->emailItemName() !!} | {{ $item->quantity }} | {{ $showNoVat ? Store::priceFormat($item->getPrice('priceWithoutVat') * $item->quantity) : '' }} | {{ Store::priceFormat($item->getPrice('priceWithVat') * $item->quantity) }} |
 @endforeach
 @if ( $delivery )
 | {{ $delivery->name }} | - | {{ $showNoVat ? Store::priceFormat($order->delivery_price) : '' }} | {{ Store::priceFormat($order->delivery_price_with_vat) }} |

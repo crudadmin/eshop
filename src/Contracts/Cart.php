@@ -163,6 +163,7 @@ class Cart
         $response = [
             'cartToken' => $this->getDriver()->getToken(),
             'items' => $items,
+            'itemsHidden' => $this->addItemsFromMutators((new CartCollection), 'addHiddenCartItems', null),
             'discounts' => array_map(function($discount){
                 return $discount->toArray();
             }, Discounts::getDiscounts()),
@@ -286,10 +287,10 @@ class Cart
     {
         $items = $this->all();
 
-        return $this->addItemsFromMutators($items, $discounts, $method);
+        return $this->addItemsFromMutators($items, $method, $discounts);
     }
 
-    public function addItemsFromMutators(CartCollection $items, $discounts = null, $method)
+    public function addItemsFromMutators(CartCollection $items, $method, $discounts = null)
     {
         foreach ( OrderService::getActiveMutators() as $mutator ) {
             if ( ! method_exists($mutator, $method) ) {

@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
+use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use Discounts;
 use Store;
@@ -81,6 +82,7 @@ class DefaultIdentifier extends Identifier
             'discountable' => false,
             'quantity' => $item->quantity,
             'default_price' => $item->item_price,
+            'manual_price' => true,
             'price' => $item->item_price,
             'vat' => Store::getVatValueById($vat),
             'price_vat' => Store::priceWithVat($item->item_price, $vat),
@@ -92,28 +94,78 @@ class DefaultIdentifier extends Identifier
     /**
      * Returns static prices into cart summary
      *
-     * @param  CartItem  $item
+     * @param  UsesIdentifier  $item
      * @param  Array|null  $discounts
      *
      * @return  array
      */
-    public function getPricesArray(CartItem $item, $discounts = null)
+    public function getPricesArray(UsesIdentifier $item, $discounts = null)
+    {
+        if ( $item instanceof CartItem ) {
+            $vat = $this->getVatValue($item);
+
+            $price = $item->item_price;
+            $priceWithVat = Store::priceWithVat($price, $vat);
+
+            return [
+                'price' => $price,
+                'initialPriceWithVat' => $priceWithVat,
+                'initialPriceWithoutVat' => $price,
+                'defaultPriceWithVat' => $priceWithVat,
+                'defaultPriceWithoutVat' => $price,
+                'priceWithVat' => $priceWithVat,
+                'priceWithoutVat' => $price,
+                'clientPrice' => $price,
+            ];
+        }
+
+        return parent::getPricesArray($item, $discounts);
+    }
+
+    /**
+     * Modify item on cart items render into website
+     *
+     * @param  CartItem  $item
+     * @return  void
+     */
+    public function onRender(CartItem $item)
     {
         $vat = $this->getVatValue($item);
 
-        $price = $item->item_price;
-        $priceWithVat = Store::priceWithVat($price, $vat);
+        //Set default vat, if is missing
+        $item->item_vat = $vat;
+        $item->item_price_vat = Store::priceWithVat($item->item_price, $vat);
+    }
 
-        return [
-            'price' => $price,
-            'initialPriceWithVat' => $priceWithVat,
-            'initialPriceWithoutVat' => $price,
-            'defaultPriceWithVat' => $priceWithVat,
-            'defaultPriceWithoutVat' => $price,
-            'priceWithVat' => $priceWithVat,
-            'priceWithoutVat' => $price,
-            'clientPrice' => $price,
-        ];
+    /**
+     * Returns product name
+     *
+     * @param  UsesIdentifier  $item
+     *
+     * @return  array
+     */
+    public function getProductNameParts(UsesIdentifier $item) : array
+    {
+        return array_filter([ $item->item_name ?: $item->name ]);
+    }
+
+    /**
+     * Returns item price
+     *
+     * @param CartItem  $item
+     * @param string    $priceKey
+     *
+     * @return  decimal
+     */
+    public function getPrice(CartItem $item, $priceKey = 'priceWithVat')
+    {
+        if ( strpos($priceKey, 'withoutVat') !== false ){
+            return $this->item_price;
+        } else {
+            $vat = $this->getVatValue($item);
+
+            return Store::priceWithVat($item->item_price, $vat);
+        }
     }
 }
 
