@@ -53,11 +53,24 @@ class DefaultIdentifier extends Identifier
         return false;
     }
 
+    /**
+     * Return set, or default vat value
+     *
+     * @param  CartItem  $item
+     *
+     * @return  integer
+     */
     private function getVatValue(CartItem $item)
     {
         return is_null($item->item_vat) ? Store::getDefaultVat() : $item->item_vat;
     }
 
+    /**
+     * Create order item by cart item properties
+     *
+     * @param  CartItem  $item
+     * @return  [type]
+     */
     public function onOrderItemCreate(CartItem $item)
     {
         $vat = $this->getVatValue($item);
@@ -74,6 +87,33 @@ class DefaultIdentifier extends Identifier
         ];
 
         return $data;
+    }
+
+    /**
+     * Returns static prices into cart summary
+     *
+     * @param  CartItem  $item
+     * @param  Array|null  $discounts
+     *
+     * @return  array
+     */
+    public function getPricesArray(CartItem $item, $discounts = null)
+    {
+        $vat = $this->getVatValue($item);
+
+        $price = $item->item_price;
+        $priceWithVat = Store::priceWithVat($price, $vat);
+
+        return [
+            'price' => $price,
+            'initialPriceWithVat' => $priceWithVat,
+            'initialPriceWithoutVat' => $price,
+            'defaultPriceWithVat' => $priceWithVat,
+            'defaultPriceWithoutVat' => $price,
+            'priceWithVat' => $priceWithVat,
+            'priceWithoutVat' => $price,
+            'clientPrice' => $price,
+        ];
     }
 }
 

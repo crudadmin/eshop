@@ -296,6 +296,28 @@ class Identifier
 
         return $data;
     }
+
+    /*
+     * Returns price of assigned model in CartItem
+     */
+    public function getPricesArray(CartItem $item, $discounts = null)
+    {
+        $array = [];
+
+        //Add all attributes from model which consits of price name in key
+        if ( $model = $item->getItemModel() ) {
+            foreach ($model->toCartArray($discounts) as $key => $price) {
+                //If does not have price in attribute name
+                if ( strpos(strtolower($key), 'price') === false ) {
+                    continue;
+                }
+
+                $array[$key] = $price;
+            }
+        }
+
+        return $array;
+    }
 }
 
 ?>

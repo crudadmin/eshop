@@ -166,9 +166,7 @@ class OrderService
      */
     public function addItemsIntoOrder()
     {
-        $items = Cart::addItemsFromMutators(
-            $this->getCartItems()
-        );
+        $items = Cart::addItemsFromMutators($this->getCartItems(), 'addHiddenCartItems');
 
         foreach ($items as $item) {
             $identifier = $item->getIdentifierClass();
@@ -271,13 +269,15 @@ class OrderService
             }
 
             //Add price from additional cart items from mutators which will be inserted into order
-            if ( method_exists($mutator, 'addCartItems') ) {
-                $addItems = $mutator->addCartItems($mutator->getActiveResponse())
-                                    ->toCartFormat();
+            foreach (['addHiddenCartItems', 'addCartItems'] as $method) {
+                if ( method_exists($mutator, $method) ) {
+                    $addItems = $mutator->addHiddenCartItems($mutator->getActiveResponse())
+                                        ->toCartFormat();
 
-                $addItemsSummary = $addItems->getSummary();
+                    $addItemsSummary = $addItems->getSummary();
 
-                $price += (@$addItemsSummary[$withVat ? 'priceWithVat' : 'priceWithoutVat'] ?: 0);
+                    $price += (@$addItemsSummary[$withVat ? 'priceWithVat' : 'priceWithoutVat'] ?: 0);
+                }
             }
         }
 
@@ -351,9 +351,11 @@ class OrderService
 
         $message = $order->getClientEmailMessage();
 
+        $items = Cart::addItemsFromMutators($this->getCartItems(), 'addHiddenCartItems');
+
         try {
             Mail::to($order->email)->send(
-                new OrderReceived($order, $this->getCartItems(), $message, $invoice)
+                new OrderReceived($order, $items, $message, $invoice)
             );
         } catch (Exception $error){
             Log::error($error);
@@ -384,9 +386,11 @@ class OrderService
 
             $message = $order->getStoreEmailMessage();
 
+            $items = Cart::addItemsFromMutators($this->getCartItems(), 'addHiddenCartItems');
+
             try {
                 Mail::to($email)->send(
-                    (new OrderReceived($order, $this->getCartItems(), $message))->setOwner(true)
+                    (new OrderReceived($order, $items, $message))->setOwner(true)
                 );
             } catch (Exception $error){
                 Log::error($error);

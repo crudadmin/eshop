@@ -181,26 +181,12 @@ trait IdentifierSupport
      */
     public function getPricesArray($discounts = null)
     {
-        $array = [];
-
         //This prices wont be added into summary
-        if ( $this->getIdentifierClass()->skipInSummary() === true ) {
+        if ( ($identifier = $this->getIdentifierClass())->skipInSummary() === true ) {
             return [];
         }
 
-        //Add all attributes from model which consits of price name in key
-        if ( $model = $this->getItemModel() ) {
-            foreach ($model->toCartArray($discounts) as $key => $price) {
-                //If does not have price in attribute name
-                if ( strpos(strtolower($key), 'price') === false ) {
-                    continue;
-                }
-
-                $array[$key] = $price;
-            }
-        }
-
-        return $array;
+        return $identifier->getPricesArray($this, $discounts);
     }
 
     /**
