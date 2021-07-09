@@ -21,6 +21,7 @@ class DefaultIdentifier extends Identifier
             'item_name' => [],
             'item_price' => [],
             'item_vat' => [],
+            'item_data' => [],
         ];
     }
 
@@ -76,7 +77,7 @@ class DefaultIdentifier extends Identifier
     {
         $vat = $this->getVatValue($item);
 
-        $data = [
+        $data = array_merge([
             'identifier' => $this->getName(),
             'name' => $item->item_name,
             'discountable' => false,
@@ -86,7 +87,7 @@ class DefaultIdentifier extends Identifier
             'price' => $item->item_price,
             'vat' => Store::getVatValueById($vat),
             'price_vat' => Store::priceWithVat($item->item_price, $vat),
-        ];
+        ], $item->item_data ?: []);
 
         return $data;
     }

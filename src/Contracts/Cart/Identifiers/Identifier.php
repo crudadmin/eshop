@@ -252,7 +252,7 @@ class Identifier
         $string = [];
 
         foreach ($this->identifiers as $key => $value) {
-            $string[] = $key.'_'.$value;
+            $string[] = $key.'_'.(is_string($value) || is_numeric($value) ? $value : '-');
         }
 
         return 'identifier_'.implode(';', $string);
@@ -292,6 +292,11 @@ class Identifier
             $identifierValue = $this->getIdentifierValue($item, $key);
 
             $data[$orderItemKey] = $identifierValue;
+        }
+
+        //We can mutate order item from product model
+        if ( method_exists($product, 'onOrderItemCreate') ){
+            $data = $product->onOrderItemCreate($data, $item);
         }
 
         return $data;
