@@ -67,17 +67,7 @@ trait OrderItemTrait
                 $join->on('parentProduct.id', '=', 'products.product_id');
             })
             ->with(['attributesItems' => function($query){
-                $query
-                    ->with('attribute')
-                    ->whereHas('attribute', function($query){
-                        if ( config('admineshop.attributes.attributesText', false) ) {
-                            $query->orWhere('product_info', 1);
-                        }
-
-                        if ( config('admineshop.attributes.attributesVariants', false) ) {
-                            $query->orWhere('variants', 1);
-                        }
-                    });
+                $query->withTextAttributes();
             }])
             ->get();
 

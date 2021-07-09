@@ -113,7 +113,7 @@ return [
     /**
      * Payment methods settings
      */
-    'payments_methods' => [
+    'payment_methods' => [
         'enabled' => true,
         'price_limit' => true,
 

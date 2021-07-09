@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Order\Concerns;
 use Admin;
 use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\GopayPayment;
+
 use Exception;
 use Log;
 
@@ -127,6 +128,10 @@ trait HasPayments
                 return $paymentClass;
             } catch (Exception $e){
                 $this->logPaymentError($e);
+
+                if ( $this->isDebug() ) {
+                    throw $e;
+                }
             }
         });
     }

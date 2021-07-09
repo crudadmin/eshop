@@ -243,10 +243,6 @@ class Product extends CartEloquent implements HasAttributesSupport
      */
     public function isType($type)
     {
-        if ( ! array_key_exists($type, config('admineshop.product_types')) ) {
-            abort(500, 'Type '.$type.' does not exists.');
-        }
-
         return $this->product_type == $type;
     }
 

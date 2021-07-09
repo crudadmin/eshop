@@ -127,7 +127,7 @@ trait HasOrderFields
                     'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|hidden|hideFromForm',
                 ])->id('delivery'),
             ] : [],
-            config('admineshop.payments_methods.enabled', true) ? [
+            config('admineshop.payment_methods.enabled', true) ? [
                 'Platobná metóda' => Group::fields([
                     Group::fields([
                         'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',

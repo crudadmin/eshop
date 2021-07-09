@@ -20,7 +20,7 @@ class PaymentsMethod extends BasePaymentsMethod
 
     public function active()
     {
-        return config('admineshop.payments_methods.enabled', true);
+        return config('admineshop.payment_methods.enabled', true);
     }
 
     public function reserved()

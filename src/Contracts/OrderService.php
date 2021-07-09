@@ -331,7 +331,7 @@ class OrderService
             ]);
 
             //Debug
-            if ( app()->environment('local') && env('APP_DEBUG') == true ) {
+            if ( $this->isDebug() ) {
                 throw $error;
             }
         }
@@ -411,6 +411,11 @@ class OrderService
             }, $this->getInvalidValidators()),
             'cart' => Cart::fullCartResponse(),
         ], 422);
+    }
+
+    public function isDebug()
+    {
+        return app()->environment('local') && env('APP_DEBUG') == true;
     }
 }
 

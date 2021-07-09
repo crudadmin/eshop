@@ -146,7 +146,7 @@ class Order extends AdminModel
         }
 
         //Add payment method feature options
-        if ( config('admineshop.payments_methods.enabled', true) === true ) {
+        if ( config('admineshop.payment_methods.enabled', true) === true ) {
             $options = array_merge($options, [
                 'payment_method_vat' => $this->getVatOptions(),
                 'payment_method_id' => $this->getPaymentMethods(),

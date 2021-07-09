@@ -33,7 +33,9 @@ class PaymentController extends Controller
         //Check payment
         try {
             //Check if order is paid or throw ErrorPaymentException
-            $paymentClass->isPaid();
+            $paymentClass->isPaid(
+                $paymentClass->getPaymentId()
+            );
 
             //If order is not paid
             if ( ! $order->paid_at ) {
@@ -77,6 +79,10 @@ class PaymentController extends Controller
                 'log' => $e->getMessage(),
             ]);
 
+            if ( OrderService::isDebug() ){
+                throw $e;
+            }
+
             return redirect(
                 OrderService::onPaymentError(PaymentErrorCodes::CODE_PAYMENT_UNVERIFIED)
             );
@@ -90,6 +96,10 @@ class PaymentController extends Controller
                 'code' => 'payment-status-unknown-error',
                 'log' => $e->getMessage(),
             ]);
+
+            if ( OrderService::isDebug() ){
+                throw $e;
+            }
 
             return redirect(
                 OrderService::onPaymentError(PaymentErrorCodes::CODE_ERROR)

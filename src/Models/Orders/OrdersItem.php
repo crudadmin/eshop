@@ -221,6 +221,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             $array[] = $this->getValue('name');
         }
 
-        return $array;
+        return array_unique($array);
     }
 }

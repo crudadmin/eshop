@@ -2,11 +2,12 @@
 
 namespace AdminEshop\Contracts\Cart\Identifiers;
 
+use Admin;
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
+use AdminEshop\Models\Orders\OrdersItem;
 use Store;
-use Admin;
 
 class ProductsIdentifier extends Identifier
 {
@@ -160,13 +161,33 @@ class ProductsIdentifier extends Identifier
      */
     public function getProductNameParts(UsesIdentifier $item) : array
     {
-        $product = $item->getValue('product');
-        $variant = $item->getValue('variant');
+        if ( $item instanceof OrdersItem ) {
+            if ( $item->product->isType('variant') ){
+                $variant = $item->product;
+                $product = $item->product->product;
+            } else {
+                $product = $item->product;
+                $variant = null;
+            }
+        } else {
+            $product = $item->getValue('product');
+            $variant = $item->getValue('variant');
+        }
+
         $productOrVariant = $variant ?: $product;
 
         $items = [
             $variant ? ($variant->name ?: $product->name) : $product->name
         ];
+
+        //If text attributes are not loaded
+        if ( config('admineshop.attributes.attributesVariants', false) || config('admineshop.attributes.attributesText', false) ) {
+            if ( $productOrVariant->relationLoaded('attributesItems') == false ){
+                $productOrVariant->load(['attributesItems' => function($query){
+                    $query->withTextAttributes();
+                }]);
+            }
+        }
 
         if ( config('admineshop.attributes.attributesVariants', false) == true ) {
             $items[] = $productOrVariant->attributesVariantsText;
