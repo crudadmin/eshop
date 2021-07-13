@@ -284,18 +284,16 @@ class Product extends CartEloquent implements HasAttributesSupport
      */
     public function scopeWithParentProductData($query)
     {
-        $selectColumns = ['products.*'];
-
-        $selectColumns[] = 'pm.image as main_image';
+        $selectColumns = ['main_product.image as main_image'];
 
         if ( config('admineshop.stock.store_rules', true) ) {
             $selectColumns = array_merge($selectColumns, [
-                'pm.stock_type as main_stock_type', 'pm.stock_sold as main_stock_sold',
+                'main_product.stock_type as main_stock_type', 'main_product.stock_sold as main_stock_sold',
             ]);
         }
 
         $query->addSelect($selectColumns)
-              ->leftJoin('products as pm', 'products.product_id', '=', 'pm.id');
+              ->leftJoin('products as main_product', 'products.product_id', '=', 'main_product.id');
     }
 
     private function getAttributesList()

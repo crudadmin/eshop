@@ -252,6 +252,8 @@ trait HasProductResponses
             $query->extendWith(['variants' => function($query) use ($key) {
                 $model = $query->getModel();
 
+                $query->select('products.*');
+
                 $query->withParentProductData();
 
                 //We can deside if filter should be applied also on selected variants

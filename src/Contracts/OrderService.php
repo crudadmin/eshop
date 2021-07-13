@@ -364,6 +364,11 @@ class OrderService
                     'type' => 'error',
                     'code' => 'email-store-error'
                 ]);
+
+                //Debug
+                if ( $this->isDebug() ) {
+                    throw $error;
+                }
             }
         }
 

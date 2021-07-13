@@ -283,7 +283,7 @@ class CartCollection extends Collection
             }
 
             //Add price from additional cart items from mutators which will be inserted into order
-            foreach (['addHiddenCartItems', 'addCartItems'] as $method) {
+            foreach (['addCartItems', 'addHiddenCartItems'] as $method) {
                 if ( method_exists($mutator, $method) ) {
                     $addItems = $mutator->{$method}($mutator->getActiveResponse())
                                         ->toCartFormat();

@@ -98,6 +98,11 @@ trait HasProductFilter
                     $query
                         ->variantsProducts()
                         ->whereHas('variants', function($query) use ($filter) {
+                            //Apply user filter scope on variants
+                            if ( $scope = $this->getFilterOption('scope.variants') ){
+                                $scope($query);
+                            }
+
                             $query->filterProduct($filter);
                         });
                 });
