@@ -14,8 +14,8 @@ class FavouriteController extends Controller
         }
 
         return api([
-            'favourites' => client()->favourites()->responseQuery()->get()->map(function($item){
-                return $item->toResponseFormat();
+            'favourites' => client()->favourites()->withFavouriteResponse()->get()->map(function($item){
+                return $item->setFavouriteResponse();
             }),
         ]);
     }
@@ -23,24 +23,15 @@ class FavouriteController extends Controller
     public function toggleFavourite()
     {
         $productId = request('product_id');
-        $variantId = request('variant_id');
+
+        $favourites = client()->favourites();
 
         //Add or update variant
-        if ( is_numeric($variantId) ) {
-            if ( client()->favourites()->where('variant_id', $variantId)->count() > 0 ) {
-                client()->favourites()->where('variant_id', $variantId)->delete();
+        if ( is_numeric($productId) ) {
+            if ( $favourites->where('product_id', $productId)->count() > 0 ) {
+                $favourites->where('product_id', $productId)->delete();
             } else {
-                client()->favourites()->create([
-                    'variant_id' => $variantId,
-                    'product_id' => $productId,
-                ]);
-            }
-        } else if ( is_numeric($productId) ) {
-            if ( client()->favourites()->where('product_id', $productId)->whereNull('variant_id')->count() > 0 ) {
-                client()->favourites()->where('product_id', $productId)->whereNull('variant_id')->delete();
-            } else {
-                client()->favourites()->create([
-                    'variant_id' => $variantId,
+                $favourites->create([
                     'product_id' => $productId,
                 ]);
             }

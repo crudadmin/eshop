@@ -53,6 +53,15 @@ trait HasRoutes
 
     }
 
+    public function routesForFavourites()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers\Client'], function(){
+            Route::get('/auth/favourites', 'FavouriteController@index')->visible();
+            Route::post('/auth/favourites', 'FavouriteController@toggleFavourite')->visible();
+        });
+
+    }
+
     public function routesForPacketaShipping()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers\Shipping'], function(){

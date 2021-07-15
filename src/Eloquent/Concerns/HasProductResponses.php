@@ -207,6 +207,11 @@ trait HasProductResponses
         return $this;
     }
 
+    public function setFavouriteResponse()
+    {
+        return $this;
+    }
+
     /**
      * Display products into category response
      * Also filter products and variants
@@ -233,6 +238,14 @@ trait HasProductResponses
 
         $query->withProductModules('detail');
 
+    }
+
+    public function scopeWithFavouriteResponse($query)
+    {
+        //We need specify select for
+        $query->addSelect('products.*');
+
+        $query->withProductModules('favourite');
     }
 
     public function scopeWithProductModules($query, $key, $variants = false)

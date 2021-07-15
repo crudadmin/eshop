@@ -54,30 +54,24 @@ class ClientsFavourite extends AdminModel
     {
         return [
             'product' => 'name:Produkt|belongsTo:products,name',
-            'variant' => 'name:Varianta|belongsTo:products_variants,name',
         ];
     }
 
-    public function mutateFields($fields)
+    public function scopeWithFavouriteResponse($query)
     {
-        //If variants are not defined in eshop
-        if ( !config('admineshop.product_types.variants') ){
-            $fields->field('variant_id', function($field){
-                $field->invisible = true;
-            });
-        }
-    }
-
-    public function scopeResponseQuery($query)
-    {
-        $query->with([
-            'product',
-            'variant'
+        $query->select('id', 'client_id', 'product_id')->with([
+            'product' => function($query){
+                $query->withFavouriteResponse();
+            },
         ])->whereHas('product');
     }
 
-    public function toResponseFormat()
+    public function setFavouriteResponse()
     {
+        if ( $this->product ) {
+            $this->product->setFavouriteResponse();
+        }
+
         return $this;
     }
 }
