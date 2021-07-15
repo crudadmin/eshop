@@ -20,13 +20,11 @@ use AdminEshop\Models\Attribute\Attribute;
 use AdminEshop\Models\Attribute\AttributesItem;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Store;
 
 class Product extends CartEloquent implements HasAttributesSupport
 {
-    use HasRelationships,
-        HasProductImage,
+    use HasProductImage,
         HasProductAttributes,
         HasStock,
         HasProductFilter,
