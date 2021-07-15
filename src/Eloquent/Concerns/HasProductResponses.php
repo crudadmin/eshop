@@ -221,9 +221,9 @@ trait HasProductResponses
 
         $query->applyQueryFilter();
 
-        $query->sortByParams();
-
         $query->withProductModules('listing');
+
+        $query->sortByParams();
     }
 
     public function scopeWithDetailResponse($query)
@@ -303,7 +303,7 @@ trait HasProductResponses
     public function scopeSortByParams($query)
     {
         $filterParams = $this->getFilterOption('filter');
-        $extractVariants = $this->getFilterOption('listing.extract');
+        $extractVariants = $this->getFilterOption('listing.variants.extract');
 
         if ( !($sortBy = $filterParams['_sort'] ?? null) ){
             return;
