@@ -266,6 +266,16 @@ trait OrderTrait
             return $item;
         })->pluck('vatValue', 'vat');
     }
+
+    public function bootOrderIntoOrderService()
+    {
+        $order = OrderService::getOrder();
+
+        //If order in payment helper is not set already
+        if ( !$order || $order->getKey() != $this->getKey() ){
+            OrderService::setOrder($this);
+        }
+    }
 }
 
 ?>

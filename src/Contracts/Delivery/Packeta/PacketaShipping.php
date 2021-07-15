@@ -38,6 +38,14 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
     private static $requestBuilder;
 
     /*
+     * Shipping name
+     */
+    public function getName()
+    {
+        return _('Zasielkovňa');
+    }
+
+    /*
      * Check if provider is enabled
      */
     public function isActive()

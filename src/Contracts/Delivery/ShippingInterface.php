@@ -6,6 +6,11 @@ use AdminEshop\Contracts\Delivery\ShippingResponse;
 
 interface ShippingInterface
 {
+    /*
+     * Shipping name
+     */
+    public function getName();
+
     /**
      * Creates package and returns shipping response with all neccessary data
      *

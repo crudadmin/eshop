@@ -38,21 +38,13 @@ class SendShippingJob implements ShouldQueue
     {
         $order = $this->order;
 
-        OrderService::setOrder($order);
-
-        $deliveryId = $order->delivery_id;
-
         //If no provider for given delivery method is available
-        if ( !($provider = OrderService::getShippingProvider($deliveryId)) ){
+        if ( !($provider = $order->getShippingProvider()) || $provider->isActive() == false ){
             return;
         }
 
         //Try send shipping, and log output
         try {
-            if ( $provider->isActive() == false ) {
-                throw new ShipmentException('Doprava nebola povolená na strane servera.');
-            }
-
             if (!($package = $provider->createPackage())){
                 throw new ShipmentException('Doprava nebola zaregistrovaná.');
             }

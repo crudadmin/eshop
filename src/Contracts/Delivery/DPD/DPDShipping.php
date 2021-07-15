@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Delivery\DPD;
 
+use AdminEshop\Admin\Buttons\DPDExportButton;
 use AdminEshop\Contracts\Delivery\CreatePackageException;
 use AdminEshop\Contracts\Delivery\ShipmentException;
 use AdminEshop\Contracts\Delivery\ShippingInterface;
@@ -9,6 +10,7 @@ use AdminEshop\Contracts\Delivery\ShippingProvider;
 use AdminEshop\Contracts\Delivery\ShippingResponse;
 use Carbon\Carbon;
 use Facades\AdminEshop\Contracts\Delivery\DPD\DPDApi;
+use Illuminate\Support\Collection;
 
 /**
  * Class Api.
@@ -37,11 +39,50 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
     private static $requestBuilder;
 
     /*
+     * Shipping name
+     */
+    public function getName()
+    {
+        return _('DPD Doprava');
+    }
+
+    /*
      * Check if provider is enabled
      */
     public function isActive()
     {
         return env('SHIPPMENT_DPD_ENABLED') === true;
+    }
+
+    /*
+     * Has shipping export?
+     */
+    public function isExportable()
+    {
+        return true;
+    }
+
+    /*
+     * Returns export data
+     */
+    public static function export(Collection $orders)
+    {
+        return [
+            'data' => view('admineshop::xml.dpd_export', compact('orders'))->render(),
+            'extension' => 'xml',
+        ];
+    }
+
+    /**
+     * Admin order buttons
+     *
+     * @return  array
+     */
+    public function buttons()
+    {
+        return [
+            DPDExportButton::class,
+        ];
     }
 
     /**
@@ -160,7 +201,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
 
     private function getProductCode()
     {
-        $type = $this->getOptions()['type'];
+        $type = $this->getOption('type');
 
         $types = [
             'classic' => 1,

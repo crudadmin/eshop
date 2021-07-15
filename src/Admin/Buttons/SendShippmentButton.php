@@ -30,8 +30,18 @@ class SendShippmentButton extends Button
      */
     public function __construct($row)
     {
-        $this->active = in_array($row->delivery_status, ['new', 'error'])
-                        && OrderService::setOrder($row)->getShippingProvider($row->delivery_id);
+        $this->active = $this->getActiveStatus($row);
+    }
+
+    private function getActiveStatus($row)
+    {
+        if ( in_array($row->delivery_status, ['new', 'error']) ) {
+            if ( $provider = OrderService::setOrder($row)->getShippingProvider($row->delivery_id) ){
+                return $provider->isActive();
+            }
+        }
+
+        return false;
     }
 
     /**

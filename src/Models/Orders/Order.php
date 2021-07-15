@@ -13,6 +13,7 @@ use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\OrderPayments;
+use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
@@ -22,6 +23,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
+use OrderService;
 use Store;
 
 class Order extends AdminModel
@@ -29,6 +31,7 @@ class Order extends AdminModel
     use Notifiable,
         OrderTrait,
         OrderPayments,
+        OrderShipping,
         HasOrderInvoice,
         HasOrderHashes,
         HasOrderEmails,
@@ -55,16 +58,19 @@ class Order extends AdminModel
 
     protected $sortable = false;
 
-    protected $buttons = [
-        GenerateInvoice::class,
-        SendShippmentButton::class,
-        OrderMessagesButton::class,
-    ];
-
     protected $rules = [
         OrderNumber::class,
         RebuildOrder::class,
     ];
+
+    public function buttons()
+    {
+        return array_merge([
+            GenerateInvoice::class,
+            SendShippmentButton::class,
+            OrderMessagesButton::class,
+        ], $this->getShippingButtons());
+    }
 
     /*
      * Automatic form and database generation
