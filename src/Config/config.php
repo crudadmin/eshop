@@ -235,4 +235,11 @@ return [
      * Should be products and other attributes localized?
      */
     'localization' => false,
+
+    /**
+     * Synchronization
+     */
+    'synchronizer' => [
+        'enabled' => false,
+    ],
 ];

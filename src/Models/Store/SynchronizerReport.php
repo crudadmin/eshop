@@ -29,6 +29,11 @@ class SynchronizerReport extends AdminModel
 
     protected $insertable = false;
 
+    public function active()
+    {
+        return config('admineshop.synchronizer.enabled', false) == true;
+    }
+
     /*
      * Automatic form and database generator by fields list
      * :name - field name

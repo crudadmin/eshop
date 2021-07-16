@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Clients;
 
 use AdminEshop\Contracts\Discounts\ClientsProducts;
+use AdminEshop\Eloquent\Concerns\OrderItemTrait;
 use AdminEshop\Models\Clients\Client;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
@@ -10,6 +11,8 @@ use Discounts;
 
 class ClientsProductsDiscount extends AdminModel
 {
+    use OrderItemTrait;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -69,6 +72,7 @@ class ClientsProductsDiscount extends AdminModel
     {
         return [
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
+            'product_id' => $this->getAvailableProducts(),
         ];
     }
 }
