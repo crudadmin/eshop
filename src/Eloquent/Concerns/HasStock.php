@@ -169,7 +169,7 @@ trait HasStock
          */
         // if ( $this instanceof ProductsVariant ) {
         //     $query->where('products.stock_type', '!=', 'hide')
-        //           ->orWhere('products_variants.stock_quantity', '>', 0);
+        //           ->orWhere('products.stock_quantity', '>', 0);
         // }
 
         /*
@@ -182,7 +182,7 @@ trait HasStock
                 ->orWhere(function($query){
                     $query
                         ->whereHas('variants', function($query){
-                            $query->where('products_variants.stock_quantity', '>', 0);
+                            $query->where('products.stock_quantity', '>', 0);
                         })
 
                         ->orWhere(function($query){

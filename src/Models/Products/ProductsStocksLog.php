@@ -34,7 +34,6 @@ class ProductsStocksLog extends AdminModel
      */
     protected $fields = [
         'product' => 'name:Produkt|belongsTo:products,name',
-        'variant' => 'name:Varianta|belongsTo:products_variants,name',
         'sub' => 'name:Úprava skladu|type:integer|required',
         'stock' => 'name:Nová hodnota skladu|type:integer|required',
         'order' => 'name:Objednávka č.|belongsTo:orders,id|invisible',

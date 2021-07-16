@@ -57,7 +57,6 @@ class ClientsProductsDiscount extends AdminModel
         return [
             'Produkt' => Group::fields([
                 'product' => 'name:Produkt|belongsTo:products,name',
-                'variant' => 'name:Varianta|belongsTo:products_variants,name',
             ]),
             'Zľava' => Group::fields([
                 'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
@@ -71,15 +70,5 @@ class ClientsProductsDiscount extends AdminModel
         return [
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
         ];
-    }
-
-    public function mutateFields($fields)
-    {
-        //If variants are not defined in eshop
-        if ( !config('admineshop.product_types.variants') ){
-            $fields->field('variant_id', function($field){
-                $field->invisible = true;
-            });
-        }
     }
 }
