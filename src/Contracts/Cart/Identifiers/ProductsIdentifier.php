@@ -177,7 +177,7 @@ class ProductsIdentifier extends Identifier
         $productOrVariant = $variant ?: $product;
 
         $items = [
-            $variant ? ($variant->name ?: $product->name) : $product->name
+            $variant ? ($variant->name ?: $product?->name) : $product?->name
         ];
 
         //If text attributes are not loaded

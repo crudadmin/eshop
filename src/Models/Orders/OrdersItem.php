@@ -153,6 +153,11 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         return $attributes;
     }
 
+    public function scopeAdminRows($query)
+    {
+        $query->with('product.product');
+    }
+
     /*
      * Rewrite initial price for discounts from saved initial value
      */
