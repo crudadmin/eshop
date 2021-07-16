@@ -5,7 +5,6 @@ namespace AdminEshop\Eloquent\Concerns;
 use AdminEshop\Events\StockChanged;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsStocksLog;
-use AdminEshop\Models\Products\ProductsVariant;
 use Store;
 
 trait HasStock
@@ -166,16 +165,17 @@ trait HasStock
     {
         /*
          * Limit stocks on variants
+         * TODO: check rule
          */
-        if ( $this instanceof ProductsVariant ) {
-            $query->where('products.stock_type', '!=', 'hide')
-                  ->orWhere('products_variants.stock_quantity', '>', 0);
-        }
+        // if ( $this instanceof ProductsVariant ) {
+        //     $query->where('products.stock_type', '!=', 'hide')
+        //           ->orWhere('products_variants.stock_quantity', '>', 0);
+        // }
 
         /*
          * Limit stocks on product
          */
-        else if ( $this instanceof Product ) {
+        if ( $this instanceof Product ) {
             $query
                 ->where('products.stock_type', '!=', 'hide')
 
@@ -215,8 +215,8 @@ trait HasStock
 
         $stockLog = ProductsStocksLog::create([
             'order_id' => $orderId,
+            //TODO: check correct variant ID is pushed here
             'product_id' => $this instanceof Product ? $this->getKey() : $this->product_id,
-            'variant_id' => $this instanceof ProductsVariant ? $this->getKey() : null,
             'sub' => $sub,
             'stock' => $this->stock_quantity,
             'message' => $message,

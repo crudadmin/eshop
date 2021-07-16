@@ -8,7 +8,6 @@ use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use App\Model\Store\DiscountsLevel;
 use Store;
 
@@ -60,9 +59,11 @@ class ClientsProducts extends Discount implements Discountable
 
             if ( $product instanceof Product ){
                 $discount = $this->getDiscountedProductsList()->where('product_id', $product->getKey())->first();
-            } elseif ( $product instanceof ProductsVariant ){
-                $discount = $this->getDiscountedProductsList()->where('variant_id', $product->getKey())->first();
             }
+            //TODO: check variant discount
+            // elseif ( $product instanceof ProductsVariant ){
+            //     $discount = $this->getDiscountedProductsList()->where('variant_id', $product->getKey())->first();
+            // }
 
             //Modify price by discount operator
             if ( $discount ) {

@@ -5,7 +5,6 @@ namespace AdminEshop\Eloquent\Concerns;
 use Admin;
 use AdminEshop\Eloquent\Paginator\ProductsPaginator;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Store;

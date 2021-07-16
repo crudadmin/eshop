@@ -8,7 +8,6 @@ use AdminEshop\Contracts\Synchronizer\SynchronizerInterface;
 use AdminEshop\Models\Products\Pivot\ProductsAttributesItem;
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use AdminEshop\Models\Products\ProductsGallery;
-use AdminEshop\Models\Products\ProductsVariant;
 use DB;
 use Store;
 

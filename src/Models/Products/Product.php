@@ -204,7 +204,9 @@ class Product extends CartEloquent implements HasAttributesSupport
     {
         //Load all attributes data
         if ( $this->hasAttributesEnabled() == true ) {
-            // $query->with('attributesItems');
+            $query->with(['attributesItems' => function($query){
+                $query->withTextAttributes();
+            }]);
         }
     }
 
@@ -263,8 +265,11 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function setAdminAttributes($attributes)
     {
-        //TODO: add attributes into table
-        // $attributes['attributes'] = $this->attributesText;
+        if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+            $attributes['attributes'] = $this->attributesVariantsText;
+        } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+            $attributes['attributes'] = $this->attributesText;
+        }
 
         return $attributes;
     }

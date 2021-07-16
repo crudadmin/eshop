@@ -4,7 +4,6 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use Admin\Eloquent\AdminModel;
 use DB;
 use Store;
