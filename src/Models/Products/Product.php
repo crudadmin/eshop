@@ -14,6 +14,7 @@ use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
 use AdminEshop\Eloquent\Concerns\HasProductPaginator;
 use AdminEshop\Eloquent\Concerns\HasProductResponses;
+use AdminEshop\Eloquent\Concerns\HasProductSorter;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Models\Attribute\Attribute;
@@ -27,6 +28,7 @@ class Product extends CartEloquent implements HasAttributesSupport
     use HasProductImage,
         HasProductAttributes,
         HasStock,
+        HasProductSorter,
         HasProductFilter,
         HasProductPaginator,
         HasProductResponses,
@@ -106,13 +108,13 @@ class Product extends CartEloquent implements HasAttributesSupport
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
                     'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|canAdd|hidden',
-                    'price' => 'name:Cena bez DPH|type:decimal|default:0|component:PriceField|required_if:product_type,'.implode(',', Store::orderableProductTypes()),
+                    'price' => 'name:Cena bez DPH|type:decimal|component:PriceField|required_if:product_type,'.implode(',', Store::orderableProductTypes()),
                 ])->id('price')->width(8),
                 'Zľava' => Group::fields([
                     'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
                     'discount' => 'name:Výška zľavy|type:decimal|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
                 ])->id('discount')->width(4),
-            ])->icon('fa-money')->id('priceTab')->attributes('hideFromFormIf:product_type,variants'),
+            ])->icon('fa-money')->id('priceTab')->attributes('hideFromFormIf:product_type,variants')->add('removeFromFormIf:product_type,variants'),
             'Popis' => Group::tab([
                 'description' => 'name:Popis produktu|type:editor|hidden'.(Store::isEnabledLocalization() ? '|locale' : ''),
             ])->icon('fa-file-text-o'),

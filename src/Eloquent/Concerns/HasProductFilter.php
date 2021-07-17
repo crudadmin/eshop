@@ -155,18 +155,18 @@ trait HasProductFilter
             return !is_null($item) && $item !== '';
         });
 
-        $filterCount = count($priceRanges);
-
         //Filter product range price
-        if ( $filterCount == 2 ){
-            $query->where(function($query) use ($priceRanges) {
+        $query->where(function($query) use ($priceRanges) {
+            $filterCount = count($priceRanges);
+
+            if ( $filterCount == 2 ){
                 $query
                     ->where($query->getQuery()->from.'.price', '>=', $priceRanges[0])
                     ->where($query->getQuery()->from.'.price', '<=', $priceRanges[1]);
-            });
-        } else if ( $filterCount == 1 ) {
-            $query->where($query->getQuery()->from.'.price', '<=', $priceRanges[0]);
-        }
+            } else if ( $filterCount == 1 ) {
+                $query->where($query->getQuery()->from.'.price', '<=', $priceRanges[0]);
+            }
+        });
     }
 
     public function scopeFilterProduct($query, $params)

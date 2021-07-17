@@ -42,8 +42,14 @@ trait HasProductPaginator
             ->get();
 
         $totalAttributes = $totalResult[0]->attributes;
-        $priceRanges = array_filter([$totalAttributes['min_filter_price'] ?? 0, $totalAttributes['max_filter_price'] ?? 0, $totalAttributes['min_filter_variant_price'] ?? 0, $totalAttributes['max_filter_variant_price'] ?? 0], function($number){
-            return is_numeric($number) && $number > 0;
+
+        $priceRanges = array_filter([
+            ($totalAttributes['min_filter_price'] ?? null) ?: null,
+            ($totalAttributes['max_filter_price'] ?? null) ?: null,
+            $totalAttributes['min_filter_variant_price'] ?? 0,
+            $totalAttributes['max_filter_variant_price'] ?? 0
+        ], function($number){
+            return is_numeric($number);
         });
 
         $total = $totalAttributes['aggregate_products'];
@@ -75,6 +81,7 @@ trait HasProductPaginator
                                 product_id
                             ')
                             ->whereNotNull('product_id')
+                            ->whereNull('deleted_at')
                             ->groupBy('product_id');
 
             $query->leftJoinSub($variants, 'pvp', function($join){
@@ -158,99 +165,99 @@ trait HasProductPaginator
     //     })->values();
     // }
 
-    private function isPriceInRange($price)
-    {
-        $priceRanges = array_filter(explode(',', $this->filterParams['_price'] ?? ''), function($item){
-            return !is_null($item) && $item !== '';
-        });
+    // private function isPriceInRange($price)
+    // {
+    //     $priceRanges = array_filter(explode(',', $this->filterParams['_price'] ?? ''), function($item){
+    //         return !is_null($item) && $item !== '';
+    //     });
 
-        $filterCount = count($priceRanges);
+    //     $filterCount = count($priceRanges);
 
-        //Filter product range price
-        if ( $filterCount == 2 ){
-            return $price >= $priceRanges[0] && $price <= $priceRanges[1];
-        }
+    //     //Filter product range price
+    //     if ( $filterCount == 2 ){
+    //         return $price >= $priceRanges[0] && $price <= $priceRanges[1];
+    //     }
 
-        //Filter product by max price
-        else if ( $filterCount == 1 ){
-            return $price <= $priceRanges[0];
-        }
-    }
+    //     //Filter product by max price
+    //     else if ( $filterCount == 1 ){
+    //         return $price <= $priceRanges[0];
+    //     }
+    // }
 
-    private function sortItems(&$items)
-    {
-        $filter = $this->filterParams;
+    // private function sortItems(&$items)
+    // {
+    //     $filter = $this->filterParams;
 
-        $existingAttributes = Store::getExistingAttributesFromFilter($filter);
+    //     $existingAttributes = Store::getExistingAttributesFromFilter($filter);
 
-        if ( !($sortBy = ($filter['_sort'] ?? null)) && count($existingAttributes) == 0 ){
-            return;
-        }
+    //     if ( !($sortBy = ($filter['_sort'] ?? null)) && count($existingAttributes) == 0 ){
+    //         return;
+    //     }
 
-        //Sort by sorter
-        if ( $sortBy ) {
-            $desc = in_array($sortBy, ['expensive']);
+    //     //Sort by sorter
+    //     if ( $sortBy ) {
+    //         $desc = in_array($sortBy, ['expensive']);
 
-            $items = $items->{ $desc ? 'sortByDesc' : 'sortBy' }(function($item) use ($sortBy) {
-                if ( in_array($sortBy, ['cheapest', 'expensive']) ) {
-                    return $this->pricesTree[$this->getVariantsKey($item)];
-                }
+    //         $items = $items->{ $desc ? 'sortByDesc' : 'sortBy' }(function($item) use ($sortBy) {
+    //             if ( in_array($sortBy, ['cheapest', 'expensive']) ) {
+    //                 return $this->pricesTree[$this->getVariantsKey($item)];
+    //             }
 
-                return $this->getKey();
-            });
-        }
+    //             return $this->getKey();
+    //         });
+    //     }
 
-        //Sort by filter score
-        else {
-            $items = $items->sortByDesc(function($item) use ($existingAttributes) {
-                return $this->getProductFilterScore($item, $existingAttributes);
-            });
-        }
-    }
+    //     //Sort by filter score
+    //     else {
+    //         $items = $items->sortByDesc(function($item) use ($existingAttributes) {
+    //             return $this->getProductFilterScore($item, $existingAttributes);
+    //         });
+    //     }
+    // }
 
-    private function getProductFilterScore($item, $existingAttributes)
-    {
-        $filter = $this->filterParams;
+    // private function getProductFilterScore($item, $existingAttributes)
+    // {
+    //     $filter = $this->filterParams;
 
-        $maxAttributeScore = count($existingAttributes);
+    //     $maxAttributeScore = count($existingAttributes);
 
-        $score = 0;
+    //     $score = 0;
 
-        if ( $item->attributesItems->count() ) {
-            $attributesItems = $item->attributesItems->groupBy('attribute_id');
+    //     if ( $item->attributesItems->count() ) {
+    //         $attributesItems = $item->attributesItems->groupBy('attribute_id');
 
-            //On each attribute match we will add +10 score
-            $aScore = 1;
-            foreach ($existingAttributes as $filterAttribute) {
-                if ( !($attributesItems[$filterAttribute['id']] ?? null) ){
-                    continue;
-                }
+    //         //On each attribute match we will add +10 score
+    //         $aScore = 1;
+    //         foreach ($existingAttributes as $filterAttribute) {
+    //             if ( !($attributesItems[$filterAttribute['id']] ?? null) ){
+    //                 continue;
+    //             }
 
-                $requestedFilterValue = explode(',', $filter[$filterAttribute['slug']]);
+    //             $requestedFilterValue = explode(',', $filter[$filterAttribute['slug']]);
 
-                //Add higher score when attribute is set as first, and low score when attribute match is for example on the third place
-                foreach ($attributesItems[$filterAttribute['id']] as $i => $attrItem) {
-                    if ( in_array($attrItem->attributes_item_id, $requestedFilterValue) ) {
-                        //On each attribute match add aScore
-                        $aScore++;
+    //             //Add higher score when attribute is set as first, and low score when attribute match is for example on the third place
+    //             foreach ($attributesItems[$filterAttribute['id']] as $i => $attrItem) {
+    //                 if ( in_array($attrItem->attributes_item_id, $requestedFilterValue) ) {
+    //                     //On each attribute match add aScore
+    //                     $aScore++;
 
-                        //On each attributeMatch we add 10 score, but we need substract position of item match.
-                        //If item is in first order, we will add full 10 score
-                        //if item is in second order, we will add 10-1=>9 score, because it is not primary value for this match.
-                        //So if two products will be set as red color, but second product is primary brown and secondary red
-                        //then both products will be in front, but product with brown will have lower score.
-                        $score += ($aScore * 10) - $i;
-                    }
-                }
-            }
-        }
+    //                     //On each attributeMatch we add 10 score, but we need substract position of item match.
+    //                     //If item is in first order, we will add full 10 score
+    //                     //if item is in second order, we will add 10-1=>9 score, because it is not primary value for this match.
+    //                     //So if two products will be set as red color, but second product is primary brown and secondary red
+    //                     //then both products will be in front, but product with brown will have lower score.
+    //                     $score += ($aScore * 10) - $i;
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        if ( ($variants = $item->getAttribute('variants')) && $variants->count() ){
-            foreach ($variants as $variant) {
-                $score += $this->getProductFilterScore($variant, $existingAttributes);
-            }
-        }
+    //     if ( ($variants = $item->getAttribute('variants')) && $variants->count() ){
+    //         foreach ($variants as $variant) {
+    //             $score += $this->getProductFilterScore($variant, $existingAttributes);
+    //         }
+    //     }
 
-        return $score;
-    }
+    //     return $score;
+    // }
 }

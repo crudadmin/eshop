@@ -11,6 +11,8 @@ use Store;
 
 trait HasProductResponses
 {
+    protected $temporaryFilterOptions = [];
+
     static $filterOptions = [
         'filter' => [],
         'scope' => null,
@@ -30,12 +32,17 @@ trait HasProductResponses
 
     public function scopeSetFilterOptions($query, $options)
     {
+        $this->temporaryFilterOptions = array_merge($this->temporaryFilterOptions, $options);
+    }
+
+    public function scopeSetGlobalFilterOptions($query, $options)
+    {
         self::$filterOptions = array_merge(self::$filterOptions, $options);
     }
 
     public function getFilterOption($key, $default = null)
     {
-        $value = self::$filterOptions[$key] ?? null;
+        $value = array_merge(self::$filterOptions, $this->temporaryFilterOptions)[$key] ?? null;
 
         return is_null($value) ? $default : $value;
     }
@@ -219,8 +226,10 @@ trait HasProductResponses
      * @param  Builder  $query
      * @param  array    $options
      */
-    public function scopeWithListingResponse($query)
+    public function scopeWithListingResponse($query, $options = [])
     {
+        $this->setFilterOptions($options);
+
         //We need specify select for
         $query->addSelect('products.*');
 
@@ -313,48 +322,12 @@ trait HasProductResponses
         }
     }
 
-    public function scopeSortByParams($query)
-    {
-        $filterParams = $this->getFilterOption('filter');
-        $extractVariants = $this->getFilterOption('listing.variants.extract');
-
-        if ( !($sortBy = $filterParams['_sort'] ?? null) ){
-            return;
-        }
-
-        if ( in_array($sortBy, ['expensive', 'cheapest', 'latest']) ) {
-            $expensive = $sortBy == 'expensive';
-            $latest = $sortBy == 'latest';
-            $agregatedColumn = $latest == true ? 'products.id' : 'products.price';
-
-            $isDesc = $expensive || $latest;
-
-            //Enabled variant extraction
-            if ( $extractVariants === false ) {
-                $variantsPrices = DB::table('products')
-                                    ->selectRaw(($isDesc ? 'max' : 'min').'('.$agregatedColumn.') as aggregator, product_id')
-                                    ->where('product_type', 'variant')
-                                    ->groupBy('product_id');
-
-                $query
-                    ->leftJoinSub($variantsPrices, 'pricedVariants', function($join){
-                        $join->on('products.id', '=', 'pricedVariants.product_id');
-                    })
-                    ->addSelect(DB::raw('IFNULL(pricedVariants.aggregator, '.$agregatedColumn.') as aggregator'));
-            } else {
-                $query->addSelect(DB::raw($agregatedColumn.' as aggregator'));
-            }
-
-            $query->orderBy('aggregator', $isDesc ? 'DESC' : 'ASC');
-        }
-    }
-
     public function scopeWithMinAndMaxVariantPrices($query)
     {
-        $query->leftJoin('products as pv', 'pv.product_id', '=', 'products.id');
-
-        $query->addSelect(DB::raw('MIN(pv.price) as min_price, MAX(pv.price) as max_price'));
-
-        $query->groupBy('products.id');
+        $query
+            ->leftJoin('products as pv', 'pv.product_id', '=', 'products.id')
+            ->whereNull('pv.deleted_at')
+            ->addSelect(DB::raw('MIN(pv.price) as min_price, MAX(pv.price) as max_price'))
+            ->groupBy('products.id');
     }
 }
