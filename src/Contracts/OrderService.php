@@ -51,6 +51,13 @@ class OrderService
      */
     protected $cartItems;
 
+    /**
+     * Should be stock countdown after new order?
+     *
+     * @var  bool
+     */
+    protected $stockSync = true;
+
     /*
      * Returns if invoices support is allowed
      */
@@ -115,7 +122,11 @@ class OrderService
      */
     public function getCartItems()
     {
-        return is_null($this->cartItems) ? Cart::all() : $this->cartItems;
+        if ( is_null($this->cartItems) ){
+            return Cart::all();
+        }
+
+        return $this->cartItems->toCartFormat();
     }
 
 
@@ -188,7 +199,10 @@ class OrderService
         //Add all order items into order
         $this->addDiscountableItemsIntoOrder();
 
-        $this->order->syncStock('-', 'order.new');
+        //Coundown stock if is allowed
+        if ( $this->stockSync == true ) {
+            $this->order->syncStock('-', 'order.new');
+        }
 
         return $this;
     }
@@ -277,7 +291,13 @@ class OrderService
     {
         $this->addOrderPrices($items);
         $this->addDiscountsData($items);
-        $this->fireMutators();
+
+        foreach ($this->getActiveMutators() as $mutator) {
+            if ( method_exists($mutator, 'mutateOrder') ) {
+                $mutator->mutateOrder($this->getOrder(), $mutator->getActiveResponse());
+            }
+        }
+
         $this->addClientIntoOrder();
 
         return $this;
@@ -421,6 +441,18 @@ class OrderService
     public function isDebug()
     {
         return app()->environment('local') && env('APP_DEBUG') == true;
+    }
+
+    /**
+     * Set stock countdown state on new order
+     *
+     * @param  bool  $state
+     */
+    public function setStockSync($state)
+    {
+        $this->stockSync = $state;
+
+        return $this;
     }
 }
 

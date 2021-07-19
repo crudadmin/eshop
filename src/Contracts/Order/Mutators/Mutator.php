@@ -6,6 +6,7 @@ use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Concerns\ActiveInterface;
 use AdminEshop\Contracts\Cart\Concerns\ActiveResponse;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
+use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
@@ -23,6 +24,13 @@ class Mutator implements ActiveInterface
      * @var  array
      */
     protected $validators = [];
+
+    /**
+     * Get cart items
+     *
+     * @var  array
+     */
+    protected $cartItems = [];
 
     /**
      * Returns if mutators is active
@@ -123,6 +131,18 @@ class Mutator implements ActiveInterface
     public function getValidators()
     {
         return $this->validators;
+    }
+
+    public function setCartItems(CartCollection $items)
+    {
+        $this->cartItems = $items;
+
+        return $this;
+    }
+
+    public function getCartItems()
+    {
+        return $this->cartItems;
     }
 }
 

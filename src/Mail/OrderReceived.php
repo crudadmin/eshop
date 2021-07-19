@@ -26,6 +26,8 @@ class OrderReceived extends Mailable
 
     private $owner = false;
 
+    private $message;
+
     /**
      * Create a new message instance.
      *
@@ -76,6 +78,8 @@ class OrderReceived extends Mailable
      */
     public function build()
     {
+        $subject = $this->order->{'get'.($this->owner ? 'Store' : 'Client').'EmailSubject'}($this->owner);
+
         $mail = $this->markdown('admineshop::mail.order.received', [
                         'message' => $this->message,
                         'order' => $this->order,
@@ -89,7 +93,7 @@ class OrderReceived extends Mailable
                         'showNoVat' => config('admineshop.mail.show_no_vat', false),
                         'existingAdditionalFields' => $this->getAvailableAdditionalFields(),
                     ])
-                    ->subject(_('Objednávka č. ') . $this->order->number);
+                    ->subject($subject);
 
         //Attach order pdf
         if ( $invoice = $this->invoice ) {

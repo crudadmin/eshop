@@ -173,7 +173,7 @@ class DeliveryMutator extends Mutator
 
         //If is price limiter available
         if ( config('admineshop.delivery.price_limit') ) {
-            $priceWithVat = Cart::all()->getSummary()['priceWithVat'] ?? 0;
+            $priceWithVat = $this->getCartItems()->getSummary()['priceWithVat'] ?? 0;
 
             $deliveries = $deliveries->filter(function($delivery) use ($priceWithVat) {
                 if ( !$delivery->price_limit ){

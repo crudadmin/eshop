@@ -13,4 +13,14 @@ trait HasOrderEmails
     {
         return sprintf(_('Gratulujeme! Obržali ste objednávku č. %s.'), $this->number);
     }
+
+    public function getClientEmailSubject()
+    {
+        return _('Objednávka č. ') . $this->number;
+    }
+
+    public function getStoreEmailSubject()
+    {
+        return _('Objednávka č. ') . $this->number;
+    }
 }

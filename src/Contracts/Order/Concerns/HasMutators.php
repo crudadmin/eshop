@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Order\Concerns;
 
 use Admin;
+use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
@@ -50,31 +51,18 @@ trait HasMutators
         });
     }
 
-
-    /**
-     * Fire all registered mutators and apply them on order
-     *
-     * @return  this
-     */
-    public function fireMutators()
-    {
-        foreach ($this->getActiveMutators() as $mutator) {
-            if ( method_exists($mutator, 'mutateOrder') ) {
-                $mutator->mutateOrder($this->getOrder(), $mutator->getActiveResponse());
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * Returns active mutators for given order
      *
      * @return  array
      */
-    public function getActiveMutators()
+    public function getActiveMutators(CartCollection $cartItems = null)
     {
-        return array_filter(array_map(function($mutator){
+        $cartItems = $cartItems ?: $this->getCartItems();
+
+        return array_filter(array_map(function($mutator) use ($cartItems) {
+            $mutator->setCartItems($cartItems);
+
             if ( Admin::isAdmin() ) {
                 $response = $mutator->isActiveInAdmin($this->getOrder());
             } else {

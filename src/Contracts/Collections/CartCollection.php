@@ -271,7 +271,7 @@ class CartCollection extends Collection
     {
         $order = OrderService::getOrder() ?: new Order;
 
-        foreach (OrderService::getActiveMutators() as $mutator) {
+        foreach (OrderService::getActiveMutators($this) as $mutator) {
             //Mutate price by anonymous price mutators
             if ( method_exists($mutator, 'mutatePrice') ) {
                 $price = $mutator->mutatePrice(
