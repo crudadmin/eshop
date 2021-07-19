@@ -101,25 +101,68 @@ class Attribute extends AdminModel
     {
         $attributes = $query->with([
             'items' => function($query) use ($productsQuery) {
+                $this->itemsProductsScope($query, $productsQuery);
+            }
+        ]);
+    }
+
+    public function loadItemsForProducts($productsQuery, $filter)
+    {
+        $this->load([
+            'items' => function($query) use ($productsQuery, $filter){
                 $query->select(
                     Admin::getModel('AttributesItem')->getAttributesItemsColumns()
-                )->whereHas('productsAttributes', function($query) use ($productsQuery) {
-                    if ( !$productsQuery ){
-                        return;
-                    }
-
-                    //Get attribute items from all products
-                    if ( Admin::getModel('Product')->hasAttributesEnabled() ) {
-                        $query->whereHas('products', $productsQuery);
-                    }
-
-                    //Get attribute items also from all variants
-                    if ( Admin::getModel('ProductsVariant')->hasAttributesEnabled() ) {
-                        $query->orWhereHas('variants.product', $productsQuery);
-                    }
+                )->where(function($query) use ($productsQuery, $filter) {
+                    $this->itemsProductsScope($query, $productsQuery, $filter);
                 });
             }
         ]);
+    }
+
+    private function itemsProductsScope($query, $productsQuery, $filter = [])
+    {
+        if ( Admin::getModel('Product')->hasAttributesEnabled() ) {
+            $query->whereHas('assignedProducts', function($query) use ($productsQuery, $filter) {
+                if ( $productsQuery ) {
+                    $productsQuery($query);
+                }
+
+                $this->filterByParameters($query, $filter);
+            });
+        }
+
+        if ( Admin::getModel('ProductsVariant')->hasAttributesEnabled() ) {
+            $query->orWhereHas('assignedVariants', function($query) use ($productsQuery, $filter) {
+                //Filter by parent product
+                $query->whereHas('product', function($query) use ($productsQuery){
+                    if ( $productsQuery ) {
+                        $productsQuery($query);
+                    }
+                });
+
+                $this->filterByParameters($query, $filter);
+            });
+        }
+    }
+
+    private function filterByParameters($query, $filter)
+    {
+        $filter = $query->getModel()->getFilterFromParams($filter);
+
+        if ( count($filter) == 0 ){
+            return;
+        }
+
+        foreach ($filter as $attributeId => $attrIds) {
+            //Filter except actual attribute
+            if ( $this->getKey() == $attributeId ){
+                continue;
+            }
+
+            $query->whereHas('attributesItems', function($query) use ($attributeId, $attrIds) {
+                $query->whereIn('attributes_item_products_attribute_items.attributes_item_id', $attrIds);
+            });
+        }
     }
 
     /**

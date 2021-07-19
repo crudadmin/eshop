@@ -29,21 +29,7 @@ trait HasProductFilter
     {
         $params = is_array($params) ? $params : [];
 
-        $filter = [];
-
-        //If no filter params are present
-        if ( count($params) > 0 ){
-            $existingAttributes = Store::getExistingAttributesFromFilter($params);
-
-            foreach ($params as $key => $value) {
-                //Denny non attributes queries
-                if ( array_key_exists($key, $existingAttributes) ){
-                    $attributeId = $existingAttributes[$key]['id'];
-
-                    $filter[$attributeId] = explode(',', $value);
-                }
-            }
-        }
+        $filter = $this->getFilterFromParams($params);
 
         $query->where(function($query) use ($filter) {
             $model = $query->getModel();
@@ -79,5 +65,26 @@ trait HasProductFilter
                 }
             }
         });
+    }
+
+    public function getFilterFromParams($params)
+    {
+        $filter = [];
+
+        //If no filter params are present
+        if ( $params && count($params) > 0 ){
+            $existingAttributes = Store::getExistingAttributesFromFilter($params);
+
+            foreach ($params as $key => $value) {
+                //Denny non attributes queries
+                if ( array_key_exists($key, $existingAttributes) ){
+                    $attributeId = $existingAttributes[$key]['id'];
+
+                    $filter[$attributeId] = explode(',', $value);
+                }
+            }
+        }
+
+        return $filter;
     }
 }

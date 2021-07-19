@@ -4,12 +4,16 @@ namespace AdminEshop\Models\Attribute;
 
 use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
+use AdminEshop\Models\Attribute\Pivot\AssignedProductsPivot;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
+use Admin;
 
 class AttributesItem extends AdminModel
 {
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+
     use HasUnit;
 
     /*
@@ -135,5 +139,21 @@ class AttributesItem extends AdminModel
     public function getAttributeItemValue($attribute)
     {
         return $this->getValue('name');
+    }
+
+    public function assignedProducts()
+    {
+        $product = get_class(Admin::getModel('Product'));
+        $productsAttributes = get_class(Admin::getModel('ProductsAttribute'));
+
+        return $this->hasManyDeep($product, [AssignedProductsPivot::class, $productsAttributes], ['attributes_item_id', 'id', 'id'], [null, 'products_attribute_id', 'product_id']);
+    }
+
+    public function assignedVariants()
+    {
+        $variant = get_class(Admin::getModel('ProductsVariant'));
+        $productsAttributes = get_class(Admin::getModel('ProductsAttribute'));
+
+        return $this->hasManyDeep($variant, [AssignedProductsPivot::class, $productsAttributes], ['attributes_item_id', 'id', 'id'], [null, 'products_attribute_id', 'products_variant_id']);
     }
 }

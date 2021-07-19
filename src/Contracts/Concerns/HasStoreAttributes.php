@@ -7,10 +7,12 @@ use Admin;
 trait HasStoreAttributes
 {
     private $attributesScope;
+    private $attributesFilter = [];
 
-    public function setAttributesScope($attributesScope)
+    public function setAttributesScope($attributesScope, $attributesFilter = [])
     {
         $this->attributesScope = $attributesScope;
+        $this->attributesFilter = $attributesFilter;
 
         return $this;
     }
@@ -22,9 +24,15 @@ trait HasStoreAttributes
 
             return $model
                         ->select($model->getAttributesColumns())
-                        ->withItemsForProducts($this->attributesScope)
+                        ->when(count($this->attributesFilter) == 0, function($query) {
+                            $query->withItemsForProducts($this->attributesScope);
+                        })
                         ->get()
                         ->each(function($attribute){
+                            if ( $attribute->relationLoaded('items') == false ){
+                                $attribute->loadItemsForProducts($this->attributesScope, $this->attributesFilter);
+                            }
+
                             //Skip reordeing, already ordered from database
                             if ( $attribute->sortby == 'order' ){
                                 return;
@@ -60,7 +68,7 @@ trait HasStoreAttributes
 
             $keyIdentifier = $isSlugIdentifier ? 'slug' : 'id';
 
-            return $this->getAttributes()->whereIn($keyIdentifier, $attributeIdentifiers)->keyBy($keyIdentifier)->toArray();
+            return Admin::getModel('Attribute')->select('id', 'name', 'slug')->get()->whereIn($keyIdentifier, $attributeIdentifiers)->keyBy($keyIdentifier)->toArray();
         });
     }
 

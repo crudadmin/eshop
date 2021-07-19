@@ -14,7 +14,8 @@
         "crudadmin/crudadmin": "^3.0|^4.0|dev-3.0-dev|dev-4.0-dev",
         "marekgogol/invoices": "^3.0|dev-3.0-dev",
         "propaganistas/laravel-phone": "^4.2",
-        "gopay/payments-sdk-php": "^1.4"
+        "gopay/payments-sdk-php": "^1.4",
+        "staudenmeir/eloquent-has-many-deep": "^1.13"
     },
     "autoload": {
         "psr-4": {
