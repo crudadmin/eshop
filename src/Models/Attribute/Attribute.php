@@ -121,28 +121,31 @@ class Attribute extends AdminModel
 
     private function itemsProductsScope($query, $productsQuery, $filter = [])
     {
-        if ( Admin::getModel('Product')->hasAttributesEnabled() ) {
-            $query->whereHas('assignedProducts', function($query) use ($productsQuery, $filter) {
-                if ( $productsQuery ) {
-                    $productsQuery($query);
+        $query
+            ->select(Admin::getModel('AttributesItem')->getAttributesItemsColumns())
+            ->whereHas('productsAttributes', function($query) use ($productsQuery, $filter) {
+                if ( !$productsQuery ){
+                    return;
                 }
 
-                $this->filterByParameters($query, $filter);
-            });
-        }
-
-        if ( Admin::getModel('ProductsVariant')->hasAttributesEnabled() ) {
-            $query->orWhereHas('assignedVariants', function($query) use ($productsQuery, $filter) {
-                //Filter by parent product
-                $query->whereHas('product', function($query) use ($productsQuery){
-                    if ( $productsQuery ) {
+                //Get attribute items from all products
+                if ( Admin::getModel('Product')->hasAttributesEnabled() ) {
+                    $query->whereHas('products', function($query) use ($productsQuery, $filter) {
                         $productsQuery($query);
-                    }
-                });
 
-                $this->filterByParameters($query, $filter);
+                        $this->filterByParameters($query, $filter);
+                    });
+                }
+
+                //Get attribute items also from all variants
+                if ( Admin::getModel('ProductsVariant')->hasAttributesEnabled() ) {
+                    $query->orWhereHas('variants', function($query) use ($productsQuery, $filter) {
+                        $query->whereHas('product', $productsQuery);
+
+                        $this->filterByParameters($query, $filter);
+                    });
+                }
             });
-        }
     }
 
     private function filterByParameters($query, $filter)
