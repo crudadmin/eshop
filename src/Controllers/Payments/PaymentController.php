@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Log;
 use Mail;
 use OrderService;
+use Admin;
 
 class PaymentController extends Controller
 {
@@ -107,8 +108,10 @@ class PaymentController extends Controller
         }
     }
 
-    public function postPayment(Order $order, $hash)
+    public function postPayment($order, $hash)
     {
+        $order = Admin::getModel('Order')->findOrFail($order);
+
         $type = 'postpayment';
 
         OrderService::setOrder($order);
