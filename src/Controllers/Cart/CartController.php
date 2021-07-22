@@ -226,7 +226,7 @@ class CartController extends Controller
         OrderService::store();
 
         //Send email to client
-        if ( config('admineshop.mail.order.store_copy', true) == true ) {
+        if ( config('admineshop.mail.order.created', true) == true ) {
             //Generate default invoice document
             $proform = OrderService::makeInvoice('proform');
 
@@ -234,7 +234,7 @@ class CartController extends Controller
         }
 
         //Sent store email
-        if ( config('admineshop.mail.order.created', true) == true ) {
+        if ( config('admineshop.mail.order.store_copy', true) == true ) {
             OrderService::sentStoreEmail();
         }
 
