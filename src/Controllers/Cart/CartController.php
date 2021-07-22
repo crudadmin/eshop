@@ -225,14 +225,18 @@ class CartController extends Controller
         //Create order
         OrderService::store();
 
-        //Generate default invoice document
-        $proform = OrderService::makeInvoice('proform');
-
         //Send email to client
-        OrderService::sentClientEmail($proform);
+        if ( config('admineshop.mail.order.store_copy', true) == true ) {
+            //Generate default invoice document
+            $proform = OrderService::makeInvoice('proform');
+
+            OrderService::sentClientEmail($proform);
+        }
 
         //Sent store email
-        OrderService::sentStoreEmail();
+        if ( config('admineshop.mail.order.created', true) == true ) {
+            OrderService::sentStoreEmail();
+        }
 
         //Send shipping
         OrderService::sendShipping();

@@ -48,6 +48,7 @@ class ProductsStocksLog extends AdminModel
         return [
             'message' => [
                 'order.new' => 'Nová objednávka',
+                'order.paid' => 'Objednávka zaplatená',
                 'order.new-backend' => 'Nová objednávka (backend)',
                 'order.canceled' => 'Zrušená objednávka',
                 'order.deleted' => 'Zmazaná objednávka',

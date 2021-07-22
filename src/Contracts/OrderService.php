@@ -200,7 +200,7 @@ class OrderService
         $this->addDiscountableItemsIntoOrder();
 
         //Coundown stock if is allowed
-        if ( $this->stockSync == true ) {
+        if ( $this->stockSync == true && config('admineshop.stock.countdown.on_order_create', true) == true ) {
             $this->order->syncStock('-', 'order.new');
         }
 
@@ -366,29 +366,31 @@ class OrderService
      */
     public function sentStoreEmail()
     {
-        if ( $email = Store::getSettings()->email ) {
-            $order = $this->getOrder();
+        if ( !($email = Store::getSettings()->email) ) {
+            return;
+        }
 
-            $message = $order->getStoreEmailMessage();
+        $order = $this->getOrder();
 
-            $items = $this->getCartItems();
+        $message = $order->getStoreEmailMessage();
 
-            try {
-                Mail::to($email)->send(
-                    (new OrderReceived($order, $items, $message))->setOwner(true)
-                );
-            } catch (Exception $error){
-                Log::error($error);
+        $items = $this->getCartItems();
 
-                $order->log()->create([
-                    'type' => 'error',
-                    'code' => 'email-store-error'
-                ]);
+        try {
+            Mail::to($email)->send(
+                (new OrderReceived($order, $items, $message))->setOwner(true)
+            );
+        } catch (Exception $error){
+            Log::error($error);
 
-                //Debug
-                if ( $this->isDebug() ) {
-                    throw $error;
-                }
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'email-store-error'
+            ]);
+
+            //Debug
+            if ( $this->isDebug() ) {
+                throw $error;
             }
         }
 

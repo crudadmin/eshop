@@ -74,6 +74,10 @@ return [
         'rounding' => [100, 50, 20, 10], //10+, 50+ items...
         'rounding_less_than_char' => '<',
         'rounding_more_than_char' => '>',
+        'countdown' => [
+            'on_order_create' => true,
+            'on_order_paid' => false,
+        ],
     ],
 
     /*
@@ -215,6 +219,17 @@ return [
     ],
 
     'mail' => [
+        'order' => [
+            //Send store order copy
+            'store_copy' => true,
+
+            //Send order success email before payment has been paid
+            'created' => true,
+
+            //Payment notification notification
+            'paid_notification' => true,
+        ],
+
         //Show without vat product values in email template
         'show_no_vat' => false,
     ],

@@ -40,8 +40,6 @@ class PaymentController extends Controller
 
             //If order is not paid
             if ( ! $order->paid_at ) {
-                event(new OrderPaidEvent($order));
-
                 //Update order status paid
                 $order->update([
                     'paid_at' => \Carbon\Carbon::now()
@@ -52,21 +50,30 @@ class PaymentController extends Controller
                     'status' => 'paid',
                 ]);
 
+                //Countdown product stock on payment
+                if ( config('admineshop.stock.countdown.on_order_paid', true) == true ) {
+                    $order->syncStock('-', 'order.paid');
+                }
+
+                event(new OrderPaidEvent($order));
+
                 //Generate invoice
                 $invoice = OrderService::makeInvoice('invoice');
 
                 //Send invoice email
-                try {
-                    Mail::to($order->email)->send(
-                        new OrderPaid($order, $invoice)
-                    );
-                } catch (Exception $e){
-                    Log::channel('store')->error($e);
+                if ( config('admineshop.mail.order.paid_notification', true) == true ) {
+                    try {
+                        Mail::to($order->email)->send(
+                            new OrderPaid($order, $invoice)
+                        );
+                    } catch (Exception $e){
+                        Log::channel('store')->error($e);
 
-                    $order->log()->create([
-                        'type' => 'error',
-                        'code' => 'email-payment-done-error',
-                    ]);
+                        $order->log()->create([
+                            'type' => 'error',
+                            'code' => 'email-payment-done-error',
+                        ]);
+                    }
                 }
             }
 
