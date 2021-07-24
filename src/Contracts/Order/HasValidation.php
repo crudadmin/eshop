@@ -80,7 +80,7 @@ trait HasValidation
         //Register validators from all mutators
         foreach ($mutators as $mutator) {
             if ( is_string($mutator) ){
-                $mutator = new $mutator;
+                $mutator = (new $mutator)->bootMutator();
             }
 
             $toValidate[] = [

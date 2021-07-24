@@ -190,10 +190,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     public function getProduct()
     {
         return Admin::cache('ordersItems.'.$this->getKey(), function(){
-            //Bind product or variant for uncounting from stock
-            if ( $this->variant_id )
-                return $this->variant;
-
             return $this->product;
         });
     }

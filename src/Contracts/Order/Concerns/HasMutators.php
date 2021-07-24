@@ -44,11 +44,15 @@ trait HasMutators
 
         $mutatorsCacheKey = implode(';', $mutators);
 
-        return $this->cache('orderMutators.'.$mutatorsCacheKey, function() use ($mutators) {
+        $mutators = $this->cache('orderMutators.'.$mutatorsCacheKey, function() use ($mutators) {
             return array_map(function($item) {
                 return new $item;
             }, $mutators);
         });
+
+        return array_map(function($mutator) {
+            return $mutator->bootMutator();
+        }, $mutators);
     }
 
     /**
@@ -56,13 +60,9 @@ trait HasMutators
      *
      * @return  array
      */
-    public function getActiveMutators(CartCollection $cartItems = null)
+    public function getActiveMutators()
     {
-        $cartItems = $cartItems ?: $this->getCartItems();
-
-        return array_filter(array_map(function($mutator) use ($cartItems) {
-            $mutator->setCartItems($cartItems);
-
+        return array_filter(array_map(function($mutator) {
             if ( Admin::isAdmin() ) {
                 $response = $mutator->isActiveInAdmin($this->getOrder());
             } else {

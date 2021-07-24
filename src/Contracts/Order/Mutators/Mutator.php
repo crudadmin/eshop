@@ -10,6 +10,7 @@ use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 use AdminEshop\Models\Orders\Order;
 use Admin\Core\Contracts\DataStore;
+use OrderService;
 
 class Mutator implements ActiveInterface
 {
@@ -143,6 +144,15 @@ class Mutator implements ActiveInterface
     public function getCartItems()
     {
         return $this->cartItems;
+    }
+
+    public function bootMutator()
+    {
+        $cartItems = OrderService::getCartItems();
+
+        $this->setCartItems($cartItems);
+
+        return $this;
     }
 }
 

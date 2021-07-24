@@ -38,6 +38,9 @@ trait HasOrderProcess
         if ( OrderService::passesValidation($mutators) === false ) {
             return OrderService::errorResponse();
         }
+
+        //We cant return anything here. because this method is used as
+        //if ( ..->validateOrder(...) ) {}
     }
 
     public function processFinalOrderValidation($mutators = null)

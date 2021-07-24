@@ -57,11 +57,11 @@ class PaymentController extends Controller
 
                 event(new OrderPaidEvent($order));
 
-                //Generate invoice
-                $invoice = OrderService::makeInvoice('invoice');
-
                 //Send invoice email
                 if ( config('admineshop.mail.order.paid_notification', true) == true ) {
+                    //Generate invoice
+                    $invoice = OrderService::makeInvoice('invoice');
+
                     try {
                         Mail::to($order->email)->send(
                             new OrderPaid($order, $invoice)

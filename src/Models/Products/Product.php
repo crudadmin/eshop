@@ -287,9 +287,9 @@ class Product extends CartEloquent implements HasAttributesSupport
      *
      * @return  void
      */
-    public function scopeWithParentProductData($query)
+    public function scopeWithParentProductData($query, $selectColumns = [])
     {
-        $selectColumns = ['main_product.image as main_image'];
+        $selectColumns = array_merge($selectColumns, ['main_product.image as main_image']);
 
         if ( config('admineshop.stock.store_rules', true) ) {
             $selectColumns = array_merge($selectColumns, [
@@ -297,7 +297,7 @@ class Product extends CartEloquent implements HasAttributesSupport
             ]);
         }
 
-        $query->addSelect($selectColumns)
+        $query->addSelect(array_unique($selectColumns))
               ->leftJoin('products as main_product', 'products.product_id', '=', 'main_product.id');
     }
 
