@@ -79,6 +79,18 @@ class PaymentHelper extends OrderProvider
         ];
     }
 
+    /**
+     * Returns payment url from payment response
+     *
+     * @param  mixed  $paymentResponse
+     *
+     * @return  string|null
+     */
+    public function getPaymentUrl($paymentResponse)
+    {
+        return $paymentResponse;
+    }
+
     public function getResponseUrl($type)
     {
         return action('\AdminEshop\Controllers\Payments\PaymentController@paymentStatus', [

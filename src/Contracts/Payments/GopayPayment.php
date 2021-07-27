@@ -188,11 +188,6 @@ class GopayPayment extends PaymentHelper
         }
     }
 
-    public function getPaymentUrl($paymentResponse)
-    {
-        return $paymentResponse;
-    }
-
     public function isPaid($id = null)
     {
         if ( !$this->gopay ) {

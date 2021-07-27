@@ -5,8 +5,11 @@ namespace AdminEshop\Contracts\Order\Concerns;
 use Admin;
 use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\GopayPayment;
-
+use AdminEshop\Events\OrderPaid as OrderPaidEvent;
+use AdminEshop\Mail\OrderPaid;
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Mail;
 use Log;
 
 trait HasPayments
@@ -134,6 +137,45 @@ trait HasPayments
                 }
             }
         });
+    }
+
+    public function orderPaid()
+    {
+        $order = $this->order;
+
+        //If order is paid already
+        if ( $order->paid_at ) {
+            return;
+        }
+
+        event(new OrderPaidEvent($order));
+
+        //Update order status paid
+        $order->update([ 'paid_at' => Carbon::now() ]);
+
+        //Countdown product stock on payment
+        if ( config('admineshop.stock.countdown.on_order_paid', true) == true ) {
+            $order->syncStock('-', 'order.paid');
+        }
+
+        //Send invoice email
+        if ( config('admineshop.mail.order.paid_notification', true) == true ) {
+            //Generate invoice
+            $invoice = $this->makeInvoice('invoice');
+
+            try {
+                Mail::to($order->email)->send(
+                    new OrderPaid($order, $invoice)
+                );
+            } catch (Exception $e){
+                Log::channel('store')->error($e);
+
+                $order->log()->create([
+                    'type' => 'error',
+                    'code' => 'email-payment-done-error',
+                ]);
+            }
+        }
     }
 }
 ?>
