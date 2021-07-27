@@ -205,7 +205,7 @@ return [
              * example value for both parameters:
              * [ 'is_company' => ['company_name', 'company_id', 'company_tax_id', 'company_vat_id'] ] -> reset all company fields, if is_company is not checked
              * [] -> does not reset anything
-             * null -> reset by defailt settings
+             * null -> reset by default settings
              */
             'fields_reset_process' => null, //Reseting fields in mid-save detail info process step
             'fields_reset_submit' => null, //Reseting fields in final submit order step

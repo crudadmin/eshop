@@ -227,7 +227,6 @@ class Order extends AdminModel
             $this->getField('country_id') ? 'country' : null,
             $this->getField('delivery_country_id') ? 'delivery_country' : null,
             'items.product' => $withAll,
-            'items.variant' => $withAll,
         ]));
     }
 

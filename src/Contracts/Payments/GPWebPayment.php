@@ -69,13 +69,6 @@ class GPWebPayment extends PaymentHelper
         }
     }
 
-    public function getPaymentData($paymentResponse)
-    {
-        return [
-            'url' => $paymentResponse,
-        ];
-    }
-
     public function getPaymentUrl($paymentResponse)
     {
         return $paymentResponse;

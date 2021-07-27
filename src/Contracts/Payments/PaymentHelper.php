@@ -65,6 +65,20 @@ class PaymentHelper extends OrderProvider
         return $this->getOrder()->makePaymentHash($type);
     }
 
+    /**
+     * Returns additional payment data
+     *
+     * @param  mixed  $paymentResponse
+     *
+     * @return  array
+     */
+    public function getPaymentData($paymentResponse)
+    {
+        return [
+            'url' => $paymentResponse,
+        ];
+    }
+
     public function getResponseUrl($type)
     {
         return action('\AdminEshop\Controllers\Payments\PaymentController@paymentStatus', [

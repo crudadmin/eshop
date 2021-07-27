@@ -36,7 +36,8 @@ trait HasProductAttributes
                 $attributes[$item->attribute_id] = $item->attribute->setRelation('items', collect());
             }
 
-            $attributes[$item->attribute_id]->items[] = $item;
+            //We need set attribute hidden, otherwise infinite loop will occurs
+            $attributes[$item->attribute_id]->items[] = $item->makeHidden('attribute');
         }
 
         return collect(array_values($attributes));
