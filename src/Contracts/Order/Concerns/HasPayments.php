@@ -75,8 +75,12 @@ trait HasPayments
         return $paymentClass;
     }
 
-    /*
+    /**
      * Create order payment
+     *
+     * @param  int|null  $paymentMethodId
+     *
+     * @return  Payment
      */
     public function makePayment($paymentMethodId = null)
     {
