@@ -4,12 +4,14 @@ namespace AdminEshop\Controllers\Payments;
 
 use Admin;
 use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
+use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 use AdminEshop\Contracts\Payments\PaymentVerifier;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\Payment;
 use Admin\Controllers\Controller;
 use Illuminate\Http\Request;
 use OrderService;
+use Exception;
 
 class PaymentController extends Controller
 {
@@ -17,37 +19,65 @@ class PaymentController extends Controller
     {
         $order = $payment->order;
 
-        $paymentClass = OrderService::setOrder($order)
+        $redirect = null;
+
+        $paymentProvider = OrderService::setOrder($order)
                                     ->getPaymentProvider($payment->payment_method_id)
                                     ->setPayment($payment);
 
         //Check if is payment hash correct hash and ids
-        if ( $hash != $paymentClass->getOrderHash($type) ) {
+        if ( $hash != $paymentProvider->getOrderHash($type) ) {
             abort(401);
         }
 
-        $paymentVerifier = new PaymentVerifier($paymentClass, $payment);
+        try {
+            $paymentProvider->isPaid(
+                $paymentProvider->getPaymentId()
+            );
 
-        $response = $paymentVerifier->verifyPaidStatus(function(){
-            OrderService::orderPaid();
+            //Custom paid callback. We also can overide default redirect
+            if ( method_exists($paymentProvider, 'onPaid')){
+                $redirect = $paymentProvider->onPaid($payment);
+            }
 
-            return redirect(OrderService::onPaymentSuccess());
-        }, function($errorCode, $e) use ($order) {
+            //Default paid callback
+            else {
+                //Update payment status
+                $payment->update([ 'status' => 'paid' ]);
+
+                OrderService::orderPaid();
+            }
+
+            //If redirect is not set yet
+            if ( ! $redirect ){
+                $redirect = redirect(OrderService::onPaymentSuccess());
+            }
+        } catch (Exception $e){
+            if ( OrderService::isDebug() ){
+                throw $e;
+            }
+
+            if ( $e instanceof PaymentResponseException ) {
+                $errorCode = PaymentErrorCodes::CODE_PAYMENT_UNVERIFIED;
+            } else {
+                $errorCode = PaymentErrorCodes::CODE_ERROR;
+            }
+
             $order->log()->create([
                 'type' => 'error',
                 'code' => $errorCode,
                 'log' => $e->getMessage(),
             ]);
 
-            return redirect(OrderService::onPaymentError($errorCode));
-        });
+            $redirect = redirect(OrderService::onPaymentError($errorCode));
+        }
 
-        //HTTP payment notification. 200 HTTP code
+        //Does not return redirect response on notification
         if ( in_array($type, ['notification']) ){
             return 'ok';
         }
 
-        return $response;
+        return $redirect;
     }
 
     public function postPayment($order, $hash)
