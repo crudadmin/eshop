@@ -6,7 +6,6 @@ use Admin;
 use AdminEshop\Models\Attribute\AttributesItem;
 use AdminEshop\Models\Products\Pivot\ProductsAttributesItem;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsAttribute;
 
 trait HasProductAttributes
 {

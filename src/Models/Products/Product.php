@@ -129,7 +129,6 @@ class Product extends CartEloquent implements HasAttributesSupport
                     ])->attributes('hideFromFormIf:product_type,variant') ] : [],
             )))->icon('fa-bars')->add('hidden')->attributes(config('admineshop.stock.store_rules', true) ? '' : 'hideFromFormIf:product_type,variants'),
             Group::tab(self::class)->attributes('hideFromFormIfNot:product_type,variants'),
-            $this->hasAttributesEnabled() ? Group::tab(ProductsAttribute::class) : [],
             'Ostatné nastavenia' => Group::tab([
                 'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
                 'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
