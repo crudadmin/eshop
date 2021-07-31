@@ -40,12 +40,20 @@ class MySqlDriver extends BaseDriver implements DriverInterface
             return $this->cartRow;
         }
 
-        $cartKey = $this->getToken();
+        if ( $cartToken = $this->getToken() ) {
+            //Fetch or create new token row
+            if ( !($cartRow = CartToken::where('token', $cartToken)->first()) ){
+                $cartRow = CartToken::create([
+                    'token' => $cartToken,
+                    'data' => $initialData ?: [],
+                ]);
+            }
+        }
 
-        if ( !($cartRow = CartToken::where('token', $cartKey)->first()) ){
-            $cartRow = CartToken::create([
-                'token' => $cartKey,
-                'data' => $initialData ?: [],
+        //If token has not been sent, we create anonymous cart token
+        else {
+            $cartRow = new CartToken([
+                'data' => $initialData
             ]);
         }
 

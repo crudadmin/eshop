@@ -165,6 +165,9 @@ return [
         //For REST authorization
         'header_token' => 'Cart-Token',
 
+        //Allow to generate new token if token is not present in request
+        'header_token_generate' => 'Cart-Initialize',
+
         'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
         // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,
 

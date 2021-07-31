@@ -98,7 +98,13 @@ class BaseDriver
             return $key;
         }
 
-        //Return key based on REST API header
-        return request()->header(config('admineshop.cart.header_token')) ?: $this->regenerateKey();
+        if ( $token = request()->header(config('admineshop.cart.header_token')) ) {
+            return $token;
+        }
+
+        //Dost not generate token automatically if header is empty
+        if ( request()->header(config('admineshop.cart.header_token_generate')) ) {
+            return $this->regenerateKey();
+        }
     }
 }
