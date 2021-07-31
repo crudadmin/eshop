@@ -76,12 +76,13 @@ class ClientDataMutator extends Mutator
      * Save given client data into session
      *
      * @var  array|null $row
+     * @var  bool $persist
      *
      * @return  void
      */
-    public function setClientData($row = null)
+    public function setClientData($row = null, $persist = true)
     {
-        $this->getDriver()->set(self::CLIENT_KEY, $row);
+        $this->getDriver()->set(self::CLIENT_KEY, $row, $persist);
     }
 
     /**
