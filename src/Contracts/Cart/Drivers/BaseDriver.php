@@ -103,7 +103,7 @@ class BaseDriver
         }
 
         //Dost not generate token automatically if header is empty
-        if ( request()->header(config('admineshop.cart.header_token_generate')) ) {
+        if ( request()->header(config('admineshop.cart.header_token_initializator')) ) {
             return $this->regenerateKey();
         }
     }
