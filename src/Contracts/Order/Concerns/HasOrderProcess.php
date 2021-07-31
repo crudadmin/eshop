@@ -3,7 +3,6 @@
 namespace AdminEshop\Contracts\Order\Concerns;
 
 use Admin;
-use OrderService;
 
 trait HasOrderProcess
 {
@@ -12,7 +11,7 @@ trait HasOrderProcess
         $request = request();
 
         if ( $fetchStoredClientData ){
-            $clientData = OrderService::getFromSession() ?: [];
+            $clientData = $this->getClientDataMutator()->getClientData() ?: [];
 
             $request->merge($request->all() + $clientData);
         }
@@ -27,16 +26,12 @@ trait HasOrderProcess
         $row = $this->getValidatedOrderRow($fetchStoredClientData);
 
         //Remove uneccessary delivery and company info from order
-        OrderService::setRequestData($row, $submitOrder);
-
-        if ( $saveDataIntoSession === true ) {
-            OrderService::storeIntoSession();
-        }
+        $this->setRequestData($row, $submitOrder, $saveDataIntoSession);
 
         //Checks products avaiability. Some products may be sold already,
         //so we need throw an error.
-        if ( OrderService::passesValidation($mutators) === false ) {
-            return OrderService::errorResponse();
+        if ( $this->passesValidation($mutators) === false ) {
+            return $this->errorResponse();
         }
 
         //We cant return anything here. because this method is used as

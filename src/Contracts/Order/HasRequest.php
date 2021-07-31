@@ -2,8 +2,6 @@
 
 namespace AdminEshop\Contracts\Order;
 
-use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
-
 trait HasRequest
 {
     /**
@@ -40,14 +38,17 @@ trait HasRequest
      *
      * @param  array  $row
      * @param  bool  $submitOrder
+     * @param  bool  $persist
      *
      * @return  this
      */
-    public function setRequestData($row, $submitOrder = false)
+    public function setRequestData($row, $submitOrder = false, $persist = false)
     {
         $row = $this->cleanNotPresent($row, $submitOrder);
 
         $this->requestData = $row;
+
+        $this->getClientDataMutator()->setClientData($row, $persist);
 
         return $this;
     }
@@ -92,30 +93,6 @@ trait HasRequest
         }
 
         return $row;
-    }
-
-    /**
-     * Store row into session
-     *
-     * @return  this
-     */
-    public function storeIntoSession()
-    {
-        $requestData = $this->getRequestData();
-
-        (new ClientDataMutator)->setClientData($requestData);
-
-        return $this;
-    }
-
-    /**
-     * Get row data from session
-     *
-     * @return  this
-     */
-    public function getFromSession()
-    {
-        return (new ClientDataMutator)->getClientData();
     }
 }
 ?>
