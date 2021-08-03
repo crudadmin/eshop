@@ -39,11 +39,11 @@ class AddressController extends Controller
         ])->save(_('Adresa bola úspešne pridaná.'));
     }
 
-    public function update()
+    public function update($id)
     {
         $client = client();
 
-        $address = $client->addresses()->findOrFail(request('id'));
+        $address = $client->addresses()->findOrFail($id);
 
         $validator = $address->validator()->only(
             $this->rules()
@@ -66,5 +66,16 @@ class AddressController extends Controller
         return autoAjax()->data([
             'addresses' => $client->addresses
         ])->save(_('Adresa bola úspešne zmazaná.'));
+    }
+
+    public function setDefault($id)
+    {
+        client()->addresses()->findOrFail($id)->update([ 'default' => true ]);
+
+        client()->addresses()->where('id', '!=', $id)->update([ 'default' => false ]);
+
+        return autoAjax()->data([
+            'addresses' => client()->addresses
+        ]);
     }
 }

@@ -247,12 +247,17 @@ class Order extends AdminModel
 
     }
 
+    public function scopeWithClientListingResponse($query)
+    {
+
+    }
+
     /**
      * Order response format
      *
      * @return  array
      */
-    public function toResponseFormat()
+    public function setClientListingResponse()
     {
         return $this->append([
             'number',
@@ -263,6 +268,11 @@ class Order extends AdminModel
             'paymentMethodPriceWithVat',
             'invoiceUrl',
         ]);
+    }
+
+    public function setSuccessOrderFormat()
+    {
+        return $this;
     }
 
     /**

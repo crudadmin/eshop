@@ -195,12 +195,12 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         });
     }
 
-    /**
-     * Order response format
-     *
-     * @return  array
-     */
-    public function toResponseFormat()
+    public function setClientListingResponse()
+    {
+        return $this;
+    }
+
+    public function setSuccessOrderFormat()
     {
         return $this;
     }

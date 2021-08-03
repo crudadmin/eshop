@@ -305,9 +305,9 @@ class CartController extends Controller
         }
 
         return api([
-            'order' => $order->makeHidden(['items'])->toResponseFormat(),
+            'order' => $order->makeHidden(['items'])->setSuccessOrderFormat(),
             'items' => $order->items->map(function($item){
-                return $item->toResponseFormat();
+                return $item->setSuccessOrderFormat();
             }),
         ]);
     }
