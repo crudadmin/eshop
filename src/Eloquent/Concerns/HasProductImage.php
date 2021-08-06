@@ -126,6 +126,7 @@ trait HasProductImage
                         ->selectRaw('products_galleries.image, products_galleries.product_id')
                         ->where('products_galleries.default', 1)
                         ->whereNotNull('products_galleries.published_at')
+                        ->whereNull('deleted_at')
                         ->groupBy('product_id');
 
         //Select default image from gallery row
