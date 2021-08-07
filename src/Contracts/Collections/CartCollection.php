@@ -271,9 +271,7 @@ class CartCollection extends Collection
     {
         $order = OrderService::getOrder() ?: new Order;
 
-        $mutators = array_map(function($mutator){
-            return $mutator->setCartItems($this);
-        }, OrderService::getActiveMutators());
+        $mutators = OrderService::getActiveMutators($this);
 
         foreach ($mutators as $mutator) {
             //Mutate price by anonymous price mutators

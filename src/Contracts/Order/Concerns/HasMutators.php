@@ -38,7 +38,7 @@ trait HasMutators
      *
      * @return  array
      */
-    public function getMutators()
+    public function getMutators(CartCollection $cartItems = null)
     {
         $mutators = is_array($this->mutators) ? $this->mutators : config('admineshop.cart.mutators');
 
@@ -50,8 +50,8 @@ trait HasMutators
             }, $mutators);
         });
 
-        return array_map(function($mutator) {
-            return $mutator->bootMutator();
+        return array_map(function($mutator) use ($cartItems) {
+            return $mutator->bootMutator($cartItems);
         }, $mutators);
     }
 
@@ -60,8 +60,10 @@ trait HasMutators
      *
      * @return  array
      */
-    public function getActiveMutators()
+    public function getActiveMutators(CartCollection $cartItems = null)
     {
+        $mutators = $this->getMutators($cartItems);
+
         return array_filter(array_map(function($mutator) {
             if ( Admin::isAdmin() ) {
                 $response = $mutator->isActiveInAdmin($this->getOrder());
@@ -82,7 +84,7 @@ trait HasMutators
             $mutator->setActiveResponse($response);
 
             return $mutator;
-        }, $this->getMutators()));
+        }, $mutators));
     }
 }
 ?>

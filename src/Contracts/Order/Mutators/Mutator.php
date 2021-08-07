@@ -146,9 +146,9 @@ class Mutator implements ActiveInterface
         return $this->cartItems;
     }
 
-    public function bootMutator()
+    public function bootMutator(CartCollection $cartItems = null)
     {
-        $cartItems = OrderService::getCartItems();
+        $cartItems = is_null($cartItems) ? OrderService::getCartItems() : $cartItems;
 
         $this->setCartItems($cartItems);
 
