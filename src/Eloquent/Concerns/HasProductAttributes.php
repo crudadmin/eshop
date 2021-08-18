@@ -64,7 +64,7 @@ trait HasProductAttributes
                     return;
                 }
 
-                return ($attrItem ? $attrItem->getAttributeItemValue($attribute) : '').($attribute ? (' '.$attribute->unitName) : '');
+                return ($attrItem ? $attrItem->getAttributeItemValue($attribute) : '').($attribute ? (($attribute->hasUnitSpace ? ' ' : '').$attribute->unitName) : '');
             })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 
