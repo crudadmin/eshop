@@ -5,6 +5,7 @@ namespace AdminEshop\Models\Products;
 use Admin;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
+use AdminEshop\Eloquent\Concerns\HasHeureka;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
@@ -22,7 +23,8 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
         HasProductImage,
         HasProductFilter,
         HasProductResponses,
-        HasVariantColors;
+        HasVariantColors,
+        HasHeureka;
 
     /*
      * Model created date, for ordering tables in database and in user interface

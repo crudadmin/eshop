@@ -78,4 +78,11 @@ trait HasRoutes
             Route::get('/auth/orders/{id}', 'Order\OrderController@show')->visible();
         });
     }
+
+    public function routesForHeureka()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
+            Route::get('/_store/heureka/feed', 'Store\HeurekaController@index');
+        });
+    }
 }

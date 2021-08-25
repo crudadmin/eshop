@@ -8,6 +8,7 @@ use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasCategoryTree;
+use AdminEshop\Eloquent\Concerns\HasHeureka;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductFilter;
 use AdminEshop\Eloquent\Concerns\HasProductImage;
@@ -27,8 +28,8 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasProductFilter,
         HasProductPaginator,
         HasProductResponses,
-        HasCategoryTree;
-
+        HasCategoryTree,
+        HasHeureka;
 
     /*
      * Model created date, for ordering tables in database and in user interface
