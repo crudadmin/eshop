@@ -188,12 +188,12 @@ class Discount implements Discountable, ActiveInterface
             $applyOnModels = $data['applyOnModels'] ?? null;
             $applyOnModels = $applyOnModels === true || is_null($applyOnModels) ? $this->applyOnModels : $applyOnModels;
 
-            $operators[] = [
+            $operators[] = array_merge($data, [
                 'operator' => $data['operator'],
                 'value' => $data['value'],
                 'applyOnModels' => $this->discountedModelsToBasename($applyOnModels),
                 'applyOnWholeCart' => $data['applyOnWholeCart'] ?? false,
-            ];
+            ]);
         }
 
         return $operators;

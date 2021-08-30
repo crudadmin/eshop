@@ -248,7 +248,7 @@ class OrderService
                     continue;
                 }
 
-                $order->items()->create([
+                $orderItem = [
                     'identifier' => 'discount',
                     'discountable' => false,
                     'name' => $discount->getName() ?: _('Zľava'),
@@ -256,7 +256,13 @@ class OrderService
                     'price' => $value * ($operator == '-' ? -1 : 1),
                     'vat' => Store::getDefaultVat(),
                     'price_vat' => Store::priceWithVat($value) * ($operator == '-' ? -1 : 1),
-                ]);
+                ];
+
+                if ( method_exists($discount, 'createDiscountableItem') ){
+                    $orderItem = $discount->createDiscountableItem($orderItem, $operatorParam);
+                }
+
+                $order->items()->create($orderItem);
             }
         }
 
