@@ -84,7 +84,9 @@ class Discounts
      */
     public function isRegistredDiscount($discountClass)
     {
-        return in_array($discountClass, $this->discounts);
+        return in_array(class_basename($discountClass), array_map(function($discount) {
+            return class_basename($discount);
+        }, $this->discounts), class_basename($discountClass));
     }
 
     /**

@@ -53,18 +53,19 @@ class DiscountsCode extends AdminModel
         return [
             'Nastavenia kódu' => Group::half([
                 'code' => 'name:Kód|min:5|max:30|index|title:Ak pole bude obsahovať prázdnu hodnotu, kód sa vygeneruje automatický.|placeholder:Zadajte kód zľavu|unique:discounts_codes,code,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
+                'min_order_price' => 'name:Minimálna cena objednávky (€)|title:S DPH|type:decimal',
                 Group::inline([
-                    'min_order_price' => 'name:Minimálna cena objednávky (€)|title:S DPH|type:decimal',
-                    'expiration_date' => 'name:Platný do dátumu|type:date|title:Pri neuvedenom dátume platí neobmedzene',
+                    'valid_from' => 'name:Platný od dátumu|type:date|title:Pri neuvedenom dátume platí neobmedzene',
+                    'valid_to' => 'name:Platný do dátumu|type:date|title:Pri neuvedenom dátume platí neobmedzene',
                 ]),
                 Group::inline([
-                    'usage' => 'name:Maximálny počet využia (ks)|title:Limit počtu použitia kupónu|type:integer|default:1',
+                    'usage' => 'name:Maximálny počet využia (ks)|title:Limit počtu použitia kupónu. Pri prázdnej hodnote plati neobmedzene.|type:integer|inAdmin:default:1',
                     'used' => 'name:Počet využitia kupónu|disabled|title:Koľko krát bol kupón využitý a použitý pri objednávke|type:integer|default:0',
                 ]),
             ])->id('settings'),
 
             'Vyberte jednu alebo viac zliav' => Group::half([
-                'discount_percentage' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|type:decimal|readonlyIfNot:discount_price,|required_without_all:discount_price,free_delivery',
+                'discount_percentage' => 'name:Zľava v %|title:Z celkovej ceny objednávky|min:0|max:100|type:decimal|readonlyIfNot:discount_price,|required_without_all:discount_price,free_delivery',
                 'discount_price' => 'name:Zľava v €|title:Z celkovej ceny objednávky, bez DPH.|min:0|type:decimal|readonlyIfNot:discount_percentage,|required_without_all:discount_percentage,free_delivery',
                 'free_delivery' => 'name:Doprava zdarma|type:checkbox|default:0',
             ])->inline(),
@@ -171,7 +172,7 @@ class DiscountsCode extends AdminModel
      */
     public function getIsActiveAttribute()
     {
-        return $this->isExpired === false && $this->isUsed === false;
+        return $this->isBeforeValidDate === false && $this->isExpired === false && $this->isUsed === false;
     }
 
     /**
@@ -181,6 +182,11 @@ class DiscountsCode extends AdminModel
      */
     public function getIsUsedAttribute()
     {
+        //Discount code without usage restriction
+        if ( is_null($this->usage) ){
+            return false;
+        }
+
         return $this->used >= $this->usage;
     }
 
@@ -191,7 +197,17 @@ class DiscountsCode extends AdminModel
      */
     public function getIsExpiredAttribute()
     {
-        return $this->expiration_date && Carbon::now()->setTime(0, 0, 0) > $this->expiration_date ? true : false;
+        return $this->valid_to && Carbon::now()->setTime(0, 0, 0) > $this->valid_to;
+    }
+
+    /**
+     * Check if coupon has been expired
+     *
+     * @return  bool
+     */
+    public function getIsBeforeValidDateAttribute()
+    {
+        return $this->valid_from && Carbon::now()->setTime(0, 0, 0) < $this->valid_from;
     }
 
     public function setDiscountResponse()

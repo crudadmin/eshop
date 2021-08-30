@@ -138,9 +138,14 @@ class DiscountCode extends Discount implements Discountable
                     return _('Zadaný kód už bol použitý.');
                 }
 
+                //Code is not valid yet
+                if ( $code->isBeforeValidDate ){
+                    return sprintf(_('Zadaný kód platí od %s.'), $code->valid_from->format('d.m.Y'));
+                }
+
                 //Expiration order price
                 if ( $code->isExpired ){
-                    return _('Zadaný kód expiroval.');
+                    return sprintf(_('Zadaný kód expiroval %s.'), $code->valid_to->format('d.m.Y'));
                 }
             }
 
@@ -196,7 +201,6 @@ class DiscountCode extends Discount implements Discountable
     public function mutateOrderRowAfter(Order $order, CartCollection $items)
     {
         if ( $codes = $this->getResponse() ) {
-            //TODO: complete, test, untested and unworking code.
             $existingCodes = $order->discountCodes->pluck('id')->toArray();
 
             //If code does not exists in order yet.
