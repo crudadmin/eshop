@@ -46,7 +46,7 @@ trait HasHeureka
 
     public function getHeurekaThumbnail()
     {
-        return $image = $this->thumbnail ? (string)$image : null;
+        return ($image = $this->thumbnail) ? (string)$image : null;
     }
 
     public function getHeurekaCategoryList()
