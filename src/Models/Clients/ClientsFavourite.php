@@ -68,16 +68,19 @@ class ClientsFavourite extends AdminModel
         }
     }
 
-    public function scopeResponseQuery($query)
+    public function scopeWithFavouriteResponse($query)
     {
         $query->with([
-            'product',
-            'variant'
+            'product' => function($query){},
+            'variant' => function($query){}
         ])->whereHas('product');
     }
 
-    public function toResponseFormat()
+    public function setFavouriteResponse()
     {
+        $this->product?->setCategoryResponse();
+        $this->variant?->setCategoryResponse();
+
         return $this;
     }
 }

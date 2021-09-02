@@ -14,8 +14,8 @@ class FavouriteController extends Controller
         }
 
         return api([
-            'favourites' => client()->favourites()->responseQuery()->get()->map(function($item){
-                return $item->toResponseFormat();
+            'favourites' => client()->favourites()->withFavouriteResponse()->get()->map(function($item){
+                return $item->setFavouriteResponse();
             }),
         ]);
     }

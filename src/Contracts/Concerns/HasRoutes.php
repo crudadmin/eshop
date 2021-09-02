@@ -85,4 +85,12 @@ trait HasRoutes
             Route::get('/_store/heureka/feed', 'Store\HeurekaController@index');
         });
     }
+
+    public function routesForFavourites()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers\Client'], function(){
+            Route::get('/auth/favourites', 'FavouriteController@index')->visible();
+            Route::post('/auth/favourites', 'FavouriteController@toggleFavourite')->visible();
+        });
+    }
 }
