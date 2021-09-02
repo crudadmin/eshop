@@ -3,8 +3,9 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
-use Store;
+use AdminEshop\Contracts\ImageResponse;
 use AdminEshop\Models\Products\Product;
+use Store;
 
 /**
  * More info at:
@@ -29,7 +30,7 @@ trait HasHeureka
             'priceWithVat',
         ])->append([
             'priceWithVat',
-        ])->toArray();
+        ])->setLocalizedResponse()->toArray();
 
         return $array + [
             'heureka_item_id' => $parentProduct ? $parentProduct->getKey() : $this->getKey(),
@@ -46,7 +47,13 @@ trait HasHeureka
 
     public function getHeurekaThumbnail()
     {
-        return ($image = $this->thumbnail) ? (string)$image : null;
+        if ( $image = $this->thumbnail ) {
+            if ( $image instanceof ImageResponse ){
+                return $image->x1;
+            }
+
+            return (string)$image;
+        }
     }
 
     public function getHeurekaCategoryList()

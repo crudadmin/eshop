@@ -5,7 +5,7 @@
     <ITEM_ID>{{ $product['id'] }}</ITEM_ID>
     <PRODUCTNAME>{{ $product['name'] }}</PRODUCTNAME>
     <PRODUCT>{{ $product['name'] }}</PRODUCT>
-    <DESCRIPTION>{{ $product['description'] ?? null }}</DESCRIPTION>
+    <DESCRIPTION>{{ strip_tags(($product['description'] ?? null) ?: '') }}</DESCRIPTION>
     <URL>{{ $product['heureka_url'] }}</URL>
     <IMGURL>{{ $product['heureka_thumbnail'] }}</IMGURL>
     {{-- <IMGURL_ALTERNATIVE>http://obchod.sk/mobily/nokia-5800-xpressmusic/obrazok2.jpg</IMGURL_ALTERNATIVE> --}}
