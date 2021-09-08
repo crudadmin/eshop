@@ -32,17 +32,42 @@ trait HasHeureka
             'priceWithVat',
         ])->setLocalizedResponse()->toArray();
 
-        return $array + [
+        return [
+            'id' => $parentProduct ? $parentProduct->getKey().'_'.$this->getKey() : $this->getKey()
+        ] + $array + [
+            'manufacturer' => $this->getHeurekaManufacturer($parentProduct),
+            'delivery_date' => $this->getHeurekaStock($parentProduct),
             'heureka_item_id' => $parentProduct ? $parentProduct->getKey() : $this->getKey(),
             'heureka_url' => $this->getHeurekaUrl($parentProduct),
             'heureka_thumbnail' => $this->getHeurekaThumbnail($parentProduct),
             'heureka_category_list' => $this->getHeurekaCategoryList($parentProduct),
+            'attributes' => $this->getHeurekaAttributes($parentProduct),
         ];
+    }
+
+    public function getHeurekaStock($parentProduct = null)
+    {
+        return $this->hasStock ? 0 : null;
+    }
+
+    public function getHeurekaManufacturer($parentProduct = null)
+    {
+
     }
 
     public function getHeurekaUrl()
     {
 
+    }
+
+    public function getHeurekaAttributes()
+    {
+        return $this->attributesList->map(function($item){
+            return [
+                'name' => $item->name,
+                'value' => $item->items->first()?->name,
+            ];
+        });
     }
 
     public function getHeurekaThumbnail()

@@ -10,10 +10,16 @@ class HeurekaController extends Controller
 {
     public function index()
     {
+        ini_set('max_execution_time', 300);
+
         $builder = new HeurekaBuilder;
 
         $deliveries = Admin::getModel('Delivery')->get();
 
-        return view('admineshop::xml.heureka', compact('builder', 'deliveries'));
+        $xml = view('admineshop::xml.heureka', compact('builder', 'deliveries'))->render();
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml'
+        ]);
     }
 }

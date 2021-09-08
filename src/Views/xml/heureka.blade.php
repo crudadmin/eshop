@@ -12,7 +12,9 @@
     {{-- <VIDEO_URL>http://www.youtube.com/watch?v=KjR759oWF7w</VIDEO_URL> --}}
     <PRICE_VAT>{{ $product['priceWithVat'] }}</PRICE_VAT>
     {{-- <HEUREKA_CPC>0,24</HEUREKA_CPC> --}}
-    {{-- <MANUFACTURER>NOKIA</MANUFACTURER> --}}
+    @if ( $product['manufacturer'] ?? null )
+    <MANUFACTURER>{{ $product['manufacturer'] }}</MANUFACTURER>
+    @endif
     <CATEGORYTEXT>{{ implode(' | ', $product['heureka_category_list'] ?? []) }}</CATEGORYTEXT>
     <EAN>{{ $product['ean'] ?? '' }}</EAN>
     <PRODUCTNO>{{ $product['code'] ?? '' }}</PRODUCTNO>
@@ -20,15 +22,23 @@
       <PARAM_NAME>Farba</PARAM_NAME>
       <VAL>čierna</VAL>
     </PARAM> --}}
-    <DELIVERY_DATE>2</DELIVERY_DATE>
-    @foreach( $deliveries as $delivery )
+    @if ( $product['delivery_date'] ?? null )
+    <DELIVERY_DATE>{{ $product['delivery_date'] }}</DELIVERY_DATE>
+    @endif
+    {{-- @foreach( $deliveries as $delivery )
     <DELIVERY>
       <DELIVERY_ID>{{ $delivery->name }}</DELIVERY_ID>
       <DELIVERY_PRICE>{{ $delivery->priceWithVat }}</DELIVERY_PRICE>
-      {{-- <DELIVERY_PRICE_COD>{{ $delivery->priceWithVat }}</DELIVERY_PRICE_COD> --}}
+      <DELIVERY_PRICE_COD>{{ $delivery->priceWithVat }}</DELIVERY_PRICE_COD>
     </DELIVERY>
-    @endforeach
+    @endforeach --}}
     <ITEMGROUP_ID>{{ $product['heureka_item_id'] ?? '' }}</ITEMGROUP_ID>
+    @foreach($product['attributes'] ?? [] as $attribute)
+    <param>
+        <param_name>{{ $attribute['name'] }}</param_name>
+        <val>{{ $attribute['value'] }}</val>
+    </param>
+    @endforeach
     {{-- <ACCESSORY>CD456</ACCESSORY> --}}
     {{-- <GIFT>Púzdro zadarmo</GIFT> --}}
     {{-- <EXTENDED_WARRANTY>
