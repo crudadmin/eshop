@@ -201,8 +201,8 @@ trait OrderTrait
         }
 
         else {
-            $tooltip = $this->getSelectOption('delivery_status');
-            $message = 'Čaká';
+            $tooltip = '';
+            $message = $this->getSelectOption('delivery_status');
         }
 
         if ( $message ) {
