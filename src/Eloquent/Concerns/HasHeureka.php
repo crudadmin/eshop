@@ -15,7 +15,7 @@ trait HasHeureka
 {
     public function getHeurekaListing()
     {
-        return $this->withCategoryResponse()->withHeurekaListing()->get();
+        return $this->withHeurekaListing()->get();
     }
 
     public function scopeWithHeurekaListing($query)
@@ -81,8 +81,16 @@ trait HasHeureka
         }
     }
 
-    public function getHeurekaCategoryList()
+    public function getHeurekaCategoryList($parentProduct = null)
     {
-        return [];
+        $categories = ($parentProduct ?: $this)?->categories;
+
+        if ( !$categories ){
+            return [];
+        }
+
+        $categories = $categories->each->setLocalizedResponse()->pluck('name')->toArray();
+
+        return array_unique($categories);
     }
 }
