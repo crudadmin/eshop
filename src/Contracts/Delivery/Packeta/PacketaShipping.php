@@ -7,6 +7,7 @@ use AdminEshop\Contracts\Delivery\ShipmentException;
 use AdminEshop\Contracts\Delivery\ShippingInterface;
 use AdminEshop\Contracts\Delivery\ShippingProvider;
 use AdminEshop\Contracts\Delivery\ShippingResponse;
+use Admin\Helpers\Button;
 use Carbon\Carbon;
 use SoapClient;
 use SoapFault;
@@ -94,6 +95,13 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
 
         $options = $this->getOptions();
 
+        $weight = $this->getPackageWeight();
+
+        //Weight is required for packeta from 1.9.2021
+        if ( is_null($weight) ){
+            throw new ShipmentException('Nebola zadaná hmotnosť balíka.');
+        }
+
         $gw = new SoapClient($options['API_HOST'].'/api/soap.wsdl');
         $apiPassword = $options['API_PASSWORD'];
 
@@ -106,7 +114,8 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
                 'phone' => $order->delivery_phone ?: $order->phone,
                 'addressId' => $order->packeta_point['id'],
                 'value' => $order->price_vat,
-                'eshop' => env('PACKETA_API_ESHOP')
+                'eshop' => env('PACKETA_API_ESHOP'),
+                'weight' => $weight,
             ];
 
             $packet = $gw->createPacket($apiPassword, $data);
@@ -117,5 +126,35 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
         catch(SoapFault $error) {
             throw new CreatePackageException($error->getMessage().' - '.json_encode($error->detail ?? '{}', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         }
+    }
+
+    /**
+     * On shipping send button question action
+     *
+     * @param  Button  $button
+     *
+     * @return  Button
+     */
+    public function buttonQuestion(Button $button)
+    {
+        return $button->title('Zadajte váhu balíka')->type('success')->component('SetPacketaWeight.vue');
+    }
+
+    /**
+     * Pass and mutate shipping options from pressed button question component
+     *
+     * @return  []
+     */
+    public function getButtonOptions(Button $button)
+    {
+        $weight = (float)str_replace(',', '.', request('weight'));
+
+        if ( $weight <= 0 ){
+            return $button->error('Váha musí byť kladne číslo uvedené v kologramoch.');
+        }
+
+        return [
+            'weight' => $weight,
+        ];
     }
 }

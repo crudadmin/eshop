@@ -18,15 +18,17 @@ class SendShippingJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $order;
+    private $options;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Order $order)
+    public function __construct(Order $order, $options = [])
     {
         $this->order = $order;
+        $this->options = $options ?: [];
     }
 
     /**
@@ -42,6 +44,10 @@ class SendShippingJob implements ShouldQueue
         if ( !($provider = $order->getShippingProvider()) || $provider->isActive() == false ){
             return;
         }
+
+        $provider->setOptions(
+            $provider->getOptions() + $this->options
+        );
 
         //Try send shipping, and log output
         try {
@@ -80,8 +86,7 @@ class SendShippingJob implements ShouldQueue
 
             $order->log()->create([
                 'type' => 'error',
-                'code' => 'delivery-error',
-                'log' => implode(' ', array_wrap($error->getMessage())),
+                'message' => implode(' ', array_wrap($error->getMessage())),
             ]);
         }
 

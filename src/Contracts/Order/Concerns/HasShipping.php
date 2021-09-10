@@ -37,9 +37,9 @@ trait HasShipping
     /*
      * Create order payment
      */
-    public function sendShipping()
+    public function sendShipping($options = [])
     {
-        SendShippingJob::dispatch($this->getOrder());
+        SendShippingJob::dispatch($this->getOrder(), $options);
     }
 
     public function makeShippingExport($providerClass, $orders)

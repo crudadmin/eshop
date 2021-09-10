@@ -105,7 +105,9 @@ return [
             //     'provider' => AdminEshop\Contracts\Delivery\Packeta\PacketaShipping::class,
             //     'options' => [
             //         'API_KEY' => env('PACKETA_API_KEY'),
-            //         'HOST' => 'http://www.zasilkovna.cz',
+            //         'API_PASSWORD' => env('PACKETA_API_PASSWORD'),
+            //         'API_HOST' => 'http://www.zasilkovna.cz',
+            //         'default_weight' => null,
             //     ],
             // ],
         ],

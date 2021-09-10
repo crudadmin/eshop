@@ -138,6 +138,7 @@ class Order extends AdminModel
             'delivery_status' => [
                 'new' => 'Čaká za objednanim dopravy',
                 'ok' => 'Prijatá',
+                'sent' => 'Odoslaná',
                 'error' => 'Neprijatá (chyba)',
             ],
         ];
