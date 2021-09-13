@@ -16,6 +16,9 @@
     <MANUFACTURER>{{ $product['manufacturer'] }}</MANUFACTURER>
     @endif
     <CATEGORYTEXT>{{ implode(' | ', $product['heureka_category_list'] ?? []) }}</CATEGORYTEXT>
+    @if ( isset($product['heureka_category_original_list']) )
+    <WEBKATEGORIA>{{ implode(' | ', $product['heureka_category_original_list'] ?? []) }}</WEBKATEGORIA>
+    @endif
     <EAN>{{ $product['ean'] ?? '' }}</EAN>
     <PRODUCTNO>{{ $product['code'] ?? '' }}</PRODUCTNO>
     {{-- <PARAM>

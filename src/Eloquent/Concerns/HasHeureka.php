@@ -81,7 +81,7 @@ trait HasHeureka
         }
     }
 
-    public function getHeurekaCategoryList($parentProduct = null)
+    public function getHeurekaCategoryList($parentProduct = null, $withOriginalName = false)
     {
         $categories = ($parentProduct ?: $this)?->categories;
 
@@ -89,7 +89,13 @@ trait HasHeureka
             return [];
         }
 
-        $categories = $categories->each->setLocalizedResponse()->pluck('name')->toArray();
+        $categories = $categories->each->setLocalizedResponse()->map(function($row) use ($withOriginalName) {
+            if ( $withOriginalName === true ){
+                return $row->name;
+            }
+
+            return $row->heureka_name ?: $row->name;
+        })->toArray();
 
         return array_unique($categories);
     }
