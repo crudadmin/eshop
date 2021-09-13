@@ -62,6 +62,10 @@ trait HasHeureka
 
     public function getHeurekaAttributes()
     {
+        if ( ! $this->hasAttributesEnabled() ) {
+            return collect();
+        }
+
         return $this->attributesList->map(function($item){
             return [
                 'name' => $item->name,
