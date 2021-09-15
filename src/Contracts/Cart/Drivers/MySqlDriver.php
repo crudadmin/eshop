@@ -43,10 +43,14 @@ class MySqlDriver extends BaseDriver implements DriverInterface
         if ( $cartToken = $this->getToken() ) {
             //Fetch or create new token row
             if ( !($cartRow = CartToken::where('token', $cartToken)->first()) ){
-                $cartRow = CartToken::create([
+                $cartRow = (new CartToken)->fill([
                     'token' => $cartToken,
                     'data' => $initialData ?: [],
-                ]);
+                ])->setClientIfEmpty();
+
+                $cartRow->save();
+            } else {
+                $cartRow->setClientIfEmpty(true);
             }
         }
 
@@ -78,7 +82,7 @@ class MySqlDriver extends BaseDriver implements DriverInterface
             Arr::set($data, $key, $value);
         }
 
-        $this->getCartSession()->update([ 'data' => $data ]);
+        $this->getCartSession()->setClientIfEmpty()->update([ 'data' => $data ]);
 
         return $this;
     }

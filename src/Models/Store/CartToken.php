@@ -37,4 +37,17 @@ class CartToken extends AdminModel
             'data' => 'name:Data|type:json',
         ];
     }
+
+    public function setClientIfEmpty($save = false)
+    {
+        if ( !$this->client_id && $client = client() ){
+            $this->client_id = $client->getKey();
+
+            if ( $save === true ) {
+                $this->save();
+            }
+        }
+
+        return $this;
+    }
 }
