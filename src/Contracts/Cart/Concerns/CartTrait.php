@@ -132,42 +132,42 @@ trait CartTrait
     /*
      * Fetch items from session
      */
-    public function fetchItemsFromDriver() : CartCollection
+    public function setItemsFromDriver($items)
     {
-        $items = $this->getDriver()->get('items');
-
         if ( ! is_array($items) ) {
-            return new CartCollection;
+            $this->items = new CartCollection;
+        } else {
+            $items = array_map(function($item){
+                $item = (object)$item;
+
+                //If cart identifier is missing
+                //This may happend if someone has something id cart, and code will change
+                //Or identifier will be renamed
+                if (!($identifier = $this->getIdentifierByName($item->identifier))) {
+                    return;
+                }
+
+                $identifier->cloneFromItem($item);
+
+                $cartItem = new CartItem($identifier, @$item->quantity ?: 0);
+
+                //Set data of item
+                if ( isset($item->data) ){
+                    $cartItem->setData($item->data, false);
+                }
+
+                //If parent cartitem identifier has not been found, we need skip this item from cart
+                if ($this->assignParentCartItem($item, $cartItem) === false){
+                    return;
+                }
+
+                return $cartItem;
+            }, $items);
+
+            $this->items = new CartCollection(array_filter($items));
         }
 
-        $items = array_map(function($item){
-            $item = (object)$item;
-
-            //If cart identifier is missing
-            //This may happend if someone has something id cart, and code will change
-            //Or identifier will be renamed
-            if (!($identifier = $this->getIdentifierByName($item->identifier))) {
-                return;
-            }
-
-            $identifier->cloneFromItem($item);
-
-            $cartItem = new CartItem($identifier, @$item->quantity ?: 0);
-
-            //Set data of item
-            if ( isset($item->data) ){
-                $cartItem->setData($item->data, false);
-            }
-
-            //If parent cartitem identifier has not been found, we need skip this item from cart
-            if ($this->assignParentCartItem($item, $cartItem) === false){
-                return;
-            }
-
-            return $cartItem;
-        }, $items);
-
-        return new CartCollection(array_filter($items));
+        return $this;
     }
 
     /**

@@ -44,8 +44,20 @@ class Cart
 
         //In every other environment than admin, we want fetch items from session
         else {
-            $this->items = $this->fetchItemsFromDriver();
+            $this->setItemsFromDriver(
+                $this->getDriver()->get('items')
+            );
         }
+    }
+
+    /**
+     * Return booted cart items
+     *
+     * @return  CartCollection
+     */
+    public function getItems()
+    {
+        return $this->items;
     }
 
     /**
