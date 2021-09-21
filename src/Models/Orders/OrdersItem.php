@@ -46,12 +46,6 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
      */
     protected $title = '';
 
-    /*
-     * Model Parent
-     * Eg. Articles::class,
-     */
-    protected $belongsToModel = Order::class;
-
     protected $withoutParent = true;
 
     protected $publishable = false;
@@ -76,6 +70,11 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         ReloadProductQuantity::class,
         RebuildOrderOnItemChange::class, //We need reload order prices after quantity check
     ];
+
+    public function belongsToModel()
+    {
+        return get_class(Admin::getModel('Order'));
+    }
 
     /*
      * Automatic form and database generation
