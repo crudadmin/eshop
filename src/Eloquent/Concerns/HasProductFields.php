@@ -10,20 +10,22 @@ trait HasProductFields
     public function getGeneralFields()
     {
         return Group::inline([
-            Group::fields(array_filter([
-                Group::fields([
-                    'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : '|index'),
-                ])->id('names'),
-                Group::fields([
-                    'image' => 'name:Obrázok|type:file|image',
-                ])->id('images'),
+            Group::fields(array_merge(
+                [
+                    Group::fields([
+                        'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : '|index|fulltext'),
+                    ])->id('names'),
+                    Group::fields([
+                        'image' => 'name:Obrázok|type:file|image',
+                    ])->id('images')
+                ],
                 config('admineshop.categories.enabled')
                     ? ['categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd'] : [],
-            ]))->id('general')->name('Základný popis produktu'),
+            ))->id('general')->name('Základne nastavenia'),
             Group::fields([
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|required',
                 'ean' => 'name:EAN|hidden',
-                'code' => 'name:Kód produktu',
+                'code' => 'name:Kód produktu|fulltext',
             ])->name('Identifikátory produkty')->id('identifiers'),
         ])->icon('fa-pencil')->id('general-tab');
     }
