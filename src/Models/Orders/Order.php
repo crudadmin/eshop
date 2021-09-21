@@ -260,6 +260,8 @@ class Order extends AdminModel
      */
     public function setClientListingResponse()
     {
+        $this->items->each->setClientListingResponse();
+
         return $this->append([
             'number',
             'hasCompany',
