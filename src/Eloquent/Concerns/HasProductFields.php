@@ -13,7 +13,7 @@ trait HasProductFields
             Group::fields(array_merge(
                 [
                     Group::fields([
-                        'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : '|index|fulltext'),
+                        'name' => 'name:Názov produktu|limit:30|required'.(Store::isEnabledLocalization() ? '|locale' : '|index'),
                     ])->id('names'),
                     Group::fields([
                         'image' => 'name:Obrázok|type:file|image',
@@ -25,7 +25,7 @@ trait HasProductFields
             Group::fields([
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|required',
                 'ean' => 'name:EAN|hidden',
-                'code' => 'name:Kód produktu|fulltext',
+                'code' => 'name:Kód produktu',
             ])->name('Identifikátory produkty')->id('identifiers'),
         ])->icon('fa-pencil')->id('general-tab');
     }
