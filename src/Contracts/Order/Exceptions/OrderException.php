@@ -13,6 +13,15 @@ class OrderException extends Exception
      */
     public $log = null;
 
+    public function __construct($message = null, $code = null, $logOrResponse = null)
+    {
+        $this->message = $message;
+
+        $this->code = $code ?: $this->code;
+
+        $this->log = $logOrResponse;
+    }
+
     /**
      * Set order log
      *

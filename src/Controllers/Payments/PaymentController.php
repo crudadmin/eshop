@@ -57,7 +57,7 @@ class PaymentController extends Controller
             }
 
             $log = $order->logException($e, function($log) use ($e) {
-                $log->code = $log->code ?: ($e instanceof OrderException ? 'PAYMENT_UNVERIFIED' : 'PAYMENT_ERROR');
+                $log->code = $log->code ?: 'PAYMENT_ERROR';
             });
 
             $redirect = redirect(OrderService::onPaymentError($log->code));
