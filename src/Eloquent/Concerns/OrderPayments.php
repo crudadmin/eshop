@@ -58,7 +58,9 @@ trait OrderPayments
     {
         $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;
 
-        if ( !($paymentClass = OrderService::bootPaymentProvider($paymentMethodId)) ){
+        $this->bootOrderIntoOrderService();
+
+        if ( !($paymentClass = OrderService::getPaymentProvider($paymentMethodId)) ){
             return;
         }
 
