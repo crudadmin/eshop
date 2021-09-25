@@ -3,7 +3,6 @@
 namespace AdminEshop\Contracts\Order\Concerns;
 
 use Admin;
-use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\GopayPayment;
 use AdminEshop\Events\OrderPaid as OrderPaidEvent;
 use AdminEshop\Mail\OrderPaid;
@@ -41,17 +40,16 @@ trait HasPayments
     /**
      * Get redirect link with payment error code
      *
-     * @param  int  $code
-     *
+     * @param  int|string  $code
      *
      * @return  string|nullable
      */
-    public function onPaymentError(int $code = 1)
+    public function onPaymentError($code)
     {
         $order = $this->getOrder();
 
         if ( is_callable($callback = $this->onPaymentErrorCallback) ) {
-            $message = PaymentErrorCodes::getMessage($code);
+            $message = $this->getOrderMessage($code);
 
             return $callback($order, $code, $message);
         }
@@ -93,27 +91,6 @@ trait HasPayments
         ]);
     }
 
-    /**
-     * Log error payment message
-     *
-     * @param  string|array  $log
-     */
-    public function logPaymentError($log = null)
-    {
-        //Serialize array error
-        if ( is_array($log) ){
-            $log = json_encode($log, JSON_PRETTY_PRINT);
-        }
-
-        Log::error($log);
-
-        $this->getOrder()->log()->create([
-            'type' => 'error',
-            'code' => 'payment-error',
-            'log' => $log,
-        ]);
-    }
-
     public function bootPaymentProvider($paymentMethodId)
     {
         if ( !$this->hasOnlinePayment($paymentMethodId) ){
@@ -134,7 +111,9 @@ trait HasPayments
 
                 return $paymentClass;
             } catch (Exception $e){
-                $this->logPaymentError($e);
+                $this->getOrder()->logException($e, function($log){
+                    $log->code = 'PAYMENT_INITIALIZATION_ERROR';
+                });
 
                 if ( $this->isDebug() ) {
                     throw $e;

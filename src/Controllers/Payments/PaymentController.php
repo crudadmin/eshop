@@ -3,15 +3,14 @@
 namespace AdminEshop\Controllers\Payments;
 
 use Admin;
-use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
-use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
+use AdminEshop\Contracts\Order\Exceptions\OrderException;
 use AdminEshop\Contracts\Payments\PaymentVerifier;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\Payment;
 use Admin\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
 use OrderService;
-use Exception;
 
 class PaymentController extends Controller
 {
@@ -57,19 +56,11 @@ class PaymentController extends Controller
                 throw $e;
             }
 
-            if ( $e instanceof PaymentResponseException ) {
-                $errorCode = PaymentErrorCodes::CODE_PAYMENT_UNVERIFIED;
-            } else {
-                $errorCode = PaymentErrorCodes::CODE_ERROR;
-            }
+            $log = $order->logException($e, function($log) use ($e) {
+                $log->code = $log->code ?: ($e instanceof OrderException ? 'PAYMENT_UNVERIFIED' : 'PAYMENT_ERROR');
+            });
 
-            $order->log()->create([
-                'type' => 'error',
-                'code' => $errorCode,
-                'log' => $e->getMessage(),
-            ]);
-
-            $redirect = redirect(OrderService::onPaymentError($errorCode));
+            $redirect = redirect(OrderService::onPaymentError($log->code));
         }
 
         //Does not return redirect response on notification
@@ -95,12 +86,12 @@ class PaymentController extends Controller
 
         //Order has been paid already
         if ( $order->paid_at ) {
-            return redirect(OrderService::onPaymentError(PaymentErrorCodes::CODE_PAID));
+            return redirect(OrderService::onPaymentError('PAYMENT_PAID'));
         }
 
         //If payment url could not be generated successfully
         if ( !($paymentUrl = $order->getPaymentUrl($order->payment_method_id)) ) {
-            $paymentUrl = OrderService::onPaymentError(PaymentErrorCodes::CODE_PAID);
+            $paymentUrl = OrderService::onPaymentError('PAYMENT_ERROR');
         }
 
         return redirect($paymentUrl);

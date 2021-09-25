@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Providers;
 
+use Arr;
 use Illuminate\Support\ServiceProvider;
 
 class ConfigServiceProvider extends ServiceProvider
@@ -43,7 +44,7 @@ class ConfigServiceProvider extends ServiceProvider
         $this->mergeConfigs(
             $this->eshopConfigKey,
             $this->getEshopConfigPath(),
-            ['attributes', 'stock', 'delivery', 'discounts', 'cart', 'mail']
+            ['attributes', 'stock', 'delivery', 'discounts', 'cart', 'mail', 'order', 'order.codes']
         );
 
         $this->mergeMarkdownConfigs();
@@ -78,11 +79,14 @@ class ConfigServiceProvider extends ServiceProvider
 
         //Merge selected properties with two dimensional array
         foreach ($keys as $property) {
-            if ( ! array_key_exists($property, $originalConfig) || ! array_key_exists($property, $config) ) {
+            if ( ! Arr::has($originalConfig, $property) || ! Arr::has($config, $property) ) {
                 continue;
             }
 
-            $attributes = array_merge($originalConfig[$property], $config[$property]);
+            $attributes = array_merge(
+                Arr::get($originalConfig, $property),
+                Arr::get($config, $property)
+            );
 
             $this->app['config']->set($key . '.' . $property, $attributes);
         }

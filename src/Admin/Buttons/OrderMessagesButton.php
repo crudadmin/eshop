@@ -43,7 +43,7 @@ class OrderMessagesButton extends Button
 
             $color = $log->type == 'error' ? 'red' : 'inherit';
 
-            $message = $log->created_at->format('d.m.Y H:i').' '.$log->getSelectOption('code').' '.($log->message ? ' - '.$log->message : '');
+            $message = $log->created_at->format('d.m.Y H:i').' '.$log->getSelectOption('code').($log->message ? ' - '.$log->message : '');
 
             //Add clone log into clipboard
             if ( $log->log && $withLog == true ) {

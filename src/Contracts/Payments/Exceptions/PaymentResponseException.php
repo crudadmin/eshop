@@ -2,9 +2,9 @@
 
 namespace AdminEshop\Contracts\Payments\Exceptions;
 
-use Exception;
+use AdminEshop\Contracts\Order\Exceptions\OrderException;
 
-class PaymentResponseException extends Exception
+class PaymentResponseException extends OrderException
 {
 
 }

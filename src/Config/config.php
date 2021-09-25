@@ -260,4 +260,18 @@ return [
     'synchronizer' => [
         'enabled' => false,
     ],
+
+    'order' => [
+        'codes' => [
+            'email-client-error' => _('Neúspešne odoslaný email zázkazníkovy'),
+            'email-store-error' => _('Neúspešne odoslaný email obchodu'),
+            'email-payment-done-error' => _('Neúspešne odoslaný email zázkazníkovy pri potvrdení platby'),
+            'delivery-error' => _('Chyba zaslania baliku dopravoci.'),
+            'delivery-info' => _('Hlásenie pri zaslani dopravy.'),
+            'PAYMENT_INITIALIZATION_ERROR' => _('Platbu nebolo možné inicializovať.'),
+            'PAYMENT_ERROR' => _('Nastala nečakaná chyba pri spracovani platby. Skúste platbu vykonať neskôr, alebo nás prosím kontaktujte.'),
+            'PAYMENT_UNVERIFIED' => _('Vaša objednávka bola úspešne zaznamenaná, no potvrdenie Vašej platby sme zatiaľ neobdržali. V prípade ak ste platbu nevykonali, môžete ju uhradiť opätovne z emailu, alebo nás kontaktujte pre ďalšie informácie.'),
+            'PAYMENT_PAID' => _('Vaša objednávka už bola úspešne zaplatená.'),
+        ],
+    ],
 ];

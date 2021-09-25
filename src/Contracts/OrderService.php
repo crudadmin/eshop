@@ -448,7 +448,12 @@ class OrderService
 
     public function isDebug()
     {
-        return app()->environment('local') && env('APP_DEBUG') == true;
+        return app()->environment('local') && env('APP_DEBUG') == true && env('APP_STORE_DEBUG') == true;
+    }
+
+    public function getOrderMessage($key)
+    {
+        return config('admineshop.order.codes.'.$key);
     }
 
     /**

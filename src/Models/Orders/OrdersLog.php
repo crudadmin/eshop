@@ -41,24 +41,6 @@ class OrdersLog extends AdminModel
 
     public $timestamps = false;
 
-    protected $options = [
-        'type' => [
-            'info' => 'Informácia',
-            'error' => 'Chyba',
-            'success' => 'Úspech',
-        ],
-        'code' => [
-            'email-client-error' => 'Neúspešne odoslaný email zázkazníkovy',
-            'email-store-error' => 'Neúspešne odoslaný email obchodu',
-            'email-payment-done-error' => 'Neúspešne odoslaný email zázkazníkovy pri potvrdení platby',
-            'payment-error' => 'Platbu nebolo možné zrealizovať.',
-            'payment-status-error' => 'Platba bola zrušená zákazníkom, alebo ešte nebola úspešne overená po vytvorení objednávky.',
-            'payment-status-unknown-error' => 'Prevod platby zlyhal chybou. Kontaktujte svojho administrátora.',
-            'delivery-error' => 'Chyba zaslania baliku dopravoci.',
-            'delivery-info' => 'Hlásenie pri zaslani dopravy.',
-        ],
-    ];
-
     protected $settings = [
         'title.insert' => 'Nové hlásenie',
     ];
@@ -78,6 +60,18 @@ class OrdersLog extends AdminModel
             'message' => 'name:Doplnková správa',
             'log' => 'name:Log|type:text',
             'created_at' => 'name:Vytvorené|type:datetime|default:CURRENT_TIMESTAMP',
+        ];
+    }
+
+    public function options()
+    {
+        return [
+            'type' => [
+                'info' => 'Informácia',
+                'error' => 'Chyba',
+                'success' => 'Úspech',
+            ],
+            'code' => config('admineshop.order.codes', []),
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace AdminEshop\Contracts\Payments;
 
 use AdminEshop\Contracts\Order\OrderProvider;
-use AdminEshop\Contracts\Payments\Concerns\PaymentErrorCodes;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 
 class PaymentHelper extends OrderProvider
