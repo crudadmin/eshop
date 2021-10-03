@@ -37,7 +37,7 @@ class PaymentsMethod extends BasePaymentsMethod
         $fields->push([
             'vat' => 'name:Sadza DPH|belongsTo:vats,:name (:vat%)|required|defaultByOption:default,1|canAdd',
             'price' => 'name:Základna cena bez DPH|type:decimal|component:PriceField||required',
-            'image' => 'name:Ikona dopravy|type:file|image',
+            'image' => 'name:Ikona platby|type:file|image',
             'description' => 'name:Popis platby|type:text',
         ]);
 
