@@ -157,11 +157,17 @@ return [
         //But we can turn it on everywere
         'default_full_response' => false,
 
-        //For REST authorization
-        'header_token' => 'Cart-Token',
+        'token' => [
+            //For REST authorization
+            'header_name' => 'Cart-Token',
 
-        //Cart token random key length
-        'token_length' => 12,
+            //Cart token random key length
+            'length' => 12,
+
+            //Remove inactive tokens after X days
+            'remove_inactive_after_days' => false,
+            'remove_empty_after_days' => 3,
+        ],
 
         'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
         // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,

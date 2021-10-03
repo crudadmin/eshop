@@ -3,8 +3,11 @@
 namespace AdminEshop\Providers;
 
 use Admin;
+use AdminEshop\Commands\CleanEmptyCartTokens;
 use AdminEshop\Commands\ImportPickupPoints;
+use AdminEshop\Jobs\CleanEmptyCartTokensJob;
 use Carbon\Carbon;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 
@@ -51,7 +54,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->commands([
             ImportPickupPoints::class,
+            CleanEmptyCartTokens::class,
         ]);
+
+        $this->registerSchedules();
     }
 
     /**
@@ -125,5 +131,12 @@ class AppServiceProvider extends ServiceProvider
 
             $router->aliasMiddleware($name, $middleware);
         }
+    }
+
+    public function registerSchedules()
+    {
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->job(new CleanEmptyCartTokensJob)->dailyAt('04:00');
+        });
     }
 }

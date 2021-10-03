@@ -74,7 +74,7 @@ class BaseDriver
      */
     public function regenerateKey()
     {
-        return Str::random(config('admineshop.cart.token_length', 12));
+        return Str::random(config('admineshop.cart.token.length', 12));
     }
 
     /*
@@ -99,6 +99,6 @@ class BaseDriver
         }
 
         //Return key based on REST API header
-        return request()->header(config('admineshop.cart.header_token')) ?: $this->regenerateKey();
+        return request()->header(config('admineshop.cart.token.header_name', 'Cart-Token')) ?: $this->regenerateKey();
     }
 }
