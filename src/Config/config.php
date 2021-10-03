@@ -160,6 +160,9 @@ return [
         //For REST authorization
         'header_token' => 'Cart-Token',
 
+        //Cart token random key length
+        'token_length' => 12,
+
         'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
         // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,
 

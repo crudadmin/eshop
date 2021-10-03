@@ -72,9 +72,9 @@ class BaseDriver
     /*
      * Generate cart id
      */
-    private function regenerateKey()
+    public function regenerateKey()
     {
-        return Str::random(100);
+        return Str::random(config('admineshop.cart.token_length', 12));
     }
 
     /*
