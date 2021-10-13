@@ -140,7 +140,9 @@ trait HasProductResponses
      */
     public function scopeWithCategoryResponse($query, $filterParams = [])
     {
-        $query->applyQueryFilter($filterParams);
+        $query
+            ->applyQueryFilter($filterParams)
+            ->withBlockedStock();
 
         if ( $this->hasAttributesEnabled() ) {
             $query->with([
@@ -150,7 +152,7 @@ trait HasProductResponses
 
         if ( $this instanceof Product && count(Store::variantsProductTypes()) ){
             $query->extendWith(['variants' => function($query) use ($filterParams) {
-                $query->withParentProductData();
+                $query->withParentProductData()->withBlockedStock();
 
                 //We can deside if filter should be applied also on selected variants
                 if ( Admin::getModel('ProductsVariant')->getProperty('applyFilterOnVariants') == true ) {

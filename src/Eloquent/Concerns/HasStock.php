@@ -6,6 +6,9 @@ use AdminEshop\Events\StockChanged;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsStocksLog;
 use AdminEshop\Models\Products\ProductsVariant;
+use AdminEshop\Models\Store\CartStockBlock;
+use Carbon\Carbon;
+use Cart;
 use Store;
 
 trait HasStock
@@ -224,5 +227,38 @@ trait HasStock
 
         //Event for added discount code
         event(new StockChanged($this, $stockLog));
+    }
+
+    public function blockedItems()
+    {
+        $blockedMinutage = config('admineshop.stock.temporary_block_time', 0);
+
+        return $this->hasMany(CartStockBlock::class, $this instanceof ProductsVariant ? 'variant_id' : 'product_id')
+                    ->where(function($query){
+                        foreach (Cart::getStockBlockIdentifier() as $key => $value) {
+                            $query->where($key, '!=', $value);
+                        }
+                    })
+                    ->where('blocked_at', '>=', Carbon::now()->addMinutes(-$blockedMinutage));
+    }
+
+    public function scopeWithBlockedStock($query)
+    {
+        if ( Cart::isStockBlockEnabled() === false ){
+            return;
+        }
+
+        $query->withSum('blockedItems', 'quantity');
+    }
+
+    public function getStockQuantityAttribute($value)
+    {
+        if ( Cart::isStockBlockEnabled() == false ){
+            return $value;
+        }
+
+        $blockedStock = (int)($this->getAttribute('blocked_items_sum_quantity') ?: 0);
+
+        return max(0, $value - $blockedStock);
     }
 }

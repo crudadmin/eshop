@@ -8,6 +8,7 @@ use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Models\Products\ProductsVariant;
 use Store;
 use Admin;
+use Cart;
 
 class ProductsIdentifier extends Identifier
 {
@@ -27,6 +28,16 @@ class ProductsIdentifier extends Identifier
     public function hasDiscounts()
     {
         return true;
+    }
+
+    /**
+     * Temporary stock block
+     *
+     * @return  bool
+     */
+    public function hasTemporaryStockBlock()
+    {
+        return Cart::isStockBlockEnabled();
     }
 
     /**

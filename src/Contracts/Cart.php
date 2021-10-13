@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts;
 use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
+use AdminEshop\Contracts\Cart\Concerns\HasStockBlockSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
@@ -18,7 +19,8 @@ class Cart
 {
     use CartTrait,
         DataStore,
-        DriverSupport;
+        DriverSupport,
+        HasStockBlockSupport;
 
     /*
      * Items in cart
