@@ -2,11 +2,9 @@
 
 namespace AdminEshop\Listeners;
 
-use Carbon\Carbon;
 use Cart;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use OrderService;
 
 class UpdateTemporaryStockListener
 {

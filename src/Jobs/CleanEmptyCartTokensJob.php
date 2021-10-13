@@ -3,6 +3,7 @@
 namespace AdminEshop\Jobs;
 
 use Admin;
+use AdminEshop\Models\Store\CartStockBlock;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -27,8 +28,14 @@ class CleanEmptyCartTokensJob implements ShouldQueue
     {
         $removeInactiveAfterDays = config('admineshop.cart.token.remove_inactive_after_days', 0) ?: 0;
         $removeEmptyAfterDays = config('admineshop.cart.token.remove_empty_after_days', 0) ?: 0;
+        $removeOldStockBlocks = config('admineshop.stock.temporary_block_time', 0) ?: 0;
 
         Log::channel('store')->info('Cart tokens remover initialized. [inactive '.$removeInactiveAfterDays.' days / empty '.$removeEmptyAfterDays.' days]');
+
+        //Remove older stock blocks than given limit
+        if ( is_numeric($removeOldStockBlocks) && $removeOldStockBlocks > 0 ) {
+            CartStockBlock::where('blocked_at', '<', Carbon::now()->addMinutes(-$removeOldStockBlocks))->forceDelete();
+        }
 
         if ( is_numeric($removeInactiveAfterDays) && $removeInactiveAfterDays > 0 ){
             $this->removeInactiveTokens($removeInactiveAfterDays);
