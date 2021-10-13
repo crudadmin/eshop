@@ -211,9 +211,12 @@ trait HasStock
         //Set sub on product type
         $sub = ($type == '-' ? $sub * -1 : $sub);
 
-        $updatedStock = $this->stock_quantity + $sub;
+        $uncastedStockQuantity = $this->attributes['stock_quantity'] ?? 0;
 
-        $this->stock_quantity = $updatedStock < 0 ? 0 : $updatedStock;
+        //Stock can be onli positive
+        $newStockQuantity = max(0, $uncastedStockQuantity + $sub);
+
+        $this->stock_quantity = $newStockQuantity;
         $this->save();
 
         $stockLog = ProductsStocksLog::create([
@@ -221,7 +224,7 @@ trait HasStock
             'product_id' => $this instanceof Product ? $this->getKey() : $this->product_id,
             'variant_id' => $this instanceof ProductsVariant ? $this->getKey() : null,
             'sub' => $sub,
-            'stock' => $this->stock_quantity,
+            'stock' => $newStockQuantity,
             'message' => $message,
         ]);
 

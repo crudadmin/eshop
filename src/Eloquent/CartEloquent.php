@@ -62,6 +62,10 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
             $query->withCartResponse();
         }
 
+        if ( method_exists($this, 'scopeWithBlockedStock') ){
+            $query->withBlockedStock();
+        }
+
         return $query;
     }
 

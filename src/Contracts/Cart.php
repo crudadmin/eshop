@@ -9,6 +9,7 @@ use AdminEshop\Contracts\Cart\Concerns\HasStockBlockSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
+use AdminEshop\Events\CartUpdated;
 use Admin\Core\Contracts\DataStore;
 use CartDriver;
 use Discounts;
@@ -313,6 +314,9 @@ class Cart
             }
 
             CartDriver::flushAllExceptWhitespaced();
+
+            //For reseting cart items
+            event(new CartUpdated(new CartCollection));
         }
 
         return $this;
