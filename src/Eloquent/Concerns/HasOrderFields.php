@@ -41,7 +41,7 @@ trait HasOrderFields
             'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
             'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
             'city' => 'name:Mesto|required|hidden',
-            'zipcode' => 'name:PSČ|max:6|zipcode|required|hidden',
+            'zipcode' => 'name:PSČ|zipcode|required|hidden',
             'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|required|exists:countries,id',
         ])->name('Fakturačné údaje')->id('billing')->grid(4);
     }

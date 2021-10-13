@@ -238,6 +238,9 @@ return [
     ],
 
     'client' => [
+        'zipcode' => [
+            'validation' => true,
+        ],
         'addresses' => false,
         'favourites' => false,
         'groups' => false,

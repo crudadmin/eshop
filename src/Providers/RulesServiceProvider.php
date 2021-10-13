@@ -53,6 +53,10 @@ class RulesServiceProvider extends ServiceProvider
         }, trans('validation.required'));
 
         Validator::extend('zipcode', function ($attribute, $value, $parameters, $validator) {
+            if ( config('admineshop.client.zipcode.validation', true) === false ){
+                return true;
+            }
+
             $value = str_replace(' ', '', $value);
 
             return is_numeric($value) && strlen($value) === 5;
