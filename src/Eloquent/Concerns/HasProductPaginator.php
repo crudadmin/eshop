@@ -199,7 +199,7 @@ trait HasProductPaginator
                     continue;
                 }
 
-                $requestedFilterValue = explode(',', $filter[$filterAttribute['slug']]);
+                $requestedFilterValue = explode(',', $filter[$filterAttribute['slug']] ?? $filter[$filterAttribute['id']]);
 
                 //Add higher score when attribute is set as first, and low score when attribute match is for example on the third place
                 foreach ($attributesItems[$filterAttribute['id']] as $i => $attrItem) {
