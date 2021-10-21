@@ -72,6 +72,7 @@ return [
      */
     'stock' => [
         'temporary_block_time' => 0,
+        'stock_notifier_scheduler' => 'everyThirtyMinutes',
         'status_with_quantity' => true, //Show detailed stock status with quantity text: Skladom 5ks, Skladom 10+ks
         'rounding' => [100, 50, 20, 10], //10+, 50+ items...
         'rounding_less_than_char' => '<',

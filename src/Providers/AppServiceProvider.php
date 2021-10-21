@@ -5,7 +5,9 @@ namespace AdminEshop\Providers;
 use Admin;
 use AdminEshop\Commands\CleanEmptyCartTokens;
 use AdminEshop\Commands\ImportPickupPoints;
+use AdminEshop\Commands\StockNotification;
 use AdminEshop\Jobs\CleanEmptyCartTokensJob;
+use AdminEshop\Jobs\ProductAvaiabilityChecker;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Kernel;
@@ -55,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
         $this->commands([
             ImportPickupPoints::class,
             CleanEmptyCartTokens::class,
+            StockNotification::class,
         ]);
 
         $this->registerSchedules();
@@ -137,6 +140,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
             $schedule->job(new CleanEmptyCartTokensJob)->dailyAt('04:00');
+
+            if ( $scheduleAt = config('admineshop.stock.stock_notifier_scheduler') ) {
+                $schedule->job(new ProductAvaiabilityChecker)->{$scheduleAt}();
+            }
         });
     }
 }

@@ -13,6 +13,7 @@ trait HasRoutes
             Route::post('/cart/toggle', 'Cart\CartController@toggleItems')->name('cart::toggleItems')->visible();
             Route::post('/cart/update', 'Cart\CartController@updateQuantity')->name('cart::updateQuantity')->visible();
             Route::post('/cart/remove', 'Cart\CartController@removeItem')->name('cart::removeItem')->visible();
+            Route::post('/cart/notify', 'Product\NotifierController@notifyOnStock')->name('cart::notifyOnStock')->visible();
         });
     }
 
