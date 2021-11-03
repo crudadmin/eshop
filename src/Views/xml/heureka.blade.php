@@ -25,7 +25,7 @@
       <PARAM_NAME>Farba</PARAM_NAME>
       <VAL>čierna</VAL>
     </PARAM> --}}
-    @if ( $product['delivery_date'] ?? null )
+    @if ( is_null($product['delivery_date'] ?? null) === false )
     <DELIVERY_DATE>{{ $product['delivery_date'] }}</DELIVERY_DATE>
     @endif
     {{-- @foreach( $deliveries as $delivery )
