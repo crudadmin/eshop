@@ -177,12 +177,23 @@ class ProductsIdentifier extends Identifier
         ];
 
         if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+            $this->loadAttributes($productOrVariant);
+
             $items[] = $productOrVariant->attributesVariantsText;
         } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+            $this->loadAttributes($productOrVariant);
+
             $items[] = $productOrVariant->attributesText;
         }
 
         return array_filter($items);
+    }
+
+    private function loadAttributes($product)
+    {
+        if ( $product && $product->hasAttributesEnabled() && $product->relationLoaded('attributesItems') == false ){
+            $product->load('attributesItems');
+        }
     }
 
     /*
