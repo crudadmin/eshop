@@ -13,6 +13,13 @@ use Store;
 
 class ProductsImport extends Synchronizer implements SynchronizerInterface
 {
+    public $synchronizeVariants = true;
+    public $synchronizeCategories = true;
+    public $synchronizeGallery = true;
+    public $synchronizeAttributes = true;
+    public $synchronizeAttributesItems = true;
+    public $synchronizeProductAttributes = true;
+
     public function getProductIdentifier()
     {
         return 'code';
@@ -60,41 +67,53 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $rows
         );
 
-        $this->synchronize(
-            Admin::getModel('ProductsVariant'),
-            $this->getProductsVariantIdentifier(),
-            $this->getPreparedVariants($rows)
-        );
+        if ( $this->synchronizeVariants ) {
+            $this->synchronize(
+                Admin::getModel('ProductsVariant'),
+                $this->getProductsVariantIdentifier(),
+                $this->getPreparedVariants($rows)
+            );
+        }
 
-        $this->synchronize(
-            new ProductsCategoriesPivot,
-            ['product_id', 'category_id'],
-            $this->getPreparedProductsCategories($rows)
-        );
+        if ( $this->synchronizeCategories ) {
+            $this->synchronize(
+                new ProductsCategoriesPivot,
+                ['product_id', 'category_id'],
+                $this->getPreparedProductsCategories($rows)
+            );
+        }
 
-        $this->synchronize(
-            Admin::getModel('ProductsGallery'),
-            $this->getProductsGalleryIdentifier(),
-            $this->getPreparedGallery($rows)
-        );
+        if ( $this->synchronizeGallery ) {
+            $this->synchronize(
+                Admin::getModel('ProductsGallery'),
+                $this->getProductsGalleryIdentifier(),
+                $this->getPreparedGallery($rows)
+            );
+        }
 
-        $this->synchronize(
-            Admin::getModel('Attribute'),
-            $this->getAttributeIdentifier(),
-            $preparedAttributes = $this->getPreparedAttributes($rows)
-        );
+        if ( $this->synchronizeAttributes ) {
+            $this->synchronize(
+                Admin::getModel('Attribute'),
+                $this->getAttributeIdentifier(),
+                $preparedAttributes = $this->getPreparedAttributes($rows)
+            );
+        }
 
-        $this->synchronize(
-            Admin::getModel('AttributesItem'),
-            $this->getAttributesItemIdentifier(),
-            $this->getPreparedAttributesItems($preparedAttributes)
-        );
+        if ( $this->synchronizeAttributes ) {
+            $this->synchronize(
+                Admin::getModel('AttributesItem'),
+                $this->getAttributesItemIdentifier(),
+                $this->getPreparedAttributesItems($preparedAttributes)
+            );
+        }
 
-        $this->synchronize(
-            Admin::getModel('ProductsAttribute'),
-            $this->getProductsAttributeIdentifier(),
-            $this->getPreparedProductsAttribute($rows)
-        );
+        if ( $this->synchronizeProductAttributes ) {
+            $this->synchronize(
+                Admin::getModel('ProductsAttribute'),
+                $this->getProductsAttributeIdentifier(),
+                $this->getPreparedProductsAttribute($rows)
+            );
+        }
     }
 
     public function getCategories()
