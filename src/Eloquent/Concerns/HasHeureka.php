@@ -41,8 +41,7 @@ trait HasHeureka
             'heureka_url' => $this->getHeurekaUrl($parentProduct),
             'heureka_thumbnail' => $this->getHeurekaThumbnail($parentProduct),
             'heureka_category_list' => $this->getHeurekaCategoryList($parentProduct),
-            'attributes' => $this->getHeurekaAttributes($parentProduct),
-            'custom_xml' => '<PRICE_NORMAl>'.$this->initialPriceWithVat.'</PRICE_NORMAl>',
+            'attributes' => $this->getHeurekaAttributes($parentProduct)
         ];
     }
 

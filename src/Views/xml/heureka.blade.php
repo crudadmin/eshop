@@ -42,7 +42,7 @@
         <val>{{ $attribute['value'] }}</val>
     </param>
     @endforeach
-    {{ $product['custom_xml'] ?? '' }}
+    {!! $product['custom_xml'] ?? '' !!}
     {{-- <ACCESSORY>CD456</ACCESSORY> --}}
     {{-- <GIFT>Púzdro zadarmo</GIFT> --}}
     {{-- <EXTENDED_WARRANTY>
