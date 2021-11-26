@@ -3,14 +3,13 @@
 namespace AdminEshop\Controllers\Product;
 
 use AdminEshop\Controllers\Controller;
-use AdminEshop\Models\Products\ProductsNotification;
 use Admin;
 
 class NotifierController extends Controller
 {
     public function notifyOnStock()
     {
-        $validator = (new ProductsNotification)->getNotifierValidator()->validate();
+        $validator = Admin::getModel('ProductsNotification')->getNotifierValidator()->validate();
 
         $data = $validator->getData();
 

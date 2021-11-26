@@ -19,7 +19,7 @@ trait HasRequest
      *
      * @var  array
      */
-    protected $defaultresetIfNotPresent = [
+    protected $defaultResetIfNotPresent = [
         'delivery_different' => ['delivery_username', 'delivery_phone', 'delivery_street', 'delivery_city', 'delivery_zipcode', 'delivery_city', 'delivery_country_id'],
         'is_company' => ['company_name', 'company_id', 'company_tax_id', 'company_vat_id'],
     ];
@@ -59,7 +59,7 @@ trait HasRequest
      */
     public function setDefaultResetIfNotPresent(array $array)
     {
-        $this->defaultresetIfNotPresent = $array;
+        $this->defaultResetIfNotPresent = $array;
     }
 
     /**
@@ -69,7 +69,7 @@ trait HasRequest
      */
     public function getDefaultResetIfNotPresent()
     {
-        return $this->defaultresetIfNotPresent;
+        return $this->defaultResetIfNotPresent;
     }
 
     /**
