@@ -276,6 +276,17 @@ trait OrderTrait
             OrderService::setOrder($this);
         }
     }
+
+    public function getVerifiedCustomersItemsIds()
+    {
+        return $this->items->map(function($item){
+            if ( ($product = $item->getProduct()) && method_exists($product, 'getHeurekaItemId') ) {
+                return $product->getHeurekaItemId();
+            }
+        })->filter(function($item){
+            return $item;
+        })->toArray();
+    }
 }
 
 ?>

@@ -186,6 +186,7 @@ return [
             AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
             AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
             AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
+            AdminEshop\Contracts\Order\Mutators\HeurekaVerifiedCustomersMutator::class,
         ],
 
         'order' => [
@@ -245,4 +246,14 @@ return [
      * Should be products and other attributes localized?
      */
     'localization' => false,
+
+    /*
+     * Heureka support
+     */
+    'heureka' => [
+        'verified_customers' => [
+            'enabled' => env('HEUREKA_VERIFIED_CUSTOMERS_ENABLED', false),
+            'key' => env('HEUREKA_VERIFIED_CUSTOMERS_KEY'),
+        ],
+    ],
 ];

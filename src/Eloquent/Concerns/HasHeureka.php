@@ -33,7 +33,7 @@ trait HasHeureka
         ])->setLocalizedResponse()->toArray();
 
         return [
-            'id' => $parentProduct ? $parentProduct->getKey().'_'.$this->getKey() : $this->getKey()
+            'id' => $this->getHeurekaItemId(),
         ] + $array + [
             'manufacturer' => $this->getHeurekaManufacturer($parentProduct),
             'delivery_date' => $this->getHeurekaStock($parentProduct),
@@ -43,6 +43,11 @@ trait HasHeureka
             'heureka_category_list' => $this->getHeurekaCategoryList($parentProduct),
             'attributes' => $this->getHeurekaAttributes($parentProduct)
         ];
+    }
+
+    public function getHeurekaItemId()
+    {
+        return $this->product_id ? $this->product_id.'_'.$this->getKey() : $this->getKey();
     }
 
     public function getHeurekaStock($parentProduct = null)
