@@ -53,6 +53,8 @@ class HeurekaVerifiedCustomersJob implements ShouldQueue
             }
 
             $instance->logOrder();
+
+            Log::channel('store')->info('Heureka verified customers sent successfully for order '.$order->number);
         } catch (Exception $e){
             Log::channel('store')->error($e);
         }
