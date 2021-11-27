@@ -12,7 +12,7 @@ trait HasOrderLog
         $row = $this->log()->getModel();
 
         $row->order_id = $this->getKey();
-        $row->type = 'error';
+        $row->type = $type;
         $row->code = $code;
         $row->message = $this->toLogResponse($message);
         $row->log = $this->toLogResponse($log);

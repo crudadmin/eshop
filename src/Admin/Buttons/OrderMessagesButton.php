@@ -15,11 +15,13 @@ class OrderMessagesButton extends Button
         //Name of button on hover
         $this->name = $this->getOrderLogContent($row, false);
 
+        $hasError = $row->log->where('type', 'error')->count() > 0;
+
         //Button classes
-        $this->class = 'btn-warning';
+        $this->class = 'btn-'.($hasError ? 'warning' : 'default');
 
         //Button Icon
-        $this->icon = 'fa-exclamation-triangle';
+        $this->icon = $hasError ? 'fa-exclamation-triangle' : 'fa-info-circle';
 
         //Allow button only when invoices are created
         $this->active = $row->log->count() > 0;
