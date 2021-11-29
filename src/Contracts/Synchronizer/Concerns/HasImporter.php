@@ -273,6 +273,7 @@ trait HasImporter
         foreach ($this->onCreate[$model->getTable()] as $i => $onCreateIdentifier) {
             try {
                 $originalRow = $rows[$onCreateIdentifier];
+
                 $row = $this->castInsertData($model, $originalRow);
 
                 $id = $model->insertGetId($row);

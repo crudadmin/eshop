@@ -26,6 +26,7 @@ trait HasProductFields
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|required',
                 'ean' => 'name:EAN|hidden',
                 'code' => 'name:Kód produktu',
+                'code_pairing' => 'name:Párovací kód produktu|inaccessible',
             ])->name('Identifikátory produkty')->id('identifiers'),
         ])->icon('fa-pencil')->id('general-tab');
     }
