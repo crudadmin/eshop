@@ -9,13 +9,13 @@ use Illuminate\Support\Collection;
 
 class ProductsSheetImport extends ProductsImport implements SynchronizerInterface
 {
-    public $synchronizeProducts = ['create' => true, 'update' => true, 'delete' => false];
-    public $synchronizeVariants = ['create' => true, 'update' => true, 'delete' => false];
-    public $synchronizeCategories = ['create' => true, 'update' => true, 'delete' => false];
-    public $synchronizeGallery = ['create' => true, 'update' => true, 'delete' => false];
-    public $synchronizeAttributes = ['create' => true, 'update' => true, 'delete' => false];
-    public $synchronizeAttributesItems = ['create' => true, 'update' => true, 'delete' => false];
-    public $synchronizeProductAttributes = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizeProducts = [ 'create' => true, 'update' => true, 'delete' => false ];
+    public $synchronizeVariants = [ 'create' => true, 'update' => true, 'delete' => false ];
+    public $synchronizeCategories = [ 'create' => true, 'update' => true, 'delete' => false ];
+    public $synchronizeGallery = [ 'create' => true, 'update' => true, 'delete' => false ];
+    public $synchronizeAttributes = [ 'create' => true, 'update' => true, 'delete' => false ];
+    public $synchronizeAttributesItems = [ 'create' => true, 'update' => true, 'delete' => false ];
+    public $synchronizeProductAttributes = [ 'create' => true, 'update' => true, 'delete' => true ];
 
     private $treeProductIdentifier = [];
     private $sheetRows;
@@ -75,8 +75,6 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
             $products[] = $item;
         }
-
-        dd($products);
 
         return $products;
     }

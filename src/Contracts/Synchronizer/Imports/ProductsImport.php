@@ -33,11 +33,11 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
     public function getProductsGalleryIdentifier()
     {
-        return array_filter([
-            'product_id',
-            $this->hasVariantsGallery() ? 'products_variant_id' : null,
-            'code'
-        ]);
+        return array_merge(
+            ['product_id' => 'products'],
+            $this->hasVariantsGallery() ? [ 'products_variant_id' => 'products_variants' ] : [],
+            [ 'code' ]
+        );
     }
 
     public function getAttributeIdentifier()
@@ -57,7 +57,11 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
     public function getProductsAttributeIdentifier()
     {
-        return ['product_id', 'products_variant_id', 'attribute_id'];
+        return [
+            'product_id' => 'products',
+            'products_variant_id' => 'products_variants',
+            'attribute_id'
+        ];
     }
 
     public function handle(array $rows = null)
@@ -83,7 +87,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         if ( $this->synchronizeCategories ) {
             $this->synchronize(
                 new ProductsCategoriesPivot,
-                ['product_id', 'category_id'],
+                ['product_id' => 'products', 'category_id'],
                 $this->getPreparedProductsCategories($rows),
                 $this->synchronizeCategories
             );
