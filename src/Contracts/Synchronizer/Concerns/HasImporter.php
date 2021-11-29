@@ -193,7 +193,16 @@ trait HasImporter
         };
     }
 
-    public function synchronize(Model $model, $fieldKey, $rows)
+    private function isAllowedSync($type, $state)
+    {
+        if ( $state === true ){
+            return true;
+        }
+
+        return $state[$type] === true;
+    }
+
+    public function synchronize(Model $model, $fieldKey, $rows, $typeOfSync = true)
     {
         $totalStart = Admin::start();
         $this->message('************* '.$model->getTable());
@@ -207,56 +216,50 @@ trait HasImporter
         $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
 
         //Identify which rows should be updated and which created
-        $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model->getTable())));
-        $this->onUpdate[$model->getTable()] = array_diff($rows->keys()->toArray(), $this->onCreate[$model->getTable()]);
-        $this->onDeleteOrHide[$model->getTable()] = $this->getDeletionRows($model, $fieldKey, $rows->keys()->toArray());
+        if ( $this->isAllowedSync('create', $typeOfSync) || $this->isAllowedSync('update', $typeOfSync) ) {
+            $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model->getTable())));
+        }
 
-        $this->message(
-             'On create rows: '.count($this->onCreate[$model->getTable()]) ."\n"
-            .'Existing rows: '.count($this->onUpdate[$model->getTable()])."\n"
-            .'On '.($this->isPublishable($model) ? 'unpublish' : 'delete').': '.count($this->onDeleteOrHide[$model->getTable()])."\n"
-            .'On publish: '.count($this->unpublishedRowsToPublish[$model->getTable()])
-            ."\n"
-        );
+        if ( $this->isAllowedSync('update', $typeOfSync) ) {
+            $this->onUpdate[$model->getTable()] = array_diff($rows->keys()->toArray(), $this->onCreate[$model->getTable()]);
+        }
+
+        if ( $this->isAllowedSync('delete', $typeOfSync) ) {
+            $this->onDeleteOrHide[$model->getTable()] = $this->getDeletionRows($model, $fieldKey, $rows->keys()->toArray());
+        }
+
+        $this->message(implode("\n", array_filter([
+            $this->isAllowedSync('create', $typeOfSync) ? 'On create rows: '.count($this->onCreate[$model->getTable()] ?? []) : null,
+            $this->isAllowedSync('update', $typeOfSync) ? 'Existing rows: '.count($this->onUpdate[$model->getTable()] ?? []) : null,
+            $this->isAllowedSync('delete', $typeOfSync) ? 'On '.($this->isPublishable($model) ? 'unpublish' : 'delete').': '.count($this->onDeleteOrHide[$model->getTable()] ?? []) : null,
+            $this->isAllowedSync('delete', $typeOfSync) ? 'On publish: '.count($this->unpublishedRowsToPublish[$model->getTable()] ?? []) : null
+        ]))."\n");
 
         //Create new rows
-        $this->createRows($model, $rows, $fieldKey);
+        if ( $this->isAllowedSync('create', $typeOfSync) ) {
+            $this->createRows($model, $rows, $fieldKey);
+        }
 
         //Update existing rows
-        $this->updateRows($model, $rows, $fieldKey);
+        if ( $this->isAllowedSync('update', $typeOfSync) ) {
+            $this->updateRows($model, $rows, $fieldKey);
+        }
 
-        $this->hideOrUnpublish($model);
-
-        $this->publishMissing($model);
+        if ( $this->isAllowedSync('delete', $typeOfSync) ) {
+            $this->hideOrUnpublish($model);
+            $this->publishMissing($model);
+        }
 
         $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
     }
 
     public function synchronizeUpdateOnly(Model $model, $fieldKey, $rows)
     {
-        $totalStart = Admin::start();
-        $this->message('************* '.$model->getTable());
-
-        $rows = collect($rows)->keyBy(
-            $this->keyByIdentifier($fieldKey)
-        );
-
-        $allIdentifiers = $rows->keys()->toArray();
-
-        $this->bootExistingRows($model, $fieldKey, $allIdentifiers);
-
-        //Identify which rows should be updated and which created
-        $this->onUpdate[$model->getTable()] = array_intersect(
-            $rows->keys()->toArray(),
-            array_keys($this->existingRows[$model->getTable()]),
-        );
-
-        $this->message('Existing rows: '.count($this->onUpdate[$model->getTable()])."\n");
-
-        //Update existing rows
-        $this->updateRows($model, $rows, $fieldKey);
-
-        $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
+        return $this->synchronize($model, $fieldKey, $rows, [
+            'create' => false,
+            'update' => true,
+            'delete' => false,
+        ]);
     }
 
     private function createRows(Model $model, $rows, $fieldKey)

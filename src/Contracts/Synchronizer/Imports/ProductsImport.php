@@ -13,12 +13,13 @@ use Store;
 
 class ProductsImport extends Synchronizer implements SynchronizerInterface
 {
-    public $synchronizeVariants = true;
-    public $synchronizeCategories = true;
-    public $synchronizeGallery = true;
-    public $synchronizeAttributes = true;
-    public $synchronizeAttributesItems = true;
-    public $synchronizeProductAttributes = true;
+    public $synchronizeProducts = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizeVariants = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizeCategories = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizeGallery = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizeAttributes = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizeAttributesItems = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizeProductAttributes = ['create' => true, 'update' => true, 'delete' => true];
 
     public function getProductIdentifier()
     {
@@ -61,17 +62,21 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
     public function handle(array $rows = null)
     {
-        $this->synchronize(
-            Admin::getModel('Product'),
-            $this->getProductIdentifier(),
-            $rows
-        );
+        if ( $this->synchronizeProducts ) {
+            $this->synchronize(
+                Admin::getModel('Product'),
+                $this->getProductIdentifier(),
+                $rows,
+                $this->synchronizeProducts
+            );
+        }
 
         if ( $this->synchronizeVariants ) {
             $this->synchronize(
                 Admin::getModel('ProductsVariant'),
                 $this->getProductsVariantIdentifier(),
-                $this->getPreparedVariants($rows)
+                $this->getPreparedVariants($rows),
+                $this->synchronizeVariants
             );
         }
 
@@ -79,7 +84,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $this->synchronize(
                 new ProductsCategoriesPivot,
                 ['product_id', 'category_id'],
-                $this->getPreparedProductsCategories($rows)
+                $this->getPreparedProductsCategories($rows),
+                $this->synchronizeCategories
             );
         }
 
@@ -87,7 +93,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $this->synchronize(
                 Admin::getModel('ProductsGallery'),
                 $this->getProductsGalleryIdentifier(),
-                $this->getPreparedGallery($rows)
+                $this->getPreparedGallery($rows),
+                $this->synchronizeGallery
             );
         }
 
@@ -95,7 +102,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $this->synchronize(
                 Admin::getModel('Attribute'),
                 $this->getAttributeIdentifier(),
-                $preparedAttributes = $this->getPreparedAttributes($rows)
+                $preparedAttributes = $this->getPreparedAttributes($rows),
+                $this->synchronizeAttributes
             );
         }
 
@@ -103,7 +111,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $this->synchronize(
                 Admin::getModel('AttributesItem'),
                 $this->getAttributesItemIdentifier(),
-                $this->getPreparedAttributesItems($preparedAttributes)
+                $this->getPreparedAttributesItems($preparedAttributes),
+                $this->synchronizeAttributes
             );
         }
 
@@ -111,7 +120,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $this->synchronize(
                 Admin::getModel('ProductsAttribute'),
                 $this->getProductsAttributeIdentifier(),
-                $this->getPreparedProductsAttribute($rows)
+                $this->getPreparedProductsAttribute($rows),
+                $this->synchronizeProductAttributes
             );
         }
     }
