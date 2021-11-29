@@ -53,7 +53,7 @@ class FromXlsToArray
             //We want bind header
             if ( $i == 0 ) {
                 foreach ($rowData as $name) {
-                    $header[parseHeaderString($name)] = $name;
+                    $header[$this->parseHeaderString($name)] = $name;
                 }
             }
 
@@ -66,5 +66,15 @@ class FromXlsToArray
         }
 
         return compact('header', 'rows');
+    }
+
+    public function parseHeaderString($string)
+    {
+        $string = preg_replace("/{\s| |\.|\-|\_}/", '-', $string);
+        $string = mb_strtolower($string);
+        $string = str_slug($string);
+        $string = str_replace('-', '_', $string);
+
+        return $string;
     }
 }
