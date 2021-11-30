@@ -77,7 +77,8 @@ class SendShippingJob implements ShouldQueue
             $order->log()->create([
                 'type' => 'error',
                 'code' => 'delivery-error',
-                'log' => implode(' ', array_wrap($error->getMessage())),
+                'message' => $error->getMessage(),
+                'log' => $error->getResponse(),
             ]);
         }
 

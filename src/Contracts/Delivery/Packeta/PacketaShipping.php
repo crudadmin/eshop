@@ -124,7 +124,9 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
         }
 
         catch(SoapFault $error) {
-            throw new CreatePackageException($error->getMessage().' - '.json_encode($error->detail ?? '{}', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            $message = implode(' - ', array_filter([$error->getMessage(), collect($error?->detail?->PacketAttributesFault?->attributes?->fault ?: [])->pluck('fault')->join(', ')]));
+
+            throw new CreatePackageException($message, json_encode($error->detail ?? '{}', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         }
     }
 

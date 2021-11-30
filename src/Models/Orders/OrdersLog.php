@@ -54,7 +54,7 @@ class OrdersLog extends AdminModel
             'payment-error' => 'Platbu nebolo možné zrealizovať.',
             'payment-status-error' => 'Platba bola zrušená zákazníkom, alebo ešte nebola úspešne overená po vytvorení objednávky.',
             'payment-status-unknown-error' => 'Prevod platby zlyhal chybou. Kontaktujte svojho administrátora.',
-            'delivery-error' => 'Chyba zaslania baliku dopravoci.',
+            'delivery-error' => 'Chyba zaslania balíku dopravcovi.',
             'delivery-info' => 'Hlásenie pri zaslani dopravy.',
         ],
     ];
