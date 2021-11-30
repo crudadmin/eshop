@@ -55,11 +55,15 @@ class FromXlsToArray
                 foreach ($rowData as $name) {
                     $header[$this->parseHeaderString($name)] = $name;
                 }
+
+                $header = array_filter($header);
             }
 
             //Add row
             else {
-                $rows[] = array_combine(array_keys($header), $rowData);
+                $trimmedRowData = array_slice($rowData, 0, count($header));
+
+                $rows[] = array_combine(array_keys($header), $trimmedRowData);
             }
 
             $i++;
