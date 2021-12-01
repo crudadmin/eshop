@@ -75,7 +75,7 @@ class PaymentHelper extends OrderProvider
     public function getPaymentData($paymentResponse)
     {
         return [
-            'url' => $paymentResponse,
+            'url' => $this->getPaymentUrl($paymentResponse),
         ];
     }
 
@@ -108,6 +108,11 @@ class PaymentHelper extends OrderProvider
             $this->getOrder()->getKey(),
             $this->getOrderHash($type),
         ]);
+    }
+
+    public function getNotificationResponse($paymentId)
+    {
+        return ['success' => true];
     }
 
     /**

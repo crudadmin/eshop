@@ -38,7 +38,12 @@ trait HasMutatorsForward
             $classess = $this->getMutatorNames();
 
             if ( array_key_exists($lowerCaseMethod, $classess) ) {
-                return $classess[$lowerCaseMethod];
+                $mutator = $classess[$lowerCaseMethod];
+
+                //We need boot automaticaly received mutator from OrderService::get{mutator}Mutator() call
+                $mutator->bootMutator($this->getCartItems());
+
+                return $mutator;
             }
         }
     }

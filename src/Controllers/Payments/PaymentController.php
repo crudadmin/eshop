@@ -65,7 +65,9 @@ class PaymentController extends Controller
 
         //Does not return redirect response on notification
         if ( in_array($type, ['notification']) ){
-            return 'ok';
+            return $paymentProvider->getNotificationResponse(
+                $paymentProvider->getPaymentId()
+            );
         }
 
         return $redirect;
