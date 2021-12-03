@@ -17,9 +17,9 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
     public $synchronizeAttributesItems = [ 'create' => true, 'update' => true, 'delete' => false ];
     public $synchronizeProductAttributes = [ 'create' => true, 'update' => true, 'delete' => true ];
 
-    private $treeProductIdentifier = [];
-    private $sheetRows;
-    private $importer;
+    protected $treeProductIdentifier = [];
+    protected $sheetRows;
+    protected $importer;
 
     public function __construct(Collection $sheetRows, SheetImportWrapper $importer)
     {
