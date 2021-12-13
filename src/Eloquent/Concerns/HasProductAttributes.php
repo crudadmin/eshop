@@ -56,7 +56,7 @@ trait HasProductAttributes
         $attributes = [];
 
         $grouppedAttributes = $this->attributesItems->sortBy(function($item){
-            return $item->attribute->getAttribute('_order');
+            return $item->attribute?->getAttribute('_order');
         })->groupBy('products_attribute_id');
 
         foreach ($grouppedAttributes as $attributeItems) {
