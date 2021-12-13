@@ -180,6 +180,7 @@ class Attribute extends AdminModel
             config('admineshop.attributes.filtrable', true) ? 'filtrable' : null,
             config('admineshop.attributes.attributesText', false) ? 'product_info' : null,
             config('admineshop.attributes.attributesVariants', false) ? 'variants' : null,
+            $this->isSortable() ? '_order' : null,
         ]);
     }
 

@@ -55,7 +55,11 @@ trait HasProductAttributes
 
         $attributes = [];
 
-        foreach ($this->attributesItems->groupBy('products_attribute_id') as $attributeItems) {
+        $grouppedAttributes = $this->attributesItems->sortBy(function($item){
+            return $item->attribute->getAttribute('_order');
+        })->groupBy('products_attribute_id');
+
+        foreach ($grouppedAttributes as $attributeItems) {
             $attributes[] = $attributeItems->map(function($item) {
                 $attribute = $item->attribute;
                 $attrItem = $item->item;
