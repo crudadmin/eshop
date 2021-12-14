@@ -101,4 +101,14 @@ class BaseDriver
         //Return key based on REST API header
         return request()->header(config('admineshop.cart.token.header_name', 'Cart-Token')) ?: $this->regenerateKey();
     }
+
+    /**
+     * Returns instance of actual cart session row
+     *
+     * @return  AdminModel|mixed
+     */
+    public function getCartSession()
+    {
+
+    }
 }
