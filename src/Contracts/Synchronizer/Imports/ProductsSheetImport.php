@@ -60,13 +60,13 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         $products = [];
 
         foreach ($this->treeProductIdentifier as $pairingColumn => $items) {
-            $item = [
+            $item = $this->getImportProduct([
                 'name' => $items[0][$this->importer->getColumnNameByField('name')],
                 'code_pairing' => $pairingColumn,
                 'product_type' => count($items) > 1 ? 'variants' : 'regular',
                 '$categories' => $this->getCategoriesList($items),
                 '$variants' => count($items) > 1 ? $this->prepareVariants($items) : [],
-            ];
+            ], $items, $pairingColumn);
 
             //If is regulat product type, we want add additional info
             if ( in_array($item['product_type'], ['regular']) ){
@@ -77,6 +77,11 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         }
 
         return $products;
+    }
+
+    public function getImportProduct($array, $items, $key)
+    {
+        return $data;
     }
 
     public function getCategoriesList($items)
@@ -95,7 +100,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         });
     }
 
-    private function prepareProductItem($item, $variant = false)
+    protected function prepareProductItem($item, $variant = false)
     {
         $array = [
             '$attributes' => $this->prepareAttributes($item),
