@@ -184,7 +184,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
         }
 
         //Add payment in delivery (cast or card)
-        if ( $order->payment_method && $order->payment_method->isCashDelivery() ) {
+        if ( $this->isCashDelivery() ) {
             $services['cod'] = [
                 'amount' => $order->price_vat,
                 'currency' => 'EUR',

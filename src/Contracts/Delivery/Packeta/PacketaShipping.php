@@ -114,7 +114,8 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
                 'phone' => $order->delivery_phone ?: $order->phone,
                 'addressId' => $order->packeta_point['id'],
                 'value' => $order->price_vat,
-                'eshop' => env('PACKETA_API_ESHOP'),
+                'cod' => $this->isCashDelivery() ? $order->price_vat : 0,
+                'eshop' => $options['eshop'] ?? env('PACKETA_API_ESHOP'),
                 'weight' => $weight,
             ];
 

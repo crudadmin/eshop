@@ -64,4 +64,9 @@ class OrderProvider
     {
         return $this->paymentMethod;
     }
+
+    public function getDelivery()
+    {
+        return $this->delivery;
+    }
 }

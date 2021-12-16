@@ -54,6 +54,17 @@ class ShippingProvider extends OrderProvider
         return ($options['weight'] ?? $options['default_weight'] ?? null);
     }
 
+    public function isCashDelivery()
+    {
+        $order = $this->getOrder();
+
+        if ( $order->paymentMethod && $order->paymentMethod->isCashDelivery() === true ){
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * On shipping send button question action
      *
