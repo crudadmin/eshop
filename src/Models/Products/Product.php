@@ -128,6 +128,11 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'name' => 'Atribúty',
                 'before' => 'code',
             ],
+            'state_filter' => [
+                'unassigned' => [ 'name' => 'Nezaradené', 'title' => 'Nezaradené do kategórii' ],
+                'active' => [ 'name' => 'Aktívne' ],
+                'inactive' => [ 'name' => 'Neaktívne' ],
+            ]
         ];
     }
 
@@ -215,5 +220,16 @@ class Product extends CartEloquent implements HasAttributesSupport
         $attributes['attributes'] = $this->attributesText;
 
         return $attributes;
+    }
+
+    public function scopeSetFilterProperty($query, $type)
+    {
+        if ( $type == 'unassigned' ){
+            $query->whereDoesntHave('categories');
+        } else if ( $type == 'active' ){
+            $query->whereNotNull('published_at');
+        } else if ( $type == 'inactive' ){
+            $query->whereNull('published_at');
+        }
     }
 }
