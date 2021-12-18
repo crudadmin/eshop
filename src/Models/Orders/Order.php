@@ -102,6 +102,7 @@ class Order extends AdminModel
             'title.update' => 'Objednávka č. :number - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',
+            'columns.price.hidden' => true,
             'columns.price.add_after' => ' '.Store::getCurrency(),
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
@@ -117,6 +118,12 @@ class Order extends AdminModel
             'columns.delivery_status_text' => [
                 'encode' => false,
                 'name' => 'Status dopravy',
+                'after' => 'status',
+            ],
+            'columns.items_list' => [
+                'hidden' => true,
+                'encode' => false,
+                'name' => 'Produkty',
                 'after' => 'status',
             ],
         ];

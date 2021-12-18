@@ -20,7 +20,7 @@ trait HasOrderFields
             [
                 'number' => 'name:Č. obj.|max:20|hideFromForm',
                 'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
-                'client' => 'name:Klient|belongsTo:clients|invisible',
+                'client' => 'name:Klient|belongsTo:clients|inaccessible',
                 'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible'
             ],
             config('admineshop.delivery.packeta', false)
@@ -37,7 +37,7 @@ trait HasOrderFields
     {
         return Group::fields([
             'username' => 'name:Meno a priezvisko|required|hidden',
-            'email' => 'name:Email|email|required',
+            'email' => 'name:Email|email|required|hidden',
             'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
             'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
             'city' => 'name:Mesto|required|hidden',
@@ -54,7 +54,7 @@ trait HasOrderFields
     protected function getDeliveryFields()
     {
         return Group::fields([
-            'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|type:checkbox|default:0',
+            'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|column_name:Ina doruč. adr.|type:checkbox|default:0',
             Group::fields([
                 'delivery_username' => 'name:Meno a priezvisko / Firma|required_if_checked:delivery_different',
                 'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
