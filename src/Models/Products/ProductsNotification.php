@@ -3,6 +3,8 @@
 namespace AdminEshop\Models\Products;
 
 use Admin;
+use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Products\ProductsVariant;
 use AdminEshop\Notifications\ProductAvailableNotification;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
@@ -26,13 +28,10 @@ class ProductsNotification extends AdminModel
 
     protected $sortable = false;
 
-    public function belongsToModel()
-    {
-        return array_filter([
-            ($model = Admin::getModel('Product')) ? get_class($model) : null,
-            ($model = Admin::getModel('ProductsVariant')) ? get_class($model) : null,
-        ]);
-    }
+    protected $belongsToModel = [
+        Product::class,
+        ProductsVariant::class,
+    ];
 
     /*
      * Automatic form and database generator by fields list

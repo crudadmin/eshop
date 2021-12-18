@@ -76,7 +76,7 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
 
     public function belongsToModel()
     {
-        return get_class(Admin::getModel('Product'));
+        return Product::class;
     }
 
     /*

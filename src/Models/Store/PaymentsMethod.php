@@ -42,7 +42,7 @@ class PaymentsMethod extends BasePaymentsMethod
         ]);
 
         $restrictionFields = [
-            'is_cod' => 'name:Platba dobierkou v dopravnej službe|column_name:Platba dobierkou|type:checkbox|default:0|title:Pri zvolení tejto platobnej metódy v spojení s dopravnou službou, ktorá podporuje dobierku, zaznačíme úhradu zasielky dobierkou.',
+            'is_cod' => 'name:Platba dobierkou v dopravnej službe|column_name:Platba dobierkou|type:checkbox|default:0|title:Pri zvolení tejto platobnej metódy v spojení s dopravnou službou, ktorá podporuje dobierku, zaznačíme úhradu zasielky dobierkou.|hidden',
         ];
 
         //Add payments rules

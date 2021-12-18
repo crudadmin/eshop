@@ -39,8 +39,8 @@ class ClientsFavourite extends AdminModel
     public function belongsToModel()
     {
         return [
-            get_class(Admin::getModel('Client')),
-            get_class(Admin::getModel('CartToken'))
+            Client::class,
+            CartToken::class,
         ];
     }
 

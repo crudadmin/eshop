@@ -5,7 +5,6 @@ namespace AdminEshop\Models\Clients;
 use AdminEshop\Admin\Rules\SetDefaultDeliveryAddress;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Admin;
 
 class ClientsAddress extends AdminModel
 {
@@ -46,7 +45,7 @@ class ClientsAddress extends AdminModel
 
     public function belongsToModel()
     {
-        return get_class(Admin::getModel('Client'));
+        return Client::class;
     }
 
     public function active()
