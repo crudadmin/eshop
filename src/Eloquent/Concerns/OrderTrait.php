@@ -215,6 +215,31 @@ trait OrderTrait
         }
     }
 
+    protected function getIsPaidStatusText()
+    {
+        $color = '';
+        $tooltip = '';
+
+        if ( $this->paid_at ){
+            $color = 'green';
+            $icon = '<i class="fa fa-check"></i>';
+            $tooltip = 'Zaplatené '.$this->paid_at->format('d.m.Y H:i:s');
+        }
+
+        else {
+            $color = 'red';
+            $icon = '<i class="fa fa-times"></i>';
+            $tooltip = 'Neuhradené';
+        }
+
+        return '
+        <span style="'.($color ? ('color: '.$color) : '' ).'">
+            <span data-toggle="tooltip" title="'.e($tooltip).'">
+                '.$icon.'
+            </span>
+        </span>';
+    }
+
     public function getDeliveryTrackingUrlAttribute()
     {
         OrderService::setOrder($this);

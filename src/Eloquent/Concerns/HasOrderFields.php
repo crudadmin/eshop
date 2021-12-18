@@ -36,7 +36,7 @@ trait HasOrderFields
     protected function getBillingFields()
     {
         return Group::fields([
-            'username' => 'name:Meno a priezvisko|required|hidden',
+            'username' => 'name:Meno a priezvisko|required|hidden|inaccessible_column',
             'email' => 'name:Email|email|required|hidden',
             'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
             'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
@@ -151,8 +151,8 @@ trait HasOrderFields
         return Group::fields([
             'Cena objednávky' => Group::half([
                 'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                'price_vat' => 'name:Cena s DPH|disabled|type:decimal',
-                'paid_at' => 'name:Zaplatené dňa|type:datetime',
+                'price_vat' => 'name:Cena s DPH|disabled|type:decimal|column_name:Suma obj.|',
+                'paid_at' => 'name:Zaplatené dňa|type:datetime|hidden',
             ])->id('price')->inline(),
             'Zľavy' => Group::half(array_merge(
                 Discounts::isRegistredDiscount(DiscountCode::class)

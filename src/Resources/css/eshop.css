@@ -1,0 +1,10 @@
+[data-table-rows="orders"] .td-is_paid,
+[data-table-rows="orders"] .td-items_list { text-align: center; }
+
+[data-table-rows="orders"] .td-price_vat { min-width: 80px; }
+
+.tooltip-products .tooltip-inner { max-width: 400px; }
+.tooltip-products .orderItemTooltip { display: flex; justify-content: space-between; }
+.tooltip-products .orderItemTooltip .--quantity { width: 50px; margin-right: 5px; }
+.tooltip-products .orderItemTooltip .--name { width: 100%; text-align: left; }
+.tooltip-products .orderItemTooltip .--price { text-align: right; min-width: 70px; margin-left: 5px }

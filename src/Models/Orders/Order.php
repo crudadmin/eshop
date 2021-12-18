@@ -113,18 +113,22 @@ class Order extends AdminModel
             ],
             'columns.delivery_address' => [
                 'name' => 'Dodacia adresa',
-                'after' => 'email',
+                'after' => 'client_name',
             ],
             'columns.delivery_status_text' => [
                 'encode' => false,
                 'name' => 'Status dopravy',
                 'after' => 'status',
             ],
-            'columns.items_list' => [
-                'hidden' => true,
+            'columns.is_paid' => [
                 'encode' => false,
-                'name' => 'Produkty',
-                'after' => 'status',
+                'name' => 'Zaplatené',
+                'after' => 'price_vat',
+            ],
+            'columns.items_list' => [
+                'component' => 'OrderItemsColumn',
+                'name' => 'Položky',
+                'before' => 'price_vat',
             ],
         ];
     }
@@ -172,7 +176,7 @@ class Order extends AdminModel
 
     public function scopeAdminRows($query)
     {
-        $query->with(['log']);
+        $query->with(['log', 'items:id,order_id']);
     }
 
     public function setAdminAttributes($attributes)
@@ -186,6 +190,10 @@ class Order extends AdminModel
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
 
         $attributes['delivery_status_text'] = $this->getDeliveryStatusText();
+
+        $attributes['is_paid'] = $this->getIsPaidStatusText();
+
+        $attributes['items_list'] = $this->items->count();
 
         return $attributes;
     }
