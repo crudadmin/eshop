@@ -17,8 +17,6 @@ export default {
 
     methods : {
         async loadProducts(){
-            console.log(this.$refs.element);
-
             if ( this.loaded == true ){
                 return;
             }

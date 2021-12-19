@@ -62,7 +62,7 @@ class SendShippingJob implements ShouldQueue
                 $order->log()->create([
                     'type' => 'info',
                     'code' => 'delivery-info',
-                    'message' => $package->getMessage(),
+                    'message' => str_limit($package->getMessage(), 250),
                 ]);
             }
         }
@@ -77,7 +77,7 @@ class SendShippingJob implements ShouldQueue
             $order->log()->create([
                 'type' => 'error',
                 'code' => 'delivery-error',
-                'message' => $error->getMessage(),
+                'message' => str_limit($error->getMessage(), 250),
                 'log' => $error->getResponse(),
             ]);
         }
@@ -87,7 +87,7 @@ class SendShippingJob implements ShouldQueue
 
             $order->log()->create([
                 'type' => 'error',
-                'message' => implode(' ', array_wrap($error->getMessage())),
+                'message' => str_limit(implode(' ', array_wrap($error->getMessage())), 250),
             ]);
         }
 
