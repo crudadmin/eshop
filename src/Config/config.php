@@ -193,6 +193,7 @@ return [
             'number' => [
                 'custom' => true, //If custom order number is turned on, number will be generated from ym00000number
                 'length' => 6, //How many decimals hould order number consist of. 000123
+                'prefix' => env('ORDER_PREFIX'),
             ],
 
             //Submit order validato request

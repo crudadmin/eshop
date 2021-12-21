@@ -5,7 +5,7 @@
 {{ _('Zaplatiť platbu online') }}
 @endcomponent
 @else
-@component('mail::button', ['url' => url('/')])
+@component('mail::button', ['url' => env('APP_NUXT_URL') ?: url('/')])
     {{ _('Pokračovať na eshop') }}
 @endcomponent
 @endif

@@ -37,9 +37,9 @@ class HeurekaVerifiedCustomersJob implements ShouldQueue
             return;
         }
 
-        try {
-            $order = $this->order;
+        $order = $this->order;
 
+        try {
             $instance = new ShopCertification($key, [
                 'service' => ShopCertification::HEUREKA_SK
             ]);
@@ -56,6 +56,13 @@ class HeurekaVerifiedCustomersJob implements ShouldQueue
 
             Log::channel('store')->info('Heureka verified customers sent successfully for order '.$order->number);
         } catch (Exception $e){
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'heureka-verified-customers',
+                'message' => 'Nepodarilo sa odoslať potvrdenie do služby overené zákaznikmi.',
+                'log' => $e->getMessage(),
+            ]);
+
             Log::channel('store')->error($e);
         }
     }
