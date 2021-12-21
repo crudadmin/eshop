@@ -33,7 +33,7 @@ trait HasHeureka
         ])->setLocalizedResponse()->toArray();
 
         return [
-            'id' => $this->getHeurekaItemId(),
+            'id' => $this->heurekaItemId,
         ] + $array + [
             'manufacturer' => $this->getHeurekaManufacturer($parentProduct),
             'delivery_date' => $this->getHeurekaStock($parentProduct),
@@ -45,7 +45,7 @@ trait HasHeureka
         ];
     }
 
-    public function getHeurekaItemId()
+    public function getHeurekaItemIdAttribute()
     {
         return $this->product_id ? $this->product_id.'_'.$this->getKey() : $this->getKey();
     }

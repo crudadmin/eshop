@@ -305,8 +305,8 @@ trait OrderTrait
     public function getVerifiedCustomersItemsIds()
     {
         return $this->items->map(function($item){
-            if ( ($product = $item->getProduct()) && method_exists($product, 'getHeurekaItemId') ) {
-                return $product->getHeurekaItemId();
+            if ( ($product = $item->getProduct()) && method_exists($product, 'getHeurekaItemIdAttribute') ) {
+                return $product->heurekaItemId;
             }
         })->filter(function($item){
             return $item;
