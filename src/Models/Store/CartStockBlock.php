@@ -35,7 +35,7 @@ class CartStockBlock extends AdminModel
         return [
             'cart_token' => 'name:Customer token|belongsTo:cart_tokens',
             'product_id' => 'name:Produkt|belongsTo:products,id',
-            'variant_id' => 'name:Produkt|belongsTo:products_variants,id',
+            'variant_id' => 'name:Produkt|belongsTo:products,id',
             'quantity' => 'name:Blokovaná kvantita|type:integer|min:0',
             'blocked_at' => 'name:Posledná blokácia|type:datetime|required',
         ];

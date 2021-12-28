@@ -18,6 +18,7 @@ class NotifierController extends Controller
         ];
 
         if ( isset($data['variant_id']) ) {
+            //TODO: fix variants
             $product = Admin::getModel('ProductsVariant')->findOrFail($data['variant_id']);
 
             $row['product_id'] = $product->product_id;

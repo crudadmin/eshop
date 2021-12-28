@@ -4,7 +4,6 @@ namespace AdminEshop\Models\Products;
 
 use Admin;
 use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsVariant;
 use AdminEshop\Notifications\ProductAvailableNotification;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
@@ -30,7 +29,6 @@ class ProductsNotification extends AdminModel
 
     protected $belongsToModel = [
         Product::class,
-        ProductsVariant::class,
     ];
 
     /*
@@ -52,7 +50,7 @@ class ProductsNotification extends AdminModel
     {
         return $this->validator()->only([
             'product_id' => 'required_without:variant_id|exists:products,id',
-            'variant_id' => 'required_without:product_id|exists:products_variants,id',
+            'variant_id' => 'required_without:product_id|exists:products,id',
             'email',
         ]);
     }
