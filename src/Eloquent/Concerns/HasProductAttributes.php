@@ -65,7 +65,11 @@ trait HasProductAttributes
 
         $attributes = [];
 
-        foreach ($this->attributesItems->groupBy('products_attribute_id') as $attributeItems) {
+        $grouppedAttributes = $this->attributesItems->sortBy(function($item){
+            return $item->attribute?->getAttribute('_order');
+        })->groupBy('products_attribute_id');
+
+        foreach ($grouppedAttributes as $attributeItems) {
             $attributes[] = $attributeItems->map(function($item) use ($filter) {
                 $attribute = $item->attribute;
 
@@ -73,7 +77,7 @@ trait HasProductAttributes
                     return false;
                 }
 
-                return ($item ? $item->getAttributeItemValue($attribute) : '').($attribute && ($unitName = $attribute->unitName) ? (' '.$unitName) : '');
+                return ($item ? $item->getAttributeItemValue($attribute) : '').($attribute && ($unitName = $attribute->unitName) ? (($attribute->hasUnitSpace ? ' ' : '').$unitName) : '');
             })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 

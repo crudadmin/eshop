@@ -5,7 +5,9 @@ namespace AdminEshop\Eloquent\Concerns;
 use AdminEshop\Events\StockChanged;
 use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Products\ProductsStocksLog;
+use AdminEshop\Models\Store\CartStockBlock;
 use Store;
+use Cart;
 
 trait HasStock
 {
@@ -208,9 +210,12 @@ trait HasStock
         //Set sub on product type
         $sub = ($type == '-' ? $sub * -1 : $sub);
 
-        $updatedStock = $this->stock_quantity + $sub;
+        $uncastedStockQuantity = $this->attributes['stock_quantity'] ?? 0;
 
-        $this->stock_quantity = $updatedStock < 0 ? 0 : $updatedStock;
+        //Stock can be onli positive
+        $newStockQuantity = max(0, $uncastedStockQuantity + $sub);
+
+        $this->stock_quantity = $newStockQuantity;
         $this->save();
 
         $stockLog = ProductsStocksLog::create([
@@ -218,11 +223,44 @@ trait HasStock
             //TODO: check correct variant ID is pushed here
             'product_id' => $this instanceof Product ? $this->getKey() : $this->product_id,
             'sub' => $sub,
-            'stock' => $this->stock_quantity,
+            'stock' => $newStockQuantity,
             'message' => $message,
         ]);
 
         //Event for added discount code
         event(new StockChanged($this, $stockLog));
+    }
+
+    public function blockedItems()
+    {
+        $blockedMinutage = config('admineshop.stock.temporary_block_time', 0);
+
+        return $this->hasMany(CartStockBlock::class, $this instanceof ProductsVariant ? 'variant_id' : 'product_id')
+                    ->where(function($query){
+                        foreach (Cart::getStockBlockIdentifier() as $key => $value) {
+                            $query->where($key, '!=', $value);
+                        }
+                    })
+                    ->where('blocked_at', '>=', Carbon::now()->addMinutes(-$blockedMinutage));
+    }
+
+    public function scopeWithBlockedStock($query)
+    {
+        if ( Cart::isStockBlockEnabled() === false ){
+            return;
+        }
+
+        $query->withSum('blockedItems', 'quantity');
+    }
+
+    public function getStockQuantityAttribute($value)
+    {
+        if ( Cart::isStockBlockEnabled() == false ){
+            return $value;
+        }
+
+        $blockedStock = (int)($this->getAttribute('blocked_items_sum_quantity') ?: 0);
+
+        return max(0, $value - $blockedStock);
     }
 }

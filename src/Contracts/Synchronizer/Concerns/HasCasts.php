@@ -13,7 +13,7 @@ trait HasCasts
             $isLocale = $this->isLocalizedField($model, $key);
 
             if ( $isLocale ){
-                if ( is_string($value) ) {
+                if ( is_string($value) || is_numeric($value) ) {
                     $defaultLocaleSlug = Localization::get()->slug;
 
                     $row[$key] = [
@@ -21,10 +21,12 @@ trait HasCasts
                     ];
                 }
 
-                //Cast json data
-                $row[$key] = array_filter($row[$key], function($item){
-                    return is_null($item) === false && $item !== '';
-                });
+                if ( is_array($row[$key]) ) {
+                    //Cast json data
+                    $row[$key] = array_filter($row[$key], function($item){
+                        return is_null($item) === false && $item !== '';
+                    });
+                }
 
                 $row[$key] = $this->encodeJsonArray($row[$key]);
             }

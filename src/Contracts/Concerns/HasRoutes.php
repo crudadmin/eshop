@@ -13,6 +13,7 @@ trait HasRoutes
             Route::post('/cart/toggle', 'Cart\CartController@toggleItems')->name('cart::toggleItems')->visible();
             Route::post('/cart/update', 'Cart\CartController@updateQuantity')->name('cart::updateQuantity')->visible();
             Route::post('/cart/remove', 'Cart\CartController@removeItem')->name('cart::removeItem')->visible();
+            Route::post('/cart/notify', 'Product\NotifierController@notifyOnStock')->name('cart::notifyOnStock')->visible();
         });
     }
 
@@ -66,6 +67,32 @@ trait HasRoutes
     {
         Route::group(['namespace' => '\AdminEshop\Controllers\Shipping'], function(){
             Route::post('/cart/shipping/packeta/point', 'PacketaController@setPoint')->visible();
+        });
+    }
+
+    public function routesForProfileAddress()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
+            Route::get('/auth/addresses', 'Client\AddressController@get')->visible();
+            Route::put('/auth/addresses', 'Client\AddressController@store')->visible();
+            Route::post('/auth/addresses/{id}', 'Client\AddressController@update')->visible();
+            Route::post('/auth/addresses/{id}/default', 'Client\AddressController@setDefault')->visible();
+            Route::delete('/auth/addresses/{id}', 'Client\AddressController@delete')->visible();
+        });
+    }
+
+    public function routesForProfileOrders()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
+            Route::get('/auth/orders', 'Order\OrderController@index')->visible();
+            Route::get('/auth/orders/{id}', 'Order\OrderController@show')->visible();
+        });
+    }
+
+    public function routesForHeureka()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
+            Route::get('/_store/heureka/feed', 'Store\HeurekaController@index');
         });
     }
 }

@@ -54,9 +54,9 @@ class Client extends Authenticatable
                         'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
                         'photo' => 'name:Fotografia|type:file|image',
                     ])->inline(),
-                    'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                     'username' => 'name:Meno a priezvisko',
                     'phone' => 'name:Telefon|'.phoneValidatorRule(),
+                    'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                 ],
                 config('admineshop.client.groups', false)
                     ? ['groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd'] : []

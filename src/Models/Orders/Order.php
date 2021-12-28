@@ -14,6 +14,7 @@ use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\OrderPayments;
+use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
@@ -23,6 +24,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
+use OrderService;
 use Store;
 
 class Order extends AdminModel
@@ -30,6 +32,7 @@ class Order extends AdminModel
     use Notifiable,
         OrderTrait,
         OrderPayments,
+        OrderShipping,
         HasOrderInvoice,
         HasOrderHashes,
         HasOrderEmails,
@@ -57,16 +60,19 @@ class Order extends AdminModel
 
     protected $sortable = false;
 
-    protected $buttons = [
-        GenerateInvoice::class,
-        SendShippmentButton::class,
-        OrderMessagesButton::class,
-    ];
-
     protected $rules = [
         OrderNumber::class,
         RebuildOrder::class,
     ];
+
+    public function buttons()
+    {
+        return array_merge([
+            GenerateInvoice::class,
+            SendShippmentButton::class,
+            OrderMessagesButton::class,
+        ], $this->getShippingButtons());
+    }
 
     /*
      * Automatic form and database generation
@@ -98,6 +104,7 @@ class Order extends AdminModel
             'title.update' => 'Objednávka č. :number - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',
+            'columns.price.hidden' => true,
             'columns.price.add_after' => ' '.Store::getCurrency(),
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
@@ -108,12 +115,22 @@ class Order extends AdminModel
             ],
             'columns.delivery_address' => [
                 'name' => 'Dodacia adresa',
-                'after' => 'email',
+                'after' => 'client_name',
             ],
             'columns.delivery_status_text' => [
                 'encode' => false,
                 'name' => 'Status dopravy',
                 'after' => 'status',
+            ],
+            'columns.is_paid' => [
+                'encode' => false,
+                'name' => 'Zaplatené',
+                'after' => 'price_vat',
+            ],
+            'columns.items_list' => [
+                'component' => 'OrderItemsColumn',
+                'name' => 'Položky',
+                'before' => 'price_vat',
             ],
         ];
     }
@@ -134,6 +151,7 @@ class Order extends AdminModel
             'delivery_status' => [
                 'new' => 'Čaká za objednanim dopravy',
                 'ok' => 'Prijatá',
+                'sent' => 'Odoslaná',
                 'error' => 'Neprijatá (chyba)',
             ],
         ];
@@ -160,7 +178,7 @@ class Order extends AdminModel
 
     public function scopeAdminRows($query)
     {
-        $query->with(['log']);
+        $query->with(['log', 'items:id,order_id']);
     }
 
     public function setAdminAttributes($attributes)
@@ -174,6 +192,10 @@ class Order extends AdminModel
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
 
         $attributes['delivery_status_text'] = $this->getDeliveryStatusText();
+
+        $attributes['is_paid'] = $this->getIsPaidStatusText();
+
+        $attributes['items_list'] = $this->items->count();
 
         return $attributes;
     }
@@ -242,13 +264,20 @@ class Order extends AdminModel
 
     }
 
+    public function scopeWithClientListingResponse($query)
+    {
+
+    }
+
     /**
      * Order response format
      *
      * @return  array
      */
-    public function toResponseFormat()
+    public function setClientListingResponse()
     {
+        $this->items->each->setClientListingResponse();
+
         return $this->append([
             'number',
             'hasCompany',
@@ -258,6 +287,11 @@ class Order extends AdminModel
             'paymentMethodPriceWithVat',
             'invoiceUrl',
         ]);
+    }
+
+    public function setSuccessOrderFormat()
+    {
+        return $this;
     }
 
     /**

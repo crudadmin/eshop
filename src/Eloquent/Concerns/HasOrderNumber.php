@@ -20,9 +20,11 @@ trait HasOrderNumber
      */
     public function getOrderNumberResetPrefix()
     {
+        $prefix = config('admineshop.cart.order.number.prefix', '');
+
         $date = $this->created_at ? $this->created_at : Carbon::now();
 
-        return $date->format('y');
+        return $prefix.$date->format('y');
     }
 
     /**

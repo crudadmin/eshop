@@ -36,23 +36,23 @@ class PaymentsMethod extends BasePaymentsMethod
 
         $fields->push([
             'vat' => 'name:Sadza DPH|belongsTo:vats,:name (:vat%)|required|defaultByOption:default,1|canAdd',
-            'price' => 'name:Základna cena bez DPH|type:decimal|component:PriceField||required',
-            'image' => 'name:Ikona dopravy|type:file|image',
+            'price' => 'name:Základna cena bez DPH|type:decimal|component:PriceField|required',
+            'image' => 'name:Ikona platby|type:file|image',
             'description' => 'name:Popis platby|type:text',
         ]);
 
-        $restrictionFields = [];
+        $restrictionFields = [
+            'is_cod' => 'name:Platba dobierkou v dopravnej službe|column_name:Platba dobierkou|type:checkbox|default:0|title:Pri zvolení tejto platobnej metódy v spojení s dopravnou službou, ktorá podporuje dobierku, zaznačíme úhradu zasielky dobierkou.|hidden',
+        ];
 
         //Add payments rules
         if ( config('admineshop.payment_methods.price_limit') == true ) {
             $restrictionFields['price_limit'] = 'name:Limit ceny objednávky pre platobnú metódu|type:decimal|title:S DPH - Po presiahnutí ceny objednávky bude platobná metóda odobraná z objednávkoveho košíku|hidden';
         }
 
-        if ( count($restrictionFields) > 0 ) {
-            $fields->push(
-                Group::tab($restrictionFields)->name('Obmedzenia')->icon('fa-gear')->id('restrictions')
-            );
-        }
+        $fields->push(
+            Group::tab($restrictionFields)->name('Obmedzenia')->icon('fa-gear')->id('restrictions')
+        );
     }
 
     protected $hidden = ['created_at', 'deleted_at', 'updated_at'];
@@ -84,7 +84,7 @@ class PaymentsMethod extends BasePaymentsMethod
      */
     public function isCashDelivery()
     {
-        return $this->getKey() == ENV('PAYMENT_WITH_CASH_ON_DELIVERY_ID');
+        return $this->is_cod === true || $this->getKey() == ENV('PAYMENT_CASH_ON_DELIVERY_ID');
     }
 
     /**

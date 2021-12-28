@@ -72,9 +72,9 @@ class BaseDriver
     /*
      * Generate cart id
      */
-    private function regenerateKey()
+    public function regenerateKey()
     {
-        return Str::random(100);
+        return Str::random(config('admineshop.cart.token.length', 12));
     }
 
     /*
@@ -98,13 +98,22 @@ class BaseDriver
             return $key;
         }
 
-        if ( $token = request()->header(config('admineshop.cart.header_token')) ) {
+        if ( $token = request()->header(config('admineshop.cart.token.header_name')) ) {
             return $token;
         }
 
         //Dost not generate token automatically if header is empty
-        if ( request()->header(config('admineshop.cart.header_token_initializator')) ) {
+        if ( request()->header(config('admineshop.cart.token.header_initializator')) ) {
             return $this->regenerateKey();
         }
+    }
+
+    /**
+     * Returns instance of actual cart session row
+     *
+     * @return  AdminModel|mixed
+     */
+    public function getCartSession()
+    {
     }
 }

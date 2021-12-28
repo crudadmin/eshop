@@ -230,6 +230,8 @@ trait HasProductResponses
     {
         $this->setFilterOptions($options);
 
+        $query->withBlockedStock();
+
         //We need specify select for
         $query->addSelect('products.*');
 
@@ -249,7 +251,7 @@ trait HasProductResponses
 
     }
 
-    public function scopeWithFavouriteResponse($query)
+    public function scopeWithFavouriteResponse($query, $variant = false)
     {
         //We need specify select for
         $query->addSelect('products.*');
@@ -276,7 +278,7 @@ trait HasProductResponses
 
                 $query->select('products.*');
 
-                $query->withParentProductData();
+                $query->withParentProductData()->withBlockedStock();
 
                 //We can deside if filter should be applied also on selected variants
                 if ( $this->getFilterOption($key.'.variants.filter', false) ) {

@@ -8,6 +8,7 @@ use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DiscountIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
+use AdminEshop\Events\CartUpdated;
 use Admin\Eloquent\AdminModel;
 use Discounts;
 use Illuminate\Support\Collection;
@@ -371,6 +372,8 @@ trait CartTrait
         }
 
         $this->getDriver()->set('items', $arrayItems);
+
+        event(new CartUpdated($this->items));
     }
 
     public function getBoughtWithProducts()

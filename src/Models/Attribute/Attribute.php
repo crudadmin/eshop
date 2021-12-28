@@ -74,7 +74,7 @@ class Attribute extends AdminModel
     {
         return [
             'name' => 'name:Názov atribútu|required'.(Store::isEnabledLocalization() ? '|locale' : ''),
-            'unit' => 'name:Merná jednotka / Typ atribútu|belongsTo:attributes_units,:name (:unit)|canAdd',
+            'unit' => 'name:Merná jednotka / Typ atribútu|belongsTo:attributes_units,:name (:unit)|canEdit|canAdd',
             'title' => 'name:Popis|'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'sortby' => 'name:Zoradiť podľa|type:select|required|default:asc',
         ];
@@ -99,40 +99,83 @@ class Attribute extends AdminModel
 
     public function scopeWithItemsForProducts($query, $productsQuery)
     {
-        $attributes = $query->with([
+        $query->with([
             'items' => function($query) use ($productsQuery) {
+                $this->itemsProductsScope($query, $productsQuery);
+            }
+        ]);
+    }
+
+    public function loadItemsForProducts($productsQuery, $filter)
+    {
+        $this->load([
+            'items' => function($query) use ($productsQuery, $filter){
                 $query->select(
                     Admin::getModel('AttributesItem')->getAttributesItemsColumns()
-                );
-
-                if ( !$productsQuery ){
-                    return;
-                }
-
-                $query->where(function($query) use ($productsQuery) {
-                    $model = Admin::getModel('Product');
-
-                    //Get attribute items from all products
-                    if ( $model->mainProductAttributes ) {
-                        $query->whereHas('products', $productsQuery);
-                    }
-
-                    //Get attribute items also from all variants
-                    if ( $model->variantsAttributes ) {
-                        $query->orWhereHas('products', function($query) use ($productsQuery) {
-                            //TODO: updated version for finding by category
-                            // $query
-                            //     ->variantProducts()
-                            //     ->join('category_product_categories', 'category_product_categories.product_id', '=', 'products.product_id')
-                            //     ->whereIn('category_product_categories.category_id', [171]);
-
-                            $query->variantProducts()
-                                  ->whereHas('product', $productsQuery);
-                        });
-                    }
+                )->where(function($query) use ($productsQuery, $filter) {
+                    $this->itemsProductsScope($query, $productsQuery, $filter);
                 });
             }
         ]);
+    }
+
+    private function itemsProductsScope($query, $productsQuery, $filter = [])
+    {
+        $query->select(Admin::getModel('AttributesItem')->getAttributesItemsColumns());
+
+        if ( !$productsQuery ){
+            return;
+        }
+
+        $query->where(function($query) use ($productsQuery) {
+            $model = Admin::getModel('Product');
+
+            //Get attribute items from all products
+            if ( $model->mainProductAttributes ) {
+                $query->whereHas('products', function($query) use ($productsQuery, $filter) {
+                    $productsQuery($query);
+
+                    $this->filterByParameters($query, $filter);
+                });
+            }
+
+            //Get attribute items also from all variants
+            if ( $model->variantsAttributes ) {
+                $query->orWhereHas('products', function($query) use ($productsQuery, $filter) {
+                    //TODO: updated version for finding by category
+                    // $query
+                    //     ->variantProducts()
+                    //     ->join('category_product_categories', 'category_product_categories.product_id', '=', 'products.product_id')
+                    //     ->whereIn('category_product_categories.category_id', [171]);
+
+                    $this->filterByParameters($query, $filter);
+
+                    $query->variantProducts()
+                          ->whereHas('product', $productsQuery);
+                });
+            }
+        });
+    }
+
+    //TODO test this method, and complete merge from crudeshop v2
+    private function filterByParameters($query, $filter)
+    {
+        $filter = $query->getModel()->getFilterFromParams($filter);
+
+        if ( count($filter) == 0 ){
+            return;
+        }
+
+        foreach ($filter as $attributeId => $attrIds) {
+            //Filter except actual attribute
+            if ( $this->getKey() == $attributeId ){
+                continue;
+            }
+
+            $query->whereHas('attributesItems', function($query) use ($attributeId, $attrIds) {
+                $query->whereIn('attributes_item_products_attribute_items.attributes_item_id', $attrIds);
+            });
+        }
     }
 
     /**
@@ -147,6 +190,7 @@ class Attribute extends AdminModel
             config('admineshop.attributes.filtrable', true) ? 'filtrable' : null,
             config('admineshop.attributes.attributesText', false) ? 'product_info' : null,
             config('admineshop.attributes.attributesVariants', false) ? 'variants' : null,
+            $this->isSortable() ? '_order' : null,
         ]);
     }
 

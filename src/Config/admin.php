@@ -44,5 +44,9 @@ return [
         __DIR__.'/../Notifications',
         __DIR__.'/../Views',
     ],
+
+    'styles' => [
+        'vendor/admineshop/eshop.css',
+    ],
 ];
 ?>

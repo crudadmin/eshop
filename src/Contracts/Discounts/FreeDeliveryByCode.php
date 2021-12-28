@@ -6,6 +6,7 @@ use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
+use Admin;
 use OrderService;
 use Store;
 
@@ -27,10 +28,22 @@ class FreeDeliveryByCode extends Discount implements Discountable
      */
     public $canApplyOutsideCart = false;
 
-    /*
-     * We does not want cache discount codes, because they may be changed in order
+    /**
+     * Returns cache key for given discount
+     *
+     * We need set specific cache key, because if code will change in runtime,
+     * we need reload this discount.
+     *
+     * @return  string
      */
-    public $cachableResponse = false;
+    public function getCacheKey()
+    {
+        if ( Admin::isAdmin() ) {
+            return false;
+        } else {
+            return $this->getKey().OrderService::getDiscountCodeDiscount()->getCacheKey();
+        }
+    }
 
     /**
      * Can be this discount shown in email?

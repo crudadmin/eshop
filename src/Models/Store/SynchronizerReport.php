@@ -80,7 +80,7 @@ class SynchronizerReport extends AdminModel
         $total = Admin::start();
 
         foreach ($classes as $namespace) {
-            $synchronizer = new $namespace;
+            $synchronizer = is_object($namespace) ? $namespace : new $namespace;
 
             if ( !($synchronizer instanceof Synchronizer) ){
                 throw new Exception('Injected class into synchronizer must by Synchronizer class.');

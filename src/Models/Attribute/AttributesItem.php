@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Attribute;
 
 use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
+use AdminEshop\Models\Attribute\Pivot\AssignedProductsPivot;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Admin;

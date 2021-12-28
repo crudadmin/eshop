@@ -122,6 +122,16 @@ class Identifier
     }
 
     /**
+     * Temporary stock block
+     *
+     * @return  bool
+     */
+    public function hasTemporaryStockBlock()
+    {
+        return false;
+    }
+
+    /**
      * Return identifier value
      *
      * @param  string  $key

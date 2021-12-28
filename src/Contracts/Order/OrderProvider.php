@@ -44,6 +44,13 @@ class OrderProvider
         return $this->options;
     }
 
+    public function setOptions($options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
     public function getOption($key, $default = null)
     {
         $options = $this->options ?: [];
@@ -56,5 +63,10 @@ class OrderProvider
     public function getPaymentMethod()
     {
         return $this->paymentMethod;
+    }
+
+    public function getDelivery()
+    {
+        return $this->delivery;
     }
 }

@@ -2,10 +2,11 @@
 
 namespace AdminEshop\Listeners;
 
+use AdminEshop\Jobs\HeurekaVerifiedCustomersJob;
+use Cart;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use OrderService;
-use Cart;
 
 class OrderCreatedListener
 {
@@ -19,5 +20,9 @@ class OrderCreatedListener
     {
         //Set created order id into cart
         Cart::getDriver()->set('order_id', OrderService::getOrder()->getKey());
+
+        if ( config('admineshop.heureka.verified_customers.enabled', false) === true ) {
+            dispatch(new HeurekaVerifiedCustomersJob($event->getOrder()));
+        }
     }
 }

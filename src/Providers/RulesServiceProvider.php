@@ -42,7 +42,7 @@ class RulesServiceProvider extends ServiceProvider
             return true;
         }, _('Cena produktu musí byť kladná.'));
 
-        Validator::extend('required_if_checked', function ($attribute, $value, $parameters, $validator) {
+        Validator::extendImplicit('required_if_checked', function ($attribute, $value, $parameters, $validator) {
             $parentField = $validator->getData()[$parameters[0]] ?? null;
 
             if ( (!$parentField || $parentField == 0) ){

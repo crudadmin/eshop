@@ -193,12 +193,12 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         });
     }
 
-    /**
-     * Order response format
-     *
-     * @return  array
-     */
-    public function toResponseFormat()
+    public function setClientListingResponse()
+    {
+        return $this;
+    }
+
+    public function setSuccessOrderFormat()
     {
         return $this;
     }
@@ -222,5 +222,16 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         }
 
         return array_unique($array);
+    }
+
+    public function invoiceItemName()
+    {
+        $name = e($this->getProductNamePartsSections(0));
+
+        if ( $additional = $this->getProductNamePartsSections(1) ) {
+            $name .= ' - '.e($additional);
+        }
+
+        return $name;
     }
 }

@@ -31,7 +31,36 @@ trait HasImporter
 
     private function isMultiKey($fieldKey)
     {
-        return is_array($fieldKey);
+        return is_array($fieldKey) && count($fieldKey) > 1;
+    }
+
+    private function getFieldKeys($fieldKey)
+    {
+        $fieldKey = array_wrap($fieldKey);
+
+        $keys = [];
+
+        foreach ($fieldKey as $key => $relationTableOrColumnName) {
+            $keys[] = is_string($key) ? $key : $relationTableOrColumnName;
+        }
+
+        return $keys;
+    }
+
+    private function getFieldKeysRelationer($fieldKey)
+    {
+        $relations = [];
+        $fieldKey = array_wrap($fieldKey);
+
+        foreach ($fieldKey as $key => $table) {
+            if ( is_string($key) === false ){
+                continue;
+            }
+
+            $relations[$key] = $table;
+        }
+
+        return $relations;
     }
 
     private function getIdentifierName($fieldKey)
@@ -62,7 +91,7 @@ trait HasImporter
     public function bootExistingRows(Model $model, $fieldKey, $allIdentifiers, $closure)
     {
         $selectcolumn = $this->isMultiKey($fieldKey)
-                            ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $fieldKey).', \'\')) as _identifier')
+                            ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $this->getFieldKeys($fieldKey)).', \'\')) as _identifier')
                             : $fieldKey;
 
         $existingRows = DB::table($model->getTable())
@@ -188,7 +217,7 @@ trait HasImporter
         return function($row) use ($fieldKey) {
             $values = [];
 
-            foreach ($fieldKey as $key) {
+            foreach ($this->getFieldKeys($fieldKey) as $key) {
                 $values[] = $row[$key] ?? '';
             }
 
@@ -196,7 +225,16 @@ trait HasImporter
         };
     }
 
-    public function synchronize(Model $model, $fieldKey, $rows, $closure = null)
+    private function isAllowedSync($type, $state)
+    {
+        if ( $state === true ){
+            return true;
+        }
+
+        return ($state[$type] ?? false) === true;
+    }
+
+    public function synchronize(Model $model, $fieldKey, $rows, $typeOfSync = true, $closure = null)
     {
         $totalStart = Admin::start();
         $this->message('************* '.$model->getTable());
@@ -210,56 +248,50 @@ trait HasImporter
         $this->bootExistingRows($model, $fieldKey, $allIdentifiers, $closure);
 
         //Identify which rows should be updated and which created
-        $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model->getTable())));
-        $this->onUpdate[$model->getTable()] = array_diff($rows->keys()->toArray(), $this->onCreate[$model->getTable()]);
-        $this->onDeleteOrHide[$model->getTable()] = $this->getDeletionRows($model, $fieldKey, $rows->keys()->toArray());
+        if ( $this->isAllowedSync('create', $typeOfSync) || $this->isAllowedSync('update', $typeOfSync) ) {
+            $this->onCreate[$model->getTable()] = array_diff($allIdentifiers, array_keys($this->getExistingRows($model->getTable())));
+        }
 
-        $this->message(
-             'On create rows: '.count($this->onCreate[$model->getTable()]) ."\n"
-            .'Existing rows: '.count($this->onUpdate[$model->getTable()])."\n"
-            .'On '.($this->isPublishable($model) ? 'unpublish' : 'delete').': '.count($this->onDeleteOrHide[$model->getTable()])."\n"
-            .'On publish: '.count($this->unpublishedRowsToPublish[$model->getTable()])
-            ."\n"
-        );
+        if ( $this->isAllowedSync('update', $typeOfSync) ) {
+            $this->onUpdate[$model->getTable()] = array_diff($rows->keys()->toArray(), $this->onCreate[$model->getTable()]);
+        }
+
+        if ( $this->isAllowedSync('delete', $typeOfSync) ) {
+            $this->onDeleteOrHide[$model->getTable()] = $this->getDeletionRows($model, $fieldKey, $rows->keys()->toArray());
+        }
+
+        $this->message(implode("\n", array_filter([
+            $this->isAllowedSync('create', $typeOfSync) ? 'On create rows: '.count($this->onCreate[$model->getTable()] ?? []) : null,
+            $this->isAllowedSync('update', $typeOfSync) ? 'Existing rows: '.count($this->onUpdate[$model->getTable()] ?? []) : null,
+            $this->isAllowedSync('delete', $typeOfSync) ? 'On '.($this->isPublishable($model) ? 'unpublish' : 'delete').': '.count($this->onDeleteOrHide[$model->getTable()] ?? []) : null,
+            $this->isAllowedSync('delete', $typeOfSync) ? 'On publish: '.count($this->unpublishedRowsToPublish[$model->getTable()] ?? []) : null
+        ]))."\n");
 
         //Create new rows
-        $this->createRows($model, $rows, $fieldKey);
+        if ( $this->isAllowedSync('create', $typeOfSync) ) {
+            $this->createRows($model, $rows, $fieldKey);
+        }
 
         //Update existing rows
-        $this->updateRows($model, $rows, $fieldKey, $closure);
+        if ( $this->isAllowedSync('update', $typeOfSync) ) {
+            $this->updateRows($model, $rows, $fieldKey, $closure);
+        }
 
-        $this->hideOrUnpublish($model, $closure);
-
-        $this->publishMissing($model, $closure);
+        if ( $this->isAllowedSync('delete', $typeOfSync) ) {
+            $this->hideOrUnpublish($model, $closure);
+            $this->publishMissing($model, $closure);
+        }
 
         $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
     }
 
     public function synchronizeUpdateOnly(Model $model, $fieldKey, $rows, $closure)
     {
-        $totalStart = Admin::start();
-        $this->message('************* '.$model->getTable());
-
-        $rows = collect($rows)->keyBy(
-            $this->keyByIdentifier($fieldKey)
-        );
-
-        $allIdentifiers = $rows->keys()->toArray();
-
-        $this->bootExistingRows($model, $fieldKey, $allIdentifiers, $closure);
-
-        //Identify which rows should be updated and which created
-        $this->onUpdate[$model->getTable()] = array_intersect(
-            $rows->keys()->toArray(),
-            array_keys($this->existingRows[$model->getTable()]),
-        );
-
-        $this->message('Existing rows: '.count($this->onUpdate[$model->getTable()])."\n");
-
-        //Update existing rows
-        $this->updateRows($model, $rows, $fieldKey, $closure);
-
-        $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
+        return $this->synchronize($model, $fieldKey, $rows, [
+            'create' => false,
+            'update' => true,
+            'delete' => false,
+        ]);
     }
 
     private function createRows(Model $model, $rows, $fieldKey)
@@ -276,6 +308,7 @@ trait HasImporter
         foreach ($this->onCreate[$model->getTable()] as $i => $onCreateIdentifier) {
             try {
                 $originalRow = $rows[$onCreateIdentifier];
+
                 $row = $this->castInsertData($model, $originalRow);
 
                 $id = $model->insertGetId($row);
@@ -305,18 +338,32 @@ trait HasImporter
     private function getDeletionRows(Model $model, $fieldKey, $allIdentifiers)
     {
         $selectFieldKeyColumn = $this->isMultiKey($fieldKey)
-                            ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $fieldKey).', \'\')) as _identifier')
+                            ? ('CONCAT_WS(\'-\', IFNULL('.implode(', \'\'), IFNULL(', $this->getFieldKeys($fieldKey)).', \'\')) as _identifier')
                             : $fieldKey;
+
+        $relations = $this->getFieldKeysRelationer($fieldKey);
 
         return DB::table($model->getTable())
             ->selectRaw($model->getKeyName().', '.$selectFieldKeyColumn)
+            ->when(count($relations), function($query) use ($relations) {
+                $i = 0;
+                foreach ($relations as $column => $table) {
+                    $existingRows = array_values($this->getExistingRows($table));
+
+                    $query->{ $i == 0 ? 'whereIn' : 'orWhereIn' }($column, $existingRows);
+
+                    $i++;
+                }
+            })
+            //Only not deleted rows already
             ->when($this->hasSoftDeletes($model), function($query){
                 $query->whereNull('deleted_at');
             })
+            //Only published rows
             ->when($this->isPublishable($model), function($query){
                 $query->whereNotNull('published_at');
             })
-            //Select only keys not present in given identifiers
+            //Select only keys not present in given identifiers list
             ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $allIdentifiers) {
                 if ( count($allIdentifiers) ) {
                     $query->whereNotIn($fieldKey, $allIdentifiers);
