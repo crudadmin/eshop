@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Contracts\Synchronizer\Excel;
 
-use Admin\Core\Helpers\File;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
@@ -11,7 +10,7 @@ class FromXlsToArray
 {
     protected $file;
 
-    public function __construct(File $file)
+    public function __construct($file)
     {
         $this->file = $file;
     }

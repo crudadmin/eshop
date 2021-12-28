@@ -2,15 +2,13 @@
 
 namespace AdminEshop\Contracts;
 
-use Admin\Core\Helpers\File;
-
 class ImageResponse
 {
     public $x1;
 
     public $x2;
 
-    public function __construct(File $image)
+    public function __construct($image)
     {
         $this->x1 = $image->url;
 

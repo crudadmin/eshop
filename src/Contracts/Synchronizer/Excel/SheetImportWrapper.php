@@ -5,7 +5,6 @@ namespace AdminEshop\Contracts\Synchronizer\Excel;
 use AdminEshop\Contracts\Synchronizer\Excel\FormattingError;
 use AdminEshop\Contracts\Synchronizer\Imports\ProductsSheetImport;
 use AdminEshop\Models\Store\SynchronizerReport;
-use Admin\Core\Helpers\File;
 use Admin\Eloquent\AdminModel;
 
 class SheetImportWrapper
@@ -40,7 +39,7 @@ class SheetImportWrapper
         return ProductsSheetImport::class;
     }
 
-    public function __construct(File $file)
+    public function __construct($file)
     {
         $this->file = $file;
 
