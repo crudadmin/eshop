@@ -25,9 +25,7 @@ class FavouriteController extends Controller
         $favourites = $favouritesModel->activeSession();
 
         $productId = request('product_id');
-        $variantId = request('variant_id')
-
-        $favourites = client()->favourites();
+        $variantId = request('variant_id');
 
         //Add or update variant
         if ( is_numeric($variantId) ) {

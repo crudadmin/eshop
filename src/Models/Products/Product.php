@@ -241,7 +241,7 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function variants()
     {
-        return $this->hasMany(self::class, 'product_id');
+        return $this->hasMany(static::class, 'product_id');
     }
 
     /**

@@ -87,8 +87,8 @@ class ClientsFavourite extends AdminModel
 
     public function setFavouriteResponse()
     {
-        $this->product?->setCategoryResponse();
-        $this->variant?->setCategoryResponse();
+        $this->product?->setListingResponse();
+        $this->variant?->setListingResponse();
 
         return $this;
     }

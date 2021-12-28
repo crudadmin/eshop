@@ -195,11 +195,15 @@ trait HasProductResponses
     public function setVariantDetailResponse()
     {
         $this->setDetailResponse();
+
+        $this->makeVisible(['product_id']);
     }
 
     public function setVariantListingResponse()
     {
         $this->setListingResponse();
+
+        $this->makeVisible(['product_id']);
     }
 
     /**
