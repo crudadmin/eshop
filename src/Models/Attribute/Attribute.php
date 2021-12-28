@@ -127,7 +127,7 @@ class Attribute extends AdminModel
             return;
         }
 
-        $query->where(function($query) use ($productsQuery) {
+        $query->where(function($query) use ($productsQuery, $filter) {
             $model = Admin::getModel('Product');
 
             //Get attribute items from all products
@@ -173,7 +173,7 @@ class Attribute extends AdminModel
             }
 
             $query->whereHas('attributesItems', function($query) use ($attributeId, $attrIds) {
-                $query->whereIn('attributes_item_products_attribute_items.attributes_item_id', $attrIds);
+                $query->whereIn('attributes_item_product_attributes_items.attributes_item_id', $attrIds);
             });
         }
     }

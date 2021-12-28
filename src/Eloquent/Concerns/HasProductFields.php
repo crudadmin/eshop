@@ -20,7 +20,7 @@ trait HasProductFields
                     ])->id('images')
                 ],
                 config('admineshop.categories.enabled')
-                    ? ['categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd'] : [],
+                    ? ['categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd|removeFromFormIfNot:product_id,NULL'] : [],
             ))->id('general')->name('Základne nastavenia'),
             Group::fields([
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|hideFromFormIf:product_type,variant|sub_component:setProductType|required',

@@ -106,6 +106,10 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
             '$attributes' => $this->prepareAttributes($item),
         ];
 
+        if ( $variant === true ){
+            $array['product_type'] = 'variant';
+        }
+
         foreach ($this->importer->getColumns() as $sheetColumnName => $column) {
             if ( !isset($column['column']) ) {
                 continue;

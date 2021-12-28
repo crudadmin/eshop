@@ -31,6 +31,8 @@ class ProductsNotification extends AdminModel
         Product::class,
     ];
 
+    protected $active = false;
+
     /*
      * Automatic form and database generator by fields list
      * :name - field name

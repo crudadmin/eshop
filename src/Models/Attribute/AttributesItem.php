@@ -2,12 +2,13 @@
 
 namespace AdminEshop\Models\Attribute;
 
+use Admin;
 use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
 use AdminEshop\Models\Attribute\Pivot\AssignedProductsPivot;
+use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Admin;
 use Store;
 
 class AttributesItem extends AdminModel
@@ -145,7 +146,7 @@ class AttributesItem extends AdminModel
 
     public function products()
     {
-        return $this->belongsToMany(Admin::getModel('Product'), 'attributes_item_product_attributes_items');
+        return $this->belongsToMany(Product::class, 'attributes_item_product_attributes_items');
     }
 
     public function scopeWithTextAttributes()

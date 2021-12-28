@@ -101,7 +101,6 @@ class Product extends CartEloquent implements HasAttributesSupport
             $this->getPriceFields(),
             $this->getDescriptionFields(),
             $this->getWarehouseFields(),
-            $this->hasAttributesEnabled() ? Group::tab( ProductsAttribute::class ) : [],
             Group::tab(self::class)->attributes('hideFromFormIfNot:product_type,variants'),
             $this->getOtherSettingsFields(),
         ];
