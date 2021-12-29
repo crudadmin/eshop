@@ -21,6 +21,7 @@ trait HasProductFields
                 ],
                 config('admineshop.categories.enabled')
                     ? ['categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd|removeFromFormIfNot:product_id,NULL'] : [],
+                ['attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name']
             ))->id('general')->name('Základne nastavenia'),
             Group::fields([
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|hideFromFormIf:product_type,variant|sub_component:setProductType|required',
@@ -28,8 +29,7 @@ trait HasProductFields
                     'ean' => 'name:EAN|hidden',
                     'code' => 'name:Kód produktu',
                     'code_pairing' => 'name:Párovací kód produktu|inaccessible',
-                ])->attributes('hideFromFormIf:product_type,variant'),
-                'attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name'
+                ])->attributes('hideFromFormIf:product_type,variants'),
             ])->name('Identifikátory produkty')->id('identifiers'),
         ])->icon('fa-pencil')->id('general-tab');
     }
