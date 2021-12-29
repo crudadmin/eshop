@@ -50,12 +50,12 @@ trait HasProductFilter
     public function scopeApplyQueryFilter($query)
     {
         $filter = $this->getFilterOption('filter', []);
-        $extractVariants = $this->getFilterOption('listing.variants.extract', false);
+        $extractVariants = $this->getFilterOption('variants.extract', false);
 
         //Filter whole products
-        $query->where(function($query) use ($filter, $extractVariants) {
+        $query->where(function($query) use ($extractVariants, $filter) {
             //Filter by basic product type
-            $query->where(function($query) use ($filter, $extractVariants) {
+            $query->where(function($query) use ($extractVariants, $filter) {
                 $query->where(function($query) use ($extractVariants) {
                     $query->where(function($query) {
                         $query
@@ -63,13 +63,16 @@ trait HasProductFilter
                             ->filterParentProduct();
                     });
 
-                    if ( is_array($extractVariants) ){
+                    if ( $extractVariants ){
                         $query->orWhere(function($query){
                             $query
                                 ->variantProducts()
                                 ->filterVariantProduct()
                                 ->whereHas('product', function($query){
-                                    $query->filterParentProduct();
+                                    $query
+                                        //We need clone settings from parent model
+                                        ->setFilterOptions($this->getFilterOptions())
+                                        ->filterParentProduct();
                                 });
                         });
                     }
@@ -83,12 +86,15 @@ trait HasProductFilter
                 $query->orWhere(function($query) use ($filter) {
                     $query
                         ->variantsProducts()
+                        ->setFilterOptions($this->getFilterOptions())
+                        ->filterParentProduct()
                         ->whereHas('variants', function($query) use ($filter) {
                             $query
+                                //We need reclone options in relationships
+                                ->setFilterOptions($this->getFilterOptions())
                                 ->filterProduct($filter)
-                                ->filterVariantProduct($filter);
-                        })
-                        ->filterParentProduct();
+                                ->filterVariantProduct();
+                        });
                 });
             }
         });
@@ -181,7 +187,7 @@ trait HasProductFilter
         $query->applyCategoryFilter($filter);
     }
 
-    public function scopeFilterVariantProduct($query, $filter = null)
+    public function scopeFilterVariantProduct($query, $options = null)
     {
         //Apply user filter scope on variants
         if ( $scope = $this->getFilterOption('scope.variants') ){

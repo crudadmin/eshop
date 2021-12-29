@@ -50,7 +50,7 @@ trait HasProductSorter
     public function scopeSortByColumnValue($query, string $type, string $agregatedColumn, bool $isDesc = false)
     {
         //Enabled variant extraction
-        if ( $this->getFilterOption('listing.variants.extract') === false ) {
+        if ( $this->getFilterOption('variants.extract') === false ) {
             $variantsPrices = DB::table('products')
                                 ->selectRaw(($isDesc ? 'max' : 'min').'('.$agregatedColumn.') as aggregator, product_id')
                                 ->where('product_type', 'variant')

@@ -75,14 +75,16 @@ class ClientsFavourite extends AdminModel
 
     public function scopeWithFavouriteResponse($query)
     {
-        $query->select('id', 'cart_token_id', 'client_id', 'product_id', 'variant_id')->with([
-            'product' => function($query){
-                $query->withFavouriteResponse();
-            },
-            'variant' => function($query){
-                $query->withFavouriteResponse(true);
-            },
-        ])->whereHas('product');
+        $query
+            ->select('id', 'cart_token_id', 'client_id', 'product_id', 'variant_id')
+            ->with([
+                'product' => function($query){
+                    $query->withFavouriteResponse();
+                },
+                'variant' => function($query){
+                    $query->withFavouriteResponse(true);
+                },
+            ])->whereHas('product');
     }
 
     public function setFavouriteResponse()

@@ -10,12 +10,34 @@ class FavouriteController extends Controller
 {
     public function index()
     {
-        $favourites = Admin::getModel('ClientsFavourite')->activeSession();
+        $favourites = Admin::getModel('ClientsFavourite')
+                        ->activeSession()
+                        ->select('id', 'product_id', 'variant_id')
+                        ->get();
+
+        $products = Admin::getModel('Product')
+                        ->withFavouriteResponse([
+                            'scope' => function($query) use ($favourites) {
+                                $query->whereIn(
+                                    $query->getModel()->getTable().'.id',
+                                    $favourites->pluck('product_id')->unique()->filter()->toArray()
+                                );
+                            },
+                            'scope.variants' => function($query) use ($favourites) {
+                                $query->whereIn(
+                                    $query->getModel()->getTable().'.id',
+                                    $favourites->pluck('variant_id')->unique()->filter()->toArray()
+                                );
+                            }
+                        ])
+                        ->productsPaginate(
+                            request('limit')
+                        );
+
+        $products->getCollection()->each->setListingResponse();
 
         return api([
-            'favourites' => $favourites->withFavouriteResponse()->get()->map(function($item){
-                return $item->setFavouriteResponse();
-            }),
+            'favourites' => $products,
         ]);
     }
 

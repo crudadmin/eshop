@@ -12,11 +12,13 @@ use Arr;
 
 trait HasProductResponses
 {
+    protected $temporaryFilterPrefix = null;
     protected $temporaryFilterOptions = [];
 
     static $filterOptions = [
         'filter' => [],
         'scope' => null,
+        'scope.variants' => null,
         'listing.attributes' => false,
         'listing.price_ranges' => false,
         'listing.variants' => false,
@@ -31,8 +33,22 @@ trait HasProductResponses
         'cart.variants.attributes' => false,
     ];
 
-    public function scopeSetFilterOptions($query, $options)
+    public function scopeSetFilterOptions($query, $options, $prefix = null)
     {
+        if ( $prefix ){
+            $this->temporaryFilterPrefix = $prefix;
+
+            foreach ($options as $key => $value) {
+                //Skip adding filter into scoped settings
+                if ( in_array($key, ['filter']) ){
+                    continue;
+                }
+
+                $options[$prefix.'.'.$key] = $value;
+                unset($options[$key]);
+            }
+        }
+
         $this->temporaryFilterOptions = array_merge($this->temporaryFilterOptions, $options);
     }
 
@@ -43,9 +59,23 @@ trait HasProductResponses
 
     public function getFilterOption($key, $default = null)
     {
-        $array = array_merge(self::$filterOptions, $this->temporaryFilterOptions);
+        $options = $this->getFilterOptions();
 
-        return Arr::get($array, $key, $default);
+        //Use prefix key instead of global key.
+        if ( $this->temporaryFilterPrefix ) {
+            $prefixKey = $this->temporaryFilterPrefix.'.'.$key;
+
+            if ( Arr::has($options, $prefixKey) ) {
+                $key = $prefixKey;
+            }
+        }
+
+        return Arr::get($options, $key, $default);
+    }
+
+    public function getFilterOptions()
+    {
+        return array_merge(self::$filterOptions, $this->temporaryFilterOptions);
     }
 
     /**
@@ -233,7 +263,7 @@ trait HasProductResponses
      */
     public function scopeWithListingResponse($query, $options = [])
     {
-        $this->setFilterOptions($options);
+        $this->setFilterOptions($options, 'listing');
 
         $query->withBlockedStock();
 
@@ -242,64 +272,75 @@ trait HasProductResponses
 
         $query->applyQueryFilter();
 
-        $query->withProductModules('listing');
+        $query->withProductModules();
 
         $query->sortByParams();
     }
 
-    public function scopeWithDetailResponse($query)
+    public function scopeWithDetailResponse($query, $options = [])
     {
+        $this->setFilterOptions($options, 'detail');
+
         //We need specify select for
         $query->addSelect('products.*');
 
-        $query->withProductModules('detail');
+        $query->withProductModules();
 
     }
 
-    public function scopeWithFavouriteResponse($query, $variant = false)
+    public function scopeWithFavouriteResponse($query, $options = [])
     {
+        $this->setFilterOptions($options, 'favourite');
+
         //We need specify select for
         $query->addSelect('products.*');
 
-        $query->withProductModules('favourite');
+        $query->applyQueryFilter();
+
+        $query->withProductModules();
     }
 
-    public function scopeWithProductModules($query, $key, $variants = false)
+    public function scopeWithProductModules($query, $prefix = null, $variants = false)
     {
+        $prefix = $prefix ? $prefix.'.' : '';
+
         $query->withMainGalleryImage($variants ? true : false);
 
-        if ( $this->getFilterOption($key.'.price_ranges', false) === true ) {
+        if ( $this->getFilterOption($prefix.'price_ranges', false) === true ) {
             $query->withMinAndMaxVariantPrices();
         }
 
         if (
             $variants === false
-            && $this->getFilterOption($key.'.variants.extract', false) === false
-            && $this->getFilterOption($key.'.variants', true) === true
+            && $this->getFilterOption($prefix.'variants.extract', false) === false
+            && $this->getFilterOption($prefix.'variants', true) === true
             && count(Store::variantsProductTypes())
         ){
-            $query->extendWith(['variants' => function($query) use ($key) {
+            $query->extendWith(['variants' => function($query) use ($prefix) {
                 $model = $query->getModel();
 
-                $query->select('products.*');
-
-                $query->withParentProductData()->withBlockedStock();
+                $query
+                    ->select('products.*')
+                    ->setFilterOptions($this->getFilterOptions())
+                    ->withParentProductData()
+                    ->filterVariantProduct()
+                    ->withBlockedStock();
 
                 //We can deside if filter should be applied also on selected variants
-                if ( $this->getFilterOption($key.'.variants.filter', false) ) {
+                if ( $this->getFilterOption($prefix.'variants.filter', false) ) {
                     $query->filterProduct(
                         $this->getFilterOption('filter')
                     );
                 }
 
-                $query->withProductModules($key.'.variants', true);
+                $query->withProductModules($prefix.'variants', true);
             }]);
         }
 
-        if ( $attributesScope = $this->getFilterOption($key.'.attributes', false) ) {
+        if ( $attributesScope = $this->getFilterOption($prefix.'attributes', false) ) {
             $query->with([
-                'attributesItems' => function($query) use ($key, $attributesScope) {
-                    if ( $attributesScope ){
+                'attributesItems' => function($query) use ($attributesScope) {
+                    if ( is_callable($attributesScope) ){
                         $attributesScope($query);
                     }
 
@@ -310,18 +351,19 @@ trait HasProductResponses
             ]);
         }
 
-        if ( $this->getFilterOption($key.'.gallery', false) === true ) {
+        if ( $this->getFilterOption($prefix.'gallery', false) === true ) {
             $query->with(['gallery']);
         }
     }
 
     public function scopeWithCartResponse($query, $variant = false)
     {
+        $this->setFilterOptions([], $variant ? 'cart.variants' : 'cart');
+
         $query->addSelect('products.*');
         // $query->select($this->getCartSelectColumns());
 
-        $query->withProductModules($variant ? 'cart.variants' : 'cart');
-
+        $query->withProductModules();
 
         //If variants are not enabled in cart response, we need throw away relation
         $variantsIntoCart = array_filter(Store::variantsProductTypes(), function($key){
