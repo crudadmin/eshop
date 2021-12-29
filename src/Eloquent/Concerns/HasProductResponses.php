@@ -5,10 +5,11 @@ namespace AdminEshop\Eloquent\Concerns;
 use Admin;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Models\Products\Product;
+use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\Modules\SeoModule;
+use Arr;
 use Illuminate\Support\Facades\DB;
 use Store;
-use Arr;
 
 trait HasProductResponses
 {
@@ -36,7 +37,7 @@ trait HasProductResponses
     public function scopeSetFilterOptions($query, $options, $prefix = null)
     {
         if ( $prefix ){
-            $this->temporaryFilterPrefix = $prefix;
+            $this->setFilterPrefix($prefix);
 
             foreach ($options as $key => $value) {
                 //Skip adding filter into scoped settings
@@ -52,18 +53,13 @@ trait HasProductResponses
         $this->temporaryFilterOptions = array_merge($this->temporaryFilterOptions, $options);
     }
 
-    public function scopeSetGlobalFilterOptions($query, $options)
-    {
-        self::$filterOptions = array_merge(self::$filterOptions, $options);
-    }
-
     public function getFilterOption($key, $default = null)
     {
         $options = $this->getFilterOptions();
 
         //Use prefix key instead of global key.
-        if ( $this->temporaryFilterPrefix ) {
-            $prefixKey = $this->temporaryFilterPrefix.'.'.$key;
+        if ( $prefix = $this->getFilterPrefix() ) {
+            $prefixKey = $prefix.'.'.$key;
 
             if ( Arr::has($options, $prefixKey) ) {
                 $key = $prefixKey;
@@ -71,6 +67,33 @@ trait HasProductResponses
         }
 
         return Arr::get($options, $key, $default);
+    }
+
+    public function scopeSetGlobalFilterOptions($query, $options)
+    {
+        self::$filterOptions = array_merge(self::$filterOptions, $options);
+    }
+
+    public function scopeSetFilterPrefix($query, $prefix)
+    {
+        $this->temporaryFilterPrefix = $prefix;
+    }
+
+
+    public function getFilterPrefix()
+    {
+        return $this->temporaryFilterPrefix;
+    }
+
+    public function scopeCloneModelFilter($query, AdminModel $model)
+    {
+        $this->setFilterOptions(
+            $model->getFilterOptions()
+        );
+
+        if ( $prefix = $model->getFilterPrefix() ) {
+            $this->setFilterPrefix($prefix);
+        }
     }
 
     public function getFilterOptions()
@@ -317,11 +340,9 @@ trait HasProductResponses
             && count(Store::variantsProductTypes())
         ){
             $query->extendWith(['variants' => function($query) use ($prefix) {
-                $model = $query->getModel();
-
                 $query
                     ->select('products.*')
-                    ->setFilterOptions($this->getFilterOptions())
+                    ->cloneModelFilter($this)
                     ->withParentProductData()
                     ->filterVariantProduct()
                     ->withBlockedStock();

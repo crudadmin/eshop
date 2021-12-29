@@ -6,6 +6,7 @@ use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use Admin\Eloquent\AdminModel;
 use DB;
 use Store;
+use Exception;
 
 trait HasProductFilter
 {
@@ -49,11 +50,11 @@ trait HasProductFilter
 
     public function scopeApplyQueryFilter($query)
     {
-        $filter = $this->getFilterOption('filter', []);
-        $extractVariants = $this->getFilterOption('variants.extract', false);
-
         //Filter whole products
-        $query->where(function($query) use ($extractVariants, $filter) {
+        $query->where(function($query) {
+            $extractVariants = $this->getFilterOption('variants.extract', false);
+            $filter = $this->getFilterOption('filter', []);
+
             //Filter by basic product type
             $query->where(function($query) use ($extractVariants, $filter) {
                 $query->where(function($query) use ($extractVariants) {
@@ -71,7 +72,7 @@ trait HasProductFilter
                                 ->whereHas('product', function($query){
                                     $query
                                         //We need clone settings from parent model
-                                        ->setFilterOptions($this->getFilterOptions())
+                                        ->cloneModelFilter($this)
                                         ->filterParentProduct();
                                 });
                         });
@@ -86,12 +87,12 @@ trait HasProductFilter
                 $query->orWhere(function($query) use ($filter) {
                     $query
                         ->variantsProducts()
-                        ->setFilterOptions($this->getFilterOptions())
+                        ->cloneModelFilter($this)
                         ->filterParentProduct()
                         ->whereHas('variants', function($query) use ($filter) {
                             $query
                                 //We need reclone options in relationships
-                                ->setFilterOptions($this->getFilterOptions())
+                                ->cloneModelFilter($this)
                                 ->filterProduct($filter)
                                 ->filterVariantProduct();
                         });
@@ -99,7 +100,7 @@ trait HasProductFilter
             }
         });
 
-        $this->extractDifferentVariants($extractVariants);
+        $this->extractDifferentVariants();
     }
 
     public function scopeApplyCategoryFilter($query, $params)
@@ -116,10 +117,19 @@ trait HasProductFilter
         $query->filterCategory($categoryFilter);
     }
 
-    public function scopeExtractDifferentVariants($query, $extractVariants)
+    public function scopeExtractDifferentVariants($query)
     {
-        if ( $extractVariants === false ) {
+        if ( !($extractor = $this->getFilterOption('variants.extract', false)) ) {
             return;
+        }
+
+        //Use default extractor when true value has been returned
+        if ( $extractor === true && $extractor = $this->getExtractorAttributes() ){
+            $extractor = array_wrap($extractor);
+        }
+
+        if ( is_array($extractor) == false ){
+            throw new Exception('Extractor attribute ids are not defined.');
         }
 
         $attributesList = DB::table('attributes_item_product_attributes_items')
@@ -129,7 +139,7 @@ trait HasProductFilter
                             CONCAT(attributes_items.attribute_id, "_", GROUP_CONCAT(attributes_item_id)) as attributes_groupper
                         ')
                         ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_product_attributes_items.attributes_item_id')
-                        ->whereIn('attributes_items.attribute_id', $extractVariants)
+                        ->whereIn('attributes_items.attribute_id', $extractor)
                         ->groupBy('variant_groupper');
 
         $query->leftJoinSub($attributesList, 'attributesList', function($join){
@@ -214,5 +224,15 @@ trait HasProductFilter
         }
 
         return $filter;
+    }
+
+    /**
+     * Extract product variants by according to attribute ids
+     *
+     * @return  array|integer
+     */
+    public function getExtractorAttributes()
+    {
+        // return env('ATTR_COLOR_ID');
     }
 }
