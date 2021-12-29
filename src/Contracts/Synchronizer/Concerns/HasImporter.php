@@ -285,13 +285,13 @@ trait HasImporter
         $this->message('************* Import successfull in '.Admin::end($totalStart)."\n");
     }
 
-    public function synchronizeUpdateOnly(Model $model, $fieldKey, $rows, $closure)
+    public function synchronizeUpdateOnly(Model $model, $fieldKey, $rows, $closure = null)
     {
         return $this->synchronize($model, $fieldKey, $rows, [
             'create' => false,
             'update' => true,
             'delete' => false,
-        ]);
+        ], $closure);
     }
 
     private function createRows(Model $model, $rows, $fieldKey)

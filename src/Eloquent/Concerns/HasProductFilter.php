@@ -3,7 +3,6 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
-use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use DB;
 use Store;
@@ -53,23 +52,25 @@ trait HasProductFilter
         $filter = $this->getFilterOption('filter', []);
         $extractVariants = $this->getFilterOption('listing.variants.extract', false);
 
-        //Apply user filter scope
-        if ( $scope = $this->getFilterOption('scope') ){
-            $scope($query);
-        }
-
-        $query->applyCategoryFilter($filter);
-
         //Filter whole products
         $query->where(function($query) use ($filter, $extractVariants) {
             //Filter by basic product type
             $query->where(function($query) use ($filter, $extractVariants) {
                 $query->where(function($query) use ($extractVariants) {
-                    $query->nonVariantProducts();
+                    $query->where(function($query) {
+                        $query
+                            ->nonVariantProducts()
+                            ->filterParentProduct();
+                    });
 
                     if ( is_array($extractVariants) ){
                         $query->orWhere(function($query){
-                            $query->variantProducts();
+                            $query
+                                ->variantProducts()
+                                ->filterVariantProduct()
+                                ->whereHas('product', function($query){
+                                    $query->filterParentProduct();
+                                });
                         });
                     }
                 });
@@ -83,13 +84,11 @@ trait HasProductFilter
                     $query
                         ->variantsProducts()
                         ->whereHas('variants', function($query) use ($filter) {
-                            //Apply user filter scope on variants
-                            if ( $scope = $this->getFilterOption('scope.variants') ){
-                                $scope($query);
-                            }
-
-                            $query->filterProduct($filter);
-                        });
+                            $query
+                                ->filterProduct($filter)
+                                ->filterVariantProduct($filter);
+                        })
+                        ->filterParentProduct();
                 });
             }
         });
@@ -166,6 +165,26 @@ trait HasProductFilter
         }
 
         $query->applyPriceRangeFilter($params);
+    }
+
+    public function scopeFilterParentProduct($query, $filter = null)
+    {
+        //Apply user filter scope
+        if ( $scope = $this->getFilterOption('scope') ){
+            $scope($query);
+        }
+
+        $filter = $filter ?: $this->getFilterOption('filter', []);
+
+        $query->applyCategoryFilter($filter);
+    }
+
+    public function scopeFilterVariantProduct($query, $filter = null)
+    {
+        //Apply user filter scope on variants
+        if ( $scope = $this->getFilterOption('scope.variants') ){
+            $scope($query);
+        }
     }
 
     public function getFilterFromParams($params)

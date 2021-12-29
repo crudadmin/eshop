@@ -8,6 +8,7 @@ use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\Modules\SeoModule;
 use Illuminate\Support\Facades\DB;
 use Store;
+use Arr;
 
 trait HasProductResponses
 {
@@ -42,9 +43,9 @@ trait HasProductResponses
 
     public function getFilterOption($key, $default = null)
     {
-        $value = array_merge(self::$filterOptions, $this->temporaryFilterOptions)[$key] ?? null;
+        $array = array_merge(self::$filterOptions, $this->temporaryFilterOptions);
 
-        return is_null($value) ? $default : $value;
+        return Arr::get($array, $key, $default);
     }
 
     /**
