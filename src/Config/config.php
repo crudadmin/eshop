@@ -70,6 +70,8 @@ return [
      */
     'stock' => [
         'store_rules' => true, //Enable different rules by product stock settings or general store settings
+        'temporary_block_time' => 0,
+        'stock_notifier_scheduler' => 'everyThirtyMinutes',
         'status_with_quantity' => true, //Show detailed stock status with quantity text: Skladom 5ks, Skladom 10+ks
         'rounding' => [100, 50, 20, 10], //10+, 50+ items...
         'rounding_less_than_char' => '<',
@@ -108,7 +110,9 @@ return [
             //     'provider' => AdminEshop\Contracts\Delivery\Packeta\PacketaShipping::class,
             //     'options' => [
             //         'API_KEY' => env('PACKETA_API_KEY'),
-            //         'HOST' => 'http://www.zasilkovna.cz',
+            //         'API_PASSWORD' => env('PACKETA_API_PASSWORD'),
+            //         'API_HOST' => 'http://www.zasilkovna.cz',
+            //         'default_weight' => null,
             //     ],
             // ],
         ],
@@ -162,11 +166,20 @@ return [
         //But we can turn it on everywere
         'default_full_response' => false,
 
-        //For REST authorization
-        'header_token' => 'Cart-Token',
+        'token' => [
+            //For REST authorization
+            'header_name' => 'Cart-Token',
 
-        //Allow to generate new token if token is not present in request
-        'header_token_initializator' => 'Cart-Initialize',
+            //Allow to generate new token if token is not present in request
+            'header_initializator' => 'Cart-Initialize',
+
+            //Cart token random key length
+            'length' => 12,
+
+            //Remove inactive tokens after X days
+            'remove_inactive_after_days' => false,
+            'remove_empty_after_days' => 3,
+        ],
 
         'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
         // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,
@@ -183,12 +196,14 @@ return [
             AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
             AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
             AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
+            AdminEshop\Contracts\Order\Mutators\HeurekaVerifiedCustomersMutator::class,
         ],
 
         'order' => [
             'number' => [
                 'custom' => true, //If custom order number is turned on, number will be generated from ym00000number
                 'length' => 6, //How many decimals hould order number consist of. 000123
+                'prefix' => env('ORDER_PREFIX'),
             ],
 
             //Submit order validato request
@@ -275,6 +290,16 @@ return [
             'PAYMENT_ERROR' => _('Nastala nečakaná chyba pri spracovani platby. Skúste platbu vykonať neskôr, alebo nás prosím kontaktujte.'),
             'PAYMENT_UNVERIFIED' => _('Vaša objednávka bola úspešne zaznamenaná, no potvrdenie Vašej platby sme zatiaľ neobdržali. V prípade ak ste platbu nevykonali, môžete ju uhradiť opätovne z emailu, alebo nás kontaktujte pre ďalšie informácie.'),
             'PAYMENT_PAID' => _('Vaša objednávka už bola úspešne zaplatená.'),
+        ],
+    ],
+
+    /*
+     * Heureka support
+     */
+    'heureka' => [
+        'verified_customers' => [
+            'enabled' => env('HEUREKA_VERIFIED_CUSTOMERS_ENABLED', false),
+            'key' => env('HEUREKA_VERIFIED_CUSTOMERS_KEY'),
         ],
     ],
 ];

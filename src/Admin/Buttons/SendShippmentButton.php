@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Admin\Buttons;
 
+use AdminEshop\Models\Orders\Order;
 use Admin\Eloquent\AdminModel;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
@@ -30,8 +31,28 @@ class SendShippmentButton extends Button
      */
     public function __construct($row)
     {
-        $this->active = in_array($row->delivery_status, ['new', 'error'])
-                        && OrderService::setOrder($row)->getShippingProvider($row->delivery_id);
+        $this->active = $this->getActiveStatus($row);
+    }
+
+    private function getActiveStatus($row)
+    {
+        if ( in_array($row->delivery_status, ['new', 'error']) ) {
+            return $this->getShippingProvider($row)?->isActive() ?: false;
+        }
+
+        return false;
+    }
+
+    private function getShippingProvider(Order $order)
+    {
+        if ( $provider = OrderService::setOrder($order)->getShippingProvider($order->delivery_id) ){
+            return $provider;
+        }
+    }
+
+    public function question(Order $order)
+    {
+        return $this->getShippingProvider($order)->buttonQuestion($this);
     }
 
     /**
@@ -41,7 +62,14 @@ class SendShippmentButton extends Button
      */
     public function fire(AdminModel $row)
     {
-        OrderService::setOrder($row)->sendShipping();
+        $options = $this->getShippingProvider($row)->getButtonOptions($this);
+
+        //Button response returned
+        if ( $options instanceof Button ){
+            return $options;
+        }
+
+        OrderService::setOrder($row)->sendShipping($options);
 
         $row->refresh();
 
@@ -55,13 +83,4 @@ class SendShippmentButton extends Button
 
         return $this->error('Nastala nečakná chyba. Skontrolujte hlásenia pre danu objednávku.');
     }
-
-    /**
-     * Firing callback on press action for multiple items
-     * @param Illuminate\Support\Collection $rows
-     */
-    // public function fireMultiple(Collection $rows)
-    // {
-    //     return $this->error('Your multiple rows action callback.');
-    // }
 }

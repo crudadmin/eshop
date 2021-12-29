@@ -6,9 +6,9 @@ use OrderService;
 
 trait HasOrderInvoice
 {
-    public function makeInvoice($type = null)
+    public function getInvoiceData($type)
     {
-        $data = array_merge($this->toArray(), [
+        return array_merge($this->toArray(), [
             'order_id' => $this->getKey(),
             'company_name' => $this->company_name ?: $this->username,
             'city' => $this->city,
@@ -29,6 +29,11 @@ trait HasOrderInvoice
             'payment_date' => $this->created_at->addDays(getInvoiceSettings()->payment_term),
             'country' => 'sk',
         ]);
+    }
+
+    public function makeInvoice($type = null)
+    {
+        $data = $this->getInvoiceData($type);
 
         //If is creating invoice, and order has proform
         if (
@@ -69,7 +74,7 @@ trait HasOrderInvoice
         //Add order items
         foreach ($this->items as $item) {
             $invoice->items()->create([
-                'name' => $item->getProductName(),
+                'name' => $item->invoiceItemName(),
                 'quantity' => $item->quantity,
                 'vat' => $item->vat,
                 'price' => $item->price,

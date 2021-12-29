@@ -14,7 +14,7 @@ class ProductsWithAttributesResource extends ResourceCollection
      */
     public function toArray($request)
     {
-        $this->collection->each->setCategoryResponse();
+        $this->collection->each->setListingResponse();
 
         return parent::toArray($request);
     }

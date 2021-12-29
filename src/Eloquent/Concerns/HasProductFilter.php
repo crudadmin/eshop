@@ -3,10 +3,10 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
-use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use DB;
 use Store;
+use Exception;
 
 trait HasProductFilter
 {
@@ -43,47 +43,38 @@ trait HasProductFilter
     {
         $params = is_array($params) ? $params : [];
 
-        $filter = [];
-
-        //If no filter params are present
-        if ( count($params) > 0 ){
-            $existingAttributes = Store::getExistingAttributesFromFilter($params);
-
-            foreach ($params as $key => $value) {
-                //Denny non attributes queries
-                if ( array_key_exists($key, $existingAttributes) ){
-                    $attributeId = $existingAttributes[$key]['id'];
-
-                    $filter[$attributeId] = explode(',', $value);
-                }
-            }
-        }
+        $filter = $this->getFilterFromParams($params);
 
         return $filter;
     }
 
     public function scopeApplyQueryFilter($query)
     {
-        $filter = $this->getFilterOption('filter', []);
-        $extractVariants = $this->getFilterOption('listing.variants.extract', false);
-
-        //Apply user filter scope
-        if ( $scope = $this->getFilterOption('scope') ){
-            $scope($query);
-        }
-
-        $query->applyCategoryFilter($filter);
-
         //Filter whole products
-        $query->where(function($query) use ($filter, $extractVariants) {
-            //Filter by basic product type
-            $query->where(function($query) use ($filter, $extractVariants) {
-                $query->where(function($query) use ($extractVariants) {
-                    $query->nonVariantProducts();
+        $query->where(function($query) {
+            $extractVariants = $this->getFilterOption('variants.extract', false);
+            $filter = $this->getFilterOption('filter', []);
 
-                    if ( is_array($extractVariants) ){
+            //Filter by basic product type
+            $query->where(function($query) use ($extractVariants, $filter) {
+                $query->where(function($query) use ($extractVariants) {
+                    $query->where(function($query) {
+                        $query
+                            ->nonVariantProducts()
+                            ->filterParentProduct();
+                    });
+
+                    if ( $extractVariants ){
                         $query->orWhere(function($query){
-                            $query->variantProducts();
+                            $query
+                                ->variantProducts()
+                                ->filterVariantProduct()
+                                ->whereHas('product', function($query){
+                                    $query
+                                        //We need clone settings from parent model
+                                        ->cloneModelFilter($this)
+                                        ->filterParentProduct();
+                                });
                         });
                     }
                 });
@@ -96,19 +87,20 @@ trait HasProductFilter
                 $query->orWhere(function($query) use ($filter) {
                     $query
                         ->variantsProducts()
+                        ->cloneModelFilter($this)
+                        ->filterParentProduct()
                         ->whereHas('variants', function($query) use ($filter) {
-                            //Apply user filter scope on variants
-                            if ( $scope = $this->getFilterOption('scope.variants') ){
-                                $scope($query);
-                            }
-
-                            $query->filterProduct($filter);
+                            $query
+                                //We need reclone options in relationships
+                                ->cloneModelFilter($this)
+                                ->filterProduct($filter)
+                                ->filterVariantProduct();
                         });
                 });
             }
         });
 
-        $this->extractDifferentVariants($extractVariants);
+        $this->extractDifferentVariants();
     }
 
     public function scopeApplyCategoryFilter($query, $params)
@@ -125,10 +117,19 @@ trait HasProductFilter
         $query->filterCategory($categoryFilter);
     }
 
-    public function scopeExtractDifferentVariants($query, $extractVariants)
+    public function scopeExtractDifferentVariants($query)
     {
-        if ( $extractVariants === false ) {
+        if ( !($extractor = $this->getFilterOption('variants.extract', false)) ) {
             return;
+        }
+
+        //Use default extractor when true value has been returned
+        if ( $extractor === true && $extractor = $this->getExtractorAttributes() ){
+            $extractor = array_wrap($extractor);
+        }
+
+        if ( is_array($extractor) == false ){
+            throw new Exception('Extractor attribute ids are not defined.');
         }
 
         $attributesList = DB::table('attributes_item_product_attributes_items')
@@ -138,7 +139,7 @@ trait HasProductFilter
                             CONCAT(attributes_items.attribute_id, "_", GROUP_CONCAT(attributes_item_id)) as attributes_groupper
                         ')
                         ->leftJoin('attributes_items', 'attributes_items.id', '=', 'attributes_item_product_attributes_items.attributes_item_id')
-                        ->whereIn('attributes_items.attribute_id', $extractVariants)
+                        ->whereIn('attributes_items.attribute_id', $extractor)
                         ->groupBy('variant_groupper');
 
         $query->leftJoinSub($attributesList, 'attributesList', function($join){
@@ -171,14 +172,67 @@ trait HasProductFilter
 
     public function scopeFilterProduct($query, $params)
     {
-        $filter = $this->getFilterFromQuery($params);
-
         $query->withoutGlobalScope('order');
+
+        $filter = $this->getFilterFromQuery($params);
 
         foreach ($filter as $attributeId => $itemIds) {
             $query->filterAttributeItems($attributeId, $itemIds);
         }
 
         $query->applyPriceRangeFilter($params);
+    }
+
+    public function scopeFilterParentProduct($query, $filter = null)
+    {
+        $query->withoutGlobalScope('order');
+
+        //Apply user filter scope
+        if ( $scope = $this->getFilterOption('scope') ){
+            $scope($query);
+        }
+
+        $filter = $filter ?: $this->getFilterOption('filter', []);
+
+        $query->applyCategoryFilter($filter);
+    }
+
+    public function scopeFilterVariantProduct($query, $options = null)
+    {
+        //Apply user filter scope on variants
+        if ( $scope = $this->getFilterOption('scope.variants') ){
+            $scope($query);
+        }
+    }
+
+    public function getFilterFromParams($params)
+    {
+        $filter = [];
+
+        //If no filter params are present
+        if ( $params && count($params) > 0 ){
+            $existingAttributes = Store::getExistingAttributesFromFilter($params);
+
+            foreach ($params as $key => $value) {
+                //Denny non attributes queries
+                if ( array_key_exists($key, $existingAttributes) ){
+                    $attributeId = $existingAttributes[$key]['id'];
+
+                    $filter[$attributeId] = explode(',', $value);
+                }
+            }
+        }
+
+        return $filter;
+    }
+
+    /**
+     * Extract product variants by according to attribute ids
+     *
+     * @return  array|integer
+     */
+    public function getExtractorAttributes()
+    {
+        // return env('ATTR_COLOR_ID');
     }
 }

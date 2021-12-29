@@ -61,6 +61,7 @@ class AttributesUnit extends AdminModel
             'name' => 'name:Názov mernej jednotky|required',
             'unit' => 'name:Merná jednotka',
             'format' => 'name:Formát jednotky|type:select|default:string|required',
+            'space' => 'name:Medzera pred mernou jednotkou|type:checkbox|default:0',
         ];
     }
 

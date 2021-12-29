@@ -73,7 +73,7 @@ trait HasProductPaginator
     {
         $query->addSelect(DB::raw('MIN(products.price) as min_filter_price, MAX(products.price) as max_filter_price'));
 
-        if ( $this->getFilterOption('listing.variants.extract') === false ) {
+        if ( $this->getFilterOption('variants.extract') === false ) {
             $variants = DB::table('products')
                             ->selectRaw('
                                 MIN(price) as min_filter_variant_price,

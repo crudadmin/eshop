@@ -201,8 +201,8 @@ trait OrderTrait
         }
 
         else {
-            $tooltip = $this->getSelectOption('delivery_status');
-            $message = 'Čaká';
+            $tooltip = '';
+            $message = $this->getSelectOption('delivery_status');
         }
 
         if ( $message ) {
@@ -213,6 +213,31 @@ trait OrderTrait
                 </span>
             </span>';
         }
+    }
+
+    protected function getIsPaidStatusText()
+    {
+        $color = '';
+        $tooltip = '';
+
+        if ( $this->paid_at ){
+            $color = 'green';
+            $icon = '<i class="fa fa-check"></i>';
+            $tooltip = 'Zaplatené '.$this->paid_at->format('d.m.Y H:i:s');
+        }
+
+        else {
+            $color = 'red';
+            $icon = '<i class="fa fa-times"></i>';
+            $tooltip = 'Neuhradené';
+        }
+
+        return '
+        <span style="'.($color ? ('color: '.$color) : '' ).'">
+            <span data-toggle="tooltip" title="'.e($tooltip).'">
+                '.$icon.'
+            </span>
+        </span>';
     }
 
     public function getDeliveryTrackingUrlAttribute()
@@ -265,6 +290,27 @@ trait OrderTrait
             $item->vatValue = $item->vat.'%';
             return $item;
         })->pluck('vatValue', 'vat');
+    }
+
+    public function bootOrderIntoOrderService()
+    {
+        $order = OrderService::getOrder();
+
+        //If order in payment helper is not set already
+        if ( !$order || $order->getKey() != $this->getKey() ){
+            OrderService::setOrder($this);
+        }
+    }
+
+    public function getVerifiedCustomersItemsIds()
+    {
+        return $this->items->map(function($item){
+            if ( ($product = $item->getProduct()) && method_exists($product, 'getHeurekaItemIdAttribute') ) {
+                return $product->heurekaItemId;
+            }
+        })->filter(function($item){
+            return $item;
+        })->toArray();
     }
 }
 

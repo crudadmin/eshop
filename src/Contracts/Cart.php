@@ -5,9 +5,11 @@ namespace AdminEshop\Contracts;
 use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
+use AdminEshop\Contracts\Cart\Concerns\HasStockBlockSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
+use AdminEshop\Events\CartUpdated;
 use Admin\Core\Contracts\DataStore;
 use CartDriver;
 use Discounts;
@@ -18,7 +20,8 @@ class Cart
 {
     use CartTrait,
         DataStore,
-        DriverSupport;
+        DriverSupport,
+        HasStockBlockSupport;
 
     /*
      * Items in cart
@@ -336,6 +339,9 @@ class Cart
             }
 
             CartDriver::flushAllExceptWhitespaced();
+
+            //For reseting cart items
+            event(new CartUpdated(new CartCollection));
         }
 
         return $this;

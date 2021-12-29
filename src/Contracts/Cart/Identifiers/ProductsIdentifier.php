@@ -30,6 +30,16 @@ class ProductsIdentifier extends Identifier
     }
 
     /**
+     * Temporary stock block
+     *
+     * @return  bool
+     */
+    public function hasTemporaryStockBlock()
+    {
+        return Cart::isStockBlockEnabled();
+    }
+
+    /**
      * Keys in array are assigned to eloquents tables
      *
      * @return  array
@@ -101,8 +111,7 @@ class ProductsIdentifier extends Identifier
         $product = $cache['product'] ?? null;
 
         if ( $item->variant_id ) {
-            //Product must be available also if is variant type
-            return $product ? ($cache['variant'] ?? null) : null;
+            return ($variant = ($cache['variant'] ?? null)) && $product ? $variant : null;
         }
 
         if ( $item->id ) {
@@ -190,12 +199,23 @@ class ProductsIdentifier extends Identifier
         }
 
         if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+            $this->loadAttributes($productOrVariant);
+
             $items[] = $productOrVariant->attributesVariantsText;
         } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+            $this->loadAttributes($productOrVariant);
+
             $items[] = $productOrVariant->attributesText;
         }
 
         return array_filter($items);
+    }
+
+    private function loadAttributes($product)
+    {
+        if ( $product && $product->hasAttributesEnabled() && $product->relationLoaded('attributesItems') == false ){
+            $product->load('attributesItems');
+        }
     }
 
     /*

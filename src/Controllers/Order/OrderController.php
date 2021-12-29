@@ -6,14 +6,15 @@ use AdminEshop\Controllers\Controller;
 
 class OrderController extends Controller
 {
-    public function userOrders()
+    public function index()
     {
         $orders = client()->orders()
                         ->with('invoices:id,order_id,pdf')
+                        ->withClientListingResponse()
                         ->paginate(request('limit', 10));
 
         $orders->getCollection()->each(function($order){
-            return $order->makeHidden('invoices')->toResponseFormat();
+            return $order->makeHidden('invoices')->setClientListingResponse();
         });
 
         return api([
@@ -26,12 +27,12 @@ class OrderController extends Controller
         $order = client()->orders()
                         ->orderDetail()
                         ->findOrFail($id)
-                        ->toResponseFormat();
+                        ->setClientListingResponse();
 
         return api([
             'order' => $order,
             'items' => $order->items->map(function($item){
-                return $item->toResponseFormat();
+                return $item->setClientListingResponse();
             }),
         ]);
     }

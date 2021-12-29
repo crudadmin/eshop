@@ -5,7 +5,6 @@ namespace AdminEshop\Models\Clients;
 use AdminEshop\Admin\Rules\SetDefaultDeliveryAddress;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use Admin;
 
 class ClientsAddress extends AdminModel
 {
@@ -24,9 +23,29 @@ class ClientsAddress extends AdminModel
 
     protected $hidden = ['created_at', 'deleted_at', 'published_at', '_order'];
 
+    protected $settings = [
+        'title.insert' => 'Nová adresa',
+        'grid' => [
+            'default' => 'full',
+            'enabled' => false,
+        ],
+        'columns.default.title' => 'Predvolená'
+    ];
+
+    protected $rules = [
+        SetDefaultDeliveryAddress::class,
+    ];
+
+    protected $options = [
+        'type' => [
+            'delivery' => 'Dodacia adresa',
+            'billing' => 'Fakturačná adresa',
+        ],
+    ];
+
     public function belongsToModel()
     {
-        return get_class(Admin::getModel('Client'));
+        return Client::class;
     }
 
     public function active()
@@ -68,31 +87,21 @@ class ClientsAddress extends AdminModel
         ];
     }
 
-    protected $settings = [
-        'title.insert' => 'Nová adresa',
-        'grid' => [
-            'default' => 'full',
-            'enabled' => false,
-        ],
-        'columns.default.title' => 'Predvolená'
-    ];
-
-    protected $options = [
-        'type' => [
-            'delivery' => 'Dodacia adresa',
-            'billing' => 'Fakturačná adresa',
-        ],
-    ];
-
     public function isCompany()
     {
-        if ( $this->type == 'delivery' )
+        if ( $this->type == 'delivery' ) {
             return false;
+        }
 
         return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
 
-    protected $rules = [
-        SetDefaultDeliveryAddress::class,
-    ];
+    public function getAddressValidator()
+    {
+        return $this->validator()->only([
+            'type', 'name',
+            'username', 'phone',
+            'street', 'zipcode', 'city', 'country_id',
+        ]);
+    }
 }

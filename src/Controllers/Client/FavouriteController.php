@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Controllers\Client;
 
+use Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -9,31 +10,64 @@ class FavouriteController extends Controller
 {
     public function index()
     {
-        if ( !client() ){
-            return collect([]);
-        }
+        $favourites = Admin::getModel('ClientsFavourite')
+                        ->activeSession()
+                        ->select('id', 'product_id', 'variant_id')
+                        ->get();
+
+        $products = Admin::getModel('Product')
+                        ->withFavouriteResponse([
+                            'scope' => function($query) use ($favourites) {
+                                $query->whereIn(
+                                    $query->getModel()->getTable().'.id',
+                                    $favourites->pluck('product_id')->unique()->filter()->toArray()
+                                );
+                            },
+                            'scope.variants' => function($query) use ($favourites) {
+                                $query->whereIn(
+                                    $query->getModel()->getTable().'.id',
+                                    $favourites->pluck('variant_id')->unique()->filter()->toArray()
+                                );
+                            }
+                        ])
+                        ->productsPaginate(
+                            request('limit')
+                        );
+
+        $products->getCollection()->each->setListingResponse();
 
         return api([
-            'favourites' => client()->favourites()->withFavouriteResponse()->get()->map(function($item){
-                return $item->setFavouriteResponse();
-            }),
+            'pagination' => $products,
+            'favourites' => $favourites,
         ]);
     }
 
     public function toggleFavourite()
     {
-        $productId = request('product_id');
+        $favouritesModel = Admin::getModel('ClientsFavourite');
+        $favourites = $favouritesModel->activeSession();
 
-        $favourites = client()->favourites();
+        $productId = request('product_id');
+        $variantId = request('variant_id');
 
         //Add or update variant
-        if ( is_numeric($productId) ) {
-            if ( $favourites->where('product_id', $productId)->count() > 0 ) {
-                $favourites->where('product_id', $productId)->delete();
+        if ( is_numeric($variantId) ) {
+            if ( $favourites->where('variant_id', $variantId)->count() > 0 ) {
+                $favourites->where('variant_id', $variantId)->delete();
             } else {
-                $favourites->create([
+                $favouritesModel->create([
+                    'variant_id' => $variantId,
                     'product_id' => $productId,
-                ]);
+                ] + $favouritesModel->getFavouritesIdentifiers());
+            }
+        } else if ( is_numeric($productId) ) {
+            if ( $favourites->where('product_id', $productId)->whereNull('variant_id')->count() > 0 ) {
+                $favourites->where('product_id', $productId)->whereNull('variant_id')->delete();
+            } else {
+                $favouritesModel->create([
+                    'variant_id' => $variantId,
+                    'product_id' => $productId,
+                ] + $favouritesModel->getFavouritesIdentifiers());
             }
         }
 

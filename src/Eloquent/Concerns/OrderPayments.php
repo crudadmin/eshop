@@ -6,16 +6,6 @@ use OrderService;
 
 trait OrderPayments
 {
-    private function bootOrderIntoOrderService()
-    {
-        $order = OrderService::getOrder();
-
-        //If order in payment helper is not set already
-        if ( !$order || $order->getKey() != $this->getKey() ){
-            OrderService::setOrder($this);
-        }
-    }
-
     public function getPaymentData($paymentMethodId = null)
     {
         $paymentMethodId = $paymentMethodId ?: $this->payment_method_id;

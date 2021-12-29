@@ -2,21 +2,12 @@
 
 namespace AdminEshop\Controllers\Client;
 
-use AdminEshop\Models\Clients\ClientsAddress;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Admin;
 
 class AddressController extends Controller
 {
-    private function rules()
-    {
-        return [
-            'type', 'name',
-            'username', 'phone',
-            'street', 'zipcode', 'city', 'country_id',
-        ];
-    }
-
     public function get()
     {
         return [
@@ -28,9 +19,7 @@ class AddressController extends Controller
     {
         $client = client();
 
-        $validator = (new ClientsAddress)->validator()->only(
-            $this->rules()
-        )->validate();
+        $validator = Admin::getModel('ClientsAddress')->getAddressValidator()->validate();
 
         $client->addresses()->create($validator->getData());
 
@@ -45,9 +34,7 @@ class AddressController extends Controller
 
         $address = $client->addresses()->findOrFail(request('id'));
 
-        $validator = $address->validator()->only(
-            $this->rules()
-        )->validate();
+        $validator = $address->getAddressValidator()->validate();
 
         $address->update($validator->getData());
 
@@ -66,5 +53,16 @@ class AddressController extends Controller
         return autoAjax()->data([
             'addresses' => $client->addresses
         ])->save(_('Adresa bola úspešne zmazaná.'));
+    }
+
+    public function setDefault($id)
+    {
+        client()->addresses()->findOrFail($id)->update([ 'default' => true ]);
+
+        client()->addresses()->where('id', '!=', $id)->update([ 'default' => false ]);
+
+        return autoAjax()->data([
+            'addresses' => client()->addresses
+        ]);
     }
 }
