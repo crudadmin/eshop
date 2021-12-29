@@ -296,9 +296,13 @@ trait HasProductResponses
             }]);
         }
 
-        if ( $this->getFilterOption($key.'.attributes', false) === true ) {
+        if ( $attributesScope = $this->getFilterOption($key.'.attributes', false) ) {
             $query->with([
-                'attributesItems' => function($query){
+                'attributesItems' => function($query) use ($key, $attributesScope) {
+                    if ( $attributesScope ){
+                        $attributesScope($query);
+                    }
+
                     $query->with(['attribute' => function($query){
                         $query->select($query->getModel()->getAttributesColumns());
                     }]);
