@@ -156,9 +156,9 @@ trait HasProductFilter
 
     public function scopeFilterProduct($query, $params)
     {
-        $filter = $this->getFilterFromQuery($params);
-
         $query->withoutGlobalScope('order');
+
+        $filter = $this->getFilterFromQuery($params);
 
         foreach ($filter as $attributeId => $itemIds) {
             $query->filterAttributeItems($attributeId, $itemIds);
@@ -169,6 +169,8 @@ trait HasProductFilter
 
     public function scopeFilterParentProduct($query, $filter = null)
     {
+        $query->withoutGlobalScope('order');
+
         //Apply user filter scope
         if ( $scope = $this->getFilterOption('scope') ){
             $scope($query);
