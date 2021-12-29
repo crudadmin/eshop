@@ -37,7 +37,8 @@ class FavouriteController extends Controller
         $products->getCollection()->each->setListingResponse();
 
         return api([
-            'favourites' => $products,
+            'pagination' => $products,
+            'favourites' => $favourites,
         ]);
     }
 
