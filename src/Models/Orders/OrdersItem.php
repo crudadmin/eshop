@@ -131,7 +131,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
             'columns.product_name.encode' => false,
             'columns.quantity.after' => 'name',
             'columns.total' => [
-                'title' => 'Cena spolu',
+                'name' => 'Cena spolu',
                 'after' => 'price_vat',
             ],
 
@@ -141,7 +141,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         ];
     }
 
-    public function setAdminAttributes($attributes)
+    public function setAdminRowsAttributes($attributes)
     {
         $attributes['total'] = Store::priceFormat(
             $this->calculateVatPrice($this->price, null) * $this->quantity

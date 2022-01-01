@@ -93,7 +93,7 @@ class Client extends Authenticatable
         return $this->company_name || $this->company_id || $this->company_tax_id || $this->company_vat_id;
     }
 
-    public function setAdminAttributes($attributes)
+    public function setAdminRowsAttributes($attributes)
     {
         $attributes['orders'] = $this->orders()->count();
         $attributes['last_order'] = ($order = $this->orders()->first()) ? $order->created_at->format('d.m.Y') : '';

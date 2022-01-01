@@ -181,7 +181,7 @@ class Order extends AdminModel
         $query->with(['log', 'items:id,order_id']);
     }
 
-    public function setAdminAttributes($attributes)
+    public function setAdminRowsAttributes($attributes)
     {
         $attributes['number'] = $this->number;
 

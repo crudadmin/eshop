@@ -147,7 +147,8 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'unassigned' => [ 'name' => 'Nezaradené', 'title' => 'Nezaradené do kategórii' ],
                 'active' => [ 'name' => 'Aktívne' ],
                 'inactive' => [ 'name' => 'Neaktívne' ],
-            ]
+            ],
+            'decimals.round_without_vat' => config('admineshop.prices.round_without_vat', false),
         ];
     }
 
@@ -228,13 +229,16 @@ class Product extends CartEloquent implements HasAttributesSupport
         return count($prices) ? $prices[0] : 0;
     }
 
-    public function setAdminAttributes($attributes)
+    public function setAdminRowsAttributes($attributes)
     {
         if ( config('admineshop.attributes.attributesVariants', false) == true ) {
             $attributes['attributes'] = $this->attributesVariantsText;
         } else if ( config('admineshop.attributes.attributesText', false) == true ) {
             $attributes['attributes'] = $this->attributesText;
         }
+
+        //Remove uneccessary decimals
+        $attributes['price'] = $this->price + 0;
 
         return $attributes;
     }
