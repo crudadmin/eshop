@@ -106,7 +106,7 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
             'Cena' => Group::tab([
                 'Cena' => Group::fields([
                     'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|required|canAdd|hidden',
-                    'price' => 'name:Cena bez DPH|type:decimal|default:0|component:PriceField|required_unless:product_type,'.implode(',', Store::orderableProductTypes()),
+                    'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField|required_unless:product_type,'.implode(',', Store::orderableProductTypes()),
                 ])->width(8)->id('price'),
                 'Zľava' => Group::fields([
                     'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
