@@ -142,6 +142,7 @@ class ProductsVariant extends CartEloquent implements HasAttributesSupport
                 'create' => 'Pridať variantu',
             ],
             'autoreset' => false,
+            'decimals.round_without_vat' => config('admineshop.prices.round_without_vat', false),
         ];
     }
 
