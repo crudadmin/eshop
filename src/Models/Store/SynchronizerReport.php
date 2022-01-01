@@ -55,7 +55,7 @@ class SynchronizerReport extends AdminModel
         'columns.status.encode' => false,
     ];
 
-    public function setAdminAttributes($attributes)
+    public function setAdminRowsAttributes($attributes)
     {
         $attributes['created'] = $this->created_at->format('d.m.Y H:i');
         $attributes['status'] = '<strong style="color: '.($this->errors ? 'red' : 'green').'">'.($this->errors ? 'Zlyhal' : 'V poriadku').'</strong>';
