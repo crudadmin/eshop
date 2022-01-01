@@ -26,9 +26,10 @@ class Store
     private $hasB2B = false;
 
     /*
-     * Custom number roundings
+     * Custom price number settings
      */
     private $rounding = null;
+    private $decimalPlaces = null;
 
     /*
      * Return all vats
@@ -127,7 +128,23 @@ class Store
 
         //We need cache rounding value for better performance
         return $this->cache('store.rounding', function(){
-            return (int)$this->getSettings()->rounding;
+            return (int)$this->getSettings()->decimal_rounding;
+        });
+    }
+
+    public function getDecimalPlaces()
+    {
+        if ( $this->decimalPlaces === false ){
+            return false;
+        }
+
+        if ( $this->decimalPlaces ) {
+            return $this->decimalPlaces;
+        }
+
+        //We need cache decimalPlaces value for better performance
+        return $this->cache('store.decimalPlaces', function(){
+            return (int)$this->getSettings()->decimal_places;
         });
     }
 
@@ -168,7 +185,7 @@ class Store
     {
         $separator = $this->getSettings()->decimal_separator == 'comma' ? ',' : '.';
 
-        return number_format($this->roundNumber($number), $this->getRounding(), $separator, ' ');
+        return number_format($this->roundNumber($number), $this->getDecimalPlaces(), $separator, ' ');
     }
 
     /*

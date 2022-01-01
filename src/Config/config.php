@@ -257,4 +257,19 @@ return [
             'key' => env('HEUREKA_VERIFIED_CUSTOMERS_KEY'),
         ],
     ],
+
+    /*
+     * Products settings
+     */
+    'prices' => [
+        //Save all prices up to x decimal places
+        'decimals_places' => '8,3',
+        /*
+            When we round no-vat prices, then all final vat prices may not be correct when store
+            uses more decimal places than defined in settings. Here is example for 2 places:
+            TRUE => 1.625 => 1.63 when rounded no-vat, and then 1.63*1.2=>1.96
+            FALSE => 1.625*1.2=>1.95
+         */
+        'round_without_vat' => false,
+    ],
 ];

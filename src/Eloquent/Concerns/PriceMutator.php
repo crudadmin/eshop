@@ -202,7 +202,7 @@ trait PriceMutator
      */
     public function getInitialPriceWithoutVatAttribute()
     {
-        return Store::roundNumber($this->getAttribute('price'));
+        return $this->getAttribute('price');
     }
 
     /*
@@ -219,12 +219,12 @@ trait PriceMutator
     public function getDefaultPriceWithoutVatAttribute()
     {
         if ( $defaultPrice = $this->getRewritedDefaultPrice() ) {
-            return Store::roundNumber($defaultPrice);
+            return $defaultPrice;
         }
 
         $price = operator_modifier($this->getAttribute('initialPriceWithoutVat'), $this->getAttribute('discount_operator'), $this->getAttribute('discount'));
 
-        return Store::roundNumber($price);
+        return config('admineshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
     }
 
     /*
@@ -242,7 +242,7 @@ trait PriceMutator
     {
         $price = $this->applyDiscounts($this->getAttribute('defaultPriceWithoutVat'), $this->toCartArrayDiscounts);
 
-        return Store::roundNumber($price);
+        return config('admineshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
     }
 
     /*

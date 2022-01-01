@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Store;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store as StoreFacade;
 
 class Store extends AdminModel
 {
@@ -38,10 +39,15 @@ class Store extends AdminModel
     {
         return [
             'email' => 'name:Email obchodu|title:Slúži pre obdržanie kópie emailov z objednávok|email',
-            Group::inline([
-                'rounding' => 'name:Zaokrúhľovanie čísel|type:select|default:0|required',
+            'Nastavenia cien' => Group::tab([
+                'decimal_places' => 'name:Zobrazovať ceny na|type:select|default:2|required',
+                'decimal_rounding' => 'name:Zaokrúhľovanie cien na|type:select|default:3|title:'.(
+                    config('admineshop.prices.round_without_vat', false)
+                        ? 'Zaokruhľovanie platí pre ceny bez DPH a taktiež pre ceny s DPH. Ak je cena bez DPH 1.625, výsledna cena s DPH bude 1.96'
+                        : 'Zaokruhľovanie platí pre všetky ceny s DPH. Ceny produktov bez DPH sa nezaokruhľujú, z týchto nezaokruhlených cien je vypočítana finálna cena s DPH.'
+                    ).'|required',
                 'decimal_separator' => 'name:Separator desatinných čísel|type:select|default:comma|required',
-            ]),
+            ])->icon('fa-money'),
             'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
             'Nastavenia skladu' => Group::tab([
                 'stock_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',
@@ -52,12 +58,16 @@ class Store extends AdminModel
 
     public function options()
     {
+        $decimalPlaces = [
+            3 => '3 desetinné miesta',
+            2 => '2 desetinné miesta',
+            1 => '1 desetinné miesto',
+            0 => 'celé čísla',
+        ];
+
         return [
-            'rounding' => [
-                2 => 'na 2 desetinné miesta',
-                1 => 'na 1 desetinné miesto',
-                0 => 'na celé čísla',
-            ],
+            'decimal_places' => $decimalPlaces,
+            'decimal_rounding' => $decimalPlaces,
             'decimal_separator' => [
                 'dot' => '. - Bodka',
                 'comma' => ', - Čiarka',
@@ -70,4 +80,11 @@ class Store extends AdminModel
         ];
     }
 
+    public function settings()
+    {
+        return [
+            'decimals.places' => StoreFacade::getDecimalPlaces(),
+            'decimals.rounding' => StoreFacade::getRounding(),
+        ];
+    }
 }
