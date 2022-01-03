@@ -41,7 +41,7 @@ class Store extends AdminModel
             'email' => 'name:Email obchodu|title:Slúži pre obdržanie kópie emailov z objednávok|email',
             'Nastavenia cien' => Group::tab([
                 'decimal_places' => 'name:Zobrazovať ceny na|type:select|default:2|required',
-                'decimal_rounding' => 'name:Zaokrúhľovanie cien na|type:select|default:3|title:'.(
+                'decimal_rounding' => 'name:Zaokrúhľovanie cien na|type:select|default:2|title:'.(
                     config('admineshop.prices.round_without_vat', false)
                         ? 'Zaokruhľovanie platí pre ceny bez DPH a taktiež pre ceny s DPH. Ak je cena bez DPH 1.625, výsledna cena s DPH bude 1.96'
                         : 'Zaokruhľovanie platí pre všetky ceny s DPH. Ceny produktov bez DPH sa nezaokruhľujú, z týchto nezaokruhlených cien je vypočítana finálna cena s DPH.'
