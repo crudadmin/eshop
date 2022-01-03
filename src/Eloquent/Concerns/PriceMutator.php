@@ -349,8 +349,6 @@ trait PriceMutator
             $vat = $this->getRewritedVatValue();
         }
 
-        $price = $price * ($vat ? (1 + ($vat / 100)) : 1);
-
         return Store::addVat($price, $vat, $round);
     }
 
