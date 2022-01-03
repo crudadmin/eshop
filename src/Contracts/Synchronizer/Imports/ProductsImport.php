@@ -34,7 +34,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     public function getProductsGalleryIdentifier()
     {
         return array_filter([
-            'product_id',
+            'product_id' => 'products',
             'code'
         ]);
     }
@@ -56,7 +56,10 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
     public function getProductsAttributeIdentifier()
     {
-        return ['product_id', 'attributes_item_id'];
+        return [
+            'product_id' => 'products',
+            'attributes_item_id'
+        ];
     }
 
     public function handle(array $rows = null)
