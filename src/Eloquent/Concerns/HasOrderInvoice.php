@@ -8,7 +8,10 @@ trait HasOrderInvoice
 {
     public function getInvoiceData($type)
     {
-        return array_merge($this->toArray(), [
+        return array_merge($this->makeHidden([
+            'number', 'number_prefix',
+            'deleted_at', 'created_at', 'updated_at', 'client_id',
+        ])->toArray(), [
             'order_id' => $this->getKey(),
             'company_name' => $this->company_name ?: $this->username,
             'city' => $this->city,
@@ -43,13 +46,6 @@ trait HasOrderInvoice
             $data['proform_id'] = $proform->getKey();
         }
 
-        //Remove uneccessary columns from invoice
-        foreach (['deleted_at', 'created_at', 'updated_at', 'client_id'] as $column) {
-            if ( array_key_exists($column, $data) ) {
-                unset($data[$column]);
-            }
-        }
-
         //If invoice exists, regenerate it.
         if ( $invoice = $this->invoices()->where('type', $type)->first() ){
             //Delete invoice items for invoice regeneration
@@ -61,6 +57,7 @@ trait HasOrderInvoice
         //If invoice does not exists
         else {
             $invoice = invoice()->make($type, $data);
+
             $invoice->save();
         }
 
