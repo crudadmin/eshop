@@ -34,6 +34,7 @@ trait HasHeureka
 
         return [
             'id' => $this->heurekaItemId,
+            'name' => $this->getHeurekaName($parentProduct),
         ] + $array + [
             'manufacturer' => $this->getHeurekaManufacturer($parentProduct),
             'delivery_date' => $this->getHeurekaStock($parentProduct),
@@ -58,6 +59,11 @@ trait HasHeureka
     public function getHeurekaManufacturer($parentProduct = null)
     {
 
+    }
+
+    public function getHeurekaName($parentProduct = null)
+    {
+        return $this->heureka_name ?: $this->getValue('name');
     }
 
     public function getHeurekaUrl()

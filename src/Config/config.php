@@ -252,6 +252,7 @@ return [
      * Heureka support
      */
     'heureka' => [
+        'enabled' => false,
         'verified_customers' => [
             'enabled' => env('HEUREKA_VERIFIED_CUSTOMERS_ENABLED', false),
             'key' => env('HEUREKA_VERIFIED_CUSTOMERS_KEY'),
