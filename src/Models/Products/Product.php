@@ -226,14 +226,18 @@ class Product extends CartEloquent implements HasAttributesSupport
         return $attributes;
     }
 
-    public function scopeSetFilterProperty($query, $type)
+    public function scopeSetFilterProperty($query, $types = '')
     {
-        if ( $type == 'unassigned' ){
-            $query->whereDoesntHave('categories');
-        } else if ( $type == 'active' ){
-            $query->whereNotNull('published_at');
-        } else if ( $type == 'inactive' ){
-            $query->whereNull('published_at');
+        $types = explode(',', $types);
+
+        foreach ($types as $i => $type) {
+            if ( $type == 'unassigned' ){
+                $query->whereDoesntHave('categories');
+            } else if ( $type == 'active' ){
+                $query->whereNotNull('published_at');
+            } else if ( $type == 'inactive' ){
+                $query->whereNull('published_at');
+            }
         }
     }
 }

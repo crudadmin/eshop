@@ -8,8 +8,8 @@
             type="button"
             class="btn mr-2"
             :class="{
-                'btn-primary': filterId == key,
-                'btn-default': filterId != key,
+                'btn-primary': filterId.includes(key),
+                'btn-default': !filterId.includes(key),
             }"
         >
             {{ property.name }}
@@ -23,20 +23,14 @@ export default {
 
     data() {
         return {
-            filterId: null,
+            filterId: [],
         };
     },
     methods: {
         setFilter(filterId) {
-            if (this.filterId == filterId) {
-                this.filterId = null;
+            this.filterId = _.xor(this.filterId, [filterId]);
 
-                this.model.removeScope('setFilterProperty');
-            } else {
-                this.filterId = filterId;
-
-                this.model.setScope('setFilterProperty', filterId);
-            }
+            this.model.setScope('setFilterProperty', this.filterId.join(','));
 
             this.model.loadRows();
         },
