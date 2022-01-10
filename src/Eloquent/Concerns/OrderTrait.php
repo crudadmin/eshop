@@ -187,7 +187,17 @@ trait OrderTrait
         return '<a href="https://maps.google.com/?q='.urlencode($address).'" target="_blank" data-toggle="tooltip" title="'.$address.'">'.str_limit($address, 20).'</a>';
     }
 
-    protected function getDeliveryStatusText()
+    protected function getStatusColumn()
+    {
+        $color = $this->status?->color;
+
+        return '
+        <span style="'.($color ? ('color: '.$color) : '' ).'">
+            '.e($this->status?->name).'
+        </span>';
+    }
+
+    protected function getDeliveryStatusColumn()
     {
         $color = '';
         $tooltip = '';
@@ -219,7 +229,7 @@ trait OrderTrait
         }
     }
 
-    protected function getIsPaidStatusText()
+    protected function getIsPaidStatusColumn()
     {
         $color = '';
         $tooltip = '';
@@ -319,7 +329,7 @@ trait OrderTrait
 
     public function getOrderIndicator()
     {
-        $color = '';
+        $color = $this->status?->color;
         $status = '';
 
         if ( $this->created_at == $this->updated_at ){

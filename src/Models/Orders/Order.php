@@ -106,7 +106,6 @@ class Order extends AdminModel
             'columns.price.add_after' => ' '.Store::getCurrency(),
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
-            'columns.status.after' => 'is_paid',
             'columns.client_name' => [
                 'encode' => false,
                 'after' => 'number',
@@ -117,7 +116,11 @@ class Order extends AdminModel
                 'after' => 'client_name',
                 'encode' => false,
             ],
-            'columns.delivery_status_text' => [
+            'columns.status_id' => [
+                'after' => 'is_paid',
+                'encode' => false,
+            ],
+            'columns.delivery_status' => [
                 'encode' => false,
                 'name' => 'Status dopravy',
                 'before' => 'delivery_id',
@@ -177,19 +180,13 @@ class Order extends AdminModel
     public function setAdminRowsAttributes($attributes)
     {
         $attributes['$indicator'] = $this->getOrderIndicator();
-
         $attributes['number'] = $this->number;
-
         $attributes['client_name'] = $this->getClientName();
-
         $attributes['delivery_address'] = $this->getDeliveryAddress();
-
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
-
-        $attributes['delivery_status_text'] = $this->getDeliveryStatusText();
-
-        $attributes['is_paid'] = $this->getIsPaidStatusText();
-
+        $attributes['status_id'] = $this->getStatusColumn();
+        $attributes['delivery_status'] = $this->getDeliveryStatusColumn();
+        $attributes['is_paid'] = $this->getIsPaidStatusColumn();
         $attributes['items_list'] = $this->items->count();
 
         return $attributes;

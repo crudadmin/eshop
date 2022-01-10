@@ -57,6 +57,7 @@ class OrdersStatus extends AdminModel
         return [
             'name' => 'name:Názov|required',
             'default' => 'name:Predvolený stav|type:checkbox|default:0|title:Po vytvorení budú objednávky v tomto stave',
+            'color' => 'name:Farba objednávky|type:color',
             'key' => 'name:Pôvodný kľúč|inaccessible',
         ];
     }
@@ -70,9 +71,9 @@ class OrdersStatus extends AdminModel
         $i = -1;
 
         $languages = [
-            ['store_id' => $storeId, 'name' => 'Pripravuje sa', 'default' => true, 'key' => 'new,waiting'] + ($hasSortable ? ['_order' => $i++] : []),
+            ['store_id' => $storeId, 'name' => 'Pripravuje sa', 'default' => true, 'key' => 'new,waiting', 'color' => '#ffb900'] + ($hasSortable ? ['_order' => $i++] : []),
             ['store_id' => $storeId, 'name' => 'Zabalená', 'default' => false, 'key' => 'shipped'] + ($hasSortable ? ['_order' => $i++] : []),
-            ['store_id' => $storeId, 'name' => 'Odoslaná', 'default' => false, 'key' => 'ok'] + ($hasSortable ? ['_order' => $i++] : []),
+            ['store_id' => $storeId, 'name' => 'Odoslaná', 'default' => false, 'key' => 'ok', 'color' => '#2ecc71'] + ($hasSortable ? ['_order' => $i++] : []),
             ['store_id' => $storeId, 'name' => 'Zrušená', 'default' => false, 'key' => 'canceled'] + ($hasSortable ? ['_order' => $i++] : []),
         ];
 
