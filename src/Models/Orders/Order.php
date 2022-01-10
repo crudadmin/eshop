@@ -141,13 +141,6 @@ class Order extends AdminModel
 
         $options = [
             'country_id' => $countries,
-            'status' => [
-                'new' => 'Prijatá',
-                'waiting' => 'Čaká za spracovaním',
-                'shipped' => 'Doručuje sa',
-                'ok' => 'Vybavená',
-                'canceled' => 'Zrušená',
-            ],
             'delivery_status' => [
                 'new' => 'Čaká za objednanim dopravy',
                 'ok' => 'Prijatá',
@@ -231,7 +224,7 @@ class Order extends AdminModel
 
     public function getStatusTextAttribute()
     {
-        return $this->getOptionValue('status', $this->status);
+        return $this->status?->name;
     }
 
     /**

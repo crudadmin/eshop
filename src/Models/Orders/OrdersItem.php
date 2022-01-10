@@ -124,7 +124,8 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
     {
         return [
             // 'increments' => false,
-            'buttons.insert' => 'Nová položka do objednávky',
+            'buttons.insert' => 'Pridať položku',
+            'buttons.create' => 'Pridať položku',
             'title.insert' => 'Pridajte položku do objednávky',
             'title.update' => 'Upravujete položku v objednávke',
             'grid.default' => 'full',

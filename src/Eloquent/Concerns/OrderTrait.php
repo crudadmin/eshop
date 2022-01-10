@@ -7,10 +7,12 @@ use AdminEshop\Contracts\Collections\OrderItemsCollection;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\OrdersItem;
+use AdminEshop\Models\Orders\OrdersStatus;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Ajax;
 use Cart;
 use Discounts;
+use Illuminate\Support\Facades\DB;
 use OrderService;
 use Store;
 
@@ -330,6 +332,21 @@ trait OrderTrait
             'color' => $color,
             'title' => $status,
         ];
+    }
+
+    public function onRequiredStatusIdRelation($table, $schema, $builder)
+    {
+        if ( $schema->hasColumn($this->getTable(), 'status') == false ){
+            return;
+        }
+
+        $statuses = OrdersStatus::whereNotNull('key')->get();
+
+        foreach ($statuses as $status) {
+            DB::table('orders')->whereIn('status', explode(',', $status->key))->update([
+                'status_id' => $status->getKey(),
+            ]);
+        }
     }
 }
 

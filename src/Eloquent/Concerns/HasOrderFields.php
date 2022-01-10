@@ -97,7 +97,7 @@ trait HasOrderFields
                 'internal_note' => 'name:Interná poznámka|type:text|hidden',
             ])->inline(),
             Group::fields([
-                'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|required',
+                'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|defaultByOption:default,1|title:Pri zmene stavu sa môže odosielať email zákazníkovy|required',
                 'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
                 'delivery_identifier' => 'name:Identifikátor zvozu dopravy|invisible',
             ])->inline(),
@@ -124,7 +124,7 @@ trait HasOrderFields
                         'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
                     ]),
                     'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
-                    'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|hidden|hideFromForm',
+                    'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|hidden|removeFromForm',
                 ])->id('delivery'),
             ] : [],
             config('admineshop.payments_methods.enabled', true) ? [
@@ -135,7 +135,7 @@ trait HasOrderFields
                         'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
                     ])->inline(),
                     'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
-                    'payment_method_price_vat' => 'name:Cena plat. metódy s DPH|type:decimal|required|hidden|hideFromForm',
+                    'payment_method_price_vat' => 'name:Cena plat. metódy s DPH|type:decimal|required|hidden|removeFromForm',
                 ])->id('payment')
             ] : [],
         ))->id('shippingAndPayments')->inline()->icon('fa-truck')->name('Doprava a platba');
