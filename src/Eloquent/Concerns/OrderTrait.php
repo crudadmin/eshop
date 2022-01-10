@@ -314,6 +314,23 @@ trait OrderTrait
             return $item;
         })->toArray();
     }
+
+    public function getOrderIndicator()
+    {
+        $color = '';
+        $status = '';
+
+        if ( $this->created_at == $this->updated_at ){
+            $color = '#e3342f';
+
+            $status = 'Neupravená objednávka';
+        }
+
+        return [
+            'color' => $color,
+            'title' => $status,
+        ];
+    }
 }
 
 ?>
