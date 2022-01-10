@@ -97,7 +97,7 @@ trait HasOrderFields
                 'internal_note' => 'name:Interná poznámka|type:text|hidden',
             ])->inline(),
             Group::fields([
-                'status' => 'name:Stav objednávky|column_name:Stav|type:select|required|default:new',
+                'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|required',
                 'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
                 'delivery_identifier' => 'name:Identifikátor zvozu dopravy|invisible',
             ])->inline(),
@@ -111,7 +111,7 @@ trait HasOrderFields
      */
     protected function getShippingAndPaymentFields()
     {
-        return Group::fields(array_merge(
+        return Group::tab(array_merge(
             config('admineshop.delivery.enabled', true) ? [
                 'Doprava' => Group::fields([
                     Group::inline(array_merge(
@@ -138,7 +138,7 @@ trait HasOrderFields
                     'payment_method_price_vat' => 'name:Cena plat. metódy s DPH|type:decimal|required|hidden|hideFromForm',
                 ])->id('payment')
             ] : [],
-        ))->id('shippingAndPayments')->inline();
+        ))->id('shippingAndPayments')->inline()->icon('fa-truck')->name('Doprava a platba');
     }
 
     /**
