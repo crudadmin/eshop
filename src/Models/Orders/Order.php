@@ -106,6 +106,7 @@ class Order extends AdminModel
             'columns.price.add_after' => ' '.Store::getCurrency(),
             'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
+            'columns.status.after' => 'is_paid',
             'columns.client_name' => [
                 'encode' => false,
                 'after' => 'number',
@@ -114,11 +115,12 @@ class Order extends AdminModel
             'columns.delivery_address' => [
                 'name' => 'Dodacia adresa',
                 'after' => 'client_name',
+                'encode' => false,
             ],
             'columns.delivery_status_text' => [
                 'encode' => false,
                 'name' => 'Status dopravy',
-                'after' => 'status',
+                'before' => 'delivery_id',
             ],
             'columns.is_paid' => [
                 'encode' => false,

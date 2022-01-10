@@ -175,12 +175,14 @@ trait OrderTrait
     {
         $prefix = $this->delivery_different ? 'delivery_' : '';
 
-        return implode(', ', array_filter([
-            $this->{$prefix.'street'},
-            $this->{$prefix.'city'},
-            $this->{$prefix.'zipcode'},
-            $this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null,
+        $address = implode(', ', array_filter([
+            e($this->{$prefix.'street'}),
+            e($this->{$prefix.'city'}),
+            e($this->{$prefix.'zipcode'}),
+            e($this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null),
         ]));
+
+        return '<a href="https://maps.google.com/?q='.urlencode($address).'" target="_blank" data-toggle="tooltip" title="'.$address.'">'.str_limit($address, 20).'</a>';
     }
 
     protected function getDeliveryStatusText()

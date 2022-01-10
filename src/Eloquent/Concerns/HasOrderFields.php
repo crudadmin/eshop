@@ -117,7 +117,7 @@ trait HasOrderFields
                     Group::inline(array_merge(
                         ['delivery' => 'name:Doprava|belongsTo:deliveries,name|required'],
                         config('admineshop.delivery.multiple_locations.enabled', false)
-                            ? ['delivery_location' => 'name:Predajňa|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:'.config('admineshop.delivery.multiple_locations.table').','.config('admineshop.delivery.multiple_locations.field_name')] : []
+                            ? ['delivery_location' => 'name:Predajňa|hidden|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:'.config('admineshop.delivery.multiple_locations.table').','.config('admineshop.delivery.multiple_locations.field_name')] : []
                     )),
                     Group::inline([
                         'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
