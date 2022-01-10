@@ -236,6 +236,7 @@ class Order extends AdminModel
         };
 
         $query->with(array_filter([
+            'status',
             $this->getField('discount_code_id') ? 'discount_code' : null,
             $this->getField('delivery_id') ? 'delivery' : null,
             $this->getField('delivery_location_id') ? 'delivery_location' : null,
