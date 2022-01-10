@@ -77,12 +77,16 @@ trait HasHeureka
             return collect();
         }
 
-        return $this->attributesList->map(function($item){
+        return $this->attributesList->map(function($attribute){
+            if ( !($item = $attribute->items->first()) ){
+                return;
+            }
+
             return [
-                'name' => $item->name,
-                'value' => $item->items->first()?->name,
+                'name' => $attribute->name,
+                'value' => $item?->getAttributeItemValue($attribute),
             ];
-        });
+        })->filter();
     }
 
     public function getHeurekaThumbnail()
