@@ -14,7 +14,7 @@ trait HasOrderLog
         $row->order_id = $this->getKey();
         $row->type = $type;
         $row->code = $code;
-        $row->message = $this->toLogResponse($message);
+        $row->message = str_limit($this->toLogResponse($message), 250);
         $row->log = $this->toLogResponse($log);
 
         if ( is_callable($callback) ){

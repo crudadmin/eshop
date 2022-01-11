@@ -44,18 +44,11 @@ class OnOrderStatusChange extends AdminRule
 
         if ( $status->email_send === true ){
             try {
-                // dd($order->status->name, $order->status_id, $order->getOriginal('status_id'));
                 Mail::to($order->email)->send(new OrderStatus($order));
 
-                $order->log()->create([
-                    'type' => 'info',
-                    'message' => 'Email o zmene stavu objednávky "'.$order->status->name.'" bol odoslaný.',
-                ]);
+                $order->logReport('info', null, 'Email o zmene stavu objednávky "'.$order->status->name.'" bol odoslaný.');
             } catch (Exception $e){
-                $order->log()->create([
-                    'type' => 'error',
-                    'message' => 'Email o zmene stavu objednávky nebol odoslaný.',
-                ]);
+                $order->logReport('error', null, 'Email o zmene stavu objednávky nebol odoslaný.');
             }
         }
     }
