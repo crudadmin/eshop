@@ -32,7 +32,7 @@ trait HasHeureka
             'priceWithVat',
         ])->setLocalizedResponse()->toArray();
 
-        return [
+        $array = [
             'id' => $this->heurekaItemId,
             'name' => $this->getHeurekaName($parentProduct),
         ] + $array + [
@@ -44,6 +44,13 @@ trait HasHeureka
             'heureka_category_list' => $this->getHeurekaCategoryList($parentProduct),
             'attributes' => $this->getHeurekaAttributes($parentProduct)
         ];
+
+        foreach ($array as $key => $value) {
+            $array[$key] = is_string($value) ? trim($value) : $value;
+        }
+
+
+        return $array;
     }
 
     public function getHeurekaItemIdAttribute()
@@ -108,14 +115,22 @@ trait HasHeureka
             return [];
         }
 
-        $categories = $categories->each->setLocalizedResponse()->map(function($row) use ($withOriginalName) {
+        $categoryFullName = null;
+
+        $categories = $categories->each->setLocalizedResponse()->map(function($row) use ($withOriginalName, $categoryFullName) {
             if ( $withOriginalName === true ){
-                return $row->name;
+                $name = $row->name;
+            } else {
+                $name = $row->heureka_name ?: $row->name;
             }
 
-            return $row->heureka_name ?: $row->name;
+            if ( $row->heureka_full_name ){
+                $categoryFullName = $name;
+            }
+
+            return $name;
         })->toArray();
 
-        return array_unique($categories);
+        return $categoryFullName ? [$categoryFullName] : array_unique($categories);
     }
 }

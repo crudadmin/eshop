@@ -72,9 +72,9 @@ class OrdersStatus extends AdminModel
 
         $languages = [
             ['store_id' => $storeId, 'name' => 'Pripravuje sa', 'default' => true, 'key' => 'new,waiting', 'color' => '#ffb900'] + ($hasSortable ? ['_order' => $i++] : []),
-            ['store_id' => $storeId, 'name' => 'Zabalená', 'default' => false, 'key' => 'shipped'] + ($hasSortable ? ['_order' => $i++] : []),
+            ['store_id' => $storeId, 'name' => 'Zabalená', 'default' => false, 'key' => 'shipped', 'color' => null] + ($hasSortable ? ['_order' => $i++] : []),
             ['store_id' => $storeId, 'name' => 'Odoslaná', 'default' => false, 'key' => 'ok', 'color' => '#2ecc71'] + ($hasSortable ? ['_order' => $i++] : []),
-            ['store_id' => $storeId, 'name' => 'Zrušená', 'default' => false, 'key' => 'canceled'] + ($hasSortable ? ['_order' => $i++] : []),
+            ['store_id' => $storeId, 'name' => 'Zrušená', 'default' => false, 'key' => 'canceled', 'color' => null] + ($hasSortable ? ['_order' => $i++] : []),
         ];
 
         $this->insert($languages);
