@@ -121,7 +121,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
 
         $params = [
             'shipment' => [
-                'reference' => $order->getKey(),
+                'reference' => $order->number,
                 'delisId' => env('SHIPPMENT_DPD_DELIS_ID'),
                 'note' => $order->note,
                 'product' => $this->getProductCode(),
@@ -191,7 +191,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
                 'bankAccount' => [
                     'id' => env('SHIPPMENT_DPD_BANK_ACCOUNT_ID'),
                 ],
-                'variableSymbol' => $order->getKey(),
+                'variableSymbol' => $order->number,
                 'paymentMethod' => 1,
             ];
         }
@@ -242,7 +242,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
         }
 
         return [
-            'reference1' => $this->getOrder()->getKey(),
+            'reference1' => $this->getOrder()->number,
             'weight' => $this->getPackageWeight(),
             'height' => 30,
             'width' => 30,
