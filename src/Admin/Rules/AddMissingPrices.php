@@ -13,7 +13,7 @@ class AddMissingPrices extends AdminRule
     //On all events
     public function fire(AdminModel $row)
     {
-        if ( $row->order && Store::getOrdersStatus($row->status_id)?->return_stock == true ) {
+        if ( ($order = $row->order) && Store::getOrdersStatus($order->status_id)?->return_stock == true ) {
             return Ajax::error('Nie je možné upravovať produkty v už zrušenej objednávke.');
         }
 

@@ -61,8 +61,8 @@ class Order extends AdminModel
 
     protected $rules = [
         OrderNumber::class,
-        RebuildOrder::class,
         OnOrderStatusChange::class,
+        RebuildOrder::class,
     ];
 
     public function buttons()
