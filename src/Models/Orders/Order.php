@@ -10,6 +10,7 @@ use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderFields;
+use AdminEshop\Eloquent\Concerns\HasOrderLog;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
@@ -37,6 +38,7 @@ class Order extends AdminModel
         HasOrderHashes,
         HasOrderEmails,
         HasOrderNumber,
+        HasOrderLog,
         HasOrderFields;
 
     /*
