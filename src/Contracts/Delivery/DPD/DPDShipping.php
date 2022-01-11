@@ -238,12 +238,16 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
     private function getParcels()
     {
         if ( static::$parcelBuilder ) {
-            return (static::$parcelBuilder)($this->getOrder());
+            return (static::$parcelBuilder)($this->getOrder(), $this);
         }
 
-        // return [
-            // ['reference1' => $order->getKey(), 'weight' => 3, 'height' => 30, 'width' => 30, 'depth' => 40],
-        // ];
+        return [
+            'reference1' => $this->getOrder()->getKey(),
+            'weight' => $this->getPackageWeight(),
+            'height' => 30,
+            'width' => 30,
+            'depth' => 40
+        ];
     }
 
     private function returnShippingResponse($response)
