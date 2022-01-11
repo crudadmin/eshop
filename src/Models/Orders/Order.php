@@ -5,6 +5,7 @@ namespace AdminEshop\Models\Orders;
 use AdminEshop\Admin\Buttons\GenerateInvoice;
 use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
+use AdminEshop\Admin\Rules\OnOrderStatusChange;
 use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
@@ -61,6 +62,7 @@ class Order extends AdminModel
     protected $rules = [
         OrderNumber::class,
         RebuildOrder::class,
+        OnOrderStatusChange::class,
     ];
 
     public function buttons()

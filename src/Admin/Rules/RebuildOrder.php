@@ -27,7 +27,10 @@ class RebuildOrder extends AdminRule
     public function updated(AdminModel $row)
     {
         //If order is canceled, then add products back to stock
-        if ( $row->status == 'canceled' && $row->getOriginal('status') != 'canceled') {
+        if (
+            Store::getOrdersStatus($row->status_id)?->return_stock === true
+            && Store::getOrdersStatus($row->getOriginal('status_id'))?->return_stock !== true
+        ) {
             $row->syncStock('+', 'order.canceled');
         }
 
@@ -55,7 +58,8 @@ class RebuildOrder extends AdminRule
      */
     public function deleted($row)
     {
-        if ( $row->status != 'canceled' ) {
+        //If order has been uncounted from stock yet
+        if ( Store::getOrdersStatus($row->status_id)?->return_stock !== true ) {
             $row->syncStock('+', 'order.deleted');
         }
     }

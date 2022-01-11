@@ -317,7 +317,11 @@ class OrderService
 
     private function addDefaultStatus()
     {
-        $this->getOrder()->status_id = OrdersStatus::where('default', true)->first()?->getKey();
+        $order = $this->getOrder();
+
+        if ( !$order->status_id ) {
+            $order->status_id = OrdersStatus::where('default', true)->first()?->getKey();
+        }
     }
 
     /**
