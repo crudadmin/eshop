@@ -234,7 +234,7 @@ trait OrderTrait
         $color = '';
         $tooltip = '';
 
-        if ( $this->paid_at ){
+        if ( $isPaid = $this->paid_at ){
             $color = 'green';
             $icon = '<i class="fa fa-check"></i>';
             $tooltip = 'Zaplatené '.$this->paid_at->format('d.m.Y H:i:s');
@@ -249,7 +249,7 @@ trait OrderTrait
         return '
         <span style="'.($color ? ('color: '.$color) : '' ).'">
             <span data-toggle="tooltip" title="'.e($tooltip).'">
-                '.$icon.'
+                '.$icon.' <div class="d-none">'.($isPaid ? 1 : 0).'</div>
             </span>
         </span>';
     }

@@ -78,7 +78,7 @@ class OrdersStatus extends AdminModel
 
         $storeId = Store::first()->getKey();
 
-        $i = -1;
+        $i = 1;
 
         $languages = [
             [
