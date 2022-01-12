@@ -11,7 +11,7 @@
 @endif
 
 {{-- Delivery info --}}
-@if ( $order->status->email_delivery && $order->delivery )
+@if ( $order->status->email_delivery && $order->delivery && $order->delivery->description_email_status )
 @component('mail::panel')
 | {{ _('Informácie k doprave') }} |
 | :------------- |

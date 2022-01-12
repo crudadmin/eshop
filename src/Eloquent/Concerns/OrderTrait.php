@@ -199,7 +199,9 @@ trait OrderTrait
 
     protected function getDeliveryStatusColumn()
     {
+        $element = 'span';
         $color = '';
+        $icon = '';
         $tooltip = '';
 
         if ( $this->delivery_status == 'ok' ){
@@ -219,13 +221,19 @@ trait OrderTrait
             $message = $this->getSelectOption('delivery_status');
         }
 
+        if ( $trackingUrl = $this->deliveryTrackingUrl ){
+            $element = 'a';
+            $icon = '<i class="fa fa-binoculars mr-2 d-inline-block"></i>';
+            $href = $trackingUrl;
+        }
+
         if ( $message ) {
             return '
-            <span style="'.($color ? ('color: '.$color) : '' ).'">
+            <'.$element.' href="'.$trackingUrl.'" style="'.($color ? ('color: '.$color) : '' ).'" target="_blank">
                 <span data-toggle="tooltip" title="'.e($tooltip).'">
-                    '.e($message).'
+                    '.$icon.e($message).'
                 </span>
-            </span>';
+            </'.$element.'>';
         }
     }
 
