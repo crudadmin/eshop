@@ -60,7 +60,9 @@ class FromXlsToArray
 
             //Add row
             else {
-                $trimmedRowData = array_slice($rowData, 0, count($header));
+                $trimmedRowData = array_map(function($value){
+                    return trim($value);
+                }, array_slice($rowData, 0, count($header)));
 
                 $rows[] = array_combine(array_keys($header), $trimmedRowData);
             }
