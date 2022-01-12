@@ -254,10 +254,11 @@ trait OrderTrait
             $tooltip = 'Neuhradené';
         }
 
+        // Yes/no is for sheet export
         return '
         <span style="'.($color ? ('color: '.$color) : '' ).'">
             <span data-toggle="tooltip" title="'.e($tooltip).'">
-                '.$icon.' <div class="d-none">'.($isPaid ? 1 : 0).'</div>
+                '.$icon.' <div class="d-none">'.($isPaid ? 'Áno' : 'Nie').'</div>
             </span>
         </span>';
     }
