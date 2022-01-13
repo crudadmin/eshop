@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Attribute;
 
 use Admin;
+use AdminEshop\Admin\Buttons\ShowProductsWithAttribute;
 use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
 use AdminEshop\Models\Attribute\Pivot\AssignedProductsPivot;
@@ -43,6 +44,10 @@ class AttributesItem extends AdminModel
 
     protected $rules = [
         CastAttributeItemValue::class,
+    ];
+
+    protected $buttons = [
+        ShowProductsWithAttribute::class,
     ];
 
     public function settings()
