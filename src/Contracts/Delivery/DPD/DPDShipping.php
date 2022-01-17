@@ -142,7 +142,9 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
             $params = (static::$requestBuilder)($order, $params);
         }
 
-        $response = DPDApi::sendRequest(
+        $response = DPDApi::setOptions([
+            'timeout' => $this->getRequestTimeout()
+        ])->sendRequest(
             DPDApi::getPackageEndpoint(),
             'create',
             $params

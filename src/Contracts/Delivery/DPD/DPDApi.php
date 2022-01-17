@@ -38,7 +38,7 @@ class DPDApi
         $this->password = env('SHIPPMENT_DPD_PASSWORD');
         $this->options = [
             'testMode' => env('SHIPPMENT_DPD_LIVE', false) == true ? false : true,
-            'timeout' => 2
+            'timeout' => 5
         ];
     }
 
@@ -54,6 +54,13 @@ class DPDApi
     public function getPickupEndpoint()
     {
         return 'https://api.dpdportal.sk/parcelshop/json';
+    }
+
+    public function setOptions(array $options = [])
+    {
+        $this->options = array_merge($this->options, $options);
+
+        return $this;
     }
 
     /**

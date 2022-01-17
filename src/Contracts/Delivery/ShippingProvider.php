@@ -7,6 +7,7 @@ use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
+use Admin;
 
 class ShippingProvider extends OrderProvider
 {
@@ -86,5 +87,17 @@ class ShippingProvider extends OrderProvider
     public function getButtonOptions(Button $button)
     {
         return [];
+    }
+
+    public function getRequestTimeout()
+    {
+        //We can use higher timeout in admin or console.
+        if ( Admin::isAdmin() || app()->runningInconsole() ){
+            return 45;
+        }
+
+        $options = $this->getOptions();
+
+        return $options['timeout'] ?? 2;
     }
 }
