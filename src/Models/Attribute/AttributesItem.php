@@ -167,4 +167,17 @@ class AttributesItem extends AdminModel
                 }
             });
     }
+
+    public function scopeFilterByProducts($query, $options = [])
+    {
+        $query->whereHas('products', function($query) use ($options) {
+            if ( is_callable($options['scope'] ?? null) ) {
+                $options['scope']($query);
+            }
+
+            if ( $filter = ($options['filter'] ?? null) ) {
+                $query->filterProduct($filter);
+            }
+        });
+    }
 }

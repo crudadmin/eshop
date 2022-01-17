@@ -62,16 +62,6 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     // protected $sortable = false;
 
-    /*
-     * Extensions for main product
-     */
-    public $mainProductAttributes = true;
-
-    /*
-     * Extension for variants
-     */
-    public $variantsAttributes = true;
-
     /**
      * Model constructor
      *

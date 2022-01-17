@@ -58,7 +58,7 @@ trait HasCasts
         if ( $this->hasSluggable($model) ){
             $slug = $row[$model->getProperty('sluggable')] ?? null;
 
-            if ( !is_null($slug) ) {
+            if ( !is_null($slug) && !empty(trim($slug)) ) {
                 $row['slug'] = $model->makeSlug($slug);
             }
         }

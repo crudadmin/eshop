@@ -101,7 +101,12 @@ class Attribute extends AdminModel
     {
         $query->with([
             'items' => function($query) use ($productsQuery) {
-                $this->itemsProductsScope($query, $productsQuery);
+                $query
+                    ->select(
+                        Admin::getModel('AttributesItem')->getAttributesItemsColumns()
+                    )->filterByProducts([
+                        'scope' => $productsQuery,
+                    ]);
             }
         ]);
     }
@@ -112,70 +117,12 @@ class Attribute extends AdminModel
             'items' => function($query) use ($productsQuery, $filter){
                 $query->select(
                     Admin::getModel('AttributesItem')->getAttributesItemsColumns()
-                )->where(function($query) use ($productsQuery, $filter) {
-                    $this->itemsProductsScope($query, $productsQuery, $filter);
-                });
+                )->filterByProducts([
+                    'scope' => $productsQuery,
+                    'filter' => $filter,
+                ]);
             }
         ]);
-    }
-
-    private function itemsProductsScope($query, $productsQuery, $filter = [])
-    {
-        $query->select(Admin::getModel('AttributesItem')->getAttributesItemsColumns());
-
-        if ( !$productsQuery ){
-            return;
-        }
-
-        $query->where(function($query) use ($productsQuery, $filter) {
-            $model = Admin::getModel('Product');
-
-            //Get attribute items from all products
-            if ( $model->mainProductAttributes ) {
-                $query->whereHas('products', function($query) use ($productsQuery, $filter) {
-                    $productsQuery($query);
-
-                    $this->filterByParameters($query, $filter);
-                });
-            }
-
-            //Get attribute items also from all variants
-            if ( $model->variantsAttributes ) {
-                $query->orWhereHas('products', function($query) use ($productsQuery, $filter) {
-                    //TODO: updated version for finding by category
-                    // $query
-                    //     ->variantProducts()
-                    //     ->join('category_product_categories', 'category_product_categories.product_id', '=', 'products.product_id')
-                    //     ->whereIn('category_product_categories.category_id', [171]);
-
-                    $this->filterByParameters($query, $filter);
-
-                    $query->variantProducts()
-                          ->whereHas('product', $productsQuery);
-                });
-            }
-        });
-    }
-
-    //TODO test this method, and complete merge from crudeshop v2
-    private function filterByParameters($query, $filter)
-    {
-        $filter = $query->getModel()->getFilterFromParams($filter);
-
-        if ( count($filter) == 0 ){
-            return;
-        }
-
-        foreach ($filter as $attributeId => $attrIds) {
-            //Filter except actual attribute
-            if ( $this->getKey() == $attributeId ){
-                continue;
-            }
-
-            $query->whereHas('attributesItems', function($query) use ($attributeId, $attrIds) {
-                $query->whereIn('attributes_item_product_attributes_items.attributes_item_id', $attrIds);
-            });
-        }
     }
 
     /**
