@@ -18,6 +18,7 @@ use AdminEshop\Eloquent\Concerns\HasProductPaginator;
 use AdminEshop\Eloquent\Concerns\HasProductResponses;
 use AdminEshop\Eloquent\Concerns\HasProductSorter;
 use AdminEshop\Eloquent\Concerns\HasStock;
+use AdminEshop\Eloquent\Concerns\HasVariantColors;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Models\Attribute\Attribute;
 use AdminEshop\Models\Attribute\AttributesItem;
@@ -36,6 +37,7 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasProductResponses,
         HasCategoryTree,
         HasHeureka,
+        HasVariantColors,
         HasProductFields;
 
     /*

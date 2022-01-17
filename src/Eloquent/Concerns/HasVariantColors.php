@@ -22,9 +22,7 @@ trait HasVariantColors
         }
 
         return $colorAttributes->map(function($item){
-            if ( $item = Store::getAttributeItem($item->attributes_item_id) ) {
-                return clone $item;
-            }
+            return $item;
         })->filter()->values()->each->setVisible(['id', 'name', 'color']);
     }
 
