@@ -16,6 +16,7 @@ use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Events\OrderCreated;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
+use AdminEshop\Models\Orders\OrdersStatus;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
@@ -287,6 +288,7 @@ class OrderService
         return $this;
     }
 
+
     /**
      * Add prices into order
      *
@@ -305,6 +307,7 @@ class OrderService
         }
 
         $this->addClientIntoOrder();
+        $this->addDefaultStatus();
 
         return $this;
     }
@@ -313,6 +316,15 @@ class OrderService
     {
         if ( Admin::isFrontend() && client() && !$this->getOrder()->client_id ) {
             $this->getOrder()->client_id = client()->getKey();
+        }
+    }
+
+    private function addDefaultStatus()
+    {
+        $order = $this->getOrder();
+
+        if ( !$order->status_id ) {
+            $order->status_id = OrdersStatus::where('default', true)->first()?->getKey();
         }
     }
 

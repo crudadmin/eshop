@@ -9,7 +9,10 @@ class OrderController extends Controller
     public function index()
     {
         $orders = client()->orders()
-                        ->with('invoices:id,order_id,pdf')
+                        ->with([
+                            'invoices:id,order_id,pdf',
+                            'status',
+                        ])
                         ->withClientListingResponse()
                         ->paginate(request('limit', 10));
 

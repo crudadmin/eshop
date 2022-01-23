@@ -5,6 +5,7 @@ namespace AdminEshop\Models\Orders;
 use AdminEshop\Admin\Buttons\GenerateInvoice;
 use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
+use AdminEshop\Admin\Rules\OnOrderStatusChange;
 use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
@@ -62,6 +63,7 @@ class Order extends AdminModel
 
     protected $rules = [
         OrderNumber::class,
+        OnOrderStatusChange::class,
         RebuildOrder::class,
     ];
 
@@ -116,11 +118,16 @@ class Order extends AdminModel
             'columns.delivery_address' => [
                 'name' => 'Dodacia adresa',
                 'after' => 'client_name',
+                'encode' => false,
             ],
-            'columns.delivery_status_text' => [
+            'columns.status_id' => [
+                'after' => 'is_paid',
+                'encode' => false,
+            ],
+            'columns.delivery_status' => [
                 'encode' => false,
                 'name' => 'Status dopravy',
-                'after' => 'status',
+                'before' => 'delivery_id',
             ],
             'columns.is_paid' => [
                 'encode' => false,
@@ -141,13 +148,6 @@ class Order extends AdminModel
 
         $options = [
             'country_id' => $countries,
-            'status' => [
-                'new' => 'Prijatá',
-                'waiting' => 'Čaká za spracovaním',
-                'shipped' => 'Doručuje sa',
-                'ok' => 'Vybavená',
-                'canceled' => 'Zrušená',
-            ],
             'delivery_status' => [
                 'new' => 'Čaká za objednanim dopravy',
                 'ok' => 'Prijatá',
@@ -183,18 +183,14 @@ class Order extends AdminModel
 
     public function setAdminRowsAttributes($attributes)
     {
+        $attributes['$indicator'] = $this->getOrderIndicator();
         $attributes['number'] = $this->number;
-
         $attributes['client_name'] = $this->getClientName();
-
         $attributes['delivery_address'] = $this->getDeliveryAddress();
-
         $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
-
-        $attributes['delivery_status_text'] = $this->getDeliveryStatusText();
-
-        $attributes['is_paid'] = $this->getIsPaidStatusText();
-
+        $attributes['status_id'] = $this->getStatusColumn();
+        $attributes['delivery_status'] = $this->getDeliveryStatusColumn();
+        $attributes['is_paid'] = $this->getIsPaidStatusColumn();
         $attributes['items_list'] = $this->items->count();
 
         return $attributes;
@@ -229,7 +225,7 @@ class Order extends AdminModel
 
     public function getStatusTextAttribute()
     {
-        return $this->getOptionValue('status', $this->status);
+        return $this->status?->name;
     }
 
     /**
@@ -244,7 +240,8 @@ class Order extends AdminModel
         };
 
         $query->with(array_filter([
-            $this->getField('discount_codes') ? 'discount_codes' : null,
+            $this->getField('status_id') ? 'status' : null,
+            $this->getField('discount_code_id') ? 'discount_code' : null,
             $this->getField('delivery_id') ? 'delivery' : null,
             $this->getField('delivery_location_id') ? 'delivery_location' : null,
             $this->getField('payment_method_id') ? 'payment_method' : null,

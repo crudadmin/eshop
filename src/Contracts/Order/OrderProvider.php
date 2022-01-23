@@ -41,7 +41,7 @@ class OrderProvider
 
     public function getOptions()
     {
-        return $this->options;
+        return $this->options ?: [];
     }
 
     public function setOptions($options)

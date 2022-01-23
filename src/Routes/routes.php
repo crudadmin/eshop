@@ -20,6 +20,10 @@ if ( config('admineshop.routes.enabled.cart_payments') === true ) {
     Store::routesForPayments();
 }
 
+if ( config('admineshop.heureka.enabled') === true ) {
+    Store::routesForHeureka();
+}
+
 Route::group([ 'namespace' => '\AdminEshop\Controllers', 'middleware' => ['web', 'admin'] ], function(){
     Route::get('/admin/orders/{id}/items', 'AdminController@getOrderItems');
 });

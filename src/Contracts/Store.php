@@ -62,6 +62,16 @@ class Store
     }
 
     /*
+     * Return order statuses
+     */
+    public function getOrdersStatuses()
+    {
+        return $this->cache('orders.statuses', function(){
+            return Admin::getModel('OrdersStatus')->get();
+        });
+    }
+
+    /*
      * Returns default vat value
      */
     public function getDefaultVat()
@@ -96,6 +106,13 @@ class Store
     {
         return $this->cache('unit.'.$unitId, function() use ($unitId) {
             return $this->getUnits()->where('id', $unitId)->first();
+        });
+    }
+
+    public function getOrdersStatus($statusId)
+    {
+        return $this->cache('unit.'.$statusId, function() use ($statusId) {
+            return $this->getOrdersStatuses()->where('id', $statusId)->first();
         });
     }
 

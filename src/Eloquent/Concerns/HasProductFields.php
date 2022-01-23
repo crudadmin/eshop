@@ -71,9 +71,13 @@ trait HasProductFields
 
     public function getOtherSettingsFields()
     {
-        return Group::tab([
-            'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
-            'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
-        ])->id('otherSettings')->icon('fa-gear')->name('Ostatné nastavenia');
+        return Group::tab(array_merge(
+            [
+                'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
+                'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
+            ],
+            config('admineshop.heureka.enabled')
+                ? ['heureka_name' => 'name:Názov pre heureku|hidden'] : [],
+        ))->id('otherSettings')->icon('fa-gear')->name('Ostatné nastavenia');
     }
 }

@@ -7,10 +7,12 @@ use AdminEshop\Contracts\Collections\OrderItemsCollection;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\OrdersItem;
+use AdminEshop\Models\Orders\OrdersStatus;
 use AdminEshop\Models\Store\PaymentsMethod;
 use Ajax;
 use Cart;
 use Discounts;
+use Illuminate\Support\Facades\DB;
 use OrderService;
 use Store;
 
@@ -175,17 +177,31 @@ trait OrderTrait
     {
         $prefix = $this->delivery_different ? 'delivery_' : '';
 
-        return implode(', ', array_filter([
-            $this->{$prefix.'street'},
-            $this->{$prefix.'city'},
-            $this->{$prefix.'zipcode'},
-            $this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null,
+        $address = implode(', ', array_filter([
+            e($this->{$prefix.'street'}),
+            e($this->{$prefix.'city'}),
+            e($this->{$prefix.'zipcode'}),
+            e($this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null),
         ]));
+
+        return '<a href="https://maps.google.com/?q='.urlencode($address).'" target="_blank" data-toggle="tooltip" title="'.$address.'">'.str_limit($address, 20).'</a>';
     }
 
-    protected function getDeliveryStatusText()
+    protected function getStatusColumn()
     {
+        $color = $this->status?->color;
+
+        return '
+        <span style="'.($color ? ('color: '.$color) : '' ).'">
+            '.e($this->status?->name).'
+        </span>';
+    }
+
+    protected function getDeliveryStatusColumn()
+    {
+        $element = 'span';
         $color = '';
+        $icon = '';
         $tooltip = '';
 
         if ( $this->delivery_status == 'ok' ){
@@ -205,22 +221,28 @@ trait OrderTrait
             $message = $this->getSelectOption('delivery_status');
         }
 
+        if ( $trackingUrl = $this->deliveryTrackingUrl ){
+            $element = 'a';
+            $icon = '<i class="fa fa-binoculars mr-2 d-inline-block"></i>';
+            $href = $trackingUrl;
+        }
+
         if ( $message ) {
             return '
-            <span style="'.($color ? ('color: '.$color) : '' ).'">
+            <'.$element.' href="'.$trackingUrl.'" style="'.($color ? ('color: '.$color) : '' ).'" target="_blank">
                 <span data-toggle="tooltip" title="'.e($tooltip).'">
-                    '.e($message).'
+                    '.$icon.e($message).'
                 </span>
-            </span>';
+            </'.$element.'>';
         }
     }
 
-    protected function getIsPaidStatusText()
+    protected function getIsPaidStatusColumn()
     {
         $color = '';
         $tooltip = '';
 
-        if ( $this->paid_at ){
+        if ( $isPaid = $this->paid_at ){
             $color = 'green';
             $icon = '<i class="fa fa-check"></i>';
             $tooltip = 'Zaplatené '.$this->paid_at->format('d.m.Y H:i:s');
@@ -232,10 +254,11 @@ trait OrderTrait
             $tooltip = 'Neuhradené';
         }
 
+        // Yes/no is for sheet export
         return '
         <span style="'.($color ? ('color: '.$color) : '' ).'">
             <span data-toggle="tooltip" title="'.e($tooltip).'">
-                '.$icon.'
+                '.$icon.' <div class="d-none">'.($isPaid ? 'Áno' : 'Nie').'</div>
             </span>
         </span>';
     }
@@ -311,6 +334,38 @@ trait OrderTrait
         })->filter(function($item){
             return $item;
         })->toArray();
+    }
+
+    public function getOrderIndicator()
+    {
+        $color = $this->status?->color;
+        $status = '';
+
+        if ( $this->created_at == $this->updated_at ){
+            $color = '#e3342f';
+
+            $status = 'Neupravená objednávka';
+        }
+
+        return [
+            'color' => $color,
+            'title' => $status,
+        ];
+    }
+
+    public function onRequiredStatusIdRelation($table, $schema, $builder)
+    {
+        if ( $schema->hasColumn($this->getTable(), 'status') == false ){
+            return;
+        }
+
+        $statuses = OrdersStatus::whereNotNull('key')->get();
+
+        foreach ($statuses as $status) {
+            DB::table('orders')->whereIn('status', explode(',', $status->key))->update([
+                'status_id' => $status->getKey(),
+            ]);
+        }
     }
 }
 

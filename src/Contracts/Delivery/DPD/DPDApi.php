@@ -37,8 +37,8 @@ class DPDApi
         $this->email = env('SHIPPMENT_DPD_EMAIL');
         $this->password = env('SHIPPMENT_DPD_PASSWORD');
         $this->options = [
-            'testMode' => env('SHIPPMENT_DPD_DEBUG', true) ? true : false,
-            'timeout' => 2
+            'testMode' => env('SHIPPMENT_DPD_LIVE', false) == true ? false : true,
+            'timeout' => 5
         ];
     }
 
@@ -54,6 +54,13 @@ class DPDApi
     public function getPickupEndpoint()
     {
         return 'https://api.dpdportal.sk/parcelshop/json';
+    }
+
+    public function setOptions(array $options = [])
+    {
+        $this->options = array_merge($this->options, $options);
+
+        return $this;
     }
 
     /**
