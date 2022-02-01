@@ -226,15 +226,4 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
         return $array;
     }
-
-    public function invoiceItemName()
-    {
-        $name = e($this->getProductNamePartsSections(0));
-
-        if ( $additional = $this->getProductNamePartsSections(1) ) {
-            $name .= ' - '.e($additional);
-        }
-
-        return $name;
-    }
 }
