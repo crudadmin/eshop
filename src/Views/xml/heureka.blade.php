@@ -9,8 +9,13 @@
     <URL>{{ $product['heureka_url'] }}</URL>
     <IMGURL>{{ $product['heureka_thumbnail'] }}</IMGURL>
     {{-- <IMGURL_ALTERNATIVE>http://obchod.sk/mobily/nokia-5800-xpressmusic/obrazok2.jpg</IMGURL_ALTERNATIVE> --}}
-    {{-- <VIDEO_URL>http://www.youtube.com/watch?v=KjR759oWF7w</VIDEO_URL> --}}
     <PRICE_VAT>{{ $product['priceWithVat'] }}</PRICE_VAT>
+    @if ( isset($product['video_url']) )
+    <VIDEO_URL>{{ $product['video_url'] }}</VIDEO_URL>
+    @endif
+    @if ( isset($product['vat']) )
+    <VAT>{{ $product['vat'] }}%</VAT>
+    @endif
     {{-- <HEUREKA_CPC>0,24</HEUREKA_CPC> --}}
     @if ( $product['manufacturer'] ?? null )
     <MANUFACTURER>{{ $product['manufacturer'] }}</MANUFACTURER>

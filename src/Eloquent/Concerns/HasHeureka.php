@@ -36,6 +36,7 @@ trait HasHeureka
             'id' => $this->heurekaItemId,
             'name' => $this->getHeurekaName($parentProduct),
         ] + $array + [
+            'vat' => Store::getVatValueById($this->vat_id),
             'manufacturer' => $this->getHeurekaManufacturer($parentProduct),
             'delivery_date' => $this->getHeurekaStock($parentProduct),
             'heureka_item_id' => $parentProduct ? $parentProduct->getKey() : $this->getKey(),
