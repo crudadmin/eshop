@@ -29,11 +29,10 @@ class OrderController extends Controller
     {
         $order = client()->orders()
                         ->orderDetail()
-                        ->findOrFail($id)
-                        ->setClientListingResponse();
+                        ->findOrFail($id);
 
         return api([
-            'order' => $order,
+            'order' => $order->setClientListingResponse(),
             'items' => $order->items->map(function($item){
                 return $item->setClientListingResponse();
             }),

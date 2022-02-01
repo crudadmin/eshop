@@ -280,6 +280,7 @@ return [
     ],
 
     'order' => [
+        'status' => true,
         'codes' => [
             'email-client-error' => _('Neúspešne odoslaný email zázkazníkovy'),
             'email-store-error' => _('Neúspešne odoslaný email obchodu'),

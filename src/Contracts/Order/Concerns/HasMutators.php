@@ -55,6 +55,13 @@ trait HasMutators
         }, $mutators);
     }
 
+    public function hasMutator($mutator)
+    {
+        return count(array_filter($this->getMutators(), function($class) use ($mutator) {
+            return $class instanceof $mutator;
+        })) > 0;
+    }
+
     /**
      * Returns active mutators for given order
      *

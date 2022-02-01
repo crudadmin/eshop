@@ -37,7 +37,7 @@ class Payment extends AdminModel
                 'price' => 'name:Cena|type:decimal|required',
                 'order' => 'name:Objednavka|belongsTo:orders,name|required',
                 'uniqid' => 'name:uniqid|max:30|required',
-                'payment_id' => 'name:Payment id',
+                'payment_id' => 'name:Payment id|index',
                 'status' => 'name:Status|max:10|default:waiting|index|required',
             ],
             config('admineshop.payment_methods.enabled', true)

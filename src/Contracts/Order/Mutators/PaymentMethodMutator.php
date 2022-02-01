@@ -3,12 +3,14 @@
 namespace AdminEshop\Contracts\Order\Mutators;
 
 use Admin;
+use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\PaymentMethodValidator;
 use AdminEshop\Events\PaymentSelected;
 use AdminEshop\Models\Orders\Order;
 use Cart;
 use Store;
+use OrderService;
 
 class PaymentMethodMutator extends Mutator
 {
@@ -140,7 +142,7 @@ class PaymentMethodMutator extends Mutator
         //We need to save also delivery key into cacheKey,
         //because if delivery would change, paymentMethod can dissapear
         //if is not assigned into selected delivery
-        $delivery = $this->getDeliveryMutator()->getSelectedDelivery();
+        $delivery = $this->getSelectedDelivery();
 
         return $this->cache('selectedPaymentMethod'.$id.'-'.($delivery ? $delivery->getKey() : 0), function() use ($id) {
             if ( $paymentMethod = $this->getPaymentMethodsByDelivery()->where('id', $id)->first() ) {
@@ -158,7 +160,7 @@ class PaymentMethodMutator extends Mutator
      */
     public function getPaymentMethodsByDelivery()
     {
-        $delivery = $this->getDeliveryMutator()->getSelectedDelivery();
+        $delivery = $this->getSelectedDelivery();
 
         //If delivery is selected and payments rules are enabled, we can receive filter
         $allowedPaymentMethods = $delivery && config('admineshop.delivery.payments') == true
@@ -206,6 +208,15 @@ class PaymentMethodMutator extends Mutator
         event(new PaymentSelected($this->getSelectedPaymentMethod()));
 
         return $this;
+    }
+
+    private function getSelectedDelivery()
+    {
+        if ( OrderService::hasMutator(DeliveryMutator::class) === false ){
+            return;
+        }
+
+        return $this->getDeliveryMutator()->getSelectedDelivery();
     }
 }
 

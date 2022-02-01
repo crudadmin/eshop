@@ -121,6 +121,7 @@ class Order extends AdminModel
                 'encode' => false,
             ],
             'columns.status_id' => [
+                'hidden' => !config('admineshop.order.status', true),
                 'after' => 'is_paid',
                 'encode' => false,
             ],

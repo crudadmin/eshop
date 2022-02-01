@@ -45,6 +45,11 @@ class OrdersStatus extends AdminModel
         SetDefaultOrderStatus::class,
     ];
 
+    public function active()
+    {
+        return config('admineshop.order.status', true);
+    }
+
     /*
      * Automatic form and database generation
      * @name - field name

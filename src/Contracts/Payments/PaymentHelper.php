@@ -40,11 +40,11 @@ class PaymentHelper extends OrderProvider
      *
      * @param  string|int  $paymentId
      */
-    public function setPaymentId($paymentId)
+    public function setPaymentId($paymentId, $data = [])
     {
-        $this->getPayment()->update([
+        $this->getPayment()->update(array_merge([
             'payment_id' => $paymentId,
-        ]);
+        ], $data));
     }
 
     /**

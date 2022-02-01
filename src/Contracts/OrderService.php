@@ -321,6 +321,10 @@ class OrderService
 
     private function addDefaultStatus()
     {
+        if ( config('admineshop.order.status') === false ){
+            return;
+        }
+
         $order = $this->getOrder();
 
         if ( !$order->status_id ) {
