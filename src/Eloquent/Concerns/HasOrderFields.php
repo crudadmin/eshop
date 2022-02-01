@@ -97,7 +97,7 @@ trait HasOrderFields
                 'internal_note' => 'name:Interná poznámka|type:text|hidden',
             ])->inline(),
             Group::fields([
-                'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|defaultByOption:default,1|title:Pri zmene stavu sa môže odosielať email zákazníkovy|required',
+                'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|defaultByOption:default,1|title:Pri zmene stavu sa môže odosielať email zákazníkovy|sub_component:IgnoreStatusEmail|required',
                 Group::inline([
                     'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
                     'delivery_identifier' => 'name:Identifikačné číslo balíka|hidden',

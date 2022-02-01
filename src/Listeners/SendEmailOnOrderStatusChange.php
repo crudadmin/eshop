@@ -22,6 +22,11 @@ class SendEmailOnOrderStatusChange
         $order = $event->order;
         $status = $event->status;
 
+        //Skip status email
+        if ( request()->has('$ignore_status_email') ){
+            return;
+        }
+
         if ( $status->email_send === true ){
             try {
                 Mail::to($order->email)->send(new OrderStatus($order));
