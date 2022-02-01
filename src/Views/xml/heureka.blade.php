@@ -28,13 +28,13 @@
     @if ( is_null($product['delivery_date'] ?? null) === false )
     <DELIVERY_DATE>{{ $product['delivery_date'] }}</DELIVERY_DATE>
     @endif
-    {{-- @foreach( $deliveries as $delivery )
+    @foreach( $deliveries as $delivery )
     <DELIVERY>
       <DELIVERY_ID>{{ $delivery->name }}</DELIVERY_ID>
       <DELIVERY_PRICE>{{ $delivery->priceWithVat }}</DELIVERY_PRICE>
-      <DELIVERY_PRICE_COD>{{ $delivery->priceWithVat }}</DELIVERY_PRICE_COD>
+      {{-- <DELIVERY_PRICE_COD>{{ $delivery->priceWithVat }}</DELIVERY_PRICE_COD> --}}
     </DELIVERY>
-    @endforeach --}}
+    @endforeach
     <ITEMGROUP_ID>{{ $product['heureka_item_id'] ?? '' }}</ITEMGROUP_ID>
     @foreach($product['attributes'] ?? [] as $attribute)
     <param>

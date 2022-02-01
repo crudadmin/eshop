@@ -16,7 +16,7 @@ class HeurekaController extends Controller
         $callback = function(){
             $builder = new HeurekaBuilder;
 
-            $deliveries = Admin::getModel('Delivery')->get();
+            $deliveries = Admin::getModel('Delivery')->whereNotNull('heureka_id')->get();
 
             return view('admineshop::xml.heureka', compact('builder', 'deliveries'))->render();
         };
