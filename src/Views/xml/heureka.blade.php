@@ -35,7 +35,7 @@
     @endif
     @foreach( $deliveries as $delivery )
     <DELIVERY>
-      <DELIVERY_ID>{{ $delivery->name }}</DELIVERY_ID>
+      <DELIVERY_ID>{{ $delivery->heureka_id }}</DELIVERY_ID>
       <DELIVERY_PRICE>{{ $delivery->priceWithVat }}</DELIVERY_PRICE>
       {{-- <DELIVERY_PRICE_COD>{{ $delivery->priceWithVat }}</DELIVERY_PRICE_COD> --}}
     </DELIVERY>
