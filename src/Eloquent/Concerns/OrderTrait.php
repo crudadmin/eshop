@@ -189,6 +189,10 @@ trait OrderTrait
 
     protected function getStatusColumn()
     {
+        if ( !$this->getField('status_id') ){
+            return;
+        }
+
         $color = $this->status?->color;
 
         return '
@@ -338,6 +342,10 @@ trait OrderTrait
 
     public function getOrderIndicator()
     {
+        if ( !$this->getField('status_id') ){
+            return;
+        }
+
         $color = $this->status?->color;
         $status = '';
 
