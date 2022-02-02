@@ -161,6 +161,6 @@ trait HasOrderFields
                 Discounts::isRegistredDiscount(DiscountCode::class)
                     ? ['discount_codes' => 'name:Zľavové kódy|belongsToMany:discounts_codes,code|hidden|canAdd'] : []
             ))->id('discounts')->inline(),
-        ])->inline()->id('orderPrices');
+        ])->id('orderPrices');
     }
 }

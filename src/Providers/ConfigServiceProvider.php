@@ -37,7 +37,7 @@ class ConfigServiceProvider extends ServiceProvider
         $this->mergeConfigs(
             'admin',
             __DIR__.'/../Config/admin.php',
-            ['groups', 'models', 'components', 'author', 'passwords', 'gettext_source_paths']
+            ['groups', 'models', 'components', 'author', 'passwords', 'gettext_source_paths', 'styles']
         );
 
         //Merge admineshop configs

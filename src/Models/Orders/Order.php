@@ -98,7 +98,7 @@ class Order extends AdminModel
 
     public function settings()
     {
-        return [
+        $settings = [
             'autoreset' => false,
             'increments' => false,
             'title.insert' => 'Nová objednávka',
@@ -120,11 +120,6 @@ class Order extends AdminModel
                 'after' => 'client_name',
                 'encode' => false,
             ],
-            'columns.status_id' => [
-                'hidden' => !config('admineshop.order.status', true),
-                'after' => 'is_paid',
-                'encode' => false,
-            ],
             'columns.delivery_status' => [
                 'encode' => false,
                 'name' => 'Status dopravy',
@@ -141,6 +136,15 @@ class Order extends AdminModel
                 'before' => 'price_vat',
             ],
         ];
+
+        if ( config('admineshop.order.status', true) ){
+            $settings['columns.status_id'] = [
+                'after' => 'is_paid',
+                'encode' => false,
+            ];
+        }
+
+        return $settings;
     }
 
     public function options()

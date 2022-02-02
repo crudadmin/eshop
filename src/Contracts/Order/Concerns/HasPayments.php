@@ -137,7 +137,7 @@ trait HasPayments
             );
 
             //Custom paid callback. We also can overide default redirect
-            if ( method_exists($paymentProvider, 'onPaid')){
+            if ( method_exists($paymentProvider, 'onPaid') ){
                 $redirect = $paymentProvider->onPaid($payment);
             }
 
