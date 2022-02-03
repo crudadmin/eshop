@@ -18,8 +18,9 @@ trait HasProductResponses
 
     static $filterOptions = [
         'filter' => [],
-        'scope' => null,
-        'scope.variants' => null,
+        'scope' => null, //only parent product
+        'scope.variants' => null, //only variants
+        'scope.product' => null, //only regular product or variant
         'listing.attributes' => false,
         'listing.price_ranges' => false,
         'listing.variants' => false,

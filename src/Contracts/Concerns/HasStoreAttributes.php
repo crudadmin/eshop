@@ -6,13 +6,11 @@ use Admin;
 
 trait HasStoreAttributes
 {
-    private $attributesScope;
-    private $attributesFilter = [];
+    private $attributesOptions;
 
-    public function setAttributesScope($attributesScope, $attributesFilter = [])
+    public function setAttributesScope($options)
     {
-        $this->attributesScope = $attributesScope;
-        $this->attributesFilter = $attributesFilter;
+        $this->attributesOptions = $options;
 
         return $this;
     }
@@ -24,13 +22,13 @@ trait HasStoreAttributes
 
             return $model
                         ->select($model->getAttributesColumns())
-                        ->when(count($this->attributesFilter) == 0, function($query) {
-                            $query->withItemsForProducts($this->attributesScope);
+                        ->when($this->attributesOptions, function($query) {
+                            $query->withItemsForProducts($this->attributesOptions);
                         })
                         ->get()
                         ->each(function($attribute){
                             if ( $attribute->relationLoaded('items') == false ){
-                                $attribute->loadItemsForProducts($this->attributesScope, $this->attributesFilter);
+                                $attribute->loadItemsForProducts($this->attributesOptions);
                             }
 
                             //Skip reordeing, already ordered from database

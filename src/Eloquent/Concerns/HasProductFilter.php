@@ -32,14 +32,18 @@ trait HasProductFilter
         });
     }
 
-    public function scopeFilterAttributeItems($query, int $attributeId, array $itemIds)
+    public function scopeFilterAttributeItems($query, array $itemIds, $attributesItemsScope = null)
     {
-        $query->whereHas('attributesItems', function($query) use ($attributeId, $itemIds) {
+        $query->whereHas('attributesItems', function($query) use ($itemIds, $attributesItemsScope) {
             $query->whereIn('attributes_item_product_attributes_items.attributes_item_id', $itemIds);
+
+            if ( is_callable($attributesItemsScope) ){
+                $attributesItemsScope($query);
+            }
         });
     }
 
-    private function getFilterFromQuery($params)
+    public function getFilterFromQuery($params)
     {
         $params = is_array($params) ? $params : [];
 
@@ -174,13 +178,20 @@ trait HasProductFilter
     {
         $query->withoutGlobalScope('order');
 
-        $filter = $this->getFilterFromQuery($params);
-
-        foreach ($filter as $attributeId => $itemIds) {
-            $query->filterAttributeItems($attributeId, $itemIds);
+        if ( $scope = $this->getFilterOption('scope.product') ){
+            $scope($query);
         }
 
-        $query->applyPriceRangeFilter($params);
+        if (
+            $this->getFilterOption('$ignore.filter.attributes', false) == false
+            && count($attrIds = array_flatten($this->getFilterFromQuery($params)))
+        ) {
+            $query->filterAttributeItems($attrIds);
+        }
+
+        if ( $this->getFilterOption('$ignore.filter.prices', false) == false ) {
+            $query->applyPriceRangeFilter($params);
+        }
     }
 
     public function scopeFilterParentProduct($query, $filter = null)

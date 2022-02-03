@@ -7,6 +7,7 @@ use AdminEshop\Admin\Buttons\ShowProductsWithAttribute;
 use AdminEshop\Admin\Rules\CastAttributeItemValue;
 use AdminEshop\Contracts\Concerns\HasUnit;
 use AdminEshop\Models\Attribute\Pivot\AssignedProductsPivot;
+use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
@@ -168,15 +169,36 @@ class AttributesItem extends AdminModel
             });
     }
 
+    public function scopeWithListingItems($query, $options = [])
+    {
+        $query
+            ->select($this->getAttributesItemsColumns())
+            ->filterByProducts($options);
+    }
+
     public function scopeFilterByProducts($query, $options = [])
     {
         $query->whereHas('products', function($query) use ($options) {
-            if ( is_callable($options['scope'] ?? null) ) {
-                $options['scope']($query);
-            }
+            $query->setFilterOptions(($options ?: []) + [
+                '$ignore.filter.attributes' => true,
+            ]);
 
-            if ( $filter = ($options['filter'] ?? null) ) {
-                $query->filterProduct($filter);
+            $query->applyQueryFilter();
+        });
+
+        $query->where(function($query) use ($options) {
+            $filter = (new Product)->getFilterFromQuery($options['filter'] ?? []);
+
+            foreach ($filter as $attributeId => $itemIds) {
+                $query->where(function($query) use ($filter, $attributeId) {
+                    $query
+                        ->where('attribute_id', $attributeId)
+                        ->orWhereHas('products', function($query) use ($filter, $attributeId) {
+                            $query->filterAttributeItems(
+                                array_flatten($filter)
+                            );
+                        });
+                });
             }
         });
     }
