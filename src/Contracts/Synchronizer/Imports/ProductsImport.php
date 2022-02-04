@@ -282,9 +282,10 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                         'product_id' => $this->getExistingRows('products')[$row[$this->{$relationIdentifier}()]],
                         'attributes_item_id' => $this->getExistingRows('attributes_items')[$identifier],
                     ];
+
+                    $productsAttribute[] = $item;
                 }
 
-                $productsAttribute[] = $item;
             }
 
             if ( isset($row['$variants']) && count($row['$variants']) ){

@@ -138,20 +138,22 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
             }
 
             //If attribute is empty
-            if ( !($item[$sheetColumnName] ?? null) ){
+            if ( !($value = $item[$sheetColumnName] ?? null) ){
                 continue;
             }
 
-            $attributes[] = [
+            $attribute = [
                 'code' => $column['attribute'],
                 'name' => $this->importer->array['header'][$sheetColumnName],
-                '$items' => [
-                    [
-                        'name' => $item[$sheetColumnName],
-                        'code' => $column['attribute'].'_'.crc32($item[$sheetColumnName]),
-                    ]
-                ],
+                '$items' => array_map(function($value) use ($column) {
+                    return [
+                        'name' => $value,
+                        'code' => $column['attribute'].'_'.crc32($value),
+                    ];
+                }, explode(';', $value)),
             ];
+
+            $attributes[] = $attribute;
         }
 
         return $attributes;
