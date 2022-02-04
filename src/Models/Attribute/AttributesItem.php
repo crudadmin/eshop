@@ -191,13 +191,27 @@ class AttributesItem extends AdminModel
             $filter = (new Product)->getFilterFromQuery($options['filter'] ?? []);
 
             foreach ($filter as $attributeId => $itemIds) {
-                $query->where(function($query) use ($filter, $attributeId) {
+                $query->orWhere(function($query) use ($filter, $attributeId) {
                     $query
-                        ->where('attribute_id', $attributeId)
+                        //Select only available values of actually filtering attribute
+                        ->where(function($query) use ($attributeId, $filter) {
+                            unset($filter[$attributeId]);
+
+                            $query
+                                ->where('attribute_id', $attributeId)
+                                ->when($filter, function($query, $filter) {
+                                    $query->whereHas('products', function($query) use ($filter) {
+                                        foreach ($filter as $subAttributeId => $itemIds) {
+                                            $query->filterAttributeItems($itemIds);
+                                        }
+                                    });
+                                });
+                        })
+                        //Select all other attributes by selected filter
                         ->orWhereHas('products', function($query) use ($filter, $attributeId) {
-                            $query->filterAttributeItems(
-                                array_flatten($filter)
-                            );
+                            foreach ($filter as $subAttributeId => $itemIds) {
+                                $query->filterAttributeItems($itemIds);
+                            }
                         });
                 });
             }
