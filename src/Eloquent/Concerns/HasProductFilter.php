@@ -184,9 +184,11 @@ trait HasProductFilter
 
         if (
             $this->getFilterOption('$ignore.filter.attributes', false) == false
-            && count($attrIds = array_flatten($this->getFilterFromQuery($params)))
+            && $filter = $this->getFilterFromQuery($params)
         ) {
-            $query->filterAttributeItems($attrIds);
+            foreach ($filter as $attributeId => $itemIds) {
+                $query->filterAttributeItems($itemIds);
+            }
         }
 
         if ( $this->getFilterOption('$ignore.filter.prices', false) == false ) {
