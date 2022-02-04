@@ -18,14 +18,14 @@ trait HasProductFilter
     public function scopeFilterCategory($query, $category)
     {
         $query->whereHas('categoriesPivot', function($query) use ($category) {
-            if ( is_numeric($category) ) {
-                $query->where('category_product_categories.category_id', $category->getKey());
-            } else if ( is_array($category) ){
-                if ( count($category) == 1 ) {
-                    $query->where('category_product_categories.category_id', $category[0]);
-                } else {
-                    $query->whereIn('category_product_categories.category_id', $category);
-                }
+            $category = is_numeric($category) ? array_wrap($category) : $category;
+
+            if ( is_array($category) ){
+                $isSingle = count($category) == 1;
+
+                $query->{$isSingle ? 'where' : 'whereIn'}(
+                    'category_product_categories.category_id', $isSingle ? $category[0] : $category
+                );
             } else if ( $category instanceof AdminModel ) {
                 $query->where('category_product_categories.category_id', $category->getKey());
             }

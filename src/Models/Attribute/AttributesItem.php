@@ -181,6 +181,7 @@ class AttributesItem extends AdminModel
         $query->whereHas('products', function($query) use ($options) {
             $query->setFilterOptions(($options ?: []) + [
                 '$ignore.filter.attributes' => true,
+                'variants.extract' => true,
             ]);
 
             $query->applyQueryFilter();
