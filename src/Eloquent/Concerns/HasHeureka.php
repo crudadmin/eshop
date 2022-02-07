@@ -110,15 +110,13 @@ trait HasHeureka
 
     public function getHeurekaCategoryList($parentProduct = null, $withOriginalName = false)
     {
-        $categories = ($parentProduct ?: $this)?->categories;
-
-        if ( !$categories ){
+        if ( !($categories = ($parentProduct ?: $this)?->getCategoriesTree()[0] ?? null) ){
             return [];
         }
 
         $categoryFullName = null;
 
-        $categories = $categories->each->setLocalizedResponse()->map(function($row) use ($withOriginalName, $categoryFullName) {
+        $categories = collect($categories)->each->setLocalizedResponse()->map(function($row) use ($withOriginalName, $categoryFullName) {
             if ( $withOriginalName === true ){
                 $name = $row->name;
             } else {
