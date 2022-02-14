@@ -47,7 +47,9 @@ class Store
     public function getUnits()
     {
         return $this->cache('units', function(){
-            return (Admin::getModel('AttributesUnit') ?: new AttributesUnit)->get();
+            $units = (Admin::getModel('AttributesUnit') ?: new AttributesUnit)->get();
+
+            return $units->each->setLocalizedResponse();
         });
     }
 
