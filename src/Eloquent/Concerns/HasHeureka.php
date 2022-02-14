@@ -101,7 +101,7 @@ trait HasHeureka
     {
         if ( $image = $this->thumbnail ) {
             if ( $image instanceof ImageResponse ){
-                return $image->x1;
+                return $image->x2;
             }
 
             return (string)$image;
