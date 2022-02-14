@@ -38,6 +38,7 @@ return [
      */
     'gettext_source_paths' => [
         __DIR__.'/../Models',
+        __DIR__.'/../Controllers',
         __DIR__.'/../Contracts',
         __DIR__.'/../Eloquent',
         __DIR__.'/../Helpers',
