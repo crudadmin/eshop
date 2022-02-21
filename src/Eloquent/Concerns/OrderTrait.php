@@ -5,10 +5,8 @@ namespace AdminEshop\Eloquent\Concerns;
 use Admin;
 use AdminEshop\Contracts\Collections\OrderItemsCollection;
 use AdminEshop\Contracts\Discounts\DiscountCode;
-use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\OrdersItem;
 use AdminEshop\Models\Orders\OrdersStatus;
-use AdminEshop\Models\Store\PaymentsMethod;
 use Ajax;
 use Cart;
 use Discounts;
@@ -136,7 +134,8 @@ trait OrderTrait
     public function getDeliveries()
     {
         return Admin::cache('order.options.deliveries', function(){
-            return Delivery::leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
+            return Admin::getModel('Delivery')
+                            ->leftJoin('vats', 'deliveries.vat_id', '=', 'vats.id')
                             ->select(array_filter([
                                 'deliveries.id',
                                 'deliveries.name',
@@ -151,7 +150,7 @@ trait OrderTrait
     public function getPaymentMethods()
     {
         return Admin::cache('order.options.payment_methods', function(){
-            return PaymentsMethod::leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
+            return Admin::getModel('PaymentsMethod')->leftJoin('vats', 'payments_methods.vat_id', '=', 'vats.id')
                             ->select([
                                 'payments_methods.id',
                                 'payments_methods.name',

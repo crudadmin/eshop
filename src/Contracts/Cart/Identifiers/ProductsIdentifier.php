@@ -266,7 +266,7 @@ class ProductsIdentifier extends Identifier
         $data = parent::onOrderItemCreate($item);
 
         //rewrite and Assign correct product or variant
-        $data['product_id'] = $item->variant_id ?: $item->product_id;
+        $data['product_id'] = ($item->variant_id ?? null) ?: ($item->product_id ?? null) ?: ($item->id ?? null);
 
         return $data;
     }
