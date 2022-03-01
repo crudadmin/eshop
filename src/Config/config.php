@@ -279,9 +279,8 @@ return [
      */
     'product' => [
         'images' => [
-                'thumbnail' => [null, 400],
-                'detail' => [680],
-            ],
+            'thumbnail' => [null, 400],
+            'detail' => [680, null],
         ],
     ],
 ];
