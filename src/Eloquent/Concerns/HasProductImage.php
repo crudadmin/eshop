@@ -16,7 +16,7 @@ trait HasProductImage
      */
     public function getThumbnailSize()
     {
-        return [null, 300];
+        return config('admineshop.product.images.thumbnail', [null, 300]);
     }
 
     /**
@@ -26,7 +26,7 @@ trait HasProductImage
      */
     public function getDetailThumbnailSize()
     {
-        return [null, 500];
+        return config('admineshop.product.images.detail', [null, 500]);
     }
 
     public function getImageOrDefaultAttribute()
