@@ -132,8 +132,9 @@ trait HasProductFilter
             $extractor = array_wrap($extractor);
         }
 
-        if ( is_array($extractor) == false ){
-            throw new Exception('Extractor attribute ids are not defined.');
+        if ( is_array($extractor) == false || count($extractor) == 0 ){
+            // throw new Exception('Extractor attribute ids are not defined.');
+            return;
         }
 
         $attributesList = DB::table('attributes_item_product_attributes_items')
