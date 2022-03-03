@@ -19,6 +19,7 @@ trait HasImporter
     protected $onCreate = [];
     protected $onUpdate = [];
     protected $onDeleteOrHide = [];
+    protected $preparedRows = [];
     protected $existingRows = [];
     protected $unpublishedRowsToPublish = [];
 
@@ -27,6 +28,11 @@ trait HasImporter
     public function getExistingRows($table)
     {
         return $this->existingRows[$table];
+    }
+
+    public function getPreparetdRows($table)
+    {
+        return $this->preparedRows[$table];
     }
 
     private function isMultiKey($fieldKey)
@@ -236,7 +242,7 @@ trait HasImporter
         $totalStart = Admin::start();
         $this->message('************* '.$model->getTable());
 
-        $rows = collect($rows)->keyBy(
+        $this->preparedRows[$model->getTable()] = $rows = collect($rows)->keyBy(
             $this->keyByIdentifier($fieldKey)
         );
 
@@ -342,13 +348,31 @@ trait HasImporter
 
         return DB::table($model->getTable())
             ->selectRaw($model->getKeyName().', '.$selectFieldKeyColumn)
-            ->when(count($relations), function($query) use ($relations) {
-                $query->where(function($query) use ($relations) {
+            ->when(count($relations), function($query) use ($relations, $model) {
+                $query->where(function($query) use ($relations, $model) {
                     $i = 0;
                     foreach ($relations as $column => $table) {
-                        $existingRows = array_values($this->getExistingRows($table));
+                        $existingRows = $this->getExistingRows($table);
+                        $preparedRows = $this->preparedRows[$table] ?: [];
 
-                        $query->{ $i == 0 ? 'whereIn' : 'orWhereIn' }($column, $existingRows);
+                        //If relation is loaded, we can check if some rows has disabled deletion of this actual relation.
+                        if ( count($preparedRows) ) {
+                            foreach ($existingRows as $key => $row) {
+                                //Disable globally relations deletion for given relation row
+                                if ( ($preparedRows[$key]['$relations']['delete'] ?? null) === false ){
+                                    unset($existingRows[$key]);
+                                }
+
+                                //Specific table deletion
+                                //For example we have product gallery, and you can set for products, that gallery won't be removed.
+                                //[ '$relation' => ['products_galleries' => ['delete' => false]] ]
+                                if ( ($preparedRows[$key]['$relations'][$model->getTable()]['delete'] ?? null) === false ){
+                                    unset($existingRows[$key]);
+                                }
+                            }
+                        }
+
+                        $query->{ $i == 0 ? 'whereIn' : 'orWhereIn' }($column, array_values($existingRows));
 
                         $i++;
                     }
