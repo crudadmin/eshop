@@ -343,14 +343,16 @@ trait HasImporter
         return DB::table($model->getTable())
             ->selectRaw($model->getKeyName().', '.$selectFieldKeyColumn)
             ->when(count($relations), function($query) use ($relations) {
-                $i = 0;
-                foreach ($relations as $column => $table) {
-                    $existingRows = array_values($this->getExistingRows($table));
+                $query->where(function($query) use ($relations) {
+                    $i = 0;
+                    foreach ($relations as $column => $table) {
+                        $existingRows = array_values($this->getExistingRows($table));
 
-                    $query->{ $i == 0 ? 'whereIn' : 'orWhereIn' }($column, $existingRows);
+                        $query->{ $i == 0 ? 'whereIn' : 'orWhereIn' }($column, $existingRows);
 
-                    $i++;
-                }
+                        $i++;
+                    }
+                });
             })
             //Only not deleted rows already
             ->when($this->hasSoftDeletes($model), function($query){
