@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Admin\Buttons\SetProductsDiscount;
 use AdminEshop\Contracts\Collections\ProductsCollection;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
@@ -63,6 +64,10 @@ class Product extends CartEloquent implements HasAttributesSupport
     protected $cartSelect = [
         'id', 'product_type', 'slug', 'name', 'image', 'code',
         'stock_quantity', 'stock_type', 'stock_sold',
+    ];
+
+    protected $buttons = [
+        SetProductsDiscount::class,
     ];
 
     /**
