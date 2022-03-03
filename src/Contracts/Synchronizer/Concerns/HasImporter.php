@@ -386,7 +386,7 @@ trait HasImporter
             ->when($this->isPublishable($model), function($query){
                 $query->whereNotNull('published_at');
             })
-            //Select only keys not present in given identifiers list
+            //Select only keys not present in given identifiers list. NULL values are skipped and wont be selected.
             ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $allIdentifiers) {
                 if ( count($allIdentifiers) ) {
                     $query->whereNotIn($fieldKey, $allIdentifiers);
