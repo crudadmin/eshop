@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
-use Admin;
+use AdminEshop\Admin\Buttons\SetProductsDiscount;
 use AdminEshop\Contracts\Collections\ProductsCollection;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
@@ -61,6 +61,10 @@ class Product extends CartEloquent implements HasAttributesSupport
     protected $sluggable = 'name';
 
     // protected $sortable = false;
+
+    protected $buttons = [
+        SetProductsDiscount::class,
+    ];
 
     /**
      * Model constructor

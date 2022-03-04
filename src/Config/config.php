@@ -319,4 +319,14 @@ return [
          */
         'round_without_vat' => false,
     ],
+
+    /*
+     * Product thumbnail sizes
+     */
+    'product' => [
+        'images' => [
+            'thumbnail' => [null, 400],
+            'detail' => [680, null],
+        ],
+    ],
 ];

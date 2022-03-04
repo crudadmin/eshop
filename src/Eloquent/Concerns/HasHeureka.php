@@ -36,6 +36,7 @@ trait HasHeureka
             'id' => $this->heurekaItemId,
             'name' => $this->getHeurekaName($parentProduct),
         ] + $array + [
+            'vat' => Store::getVatValueById($this->vat_id),
             'manufacturer' => $this->getHeurekaManufacturer($parentProduct),
             'delivery_date' => $this->getHeurekaStock($parentProduct),
             'heureka_item_id' => $parentProduct ? $parentProduct->getKey() : $this->getKey(),
@@ -100,7 +101,7 @@ trait HasHeureka
     {
         if ( $image = $this->thumbnail ) {
             if ( $image instanceof ImageResponse ){
-                return $image->x1;
+                return $image->x2;
             }
 
             return (string)$image;
@@ -109,15 +110,13 @@ trait HasHeureka
 
     public function getHeurekaCategoryList($parentProduct = null, $withOriginalName = false)
     {
-        $categories = ($parentProduct ?: $this)?->categories;
-
-        if ( !$categories ){
+        if ( !($categories = ($parentProduct ?: $this)?->getCategoriesTree()[0] ?? null) ){
             return [];
         }
 
         $categoryFullName = null;
 
-        $categories = $categories->each->setLocalizedResponse()->map(function($row) use ($withOriginalName, $categoryFullName) {
+        $categories = collect($categories)->each->setLocalizedResponse()->map(function($row) use ($withOriginalName, $categoryFullName) {
             if ( $withOriginalName === true ){
                 $name = $row->name;
             } else {

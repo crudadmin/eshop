@@ -254,7 +254,6 @@ class CartCollection extends Collection
             }
 
             //Round numbers, and make sure all numbers are positive
-            $sum[$key] = $sum[$key] < 0 ? 0 : $sum[$key];
             $sum[$key] = Store::roundNumber($sum[$key]);
         }
 

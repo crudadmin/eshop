@@ -9,8 +9,13 @@
     <URL>{{ $product['heureka_url'] }}</URL>
     <IMGURL>{{ $product['heureka_thumbnail'] }}</IMGURL>
     {{-- <IMGURL_ALTERNATIVE>http://obchod.sk/mobily/nokia-5800-xpressmusic/obrazok2.jpg</IMGURL_ALTERNATIVE> --}}
-    {{-- <VIDEO_URL>http://www.youtube.com/watch?v=KjR759oWF7w</VIDEO_URL> --}}
     <PRICE_VAT>{{ $product['priceWithVat'] }}</PRICE_VAT>
+    @if ( isset($product['video_url']) )
+    <VIDEO_URL>{{ $product['video_url'] }}</VIDEO_URL>
+    @endif
+    @if ( isset($product['vat']) )
+    <VAT>{{ $product['vat'] }}%</VAT>
+    @endif
     {{-- <HEUREKA_CPC>0,24</HEUREKA_CPC> --}}
     @if ( $product['manufacturer'] ?? null )
     <MANUFACTURER>{{ $product['manufacturer'] }}</MANUFACTURER>
@@ -28,13 +33,13 @@
     @if ( is_null($product['delivery_date'] ?? null) === false )
     <DELIVERY_DATE>{{ $product['delivery_date'] }}</DELIVERY_DATE>
     @endif
-    {{-- @foreach( $deliveries as $delivery )
+    @foreach( $deliveries as $delivery )
     <DELIVERY>
-      <DELIVERY_ID>{{ $delivery->name }}</DELIVERY_ID>
+      <DELIVERY_ID>{{ $delivery->heureka_id }}</DELIVERY_ID>
       <DELIVERY_PRICE>{{ $delivery->priceWithVat }}</DELIVERY_PRICE>
-      <DELIVERY_PRICE_COD>{{ $delivery->priceWithVat }}</DELIVERY_PRICE_COD>
+      {{-- <DELIVERY_PRICE_COD>{{ $delivery->priceWithVat }}</DELIVERY_PRICE_COD> --}}
     </DELIVERY>
-    @endforeach --}}
+    @endforeach
     <ITEMGROUP_ID>{{ $product['heureka_item_id'] ?? '' }}</ITEMGROUP_ID>
     @foreach($product['attributes'] ?? [] as $attribute)
     <param>

@@ -53,4 +53,29 @@ trait HasCategoryTree
 
         return $tree;
     }
+
+    public function getCategoriesTree()
+    {
+        $trees = [];
+
+        foreach ( $this->categories->whereNull('category_id') as $category ) {
+            $treeLevel = array_merge([$category], $this->buildTreeLevels($category));
+
+            $trees[] = $treeLevel;
+        }
+
+        return $trees;
+    }
+
+    private function buildTreeLevels($parentCategory) {
+        $levels = [];
+
+        foreach ($this->categories->where('category_id', $parentCategory->getKey()) as $category) {
+            $levels[] = $category;
+
+            $levels = array_merge($levels, $this->buildTreeLevels($category));
+        }
+
+        return $levels;
+    }
 }

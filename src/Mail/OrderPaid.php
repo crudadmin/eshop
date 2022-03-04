@@ -18,16 +18,18 @@ class OrderPaid extends Mailable
 
     private $order;
     private $invoice;
+    private $message;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Order $order, Invoice $invoice = null)
+    public function __construct(Order $order, Invoice $invoice = null, $message = null)
     {
         $this->order = $order;
         $this->invoice = $invoice;
+        $this->message = $message;
     }
 
     /**
@@ -37,10 +39,14 @@ class OrderPaid extends Mailable
      */
     public function build()
     {
+
         $mail = $this
-                ->subject(_('Potvrdenie platby k objednávke č. '). $this->order->number)
+                //Ability to rewrite subject if is not set
+                ->subject(
+                    $this->subject ?: sprintf(_('Potvrdenie platby k objednávke č. %s'), $this->order->number)
+                )
                 ->markdown('admineshop::mail.order.paid', [
-                    'message' => _('Vaša objednávka bola úspešne dokončená a zaplatená. Ďakujeme!'),
+                    'message' => $this->message ?: _('Vaša objednávka bola úspešne dokončená a zaplatená. Ďakujeme!'),
                     'order' => $this->order,
                     'invoice' => $this->invoice,
                 ]);

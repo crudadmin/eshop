@@ -91,6 +91,11 @@ class Delivery extends AdminModel implements DiscountSupport
             $restrictionFields['price_limit'] = 'name:Limit ceny objednávky pre dopravu|type:decimal|title:S DPH - Po presiahnutí ceny objednávky bude doprava odobraná z objednávkoveho košíku|hidden';
         }
 
+        //Add payments rules
+        if ( config('admineshop.heureka.enabled') ) {
+            $restrictionFields['heureka_id'] = 'name:Heureka ID dopravy|title:Ak identifikátor bude vyplnený, zašle sa doprava do heureka exportu. - https://sluzby.heureka.sk/napoveda/xml-feed/#DELIVERY';
+        }
+
         if ( count($restrictionFields) > 0 ) {
             $fields->push(
                 Group::tab($restrictionFields)->name('Obmedzenia')->icon('fa-gear')->id('restrictions')

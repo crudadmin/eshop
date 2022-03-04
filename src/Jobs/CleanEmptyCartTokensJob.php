@@ -55,7 +55,7 @@ class CleanEmptyCartTokensJob implements ShouldQueue
             ->whereDate('cart_tokens.updated_at', '<=', $oldAtLeastDays);
 
         if ( ($count = $tokens->count()) > 0 ) {
-            $tokens->forceDelete();
+            $this->removeTokens($tokens);
 
             Log::channel('store')->info('Inactive cart tokens removed: '.$count);
         }
@@ -75,9 +75,19 @@ class CleanEmptyCartTokensJob implements ShouldQueue
             });
 
         if ( ($count = $tokens->count()) > 0 ) {
-            $tokens->forceDelete();
+            $this->removeTokens($tokens);
 
             Log::channel('store')->info('Empty cart tokens removed: '.$count);
         }
+    }
+
+    private function removeTokens($tokensQuery)
+    {
+        $tokensToRemove = $tokensQuery->pluck('id')->toArray();
+
+        //Remove tokens favourites first
+        Admin::getModel('ClientsFavourite')->whereIn('cart_token_id', $tokensToRemove)->forceDelete();
+
+        $tokensQuery->forceDelete();
     }
 }
