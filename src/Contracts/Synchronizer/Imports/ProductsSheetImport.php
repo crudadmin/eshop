@@ -121,11 +121,21 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
             //Does not overide built in values
             if ( !array_key_exists($column['column'], $array) ) {
-                $array[$column['column']] = $item[$sheetColumnName] ?? $column['default'] ?? null;
+                $array[$column['column']] = $this->isEmptyValue($item[$sheetColumnName] ?? null) === false
+                    ? $item[$sheetColumnName]
+                    : ($this->isEmptyValue($column['default'] ?? null) === false
+                        ? $column['default']
+                        : null
+                    );
             }
         }
 
         return $array;
+    }
+
+    private function isEmptyValue($value)
+    {
+        return is_null($value) || $value === '';
     }
 
     public function prepareAttributes($item)

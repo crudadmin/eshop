@@ -312,6 +312,8 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
 
     private function getVatIdByValue($value)
     {
+        $value = $value ?: 0;
+
         return $this->cache('vat.'.$value, function() use ($value){
             if ( $vat = Store::getVats()->where('vat', $value)->first() ){
                 return $vat->getKey();
