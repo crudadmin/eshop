@@ -50,24 +50,23 @@ class FavouriteController extends Controller
         $productId = request('product_id');
         $variantId = request('variant_id');
 
+        $data = $favouritesModel->getRequestMutator([
+            'variant_id' => $variantId,
+            'product_id' => $productId,
+        ] + $favouritesModel->getFavouritesIdentifiers());
+
         //Add or update variant
         if ( is_numeric($variantId) ) {
             if ( $favourites->where('variant_id', $variantId)->count() > 0 ) {
                 $favourites->where('variant_id', $variantId)->delete();
             } else {
-                $favouritesModel->create([
-                    'variant_id' => $variantId,
-                    'product_id' => $productId,
-                ] + $favouritesModel->getFavouritesIdentifiers());
+                $favouritesModel->create($data);
             }
         } else if ( is_numeric($productId) ) {
             if ( $favourites->where('product_id', $productId)->whereNull('variant_id')->count() > 0 ) {
                 $favourites->where('product_id', $productId)->whereNull('variant_id')->delete();
             } else {
-                $favouritesModel->create([
-                    'variant_id' => $variantId,
-                    'product_id' => $productId,
-                ] + $favouritesModel->getFavouritesIdentifiers());
+                $favouritesModel->create($data);
             }
         }
 

@@ -127,4 +127,9 @@ class ClientsFavourite extends AdminModel
             }
         });
     }
+
+    public function getRequestMutator($data)
+    {
+        return $data;
+    }
 }
