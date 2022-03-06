@@ -155,6 +155,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         foreach ($rows as $product) {
             foreach ($product['$variants'] ?? [] as $variant) {
                 $variants[] = $variant + [
+                    'product_type' => ($variant['product_type'] ?? null) ?: 'variant',
                     'product_id' => $this->getExistingRows('products')[
                         $product[$this->getProductIdentifier()]
                     ],
