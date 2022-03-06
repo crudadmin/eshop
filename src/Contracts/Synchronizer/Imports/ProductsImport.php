@@ -68,7 +68,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             $this->synchronize(
                 Admin::getModel('Product'),
                 $this->getProductIdentifier(),
-                $rows,
+                $this->cleanProducts($rows),
                 $this->synchronizeProducts,
                 function($query){
                     $query->whereNull('product_id');
@@ -132,6 +132,19 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                 $this->synchronizeProductAttributes
             );
         }
+    }
+
+    private function cleanProducts($rows)
+    {
+        foreach ($rows as $row) {
+            //If product type is not variants type, and product id has not been set,
+            //then we want reset product id, because previously this product may be variant.
+            if ( ($row['product_type'] ?? null) !== 'variants' && !isset($row['product_id']) ){
+                $row['product_id'] = null;
+            }
+        }
+
+        return $rows;
     }
 
     public function getCategories()
