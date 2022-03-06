@@ -12,7 +12,7 @@ class FavouriteController extends Controller
     {
         $favourites = Admin::getModel('ClientsFavourite')
                         ->activeSession()
-                        ->select('id', 'product_id', 'variant_id')
+                        ->withFavouriteResponse()
                         ->get();
 
         $products = Admin::getModel('Product')
@@ -38,7 +38,7 @@ class FavouriteController extends Controller
 
         return api([
             'pagination' => $products,
-            'favourites' => $favourites,
+            'favourites' => $favourites->each->setFavouriteResponse(),
         ]);
     }
 
