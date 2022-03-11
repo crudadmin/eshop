@@ -83,10 +83,12 @@ class CleanEmptyCartTokensJob implements ShouldQueue
 
     private function removeTokens($tokensQuery)
     {
-        $tokensToRemove = $tokensQuery->pluck('id')->toArray();
+        $tokensQuery->pluck('id')->chunk(1000)->each(function($chunk){
+            $tokensToRemove = $chunk->toArray();
 
-        //Remove tokens favourites first
-        Admin::getModel('ClientsFavourite')->whereIn('cart_token_id', $tokensToRemove)->forceDelete();
+            //Remove tokens favourites first
+            Admin::getModel('ClientsFavourite')->whereIn('cart_token_id', $tokensToRemove)->forceDelete();
+        });
 
         $tokensQuery->forceDelete();
     }
