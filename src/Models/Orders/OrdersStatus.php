@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Orders;
 
+use AdminEshop\Admin\Buttons\SendTestingOrderStatus;
 use AdminEshop\Admin\Rules\SetDefaultOrderStatus;
 use AdminEshop\Models\Store\Store;
 use Admin\Eloquent\AdminModel;
@@ -43,6 +44,10 @@ class OrdersStatus extends AdminModel
 
     protected $rules = [
         SetDefaultOrderStatus::class,
+    ];
+
+    protected $buttons = [
+        SendTestingOrderStatus::class,
     ];
 
     /*
