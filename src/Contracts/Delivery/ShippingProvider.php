@@ -4,7 +4,6 @@ namespace AdminEshop\Contracts\Delivery;
 
 use AdminEshop\Contracts\Order\OrderProvider;
 use AdminEshop\Models\Delivery\Delivery;
-use AdminEshop\Models\Orders\Order;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
 use Admin;
@@ -99,5 +98,21 @@ class ShippingProvider extends OrderProvider
         $options = $this->getOptions();
 
         return $options['timeout'] ?? 2;
+    }
+
+    /*
+     * Returns selected pickup point location name
+     */
+    public function getPickupName()
+    {
+
+    }
+
+    /*
+     * Returns selected pickup point location address
+     */
+    public function getPickupAddress()
+    {
+
     }
 }
