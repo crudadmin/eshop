@@ -138,6 +138,7 @@ class OrdersStatus extends AdminModel
             }
         }
 
+        $text = str_replace('{number}', $order->number, $text);
         $text = str_replace('{date}', $order->created_at->format('d.m.Y'), $text);
         $text = str_replace('{datetime}', $order->created_at->format('d.m.Y H:i'), $text);
 
