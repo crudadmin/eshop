@@ -186,6 +186,13 @@ class Order extends AdminModel
         $query->with(['log', 'items:id,order_id']);
     }
 
+    public function setAdminAttributes($attributes)
+    {
+        $attributes['delivery_pickup_point'] = $this->getPickupAddressWithName();
+
+        return $attributes;
+    }
+
     public function setAdminRowsAttributes($attributes)
     {
         $attributes['$indicator'] = $this->getOrderIndicator();

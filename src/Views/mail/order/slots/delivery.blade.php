@@ -7,7 +7,7 @@
 @endif
 
 @component('mail::panel')
-| {{ $order->delivery_different ? _('Fakturačná adresa') : _('Fakturačná a dodacia adresa') }} | |
+| {{ $order->delivery_different || $order->deliveryPickupAddress ? _('Fakturačná adresa') : _('Fakturačná a dodacia adresa') }} | |
 | :------------- | ----------:|
 @if ( $order->is_company )
 | {{ _('Firma') }}: | {{ $order->company_name }} |

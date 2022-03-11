@@ -118,7 +118,10 @@ trait HasOrderFields
             config('admineshop.delivery.enabled', true) ? [
                 'Doprava' => Group::fields([
                     Group::inline(array_merge(
-                        ['delivery' => 'name:Doprava|belongsTo:deliveries,name|required'],
+                        [
+                            'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
+                            'delivery_pickup_point' => 'name:Odberné miesto|imaginary|disabled|removeFromFormIf:delivery_pickup_point,NULL'
+                        ],
                         config('admineshop.delivery.multiple_locations.enabled', false)
                             ? ['delivery_location' => 'name:Predajňa|hidden|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:'.config('admineshop.delivery.multiple_locations.table').','.config('admineshop.delivery.multiple_locations.field_name')] : []
                     )),

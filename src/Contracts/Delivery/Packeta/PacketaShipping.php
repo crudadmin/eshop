@@ -160,4 +160,24 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
             'weight' => $weight,
         ];
     }
+
+    /*
+     * Returns selected delivery location point name
+     */
+    public function getPickupName()
+    {
+        if ( isset($this->getOrder()->packeta_point['place']) ){
+            return $this->getOrder()->packeta_point['place'];
+        }
+    }
+
+    /*
+     * Returns selected pickup point location address
+     */
+    public function getPickupAddress()
+    {
+        if ( isset($this->getOrder()->packeta_point['name']) ){
+            return $this->getOrder()->packeta_point['name'];
+        }
+    }
 }

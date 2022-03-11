@@ -172,16 +172,25 @@ trait OrderTrait
         return $clientName;
     }
 
+    private function getPickupAddressWithName()
+    {
+        return implode(' - ', array_filter([$this->deliveryPickupName, $this->deliveryPickupAddress]));
+    }
+
     private function getDeliveryAddress()
     {
-        $prefix = $this->delivery_different ? 'delivery_' : '';
+        if ( $pickupAddress = $this->getPickupAddressWithName() ){
+            $address = $pickupAddress;
+        } else {
+            $prefix = $this->delivery_different ? 'delivery_' : '';
 
-        $address = implode(', ', array_filter([
-            e($this->{$prefix.'street'}),
-            e($this->{$prefix.'city'}),
-            e($this->{$prefix.'zipcode'}),
-            e($this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null),
-        ]));
+            $address = implode(', ', array_filter([
+                e($this->{$prefix.'street'}),
+                e($this->{$prefix.'city'}),
+                e($this->{$prefix.'zipcode'}),
+                e($this->{$prefix.'country'} ? $this->{$prefix.'country'}->name : null),
+            ]));
+        }
 
         return '<a href="https://maps.google.com/?q='.urlencode($address).'" target="_blank" data-toggle="tooltip" title="'.$address.'">'.str_limit($address, 20).'</a>';
     }

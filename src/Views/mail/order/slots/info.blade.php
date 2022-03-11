@@ -5,10 +5,10 @@
 | {{ _('Spôsob platby') }}: | {{ $payment_method->name }} |
 @endif
 @if ( $delivery )
-| {{ _('Doprava') }}: | {{ $delivery->name }} {{ $location ? '('.$location->{config('admineshop.delivery.multiple_locations.field_name')}.')' : '' }} |
+| {{ _('Doprava') }}: | {{ $delivery->name }} {{ $order->deliveryPickupName ? '('.$order->deliveryPickupName.')' : '' }} |
 @endif
-@if ( $location && $location->address )
-| {{ _('Adresa zvolenej dopravy') }}: | {{ $location->address }} |
+@if ( $order->deliveryPickupAddress )
+| {{ _('Odberné miesto') }}: | {{ $order->deliveryPickupAddress }} |
 @endif
 | {{ _('Tel. číslo') }}: | {{ $order->phone ?: $order->delivery_phone }} |
 | {{ _('Vytvorená dňa') }}:  | {{ $order->created_at->format('d.m.Y H:i') }} |

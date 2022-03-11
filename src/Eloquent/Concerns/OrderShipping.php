@@ -28,6 +28,28 @@ trait OrderShipping
 
         return $buttons;
     }
+
+    public function getDeliveryPickupAddressAttribute()
+    {
+        if ( ($provider = $this->getShippingProvider()) && $name = $provider->getPickupAddress() ) {
+            return $name;
+        }
+
+        if ( $location = $this->delivery_location ) {
+            return $location?->address;
+        }
+    }
+
+    public function getDeliveryPickupNameAttribute()
+    {
+        if ( ($provider = $this->getShippingProvider()) && $name = $provider->getPickupName() ) {
+            return $name;
+        }
+
+        if ( $location = $this->delivery_location ) {
+            return $location->{config('admineshop.delivery.multiple_locations.field_name')};
+        }
+    }
 }
 
 ?>
