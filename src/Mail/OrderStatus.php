@@ -41,6 +41,5 @@ class OrderStatus extends Mailable
             ])->subject(
                 sprintf(_('Zmena stavu objednávky č. %s na %s'), $this->order->number, $this->order->status->name)
             );
-
     }
 }

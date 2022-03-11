@@ -1,23 +1,18 @@
 @component('mail::message')
 # {{ sprintf(_('Dobrý deň %s'), $order->firstname) }},
 
-{{-- Status info --}}
+@include('admineshop::mail.order.slots.status.slot_before')
+
 @if ( $order->status->email_content )
-@component('mail::panel')
-| {{ _('Informácia k stavu objednávky') }} |
-| :------------- |
-| {!! $order->status->email_content !!} |
-@endcomponent
+{!! $order->status->email_content !!}
 @endif
 
 {{-- Delivery info --}}
 @if ( $order->status->email_delivery && $order->delivery && $order->delivery->description_email_status )
-@component('mail::panel')
-| {{ _('Informácie k doprave') }} |
-| :------------- |
-| {!! $order->delivery->description_email_status !!} |
-@endcomponent
+{!! $order->delivery->description_email_status !!}
 @endif
+
+@include('admineshop::mail.order.slots.status.slot_after')
 
 {{-- Delivery tracking button --}}
 @if ( $order->deliveryTrackingUrl )
@@ -26,6 +21,5 @@
 @endcomponent
 @endif
 
-{{ _('S pozdravom') }},<br>
-{{ config('app.name') }}
+@include('admineshop::mail.order.slots.footer')
 @endcomponent

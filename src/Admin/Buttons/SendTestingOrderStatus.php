@@ -9,6 +9,7 @@ use Admin\Helpers\Button;
 use Illuminate\Support\Facades\Mail;
 use OrderService;
 use Store;
+use Localization;
 
 class SendTestingOrderStatus extends Button
 {
@@ -27,6 +28,8 @@ class SendTestingOrderStatus extends Button
     //Button Icon
     public $icon = 'fa-envelope-o';
 
+    const SESSION_ORDER_KEY = 'status_test_number';
+
     public function __construct($row)
     {
         $this->active = $row->email_send == true || $row->default === true;
@@ -43,7 +46,17 @@ class SendTestingOrderStatus extends Button
             return $this->error(_('Pre odoslanie testovacieho emailu si nastavte email v nastaveniach obchodu.'));
         }
 
-        return $this->warning(sprintf(_('Na Váš email %s bude odoslaná posledná vytvorená objednávka s týmto stavom objednávky.'), $email));
+        if ( !($order = Order::latest()->select(['number'])->first()) ){
+            return $this->error(_('Pre otestovanie vytvorte aspoň jednú objednávku.'));
+        }
+
+        $number = session()->get(self::SESSION_ORDER_KEY, $order->number);
+
+        return $this
+                ->warning(sprintf(_('Na Váš email <strong>%s</strong> bude odoslaná správa s týmto stavom objednávky.'), $email))
+                ->component('SendTestOrderStatusEmail', [
+                    'order_number' => $number,
+                ]);
     }
 
     /**
@@ -53,7 +66,18 @@ class SendTestingOrderStatus extends Button
      */
     public function fire(AdminModel $status)
     {
-        $order = Order::latest()->first();
+        //Boot website localization for templates
+        Localization::boot();
+
+        $number = request('order_number');
+
+        if ( !($order = Order::where('number', $number)->first()) ){
+            return $this->error(_('Táto objednávka nebola nájdená.'));
+        }
+
+        session()->put(self::SESSION_ORDER_KEY, $number);
+        session()->save();
+
         $order->status_id = $status->getKey();
 
         $email = $this->getStoreEmail();

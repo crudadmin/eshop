@@ -6,6 +6,10 @@ trait HasOrderEmails
 {
     public function getClientEmailMessage()
     {
+        if ( $this->status && $text = $this->status->parseOrderText('email_content', $this) ) {
+            return $this->status->parseOrderText('email_content', $this);
+        }
+
         return sprintf(_('Vaša objednávka č. %s zo dňa %s bola úspešne prijatá.'), $this->number, $this->created_at->format('d.m.Y'));
     }
 
