@@ -113,6 +113,25 @@ class OrderService
     }
 
     /**
+     * Set cart items from order
+     * Todo: (test functionality for 100% worflow)
+     *
+     * @param  Order  $order
+     */
+    public function setOrderCartItems(Order $order)
+    {
+        $cartItems = (new CartCollection(
+            $order->items->map(function($item){
+                return $item->getCartItem();
+            })
+        ))->renderCartItems();
+
+        $this->setCartItems($cartItems);
+
+        return $this;
+    }
+
+    /**
      * This cart items will be inserted into order
      *
      * @return  CartCollection
@@ -344,17 +363,21 @@ class OrderService
      *
      * @return  void
      */
-    public function sentClientEmail(Invoice $invoice = null)
+    public function sentClientEmail(Invoice $invoice = null, $email = null, $silent = true)
     {
-        $order = $this->getOrder();
-
-        $message = $order->getClientEmailMessage();
-
         try {
-            Mail::to($order->email)->send(
+            $order = $this->getOrder();
+
+            $message = $order->getClientEmailMessage();
+
+            Mail::to($email ?: $order->email)->send(
                 new OrderReceived($order, $this->getCartItems(), $message, $invoice)
             );
         } catch (Exception $error){
+            if ( $silent === false ){
+                throw $error;
+            }
+
             Log::error($error);
 
             $order->log()->create([

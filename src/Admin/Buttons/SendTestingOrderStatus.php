@@ -7,6 +7,7 @@ use AdminEshop\Models\Orders\Order;
 use Admin\Eloquent\AdminModel;
 use Admin\Helpers\Button;
 use Illuminate\Support\Facades\Mail;
+use OrderService;
 use Store;
 
 class SendTestingOrderStatus extends Button
@@ -28,7 +29,7 @@ class SendTestingOrderStatus extends Button
 
     public function __construct($row)
     {
-        $this->active = $row->email_send == true;
+        $this->active = $row->email_send == true || $row->default === true;
     }
 
     private function getStoreEmail()
@@ -55,7 +56,13 @@ class SendTestingOrderStatus extends Button
         $order = Order::latest()->first();
         $order->status_id = $status->getKey();
 
-        Mail::to($this->getStoreEmail())->send(new OrderStatus($order));
+        $email = $this->getStoreEmail();
+
+        if ( $status->default === true ) {
+            OrderService::setOrder($order)->setOrderCartItems($order)->sentClientEmail(null, $email, false);
+        } else {
+            Mail::to($email)->send(new OrderStatus($order));
+        }
 
         return $this->success('Email bol úspešne odoslaný na Vašu adresu.');
     }
