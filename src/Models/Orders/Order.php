@@ -274,6 +274,11 @@ class Order extends AdminModel
 
     }
 
+    public function setOrderResponse()
+    {
+        return $this;
+    }
+
     /**
      * Order response format
      *
@@ -281,7 +286,9 @@ class Order extends AdminModel
      */
     public function setClientListingResponse()
     {
-        $this->items->each->setClientListingResponse();
+        if ( $this->relationLoaded('items') ) {
+            $this->items->each->setClientListingResponse();
+        }
 
         return $this->append([
             'number',
@@ -291,6 +298,8 @@ class Order extends AdminModel
             'deliveryTrackingUrl',
             'paymentMethodPriceWithVat',
             'invoiceUrl',
+            'deliveryPickupName',
+            'deliveryPickupAddress',
         ]);
     }
 
