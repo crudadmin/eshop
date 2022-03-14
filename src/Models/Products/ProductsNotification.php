@@ -22,11 +22,21 @@ class ProductsNotification extends AdminModel
     /*
      * Template name
      */
-    protected $name = 'Notifikácie pri naskladnení';
+    protected $name = 'Notifikácie naskladnenia';
 
     protected $publishable = false;
 
     protected $sortable = false;
+
+    protected $inMenu = true;
+
+    protected $group = 'store';
+
+    protected $icon = 'fa-bell';
+
+    protected $settings = [
+        'xls' => true,
+    ];
 
     protected $belongsToModel = [
         Product::class,
@@ -42,6 +52,8 @@ class ProductsNotification extends AdminModel
     public function fields()
     {
         return [
+            'product_id' => 'name:Produkt|belongsTo:products,:name :code',
+            'products_variant_id' => 'name:Varianta|belongsTo:products_variants,:name :code',
             'email' => 'name:E-mail|required|email|max:90',
             'notified' => 'name:Upozornený emailom|type:checkbox|default:0',
             'notified_error' => 'name:Chyba pri upozornení|type:checkbox|default:0|inaccessible',
