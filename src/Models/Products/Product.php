@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Admin\Buttons\SetProductsCategory;
 use AdminEshop\Admin\Buttons\SetProductsDiscount;
 use AdminEshop\Contracts\Collections\ProductsCollection;
 use AdminEshop\Eloquent\CartEloquent;
@@ -68,6 +69,7 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     protected $buttons = [
         SetProductsDiscount::class,
+        SetProductsCategory::class,
     ];
 
     /**

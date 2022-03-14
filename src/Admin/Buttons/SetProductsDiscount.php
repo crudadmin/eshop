@@ -60,7 +60,7 @@ class SetProductsDiscount extends Button
         return $this->success('Zľava pre vybrané produkty bola úspešne uložená.');
     }
 
-    private function setProductDiscount($product)
+    public function setProductDiscount($product)
     {
         $product->discount_operator = request('discount_operator', 'default');
         $product->discount = request('discount', null);

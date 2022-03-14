@@ -66,7 +66,7 @@ trait HasProductPaginator
         $this->sortItems($items);
 
         if ( method_exists($this, 'customSortItems') ){
-            $this->customSortItems($items);
+            $this->customSortItems($items, $this->filterParams);
         }
 
         //Sort collected prices
