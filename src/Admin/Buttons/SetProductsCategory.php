@@ -58,7 +58,7 @@ class SetProductsCategory extends Button
             });
         }
 
-        return $this->success('Zľava pre vybrané produkty bola úspešne uložená.');
+        return $this->success('Kategória bola pre vybrané produkty úspešne priradená.');
     }
 
     public function setProductCategory($product, $item)
