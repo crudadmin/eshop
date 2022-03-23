@@ -17,17 +17,21 @@
         <div class="box-body">
         <component
             :is="sortable ? 'draggable' : 'div'"
-            :group="{ put : false }"
-            @start="model.onDragStart($event)"
+            :group="{ put : put, group : model.table }"
+            :list="firstLevel"
+            @start="model.onDragStart($event, firstLevel)"
             @end="model.onDragEnd($event, firstLevel)"
+            @change="model.onDragChange($event, firstLevel)"
             v-bind="model.getDragOptions()"
             handle=".sitetree__item__drag">
 
             <CategoriesTreeItem
                 v-for="item in firstLevel"
+                :model="model"
                 :item="item"
                 :items="items"
                 :sortable="sortable"
+                :put="put"
                 :key="item.id" />
             </component>
         </div>
@@ -41,6 +45,7 @@ export default {
 
     data(){
         return {
+            put : true,
             sortable : true,
         }
     },

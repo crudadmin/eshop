@@ -60,16 +60,20 @@
     <div class="sitetree__subtree" v-if="showSubTree">
         <component
             :is="sortable ? 'draggable' : 'div'"
-            :group="{ put : false }"
-            @start="model.onDragStart($event)"
+            :group="{ put : put, group : model.table }"
+            :list="nextLevel"
+            @start="model.onDragStart($event, nextLevel)"
             @end="model.onDragEnd($event, nextLevel)"
+            @change="model.onDragChange($event, nextLevel, item)"
             v-bind="model.getDragOptions()"
             handle=".sitetree__item__drag">
             <CategoriesTreeItem
                 v-for="subItem in nextLevel"
+                :model="model"
                 :item="subItem"
                 :parentRow="item"
                 :sortable="sortable"
+                :put="put"
                 :items="items"
                 :key="subItem.id" />
         </component>
@@ -90,7 +94,7 @@ import draggable from 'vuedraggable'
 export default {
     name : 'CategoriesTreeItem',
 
-    props : ['item', 'parentRow', 'items', 'sortable'],
+    props : ['item', 'parentRow', 'items', 'sortable', 'put'],
 
     components : {
         draggable,
