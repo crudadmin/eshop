@@ -102,7 +102,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->publishes([__DIR__ . '/../Views' => resource_path('views/vendor/admineshop') ], 'admineshop.views');
         $this->publishes([__DIR__ . '/../Config/config.php' => config_path('admineshop.php') ], 'admineshop.config');
-        $this->publishes([__DIR__ . '/../Resources/css' => public_path('vendor/admineshop') ], 'admineshop.resources');
+        $this->publishes([__DIR__ . '/../Resources/dist' => public_path('vendor/admineshop') ], 'admineshop.resources');
     }
 
     public function bootFacades()

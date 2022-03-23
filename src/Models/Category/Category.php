@@ -34,6 +34,12 @@ class Category extends AdminModel
 
     protected $sluggable = 'name';
 
+    protected $withRecursiveRows = true;
+
+    protected $layouts = [
+        'table-before' => 'CategoriesTree',
+    ];
+
     public function belongsToModel()
     {
         if ( config('admineshop.categories.max_level', 1) > 1 ) {
@@ -47,6 +53,8 @@ class Category extends AdminModel
             'title.update' => ':name',
             'recursivity.name' => 'Podkategórie',
             'recursivity.max_depth' => config('admineshop.categories.max_level'),
+            'pagination.enabled' => false,
+            'table.enabled' => false,
         ];
     }
 
@@ -61,11 +69,31 @@ class Category extends AdminModel
         return [
             'name' => 'name:Názov kategórie|required|max:90'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'code' => 'name:Kód kategórie|index|max:30',
+            'category' => 'name:Patri do kategórie|belongsTo:categories,name|title:Kategória je priradená do tejto nadradenej kategórie',
+        ];
+    }
+
+    public function options()
+    {
+        return [
+            'category_id' => $this->getCategoriesOptions(),
         ];
     }
 
     public function categories()
     {
         return $this->hasMany(get_class($this), 'category_id');
+    }
+
+    public function scopeAdminRows($query)
+    {
+        $query->withCount('products');
+    }
+
+    public function setAdminRowsAttributes($attributes)
+    {
+        $attributes['products_count'] = $this->products_count;
+
+        return $attributes;
     }
 }

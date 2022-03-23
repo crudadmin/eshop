@@ -1,4 +1,5 @@
 <?php
+
 return [
     /*
      * Administration name
@@ -46,7 +47,11 @@ return [
     ],
 
     'styles' => [
-        'vendor/admineshop/eshop.css',
+        'vendor/admineshop/css/eshop.css',
+    ],
+
+    'scripts' => [
+        'vendor/admineshop/js/app.js',
     ],
 ];
 ?>
