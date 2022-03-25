@@ -117,7 +117,7 @@ class Category extends AdminModel
         return array_reverse($parentCategoryIds);
     }
 
-    public function onUpdateRelationOrder($movedCategoryId, $key, $toCategoryId)
+    public function onRecursiveDragAndDrop($movedCategoryId, $key, $toCategoryId)
     {
         $removeParentIds = $this->getParentCategoryIds($movedCategoryId);
         $newParentIds = collect(array_merge($this->getParentCategoryIds($toCategoryId), [ $movedCategoryId ]));
