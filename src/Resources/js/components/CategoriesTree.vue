@@ -19,21 +19,26 @@
             :is="sortable ? 'draggable' : 'div'"
             :group="{ put : put, group : model.table }"
             :list="firstLevel"
-            @start="model.onDragStart($event, firstLevel)"
-            @end="model.onDragEnd($event, firstLevel)"
-            @change="model.onDragChange($event, firstLevel)"
+            @start="model.onDragStart($event)"
+            @change="model.onDragChange($event, null, firstLevel)"
             v-bind="model.getDragOptions()"
-            handle=".sitetree__item__drag">
-
+            handle=".sitetree__item__drag"
+            draggable=".--draggableItem">
             <CategoriesTreeItem
                 v-for="item in firstLevel"
+                level="0"
                 :model="model"
                 :item="item"
                 :items="items"
                 :sortable="sortable"
                 :put="put"
                 :key="item.id" />
-            </component>
+
+            <div slot="footer">
+                <CategoriesAddNew :model="model" />
+            </div>
+        </component>
+
         </div>
     </div>
 </div>

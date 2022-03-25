@@ -1,26 +1,31 @@
 <template>
-<div class="sitetree__item__wrapper">
+<div class="sitetree__item__wrapper --draggableItem">
     <div class="sitetree__item">
         <div class="sitetree__item__drag" v-if="sortable && row.id">
             <i class="fa fa-grip-vertical"></i>
         </div>
         <div class="sitetree__item__inputs">
-            <h6 class="mb-0">{{ getLocaleFieldValue(item.name) }} <small>({{ item.products_count||0 }})</small></h6>
+            <h6 class="mb-0">
+                {{ getLocaleFieldValue(item.name) }}
+                <small>({{ __('%s podkategórii').replace('%s', nextLevel.length) }} / {{ __('%s produktov').replace('%s', item.products_count||0) }})</small>
+            </h6>
         </div>
         <div class="sitetree__item__actions">
             <button
-                class="btn btn-sm btn-primary"
+                class="btn btn-sm"
+                :class="{ 'btn-primary' : showSubTree, 'btn-default' : !showSubTree }"
                 @click="showSubTree = !showSubTree"
-                v-if="row.id && (row.insertable || nextLevel.length > 0)"
+                v-if="canDisplayNextLevel"
             >
                 <i class="fa" :class="{ 'fa-angle-down' : !showSubTree, 'fa-angle-up' : showSubTree }"></i>
             </button>
 
             <button
-                data-toggle="tooltip"
-                :title="_('Pridať podkategóriu')"
                 class="btn btn-sm btn-default"
                 @click="addNewSubcategory()"
+                :title="__('Pridať podkategóriu')"
+                data-toggle="tooltip"
+                v-if="model.insertable"
             >
                 <i class="fa fa-plus"></i>
             </button>
@@ -62,11 +67,11 @@
             :is="sortable ? 'draggable' : 'div'"
             :group="{ put : put, group : model.table }"
             :list="nextLevel"
-            @start="model.onDragStart($event, nextLevel)"
-            @end="model.onDragEnd($event, nextLevel)"
-            @change="model.onDragChange($event, nextLevel, item)"
+            @start="model.onDragStart($event)"
+            @change="model.onDragChange($event, item, nextLevel)"
             v-bind="model.getDragOptions()"
-            handle=".sitetree__item__drag">
+            handle=".sitetree__item__drag"
+            draggable=".--draggableItem">
             <CategoriesTreeItem
                 v-for="subItem in nextLevel"
                 :model="model"
@@ -75,12 +80,13 @@
                 :sortable="sortable"
                 :put="put"
                 :items="items"
+                :level="level + 1"
                 :key="subItem.id" />
-        </component>
 
-        <CategoriesTreeItem
-            v-if="row.insertable"
-            :parentRow="item" />
+            <div slot="footer" v-if="nextLevel.length == 0">
+                <CategoriesAddNew :model="model" :item="item" />
+            </div>
+        </component>
     </div>
 </div>
 </template>
@@ -94,7 +100,7 @@ import draggable from 'vuedraggable'
 export default {
     name : 'CategoriesTreeItem',
 
-    props : ['item', 'parentRow', 'items', 'sortable', 'put'],
+    props : ['item', 'parentRow', 'items', 'sortable', 'put', 'level'],
 
     components : {
         draggable,
@@ -126,6 +132,13 @@ export default {
                 category_id : this.item.id
             });
         },
+        canDisplayNextLevel(){
+            if ( !this.row?.id || this.model.insertable === false ){
+                return;
+            }
+
+            return this.level <= this.model.getSettings('recursivity.max_depth');
+        }
     },
 
     methods: {
@@ -139,3 +152,7 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+
+</style>
