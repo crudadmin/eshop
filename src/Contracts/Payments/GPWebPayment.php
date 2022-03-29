@@ -20,23 +20,26 @@ class GPWebPayment extends PaymentHelper
 
     public function __construct($options = null)
     {
-        parent::__construct($options);
+        parent::__construct(
+            array_merge($options ?: [], config('webpay'))
+        );
 
-        if ( !is_array($config = config('webpay')) ) {
+        $options = $this->getOptions();
+        if ( count($options) === 0 ) {
             abort(500, 'Webpay configuration does not exists');
 
             return;
         }
 
         $signer = new Signer(
-            base_path($config['priv_path']),      // Path of private key.
-            $config['password'],                  // Password for private key.
-            base_path($config['pub_path'])        // Path of public key.
+            base_path($options['priv_path']),      // Path of private key.
+            $options['password'],                  // Password for private key.
+            base_path($options['pub_path'])        // Path of public key.
         );
 
         $this->webpay = new WebpayApi(
-            $config['merchant_id'],
-            $config['production'] ? 'https://3dsecure.gpwebpay.com/pgw/order.do' : 'https://test.3dsecure.gpwebpay.com/pgw/order.do',
+            $options['merchant_id'],
+            $options['production'] ? 'https://3dsecure.gpwebpay.com/pgw/order.do' : 'https://test.3dsecure.gpwebpay.com/pgw/order.do',
             $signer
         );
     }
@@ -52,8 +55,12 @@ class GPWebPayment extends PaymentHelper
 
             $payment = $this->getPayment();
 
+            //In case of development purposes, we need create
+            //range of payments for each development environment.
+            $number = ((int)$this->getOption('number_prefix', 0)) + $payment->getKey();
+
             $request = new PaymentRequest(
-                $payment->getKey(),
+                $number,
                 $payment->price,
                 PaymentRequest::EUR,
                 0,
