@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="box box--presets mb-2">
+    <div class="box box--presets mb-2" v-if="isDeepLevel === false">
         <div class="box-header box-header--actions">
             <div class="box-header__left">
                 <div>
@@ -55,7 +55,14 @@ export default {
         }
     },
 
+    created(){
+        this.model.hideTab('categories');
+    },
+
     computed: {
+        isDeepLevel(){
+            return this.model.getParentModels().length > 0;
+        },
         items(){
             return this.model.getRows({ withAllRows : true });
         },
