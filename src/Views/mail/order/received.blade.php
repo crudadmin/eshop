@@ -2,7 +2,7 @@
 # {{ _('Dobrý deň') }},
 
 @if ( isset($message) )
-{{ $message }}
+{!! $message !!}
 @endif
 
 @include('admineshop::mail.order.slots.items')
@@ -21,6 +21,5 @@
 
 @include('admineshop::mail.order.slots.action_button')
 
-{{ _('S pozdravom') }},<br>
-{{ config('app.name') }}
+@include('admineshop::mail.order.slots.footer')
 @endcomponent

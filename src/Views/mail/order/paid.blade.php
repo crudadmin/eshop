@@ -7,6 +7,5 @@
 
 @include('admineshop::mail.order.slots.invoice_button')
 
-{{ _('S pozdravom') }},<br>
-{{ config('app.name') }}
+@include('admineshop::mail.order.slots.footer')
 @endcomponent

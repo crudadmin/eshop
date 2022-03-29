@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Orders;
 
+use AdminEshop\Admin\Buttons\SendTestingOrderStatus;
 use AdminEshop\Admin\Rules\SetDefaultOrderStatus;
 use AdminEshop\Models\Store\Store;
 use Admin\Eloquent\AdminModel;
@@ -45,6 +46,10 @@ class OrdersStatus extends AdminModel
         SetDefaultOrderStatus::class,
     ];
 
+    protected $buttons = [
+        SendTestingOrderStatus::class,
+    ];
+
     public function active()
     {
         return config('admineshop.order.status', true);
@@ -71,9 +76,9 @@ class OrdersStatus extends AdminModel
                 Group::inline([
                     'email_send' => 'name:Odoslať email pri zmene stavu|column_name:Email|type:checkbox|default:0',
                     'email_delivery' => 'name:Do zmeny stavu zahrnúť informácie o doprave|type:checkbox|default:0|removeFromFormIf:email_send,0',
-                ]),
-                'email_content' => 'name:Obsah emailu|type:editor',
-            ])->icon('fa fa-envelope')->add('removeFromFormIf:default,1|hidden')
+                ])->add('removeFromFormIf:default,1'),
+                'email_content' => 'name:Obsah emailu|type:editor|sub_component:ShowOrderStatusVariables',
+            ])->icon('fa fa-envelope')->add('hidden')->id('notification')
         ];
     }
 
@@ -92,6 +97,7 @@ class OrdersStatus extends AdminModel
                 'default' => true,
                 'key' => 'new,waiting',
                 'email_delivery' => 0,
+                'email_content' => _('Vaša objednávka č. {number} zo dňa {date} bola úspešne prijatá.'),
                 'return_stock' => false,
                 'color' => '#ffb900'
             ] + ($hasSortable ? ['_order' => $i++] : []),
@@ -125,5 +131,22 @@ class OrdersStatus extends AdminModel
         ];
 
         $this->insert($languages);
+    }
+
+    public function parseOrderText($key, $order)
+    {
+        $text = $this->{$key} ?? '';
+
+        foreach ($order->append(['firstname', 'lastname'])->toArray() as $key => $value) {
+            if ( is_string($value) || is_numeric($value) ) {
+                $text = str_replace('{'.$key.'}', e($value), $text);
+            }
+        }
+
+        $text = str_replace('{number}', $order->number, $text);
+        $text = str_replace('{date}', $order->created_at->format('d.m.Y'), $text);
+        $text = str_replace('{datetime}', $order->created_at->format('d.m.Y H:i'), $text);
+
+        return $text;
     }
 }

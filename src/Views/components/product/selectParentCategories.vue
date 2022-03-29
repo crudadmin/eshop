@@ -9,13 +9,17 @@ export default {
 
             this.toggling = true;
 
+            //Category has been added
             if ( (value||[]).length > (oldValue||[]).length ) {
-                let addedCategoryId = _.xor(oldValue, value)[0];
+                let addedCategoryId = _.xor(oldValue, value);
 
-                this.addParentCategories(addedCategoryId)
+                if ( addedCategoryId.length == 1 ) {
+                    this.addParentCategories(addedCategoryId[0])
+                }
             }
 
-            if ( (value||[]).length < (oldValue||[]).length ) {
+            //Category has been removed
+            else if ( (value||[]).length < (oldValue||[]).length ) {
                 let removedCategoryId = _.xor(value, oldValue)[0];
 
                 this.removeChildCategories(removedCategoryId)

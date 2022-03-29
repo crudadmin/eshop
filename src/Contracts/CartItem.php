@@ -93,8 +93,9 @@ class CartItem implements UsesIdentifier
      */
     public function getValue(string $key)
     {
-        if ( property_exists($this, $key) )
+        if ( property_exists($this, $key) ) {
             return $this->{$key};
+        }
     }
 
     /**

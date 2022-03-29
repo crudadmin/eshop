@@ -250,7 +250,7 @@ class CartController extends Controller
         $order = OrderService::getOrder();
 
         return autoAjax()->success(_('Objednávka bola úspešne odoslaná.'))->data([
-            'order' => $order,
+            'order' => $order->setOrderResponse(),
             'order_hash' => $order->getHash(),
             'payment' => ($paymentData = $order->getPaymentData()) ? $paymentData : [],
             'cart' => Cart::fullCartResponse(),

@@ -30,7 +30,7 @@ trait HasCategoryTree
                 $tree[] = [
                     'id' => $category->getKey(),
                     'name' => implode(' >> ', array_map(function($id) use ($categories){
-                        return $categories[$id]->name;
+                        return $categories[$id]->getValue('name');
                     }, $categoryTree)),
                     'tree' => $categoryTree,
                 ];
