@@ -26,7 +26,7 @@
             draggable=".--draggableItem">
             <CategoriesTreeItem
                 v-for="item in firstLevel"
-                level="0"
+                :level="0"
                 :model="model"
                 :item="item"
                 :items="items"

@@ -25,7 +25,7 @@
                 @click="addNewSubcategory()"
                 :title="__('Pridať podkategóriu')"
                 data-toggle="tooltip"
-                v-if="model.insertable"
+                v-if="canDisplayNextLevel"
             >
                 <i class="fa fa-plus"></i>
             </button>
@@ -137,7 +137,7 @@ export default {
                 return;
             }
 
-            return this.level <= this.model.getSettings('recursivity.max_depth');
+            return this.level < this.model.getSettings('recursivity.max_depth');
         }
     },
 
