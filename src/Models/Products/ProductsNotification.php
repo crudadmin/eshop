@@ -53,7 +53,7 @@ class ProductsNotification extends AdminModel
     {
         return [
             'product_id' => 'name:Produkt|belongsTo:products,:name :code',
-            'products_variant_id' => 'name:Varianta|belongsTo:products_variants,:name :code',
+            'products_variant_id' => 'name:Varianta|belongsTo:products,:name :code',
             'email' => 'name:E-mail|required|email|max:90',
             'notified' => 'name:Upozornený emailom|type:checkbox|default:0',
             'notified_error' => 'name:Chyba pri upozornení|type:checkbox|default:0|inaccessible',
