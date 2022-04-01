@@ -16,10 +16,10 @@ function operator_types($except = [])
     $operators = [
         '+%' => '% - Pričítať k aktualnej cene',
         '-%' => '% - Odčítať z aktuálnej ceny',
-        '+' => '+ Pripočítať k cene bez DPH',
-        '-' => '- Odčítať z ceny bez DPH',
-        '+V' => '+ Pripočítať k cene s DPH',
-        '-V' => '- Odčítať z ceny s DPH',
+        '+V' => '+ Pripočítať k cene (s DPH)',
+        '-V' => '- Odčítať z ceny (s DPH)',
+        '+' => '+ Pripočítať k cene (bez DPH)',
+        '-' => '- Odčítať z ceny (bez DPH)',
         '*' => '* Vynásobit cenu',
         'abs' => 'Nová hodnota',
     ];
