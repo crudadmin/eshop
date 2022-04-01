@@ -168,7 +168,7 @@ trait PriceMutator
                 if ( $discount->operator && is_numeric($value) ) {
                     $originalPrice = $price;
 
-                    $price = operator_modifier($price, $discount->operator, $value);
+                    $price = operator_modifier($price, $discount->operator, $value, $this->getRewritedVatValue());
 
                     //Save all discounts applied on given model
                     $this->appliedDiscounts[$discount->getKey()] = [
@@ -222,7 +222,7 @@ trait PriceMutator
             return $defaultPrice;
         }
 
-        $price = operator_modifier($this->getAttribute('initialPriceWithoutVat'), $this->getAttribute('discount_operator'), $this->getAttribute('discount'));
+        $price = operator_modifier($this->getAttribute('initialPriceWithoutVat'), $this->getAttribute('discount_operator'), $this->getAttribute('discount'), $this->getRewritedVatValue());
 
         return config('admineshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
     }
@@ -320,12 +320,7 @@ trait PriceMutator
             $round = Store::hasSummaryRounding();
         }
 
-        $vat = $this->getAttribute('vatValue');
-
-        //If model has rewriten vat value
-        if ( ! is_null($this->getRewritedVatValue()) ) {
-            $vat = $this->getRewritedVatValue();
-        }
+        $vat = $this->getRewritedVatValue();
 
         $price = $price * ($vat ? (1 + ($vat / 100)) : 1);
 
@@ -403,7 +398,9 @@ trait PriceMutator
      */
     public function getRewritedVatValue()
     {
-        return $this->rewritedVatValue;
+        $rewritedVat = $this->rewritedVatValue;
+
+        return is_null($rewritedVat) === false ? $rewritedVat : $this->getAttribute('vatValue');
     }
 
     /**
