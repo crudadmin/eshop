@@ -92,4 +92,15 @@ class Store extends AdminModel
             'decimals.rounding' => StoreFacade::getRounding(),
         ];
     }
+
+    public function onTableCreate($table, $schema)
+    {
+        $this->insert([
+            'decimal_places' => $this->getField('decimal_places')['default'] ?? null,
+            'decimal_rounding' => $this->getField('decimal_rounding')['default'] ?? null,
+            'decimal_separator' => $this->getField('decimal_separator')['default'] ?? null,
+            'default_image' => '',
+        ]);
+    }
+
 }
