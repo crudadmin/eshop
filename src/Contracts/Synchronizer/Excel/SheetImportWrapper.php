@@ -72,7 +72,7 @@ class SheetImportWrapper
 
     public function getColumnNameByField($key)
     {
-        $columns = $this->getColumns();
+        $columns = $this->getCastedColumns();
 
         if ( $columnName = (collect($columns)->where('column', $key)->keys()[0] ?? null) ){
             return FromXlsToArray::parseHeaderString($columnName);

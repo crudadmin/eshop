@@ -112,7 +112,6 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
         foreach ($this->importer->getCastedColumns() as $sheetColumnName => $column) {
             if ( !isset($column['column']) ) {
-                $column['column'] = $sheetColumnName;
                 continue;
             }
 
@@ -143,7 +142,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
     {
         $attributes = [];
 
-        foreach ($this->importer->getColumns() as $sheetColumnName => $column) {
+        foreach ($this->importer->getCastedColumns() as $sheetColumnName => $column) {
             if ( !isset($column['attribute']) ) {
                 continue;
             }
