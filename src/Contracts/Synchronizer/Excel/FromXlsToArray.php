@@ -52,7 +52,7 @@ class FromXlsToArray
             //We want bind header
             if ( $i == 0 ) {
                 foreach ($rowData as $name) {
-                    $header[$this->parseHeaderString($name)] = $name;
+                    $header[self::parseHeaderString($name)] = $name;
                 }
 
                 $header = array_filter($header);
@@ -64,7 +64,9 @@ class FromXlsToArray
                     return trim($value);
                 }, array_slice($rowData, 0, count($header)));
 
-                $rows[] = array_combine(array_keys($header), $trimmedRowData);
+                if ( count(array_filter($trimmedRowData)) ) {
+                    $rows[] = array_combine(array_keys($header), $trimmedRowData);
+                }
             }
 
             $i++;
@@ -73,7 +75,7 @@ class FromXlsToArray
         return compact('header', 'rows');
     }
 
-    public function parseHeaderString($string)
+    public static function parseHeaderString($string)
     {
         $string = preg_replace("/{\s| |\.|\-|\_}/", '-', $string);
         $string = mb_strtolower($string);

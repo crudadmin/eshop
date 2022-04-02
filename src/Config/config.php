@@ -329,4 +329,11 @@ return [
             'detail' => [680, null],
         ],
     ],
+
+    'import' => [
+        // [
+        //     'name' => _('Import produktov'),
+        //     'class' => \AdminEshop\Contracts\Synchronizer\Excel\SheetImportWrapper::class,
+        // ],
+    ],
 ];

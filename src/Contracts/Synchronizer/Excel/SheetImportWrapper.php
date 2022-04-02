@@ -13,6 +13,8 @@ class SheetImportWrapper
 
     public $array;
 
+    private $castedColumns;
+
     public function getColumns()
     {
         return [
@@ -50,11 +52,12 @@ class SheetImportWrapper
     {
         $insert = collect();
 
+        $rows = $this->getRows();
+
         if ( !$this->getPairingCodeColumnName() ){
             throw new FormattingError('Pairing symbol is not available.');
         }
 
-        $rows = $this->getRows();
         $class = $this->getImporter();
 
         (new SynchronizerReport)->makeReport('Synchronizácia produktov', [
@@ -79,7 +82,7 @@ class SheetImportWrapper
 
     public function checkColumnsAviability()
     {
-        $columns = $this->getColumns();
+        $columns = $this->getCastedColumns();
 
         $errors = [];
 
@@ -99,5 +102,21 @@ class SheetImportWrapper
                 '<strong>'.implode(' | ', $errors).'</strong>'
             );
         }
+    }
+
+    private function getCastedColumns()
+    {
+        if ( $this->castedColumns ){
+            return $this->castedColumns;
+        }
+
+        $columns = $this->getColumns();
+
+        return $this->castedColumns = array_combine(
+            array_map(function($key){
+                return FromXlsToArray::parseHeaderString($key);
+            }, array_keys($columns)),
+            array_values($columns)
+        );
     }
 }
