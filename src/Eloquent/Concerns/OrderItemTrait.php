@@ -46,6 +46,8 @@ trait OrderItemTrait
                 $attributesText = $product->attributesVariantsText;
             } else if ( config('admineshop.attributes.attributesText', false) == true ) {
                 $attributesText = $product->attributesText;
+            } else {
+                $attributesText = null;
             }
 
             //Extend name with attributes

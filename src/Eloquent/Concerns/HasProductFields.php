@@ -27,7 +27,7 @@ trait HasProductFields
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|hideFromFormIf:product_type,variant|sub_component:setProductType|required',
                 Group::inline([
                     'ean' => 'name:EAN|hidden',
-                    'code' => 'name:Kód produktu',
+                    'code' => 'name:Kód produktu|index',
                     'code_pairing' => 'name:Párovací kód produktu|inaccessible',
                 ])->attributes('hideFromFormIf:product_type,variants'),
             ])->name('Identifikátory produkty')->id('identifiers'),
