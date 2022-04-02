@@ -17,6 +17,11 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
     public $synchronizeAttributesItems = [ 'create' => true, 'update' => true, 'delete' => false ];
     public $synchronizeProductAttributes = [ 'create' => true, 'update' => true, 'delete' => true ];
 
+    public $separators = [
+        'categories' => ';',
+        'attributes' => ';',
+    ];
+
     protected $treeProductIdentifier = [];
     protected $sheetRows;
     protected $importer;
@@ -86,7 +91,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
     public function getCategoriesList($items)
     {
-        $categories = explode(';', ($items[0][$this->importer->getColumnNameByField('$categories')] ?? '').'');
+        $categories = explode($this->separators['categories'], ($items[0][$this->importer->getColumnNameByField('$categories')] ?? '').'');
 
         return array_map(function($number){
             return (int)$number;
@@ -160,7 +165,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
                         'name' => $value,
                         'code' => $column['attribute'].'_'.crc32($value),
                     ];
-                }, explode(';', $value)),
+                }, explode($this->separators['attributes'], $value)),
             ];
 
             $attributes[] = $attribute;
