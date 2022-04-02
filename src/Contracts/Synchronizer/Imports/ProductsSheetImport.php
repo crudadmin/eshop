@@ -157,6 +157,11 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
                 continue;
             }
 
+            //Disable or enable separating imported items with ;
+            $items = ($column['multiple'] ?? true) === true
+                        ? explode($this->separators['attributes'], $value)
+                        : [$value];
+
             $attribute = [
                 'code' => $column['attribute'],
                 'name' => $this->importer->array['header'][$sheetColumnName],
@@ -165,7 +170,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
                         'name' => $value,
                         'code' => $column['attribute'].'_'.crc32($value),
                     ];
-                }, explode($this->separators['attributes'], $value)),
+                }, $items),
             ];
 
             $attributes[] = $attribute;
