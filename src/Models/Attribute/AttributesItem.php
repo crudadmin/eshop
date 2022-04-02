@@ -72,6 +72,7 @@ class AttributesItem extends AdminModel
     {
         return [
             'name' => 'name:Hodnota atribútu|hidden|component:AttributeItemValue|validate_attribute_unit|required'.(Store::isEnabledLocalization() ? '|locale' : ''),
+            'code' => 'name:Importný kód|inaccessible|max:30|index',
         ];
     }
 

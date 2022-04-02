@@ -54,7 +54,7 @@ class SheetImportWrapper
 
         $rows = $this->getRows();
 
-        if ( !$this->getPairingCodeColumnName() ){
+        if ( is_null($this->getPairingCodeColumnName()) ){
             throw new FormattingError('Pairing symbol is not available.');
         }
 
@@ -72,7 +72,15 @@ class SheetImportWrapper
 
     public function getColumnNameByField($key)
     {
-        return collect($this->getColumns())->where('column', $key)->keys()[0] ?? null;
+        $columns = $this->getColumns();
+
+        if ( $columnName = (collect($columns)->where('column', $key)->keys()[0] ?? null) ){
+            return FromXlsToArray::parseHeaderString($columnName);
+        }
+
+        if ( array_key_exists($key, $columns) ){
+            return $key;
+        }
     }
 
     public function getPairingCodeColumnName()
@@ -104,7 +112,7 @@ class SheetImportWrapper
         }
     }
 
-    private function getCastedColumns()
+    public function getCastedColumns()
     {
         if ( $this->castedColumns ){
             return $this->castedColumns;

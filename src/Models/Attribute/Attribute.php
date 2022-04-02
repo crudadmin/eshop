@@ -77,6 +77,7 @@ class Attribute extends AdminModel
             'unit' => 'name:Merná jednotka / Typ atribútu|belongsTo:attributes_units,:name (:unit)|canEdit|canAdd',
             'title' => 'name:Popis|'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'sortby' => 'name:Zoradiť podľa|type:select|required|default:asc',
+            'code' => 'name:Importný kód|inaccessible|max:30|index',
         ];
     }
 
