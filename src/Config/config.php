@@ -16,6 +16,9 @@ return [
             'cache' => env('CACHE_BOOTSTRAP_TIME', 0),
             'class' => \AdminEshop\Contracts\Request\BootstrapRequest::class,
         ],
+        'listing' => [
+            'cache' => env('CACHE_LISTING_TIME', 0),
+        ],
     ],
 
     /*
