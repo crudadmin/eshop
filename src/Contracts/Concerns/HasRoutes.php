@@ -6,7 +6,7 @@ use Route;
 
 trait HasRoutes
 {
-    public function routesBootstrap()
+    public function routesForBootstrap()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers\Bootstrap'], function(){
             Route::any('/bootstrap', 'BootstrapController@index')->visible();

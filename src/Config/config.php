@@ -13,7 +13,7 @@ return [
             'cart_payments' => false,
         ],
         'bootstrap' => [
-            'cache' => env('CACHE_BOOTSTRAP_TIME', 5),
+            'cache' => env('CACHE_BOOTSTRAP_TIME', 0),
             'class' => \AdminEshop\Contracts\Request\BootstrapRequest::class,
         ],
     ],

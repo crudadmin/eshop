@@ -2,10 +2,11 @@
 
 namespace AdminEshop\Contracts\Request;
 
+use Admin;
 use Admin\Controllers\GettextController;
 use EditorMode;
+use Localization;
 use Store;
-use Admin;
 
 class BootstrapRequest
 {
@@ -21,7 +22,9 @@ class BootstrapRequest
 
     public function getBackendEnv()
     {
-        return [];
+        return [
+            'APP_ENV' => env('APP_ENV'),
+        ];
     }
 
     public function getStoreProperties()
@@ -31,6 +34,7 @@ class BootstrapRequest
             'store/setSettings' => Store::getSettings()->setBootstrapResponse(),
             'store/setCurrency' => Store::getCurrency(),
             'store/setRounding' => Store::getRounding(),
+            'store/setDecimalPlaces' => Store::getDecimalPlaces(),
             'store/setVat' => Store::hasB2B() ? false : true,
             'store/setVats' => Store::getVats(),
             'store/setCountries' => Store::getCountries()->each->setBootstrapResponse(),
@@ -42,12 +46,17 @@ class BootstrapRequest
         return [
             'seo_routes' => $this->getSeoRoutes(),
             'routes' => EditorMode::getVisibleRoutes(),
-            'translates' => (new GettextController)->getJson(),
+            'translates' => $this->getJsonTranslations(),
+            'languages' => $this->getLanguages(),
         ];
     }
 
-    private function getSeoRoutes()
+    public function getSeoRoutes()
     {
+        if ( !config('admin.seo') ){
+            return [];
+        }
+
         return Admin::getModel('RoutesSeo')->get()->each(function($row){
             $row->setVisible(['url', 'title', 'keywords', 'description', 'metaImageThumbnail']);
 
@@ -55,6 +64,15 @@ class BootstrapRequest
         })->toArray();
     }
 
+    public function getLanguages()
+    {
+        return Localization::getLanguages()->each->setVisible(['id', 'name', 'slug']);
+    }
+
+    public function getJsonTranslations()
+    {
+        return Localization::getJson();
+    }
 }
 
 ?>

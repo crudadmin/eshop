@@ -28,6 +28,9 @@ class Store extends AdminModel
 
     protected $single = true;
 
+    protected $publishable = false;
+    protected $sortable = false;
+
     /*
      * Automatic form and database generation
      * @name - field name
