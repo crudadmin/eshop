@@ -55,6 +55,7 @@ return [
         'filtrable' => true, //Toggle if attribute should be presnet in filter
         'attributesText' => false, //display attributesText property in products
         'attributesVariants' => false, //set which attributes can define variants
+        'hideOnFiltration' => true, //When filtrating fields, we want hide items which are not present in actual filter
         'separator' => [
             'item' => ', ',
             'attribute' => ', ',
