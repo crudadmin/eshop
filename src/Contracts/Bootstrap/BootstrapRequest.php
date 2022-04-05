@@ -1,6 +1,6 @@
 <?php
 
-namespace AdminEshop\Contracts\Request;
+namespace AdminEshop\Contracts\Bootstrap;
 
 use Admin;
 use Admin\Controllers\GettextController;
@@ -38,6 +38,7 @@ class BootstrapRequest
             'store/setVat' => Store::hasB2B() ? false : true,
             'store/setVats' => Store::getVats(),
             'store/setCountries' => Store::getCountries()->each->setBootstrapResponse(),
+            'store/setCategories' => $this->getCategories(),
         ];
     }
 
@@ -62,6 +63,11 @@ class BootstrapRequest
 
             $row->setLocalizedResponse();
         })->toArray();
+    }
+
+    public function getCategories()
+    {
+        return [];
     }
 
     public function getLanguages()

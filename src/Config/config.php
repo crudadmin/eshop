@@ -200,7 +200,6 @@ return [
             AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
             AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
             AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
-            AdminEshop\Contracts\Order\Mutators\HeurekaVerifiedCustomersMutator::class,
         ],
 
         'order' => [

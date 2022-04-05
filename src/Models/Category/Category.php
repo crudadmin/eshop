@@ -140,4 +140,9 @@ class Category extends AdminModel
             });
         });
     }
+
+    public function setBootstrapResponse()
+    {
+        return $this;
+    }
 }
