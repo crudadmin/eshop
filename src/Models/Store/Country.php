@@ -17,4 +17,9 @@ class Country extends BaseCountry
             'iso3166' => 'name:Číselný kód krajiny (ISO 3166)|title:https://sk.wikipedia.org/wiki/ISO_3166-1 - Potrebné pre DPD'
         ]);
     }
+
+    public function setBootstrapResponse()
+    {
+        return $this->setVisible(['id', 'name', 'code']);
+    }
 }

@@ -12,6 +12,10 @@ return [
             'cart_submit' => false,
             'cart_payments' => false,
         ],
+        'bootstrap' => [
+            'cache' => env('CACHE_BOOTSTRAP_TIME', 5),
+            'class' => \AdminEshop\Contracts\Request\BootstrapRequest::class,
+        ],
     ],
 
     /*

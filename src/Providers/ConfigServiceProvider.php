@@ -44,7 +44,7 @@ class ConfigServiceProvider extends ServiceProvider
         $this->mergeConfigs(
             $this->eshopConfigKey,
             $this->getEshopConfigPath(),
-            ['attributes', 'stock', 'delivery', 'discounts', 'cart', 'mail', 'order', 'order.codes']
+            ['routes', 'attributes', 'stock', 'delivery', 'discounts', 'cart', 'mail', 'order', 'order.codes']
         );
 
         $this->mergeMarkdownConfigs();

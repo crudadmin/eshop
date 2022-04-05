@@ -103,4 +103,8 @@ class Store extends AdminModel
         ]);
     }
 
+    public function setBootstrapResponse()
+    {
+        return $this->setVisible(['id', 'email', 'decimal_places', 'decimal_rounding', 'decimal_separator']);
+    }
 }
