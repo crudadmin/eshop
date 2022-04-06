@@ -145,4 +145,9 @@ class Category extends AdminModel
     {
         return $this;
     }
+
+    public function setListingResponse()
+    {
+        return $this;
+    }
 }

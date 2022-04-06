@@ -13,6 +13,13 @@ trait HasRoutes
         });
     }
 
+    public function routesForListing()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers\Listing'], function(){
+            Route::any('/listing/{category?}', 'ListingController@index')->visible();
+        });
+    }
+
     public function routesForProducts()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
