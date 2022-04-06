@@ -181,22 +181,54 @@ trait HasProductFilter
 
     public function scopeApplyPriceRangeFilter($query, $params, $extractVariants = false)
     {
-        $priceRanges = array_filter(explode(',', $params['_price'] ?? ''), function($item){
-            return !is_null($item) && $item !== '';
-        });
+        $priceRanges = [];
 
-        //Filter product range price
-        $query->where(function($query) use ($priceRanges) {
-            $filterCount = count($priceRanges);
+        //Filter by single price range
+        if ( $price = ($params['_price'] ?? '') ) {
+            $priceRanges[] = array_filter(explode(',', $price), function($item){
+                return !is_null($item) && $item !== '';
+            });
+        }
 
-            if ( $filterCount == 2 ){
-                $query
-                    ->where($query->getQuery()->from.'.price', '>=', $priceRanges[0])
-                    ->where($query->getQuery()->from.'.price', '<=', $priceRanges[1]);
-            } else if ( $filterCount == 1 ) {
-                $query->where($query->getQuery()->from.'.price', '<=', $priceRanges[0]);
-            }
-        });
+        //Filter by multiple price ranges, eg: 0,9.99 ; 10,99.99
+        if ( $prices = ($params['_prices'] ?? '') ) {
+            $priceRanges = array_merge($priceRanges, array_map(
+                fn($range) => array_map(fn($r) => (float)$r, explode(',', $range)),
+                explode(';', $prices)
+            ));
+        }
+
+        if ( count($priceRanges) > 0 ){
+            //Filter product range price
+            $query->where(function($query) use ($priceRanges) {
+                foreach ($priceRanges as $priceRange) {
+                    $query->orWhere(function($query) use ($priceRange){
+                        $column = $query->getQuery()->from.'.price';
+                        $filterCount = count($priceRange);
+
+                        if ( $filterCount == 2 ){
+                            //basic filter from to, eg: 5-200
+                            if ( $priceRange[0] < $priceRange[1] ) {
+                                $query
+                                    ->where($column, '>=', $priceRange[0])
+                                    ->where($column, '<=', $priceRange[1]);
+                            }
+
+                            //Filter up to 200+: we need pass 200;0, it means we want filter 200 and higher.
+                            else if ( $priceRange[0] > $priceRange[1] ){
+                                $query->where($column, '>=', $priceRange[0]);
+                            }
+                        }
+
+                        //Filter x and lower, pass 1 param.
+                        else if ( $filterCount == 1 ) {
+                            $query->where($column, '<=', $priceRange[0]);
+                        }
+                    });
+                }
+            });
+        }
+
     }
 
     public function scopeFilterProduct($query, $params)
