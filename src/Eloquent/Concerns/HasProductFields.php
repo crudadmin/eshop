@@ -13,7 +13,7 @@ trait HasProductFields
             Group::fields(array_merge(
                 [
                     Group::fields([
-                        'name' => 'name:Názov produktu|limit:65|required'.(Store::isEnabledLocalization() ? '|locale' : '|index'),
+                        'name' => 'name:Názov produktu|limit:65|required'.(Store::isEnabledLocalization() ? '|locale' : '|index').'|'.(in_array('name', $this->getSearchableColumns()) ? 'fulltext' : ''),
                     ])->id('names'),
                     Group::fields([
                         'image' => 'name:Obrázok|type:file|image',

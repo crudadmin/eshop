@@ -9,6 +9,18 @@ trait HasProductSorter
     public function getAvailableSorts()
     {
         return [
+            'name-asc' => [
+                'name' => _('Cheapest'),
+                'scope' => function($query){
+                    $query->orderBy('products.name', 'ASC');
+                },
+            ],
+            'name-desc' => [
+                'name' => _('Cheapest'),
+                'scope' => function($query){
+                    $query->orderBy('products.name', 'DESC');
+                },
+            ],
             'cheapest' => [
                 'name' => _('Cheapest'),
                 'scope' => function($query){

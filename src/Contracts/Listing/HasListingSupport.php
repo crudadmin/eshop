@@ -8,11 +8,6 @@ use Admin;
 
 trait HasListingSupport
 {
-    public function defaultLimit()
-    {
-        return 20;
-    }
-
     public function getCachableQueries()
     {
         return ['page', 'limit'];
@@ -41,7 +36,6 @@ trait HasListingSupport
             $products = $this->getProducts($options);
 
             return [
-                'defaultLimit' => $this->defaultLimit(),
                 'pagination' => $products,
                 'attributes' => $attributes,
             ];
@@ -53,7 +47,7 @@ trait HasListingSupport
         $productsQuery = Admin::getModel('Product')->withListingResponse($options);
 
         $products = $productsQuery->productsPaginate(
-            request('limit', $this->defaultLimit())
+            request('filter._limit', request('limit'))
         );
 
         $products->getCollection()->each->setListingResponse();

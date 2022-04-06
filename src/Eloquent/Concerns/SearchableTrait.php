@@ -2,6 +2,8 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Exception;
+
 trait SearchableTrait
 {
     /**
@@ -33,6 +35,11 @@ trait SearchableTrait
         return $searchTerm;
     }
 
+    public function getSearchableColumns()
+    {
+        return method_exists($this, 'searchable') ? $this->searchable() : ($this->searchable ?: []);
+    }
+
     /**
      * Scope a query that matches a full text search of term.
      *
@@ -42,7 +49,10 @@ trait SearchableTrait
      */
     public function scopeFulltextSearch($query, $term, $where = null, $orderBy = null)
     {
-        $searchable = method_exists($this, 'searchable') ? $this->searchable() : $this->searchable;
+        $searchable = $this->getSearchableColumns();
+        if ( is_array($searchable) === false || count($searchable) === 0 ){
+            throw new Exception('No searchable columns found.');
+        }
 
         $columns = implode(',', $query->getModel()->fixAmbiguousColumn($searchable));
 
