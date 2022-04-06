@@ -126,12 +126,19 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
             //Does not overide built in values
             if ( !array_key_exists($column['column'], $array) ) {
-                $array[$column['column']] = $this->isEmptyValue($item[$sheetColumnName] ?? null) === false
+                $value = $this->isEmptyValue($item[$sheetColumnName] ?? null) === false
                     ? $item[$sheetColumnName]
                     : ($this->isEmptyValue($column['default'] ?? null) === false
                         ? $column['default']
                         : null
                     );
+
+                //Skip empty values
+                if ( is_null($value) && ($column['skipEmpty'] ?? false) === true ){
+                    continue;
+                }
+
+                $array[$column['column']] = $value;
             }
         }
 
