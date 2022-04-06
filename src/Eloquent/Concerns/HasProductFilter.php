@@ -62,12 +62,14 @@ trait HasProductFilter
             //Filter by basic product type
             $query->where(function($query) use ($extractVariants, $filter) {
                 $query->where(function($query) use ($extractVariants) {
+                    //Regular product
                     $query->where(function($query) {
                         $query
                             ->nonVariantProducts()
                             ->filterParentProduct();
                     });
 
+                    //Retrieve variants as well
                     if ( $extractVariants ){
                         $query->orWhere(function($query){
                             $query
@@ -86,13 +88,14 @@ trait HasProductFilter
                 $query->filterProduct($filter);
             });
 
+            //Retrieve basic parents of variants types.
             if ( $extractVariants === false ) {
-                //Filter product by variant attributes
                 $query->orWhere(function($query) use ($filter) {
                     $query
                         ->variantsProducts()
                         ->cloneModelFilter($this)
                         ->filterParentProduct()
+                        //Only when filter of parent product matches with variants
                         ->whereHas('variants', function($query) use ($filter) {
                             $query
                                 //We need reclone options in relationships
@@ -119,6 +122,27 @@ trait HasProductFilter
                             : explode(',', $categoryFilter.'');
 
         $query->filterCategory($categoryFilter);
+    }
+
+    public function scopeApplySearchFilter($query, $params)
+    {
+        //Filter by category
+        if ( !($searchQuery = $params['_search'] ?? null) ) {
+            return;
+        }
+
+        $query->onSearch($searchQuery);
+    }
+
+    /**
+     * We can modiry search engine in this method
+     *
+     * @param  Builder  $query
+     * @param  string  $searchQuery
+     */
+    public function scopeOnSearch($query, $searchQuery)
+    {
+        $query->fulltextSearch($searchQuery);
     }
 
     public function scopeExtractDifferentVariants($query)
@@ -209,6 +233,7 @@ trait HasProductFilter
         $filter = $filter ?: $this->getFilterOption('filter', []);
 
         $query->applyCategoryFilter($filter);
+        $query->applySearchFilter($filter);
     }
 
     public function scopeFilterVariantProduct($query, $options = null)

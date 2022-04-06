@@ -21,6 +21,7 @@ use AdminEshop\Eloquent\Concerns\HasProductSorter;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\HasVariantColors;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Eloquent\Concerns\SearchableTrait;
 use AdminEshop\Models\Attribute\Attribute;
 use AdminEshop\Models\Attribute\AttributesItem;
 use Admin\Eloquent\AdminModel;
@@ -39,7 +40,8 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasCategoryTree,
         HasHeureka,
         HasVariantColors,
-        HasProductFields;
+        HasProductFields,
+        SearchableTrait;
 
     /*
      * Model created date, for ordering tables in database and in user interface
