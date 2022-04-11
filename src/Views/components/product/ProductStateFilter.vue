@@ -6,7 +6,7 @@
             data-toggle="tooltip"
             :title="property.title"
             type="button"
-            class="btn mr-2"
+            class="btn mr-1"
             :class="{
                 'btn-primary': filterId.includes(key),
                 'btn-default': !filterId.includes(key),
