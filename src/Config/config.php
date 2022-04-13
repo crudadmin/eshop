@@ -260,7 +260,9 @@ return [
     ],
 
     'client' => [
+        'guard' => 'api',
         'username_splitted' => false,
+        'in_cart_response' => true,
         'zipcode' => [
             'validation' => true,
         ],

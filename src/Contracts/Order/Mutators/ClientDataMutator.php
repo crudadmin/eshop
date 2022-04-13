@@ -67,9 +67,15 @@ class ClientDataMutator extends Mutator
      */
     public function mutateFullCartResponse($response) : array
     {
-        return array_merge($response, [
+        $data = [
             'clientData' => $this->getClientData(),
-        ]);
+        ];
+
+        if ( config('admineshop.client.in_cart_response') == true && client() ){
+            $response['client'] = client()->setClientResponse();;
+        }
+
+        return array_merge($response, $data);
     }
 
     /**

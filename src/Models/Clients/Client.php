@@ -63,7 +63,7 @@ class Client extends Authenticatable
                         'lastname' => 'name:Priezvisko',
                     ])->add('hidden'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : ''))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
                     'phone' => 'name:Telefon|'.phoneValidatorRule(),
-                    'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
+                    'password' => 'name:Heslo|type:password|min:6|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                 ],
                 config('admineshop.client.groups', false)
                     ? ['groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd'] : []
@@ -113,5 +113,10 @@ class Client extends Authenticatable
         if ( $this->photo ){
             return $this->photo->resize(300, 300)->url;
         }
+    }
+
+    public function setClientResponse()
+    {
+        return $this;
     }
 }
