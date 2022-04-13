@@ -36,7 +36,11 @@ trait HasOrderFields
     protected function getBillingFields()
     {
         return Group::fields([
-            'username' => 'name:Meno a priezvisko|required|hidden|inaccessible_column',
+            'username' => 'name:Meno a priezvisko|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required'),
+            Group::inline([
+                'firstname' => 'name:Meno',
+                'lastname' => 'name:Priezvisko',
+            ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required'))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
             'email' => 'name:Email|email|required|hidden',
             'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
             'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
@@ -56,7 +60,11 @@ trait HasOrderFields
         return Group::fields([
             'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|column_name:Ina doruč. adr.|type:checkbox|default:0',
             Group::fields([
-                'delivery_username' => 'name:Meno a priezvisko / Firma|required_if_checked:delivery_different',
+                'delivery_username' => 'name:Meno a priezvisko / Firma|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required_if_checked:delivery_different'),
+                Group::inline([
+                    'delivery_firstname' => 'name:Meno',
+                    'delivery_lastname' => 'name:Priezvisko',
+                ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required_if_checked:delivery_different'))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
                 'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
                 'delivery_street' => 'name:Ulica a č.p.|required_if_checked:delivery_different',
                 'delivery_city' => 'name:Mesto|required_if_checked:delivery_different',

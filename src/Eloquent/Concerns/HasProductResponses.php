@@ -362,6 +362,8 @@ trait HasProductResponses
         if ( $attributesScope = $this->getFilterOption($prefix.'attributes', false) ) {
             $query->with([
                 'attributesItems' => function($query) use ($attributesScope) {
+                    $query->withResponse($this->getFilterPrefix());
+
                     if ( is_callable($attributesScope) ){
                         $attributesScope($query);
                     }

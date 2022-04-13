@@ -3,13 +3,16 @@
 namespace AdminEshop\Models\Clients;
 
 use AdminEshop\Contracts\Discounts\ClientPercentage;
+use AdminEshop\Eloquent\Concerns\HasUsernames;
 use Admin\Eloquent\Authenticatable;
 use Admin\Fields\Group;
-use Illuminate\Notifications\Notifiable;
 use Discounts;
+use Illuminate\Notifications\Notifiable;
 
 class Client extends Authenticatable
 {
+    use HasUsernames;
+
     /*
      * Model created date, for ordering tables in database and in user interface
      */
@@ -54,7 +57,11 @@ class Client extends Authenticatable
                         'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
                         'photo' => 'name:Fotografia|type:file|image',
                     ])->inline(),
-                    'username' => 'name:Meno a priezvisko',
+                    'username' => 'name:Meno a priezvisko'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : ''),
+                    Group::inline([
+                        'firstname' => 'name:Meno',
+                        'lastname' => 'name:Priezvisko',
+                    ])->add('hidden'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : ''))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
                     'phone' => 'name:Telefon|'.phoneValidatorRule(),
                     'password' => 'name:Heslo|type:password|min:4|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                 ],

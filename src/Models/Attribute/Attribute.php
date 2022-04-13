@@ -89,10 +89,12 @@ class Attribute extends AdminModel
 
         if ( $filtrable || $attributesText || $attributesVariants ){
             $fields->push(
-                Group::inline(array_filter([
-                    'filtrable' => $filtrable ? 'name:Filtrovať podľa atribútu|type:checkbox|title:Povoliť atribút vo filtrácii produktov|default:0' : null,
-                    'product_info' => $attributesText ? 'name:V skrátenom popise produktu|title:Zobraziť v skátenom popise produktu|type:checkbox|default:0' : null,
-                    'variants' => $attributesVariants ? 'name:Definuje variantu produktu|title:Zobrazi sa v detaile produktu možnosť preklikávania medzi priradenými hodnotami atribútu|type:checkbox|default:0' : null,
+                Group::fields(array_filter([
+                    Group::inline([
+                        'filtrable' => $filtrable ? 'name:Filtrovať podľa atribútu|type:checkbox|title:Povoliť atribút vo filtrácii produktov|default:0' : null,
+                        'product_info' => $attributesText ? 'name:V skrátenom popise produktu|title:Zobraziť v skátenom popise produktu|type:checkbox|default:0' : null,
+                        'variants' => $attributesVariants ? 'name:Definuje variantu produktu|title:Zobrazi sa v detaile produktu možnosť preklikávania medzi priradenými hodnotami atribútu|type:checkbox|default:0' : null,
+                    ]),
                 ]))->name('Nastavenia atribútu')->id('settings')
             );
         }

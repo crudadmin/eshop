@@ -218,4 +218,9 @@ class AttributesItem extends AdminModel
             }
         });
     }
+
+    public function scopeWithResponse($query, $type)
+    {
+        $query->select($this->getAttributesItemsColumns());
+    }
 }

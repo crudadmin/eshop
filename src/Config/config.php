@@ -172,7 +172,7 @@ return [
         //Return full cart response with all deliveries, payment methods etc,,, in every cart request
         //add/update/delete items, manage discount codes, etc... By default those data are returned only on cart page.
         //But we can turn it on everywere
-        'default_full_response' => false,
+        'default_full_response' => true,
 
         'token' => [
             //For REST authorization
@@ -189,12 +189,12 @@ return [
             'remove_empty_after_days' => 3,
         ],
 
-        'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
-        // 'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,
+        // 'driver' => AdminEshop\Contracts\Cart\Drivers\SessionDriver::class,
+        'driver' => AdminEshop\Contracts\Cart\Drivers\MySqlDriver::class,
 
         //For session (NonRest) authorization with MySqlDriver..
         //If we want use header_token (REST), we need turn off session
-        'session' => true,
+        'session' => false,
 
         //Cart and order mutators
         'mutators' => [
@@ -260,6 +260,7 @@ return [
     ],
 
     'client' => [
+        'username_splitted' => false,
         'zipcode' => [
             'validation' => true,
         ],

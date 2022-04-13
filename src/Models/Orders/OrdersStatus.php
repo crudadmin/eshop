@@ -90,7 +90,7 @@ class OrdersStatus extends AdminModel
 
         $i = 1;
 
-        $languages = [
+        $insert = [
             [
                 'store_id' => $storeId,
                 'name' => 'Pripravuje sa',
@@ -107,6 +107,7 @@ class OrdersStatus extends AdminModel
                 'default' => false,
                 'key' => 'shipped',
                 'email_delivery' => 0,
+                'email_content' => null,
                 'return_stock' => false,
                 'color' => null]
                  + ($hasSortable ? ['_order' => $i++] : []),
@@ -116,6 +117,7 @@ class OrdersStatus extends AdminModel
                 'default' => false,
                 'key' => 'ok',
                 'email_delivery' => 0,
+                'email_content' => null,
                 'return_stock' => false,
                 'color' => '#2ecc71'
             ] + ($hasSortable ? ['_order' => $i++] : []),
@@ -125,12 +127,13 @@ class OrdersStatus extends AdminModel
                 'default' => false,
                 'key' => 'canceled',
                 'email_delivery' => 0,
+                'email_content' => null,
                 'return_stock' => true,
                 'color' => null
             ] + ($hasSortable ? ['_order' => $i++] : []),
         ];
 
-        $this->insert($languages);
+        $this->insert($insert);
     }
 
     public function parseOrderText($key, $order)

@@ -287,38 +287,6 @@ trait OrderTrait
         return $provider->getTrackingUrl($this->delivery_identifier);
     }
 
-    public function getFirstnameAttribute()
-    {
-        $names = explode(' ', $this->username);
-
-        return $names[0] ?? null;
-    }
-
-    public function getLastnameAttribute()
-    {
-        $names = explode(' ', $this->username);
-
-        if ( count($names) >= 2 ) {
-            return end($names);
-        }
-    }
-
-    public function getDeliveryFirstnameAttribute()
-    {
-        $names = explode(' ', $this->delivery_username);
-
-        return $names[0] ?? null;
-    }
-
-    public function getDeliveryLastnameAttribute()
-    {
-        $names = explode(' ', $this->delivery_username);
-
-        if ( count($names) >= 2 ) {
-            return end($names);
-        }
-    }
-
     protected function getVatOptions()
     {
         return Store::getVats()->map(function($item){

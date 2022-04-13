@@ -10,10 +10,11 @@ use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderFields;
-use AdminEshop\Eloquent\Concerns\HasOrderLog;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
+use AdminEshop\Eloquent\Concerns\HasOrderLog;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
+use AdminEshop\Eloquent\Concerns\HasUsernames;
 use AdminEshop\Eloquent\Concerns\OrderPayments;
 use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
@@ -34,6 +35,7 @@ class Order extends AdminModel
         OrderTrait,
         OrderPayments,
         OrderShipping,
+        HasUsernames,
         HasOrderInvoice,
         HasOrderHashes,
         HasOrderEmails,

@@ -20,6 +20,13 @@ trait HasRoutes
         });
     }
 
+    public function routesForProductDetail()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers\Product'], function(){
+            Route::any('/product/{slug?}', 'ProductController@show')->visible();
+        });
+    }
+
     public function routesForProducts()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
