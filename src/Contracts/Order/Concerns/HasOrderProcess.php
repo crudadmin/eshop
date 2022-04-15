@@ -3,27 +3,15 @@
 namespace AdminEshop\Contracts\Order\Concerns;
 
 use Admin;
+use Illuminate\Http\Request;
 
 trait HasOrderProcess
 {
-    private function getValidatedOrderRow($fetchStoredClientData = false)
-    {
-        $request = request();
-
-        if ( $fetchStoredClientData ){
-            $clientData = $this->getClientDataMutator()->getClientData() ?: [];
-
-            $request->merge($request->all() + $clientData);
-        }
-
-        $validator = Admin::getModel('Order')->orderValidator($request);
-
-        return $validator->validate()->getData();
-    }
-
     public function validateOrder($mutators = null, $fetchStoredClientData = false, $saveDataIntoSession = true, $submitOrder = false)
     {
-        $row = $this->getValidatedOrderRow($fetchStoredClientData);
+        $request = $this->getPreparedOrderRequest($submitOrder, $fetchStoredClientData);
+
+        $row = Admin::getModel('Order')->orderValidator($request)->validate()->getData();
 
         //Remove uneccessary delivery and company info from order
         $this->setRequestData($row, $submitOrder, $saveDataIntoSession);
@@ -40,7 +28,9 @@ trait HasOrderProcess
 
     public function processFinalOrderValidation($mutators = null)
     {
-        $row = $this->getValidatedOrderRow(true);
+        $request = $this->getPreparedOrderRequest(true, true);
+
+        Admin::getModel('Order')->orderValidator($request)->validate();
 
         return $this->validateOrder($mutators, true, false, true);
     }

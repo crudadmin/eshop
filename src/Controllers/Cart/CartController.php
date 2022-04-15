@@ -4,6 +4,7 @@ namespace AdminEshop\Controllers\Cart;
 
 use Admin;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
+use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
 use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Controllers\Controller;
 use AdminEshop\Models\Delivery\Delivery;
@@ -214,6 +215,17 @@ class CartController extends Controller
         return api(
             Cart::fullCartResponse()
         );
+    }
+
+    public function storeAddress()
+    {
+        if ( $errorResponse = OrderService::validateOrder([
+            ClientDataMutator::class,
+        ]) ){
+            return $errorResponse;
+        }
+
+        return Cart::fullCartResponse();
     }
 
     public function checkAccountExistance()

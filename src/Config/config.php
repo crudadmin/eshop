@@ -213,6 +213,9 @@ return [
                 'prefix' => env('ORDER_PREFIX'),
             ],
 
+            //Set delivery address as primary in request form
+            'delivery_address_primary' => false,
+
             //Submit order validato request
             'validator' => AdminEshop\Requests\SubmitOrderRequest::class,
 

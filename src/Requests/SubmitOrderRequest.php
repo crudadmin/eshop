@@ -10,7 +10,7 @@ class SubmitOrderRequest extends AdminModelRequest
     {
         return [
             //Client fields
-            'username', 'email', 'phone',
+            'username', 'firstname', 'lastname', 'email', 'phone',
             'street', 'zipcode', 'city', 'country_id',
 
             //Company fields
@@ -18,7 +18,7 @@ class SubmitOrderRequest extends AdminModelRequest
 
             //Delivery fields
             'delivery_different',
-            'delivery_username',
+            'delivery_username', 'delivery_firstname', 'delivery_lastname',
             'delivery_phone',
             'delivery_street',
             'delivery_zipcode', 'delivery_city',

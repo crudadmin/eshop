@@ -2,9 +2,11 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use OrderService;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use Admin\Fields\Group;
 use Discounts;
+use Admin;
 use Store;
 
 trait HasOrderFields
@@ -35,18 +37,20 @@ trait HasOrderFields
      */
     protected function getBillingFields()
     {
+        $requiredRule = $this->getRequiredRuleForBilling();
+
         return Group::fields([
-            'username' => 'name:Meno a priezvisko|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required'),
+            'username' => 'name:Meno a priezvisko|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule),
             Group::inline([
                 'firstname' => 'name:Meno',
                 'lastname' => 'name:Priezvisko',
-            ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required'))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
-            'email' => 'name:Email|email|required|hidden',
+            ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
+            'email' => 'name:Email|required|email|hidden',
             'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
-            'street' => 'name:Ulica a č.p.|column_name:Ulica|required|hidden',
-            'city' => 'name:Mesto|required|hidden',
-            'zipcode' => 'name:PSČ|zipcode|required|hidden',
-            'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1|required|exists:countries,id',
+            'street' => 'name:Ulica a č.p.|column_name:Ulica'.$requiredRule.'|hidden',
+            'city' => 'name:Mesto'.$requiredRule.'|hidden',
+            'zipcode' => 'name:PSČ|zipcode'.$requiredRule.'|hidden',
+            'country' => 'name:Krajina|hidden|belongsTo:countries,name|defaultByOption:default,1'.$requiredRule.'|exists:countries,id',
         ])->name('Fakturačné údaje')->id('billing')->grid(4);
     }
 
@@ -57,19 +61,21 @@ trait HasOrderFields
      */
     protected function getDeliveryFields()
     {
+        $requiredRule = $this->getRequiredRuleForDelivery();
+
         return Group::fields([
             'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|column_name:Ina doruč. adr.|type:checkbox|default:0',
             Group::fields([
-                'delivery_username' => 'name:Meno a priezvisko / Firma|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required_if_checked:delivery_different'),
+                'delivery_username' => 'name:Meno a priezvisko / Firma|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule),
                 Group::inline([
                     'delivery_firstname' => 'name:Meno',
                     'delivery_lastname' => 'name:Priezvisko',
-                ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : '|required_if_checked:delivery_different'))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
+                ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
                 'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
-                'delivery_street' => 'name:Ulica a č.p.|required_if_checked:delivery_different',
-                'delivery_city' => 'name:Mesto|required_if_checked:delivery_different',
-                'delivery_zipcode' => 'name:PSČ|required_if_checked:delivery_different|zipcode',
-                'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1|required_if_checked:delivery_different',
+                'delivery_street' => 'name:Ulica a č.p.'.$requiredRule,
+                'delivery_city' => 'name:Mesto'.$requiredRule,
+                'delivery_zipcode' => 'name:PSČ'.$requiredRule.'|zipcode',
+                'delivery_country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id|defaultByOption:default,1'.$requiredRule,
             ])->attributes('hideFieldIfNot:delivery_different,1')->id('delivery_fields'),
         ])->add('hidden')->name('Dodacie údaje')->id('delivery')->grid(4);
     }
@@ -173,5 +179,19 @@ trait HasOrderFields
                     ? ['discount_codes' => 'name:Zľavové kódy|belongsToMany:discounts_codes,code|hidden|canAdd'] : []
             ))->id('discounts')->inline(),
         ])->id('orderPrices');
+    }
+
+    protected function getRequiredRuleForBilling()
+    {
+        return Admin::isAdmin() === true || OrderService::isDeliveryAddressPrimary() === false
+            ? '|required'
+            : '|required_if_checked:delivery_different';
+    }
+
+    protected function getRequiredRuleForDelivery()
+    {
+        return OrderService::isDeliveryAddressPrimary() === true && Admin::isAdmin() === false
+                ? '|required'
+                : '|required_if_checked:delivery_different';
     }
 }
