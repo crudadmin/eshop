@@ -61,6 +61,7 @@ trait HasRoutes
     public function routesForCartSubmit()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
+            Route::post('/cart/account-exists', 'Cart\CartController@checkAccountExistance')->middleware('throttle:20')->visible();
             Route::post('/cart/submit', 'Cart\CartController@submitOrder')->visible();
             Route::get('/cart/success/{id?}/{orderhash?}', 'Cart\CartController@success')->visible();
         });

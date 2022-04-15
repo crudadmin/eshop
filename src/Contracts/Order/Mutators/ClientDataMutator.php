@@ -72,7 +72,7 @@ class ClientDataMutator extends Mutator
         ];
 
         if ( config('admineshop.client.in_cart_response') == true && client() ){
-            $response['client'] = client()->setClientResponse();;
+            $response['client'] = client()->setClientResponse();
         }
 
         return array_merge($response, $data);

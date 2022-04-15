@@ -216,6 +216,22 @@ class CartController extends Controller
         );
     }
 
+    public function checkAccountExistance()
+    {
+        $email = request('email');
+
+        $model = Admin::getModel('Client');
+        $client = $model->where('email', $email)->first();
+
+        $data = method_exists($model, 'onAccountExistanceCheck')
+                    ? (($client ?: $model)->onAccountExistanceCheck($client) ?: [])
+                    : [];
+
+        return api(array_merge([
+            'exists' => $client ? true : false,
+        ], $data));
+    }
+
     public function submitOrder()
     {
         if ( $errorResponse = OrderService::processFinalOrderValidation() ){
