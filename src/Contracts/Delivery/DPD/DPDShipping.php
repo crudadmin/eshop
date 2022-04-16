@@ -229,7 +229,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
         }
 
         return [
-            'date' => Carbon::now()->addWeekday(1)->format('Ymd'),
+            'date' => Carbon::now()->nextBusinessDay(1)->format('Ymd'),
             'timeWindow' => [
                 'beginning' => '1000',
                 'end' => '1500',

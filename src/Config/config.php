@@ -283,4 +283,9 @@ return [
             'detail' => [680, null],
         ],
     ],
+
+    'holidays' => [
+        'country' => 'sk',
+        'additional' => [],
+    ],
 ];
