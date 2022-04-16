@@ -15,7 +15,8 @@
         "marekgogol/invoices": "^3.0|dev-3.0-dev",
         "propaganistas/laravel-phone": "^4.2",
         "heureka/overeno-zakazniky": "^4.0",
-        "gopay/payments-sdk-php": "^1.4"
+        "gopay/payments-sdk-php": "^1.4",
+        "cmixin/business-day": "^1.0"
     },
     "autoload": {
         "psr-4": {
