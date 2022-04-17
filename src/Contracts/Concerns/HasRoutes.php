@@ -50,6 +50,7 @@ trait HasRoutes
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
             Route::get('/cart', 'Cart\CartController@getFullSummary')->name('cart::fullSummary')->visible();
+            Route::any('/cart/validate/{type}', 'Cart\CartController@passesValidation')->name('cart::validate')->visible();
             Route::get('/cart/delivery-locations/{id}', 'Cart\CartController@getDeliveryLocations')->name('cart::getDeliveryLocations')->visible();
 
             Route::post('/cart/setDelivery', 'Cart\CartController@setDelivery')->name('cart::setDelivery')->visible();

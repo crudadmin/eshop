@@ -206,6 +206,17 @@ return [
             AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
         ],
 
+        //Validation steps mutators
+        'validation_steps' => [
+            // 'address' => [
+            //     AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class
+            // ],
+            // 'shipping' => [
+            //     AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class,
+            //     AdminEshop\Contracts\Order\Mutators\ClientDataMutator::class,
+            // ],
+        ],
+
         'order' => [
             'number' => [
                 'custom' => true, //If custom order number is turned on, number will be generated from ym00000number

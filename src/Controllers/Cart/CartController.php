@@ -304,4 +304,13 @@ class CartController extends Controller
             }),
         ]);
     }
+
+    public function passesValidation($type)
+    {
+        if ( OrderService::passesValidation(config('admineshop.cart.validation_steps.'.$type, [])) === false ) {
+            return OrderService::errorResponse();
+        }
+
+        return autoAjax()->success();
+    }
 }
