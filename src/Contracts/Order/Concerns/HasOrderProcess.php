@@ -9,7 +9,7 @@ trait HasOrderProcess
 {
     public function validateOrder($mutators = null, $fetchStoredClientData = false, $saveDataIntoSession = true, $submitOrder = false)
     {
-        $request = $this->getPreparedOrderRequest($submitOrder, $fetchStoredClientData);
+        $request = $this->getPreparedOrderRequest($submitOrder, $fetchStoredClientData, $saveDataIntoSession);
 
         $row = Admin::getModel('Order')->orderValidator($request)->validate()->getData();
 
@@ -28,10 +28,6 @@ trait HasOrderProcess
 
     public function processFinalOrderValidation($mutators = null)
     {
-        $request = $this->getPreparedOrderRequest(true, true);
-
-        Admin::getModel('Order')->orderValidator($request)->validate();
-
         return $this->validateOrder($mutators, true, false, true);
     }
 }

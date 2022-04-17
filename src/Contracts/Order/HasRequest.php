@@ -41,7 +41,7 @@ trait HasRequest
      */
     public function setRequestData($row, $submitOrder = false, $persist = false)
     {
-        $this->requestData = $this->prepareRequestData($row, $submitOrder);
+        $this->requestData = $this->prepareRequestData($row, $submitOrder, true);
 
         $this->getClientDataMutator()->setClientData($row, $persist);
 
@@ -77,12 +77,13 @@ trait HasRequest
      *
      * @param  array  $row
      * @param  boolean  $submitOrder
+     * @param  boolean  $cleanedData
      *
      * @return  array
      */
-    public function prepareRequestData($row, $submitOrder, $fetchStoredClientData = false)
+    public function prepareRequestData($row, $submitOrder, $cleanedData = false)
     {
-        $row = $this->cleanNotPresent($row, $submitOrder, $fetchStoredClientData = false);
+        $row = $this->cleanNotPresent($row, $submitOrder, $cleanedData);
 
         return $row;
     }
@@ -93,7 +94,7 @@ trait HasRequest
      * @param  array  $row
      * @return  $row
      */
-    private function cleanNotPresent(&$row, $submitOrder = false, $fetchStoredClientData = false)
+    private function cleanNotPresent(&$row, $submitOrder = false, $cleanedData = false)
     {
         $resetFields = config('admineshop.cart.order.'.($submitOrder ? 'fields_reset_submit' : 'fields_reset_process'));
         $resetFields = is_array($resetFields) ? $resetFields : $this->getDefaultResetIfNotPresent();
@@ -112,7 +113,7 @@ trait HasRequest
                         $row[$unprefixedKey] = $row[$key];
 
                         //On order submit, we can reset this temporary fields and keep only final fields
-                        if ( $submitOrder === true && $fetchStoredClientData == true ){
+                        if ( $submitOrder === true && $cleanedData == true ){
                             $row[$key] = null;
                         }
                     }
@@ -142,7 +143,7 @@ trait HasRequest
 
         //Replace data by properties
         $request = $request->replace(
-            $this->prepareRequestData($request->all(), $submitOrder, $fetchStoredClientData)
+            $this->prepareRequestData($request->all(), $submitOrder)
         );
 
         return $request;
@@ -164,10 +165,15 @@ trait HasRequest
 
     private function getDeliveryAddressResetIfNotPresent()
     {
+        $fields = array_merge(
+            ['delivery_username', 'delivery_firstname', 'delivery_lastname', 'delivery_phone', 'delivery_street', 'delivery_city', 'delivery_zipcode', 'delivery_city', 'delivery_country_id'],
+            config('admineshop.cart.order.additional_delivery_fields', [])
+        );
+
         return [
             'delivery_different' => [
                 'rewriteSameFieldsWithoutPrefix' => $this->isDeliveryAddressPrimary() ? 'delivery_' : null,
-                'fields' => ['delivery_username', 'delivery_firstname', 'delivery_lastname', 'delivery_phone', 'delivery_street', 'delivery_city', 'delivery_zipcode', 'delivery_city', 'delivery_country_id'],
+                'fields' => $fields,
             ],
         ];
     }

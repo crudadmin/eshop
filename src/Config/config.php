@@ -238,6 +238,9 @@ return [
             //Which field should be displayed in email template in section "Additional fields"
             'additional_email_fields' => [],
 
+            //We want enable additional delivery fields
+            'additional_delivery_fields' => [], //eg: delivery_apartment
+
             /**
              * For example if is_company is not checked, we can reset all company fields when they present in request.
              *
