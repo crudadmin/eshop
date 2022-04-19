@@ -39,6 +39,7 @@ class Payment extends AdminModel
                 'uniqid' => 'name:uniqid|max:30|required',
                 'payment_id' => 'name:Payment id|index',
                 'status' => 'name:Status|max:10|default:waiting|index|required',
+                'data' => 'name:Data|type:json',
             ],
             config('admineshop.payment_methods.enabled', true)
                 ? [ 'payment_method_id' => 'name:Typ platby|belongsTo:payments_methods,name|required' ] : [],

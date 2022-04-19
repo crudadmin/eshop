@@ -26,9 +26,7 @@ class GPWebPayment extends PaymentHelper
 
         $options = $this->getOptions();
         if ( count($options) === 0 ) {
-            abort(500, 'Webpay configuration does not exists');
-
-            return;
+            return abort(500, 'Webpay configuration does not exists');
         }
 
         $signer = new Signer(

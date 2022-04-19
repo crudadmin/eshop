@@ -5,6 +5,7 @@ namespace AdminEshop\Controllers\Payments;
 use Admin;
 use AdminEshop\Contracts\Order\Exceptions\OrderException;
 use AdminEshop\Contracts\Payments\PaymentVerifier;
+use AdminEshop\Contracts\Payments\Stripe\StripeWebhooks;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\Payment;
 use Admin\Controllers\Controller;
@@ -50,5 +51,18 @@ class PaymentController extends Controller
         }
 
         return redirect($paymentUrl);
+    }
+
+    public function webhooks($type)
+    {
+        if ( $type == 'stripe' ) {
+            $webhooks = new StripeWebhooks;
+
+            $event = $webhooks->getWebhookEvent();
+
+            $webhooks->onWebhookEvent(
+                $event
+            );
+        }
     }
 }
