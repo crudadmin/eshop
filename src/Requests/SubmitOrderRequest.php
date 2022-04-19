@@ -17,7 +17,7 @@ class SubmitOrderRequest extends AdminModelRequest
             'is_company', 'company_name', 'company_id', 'company_tax_id', 'company_vat_id',
 
             //Other fields
-            'note',
+            'note', 'register_account',
 
             //Delivery fields
             'delivery_different',

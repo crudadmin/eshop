@@ -8,6 +8,7 @@ use AdminEshop\Events\OrderStatusChange;
 use AdminEshop\Listeners\ClientLoggedInListener;
 use AdminEshop\Listeners\OnAdminUpdateListener;
 use AdminEshop\Listeners\OrderCreatedListener;
+use AdminEshop\Listeners\RegisterClientOnOrderCreated;
 use AdminEshop\Listeners\SendEmailOnOrderStatusChange;
 use AdminEshop\Listeners\UpdateTemporaryStockListener;
 use Admin\Resources\Events\OnAdminUpdate;
@@ -20,6 +21,7 @@ class EventsServiceProvider extends ServiceProvider
     protected $listen = [
         OrderCreated::class => [
             OrderCreatedListener::class,
+            RegisterClientOnOrderCreated::class,
         ],
         OrderStatusChange::class => [
             SendEmailOnOrderStatusChange::class,
