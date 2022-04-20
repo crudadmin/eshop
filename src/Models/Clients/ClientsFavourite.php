@@ -116,7 +116,7 @@ class ClientsFavourite extends AdminModel
             $identifiers['cart_token_id'] = $cartToken->getKey();
         }
 
-        return $identifiers;
+        return array_filter($identifiers);
     }
 
     public function scopeActiveSession($query)
