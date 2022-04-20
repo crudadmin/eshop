@@ -6,7 +6,7 @@
         </div>
         <div class="sitetree__item__inputs">
             <h6 class="mb-0">
-                {{ getLocaleFieldValue(item.name) }}
+                <span :title="__('Kategória č. %s', item.id)" data-toggle="tooltip">{{ getLocaleFieldValue(item.name) }}</span>
                 <small>({{ __('%s podkategórii').replace('%s', nextLevel.length) }} / {{ __('%s produktov').replace('%s', item.products_count||0) }})</small>
             </h6>
         </div>
@@ -47,19 +47,6 @@
                 :row="row"
                 :buttonKey="buttonKey"
                 :model="model"/>
-
-            <publish-button
-                v-if="row.id && model.canUnpublishRow(row)"
-                :model="model"
-                :row="item" />
-
-            <button
-                v-if="row.id"
-                class="btn btn-sm btn-danger"
-                @click="removeItem(row)"
-            >
-                <i class="fa fa-trash"></i>
-            </button>
         </div>
     </div>
     <div class="sitetree__subtree" v-if="showSubTree">

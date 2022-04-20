@@ -180,10 +180,10 @@ class AttributesItem extends AdminModel
     public function scopeFilterByProducts($query, $options = [])
     {
         $query->whereHas('products', function($query) use ($options) {
-            $query->setFilterOptions(($options ?: []) + [
+            $query->setFilterOptions(array_merge($options ?: [], [
                 '$ignore.filter.attributes' => true,
                 'variants.extract' => true,
-            ]);
+            ]));
 
             $query->applyQueryFilter();
         });
