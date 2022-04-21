@@ -190,7 +190,7 @@ trait HasOrderFields
 
     protected function getRequiredRuleForDelivery()
     {
-        return OrderService::isDeliveryAddressPrimary() === true && Admin::isAdmin() === false
+        return OrderService::isDeliveryAddressPrimary() === true && Admin::isFrontend() === true
                 ? '|required'
                 : '|required_if_checked:delivery_different';
     }
