@@ -55,13 +55,13 @@ trait HasListingSupport
         return $products;
     }
 
-    private function getCachedListingResponse(string $cacheKey, array $options, callable $response)
+    private function getCachedListingResponse(string $cachePrefix, array $options, callable $response)
     {
         //Return cached response
-        if ( $this->canUseCache($options) ){
-            $cacheKey = $this->buildCacheKey($cacheKey, $options);
+        if ( $this->canUseCache($options, $cachePrefix) ){
+            $key = $this->buildCacheKey($cachePrefix, $options);
 
-            return json_decode(Cache::remember($cacheKey, $this->getCacheMinutage() * 60, function() use ($response, $options) {
+            return json_decode(Cache::remember($key, $this->getCacheMinutage($cachePrefix) * 60, function() use ($response, $options) {
                 return json_encode($response($options));
             }), true);
         }
@@ -69,7 +69,7 @@ trait HasListingSupport
         return $response($options);
     }
 
-    public function canUseCache($options)
+    public function canUseCache($options, $cachePrefix)
     {
         //If search key is presnet, we need disable cache
         if ( $options['filter']['_search'] ?? null ){
@@ -77,18 +77,18 @@ trait HasListingSupport
         }
 
         //If cache minutage is present
-        return (is_numeric($min = $this->getCacheMinutage())) && $min >= 1;
+        return (is_numeric($min = $this->getCacheMinutage($cachePrefix))) && $min >= 1;
     }
 
-    private function getCacheMinutage()
+    private function getCacheMinutage($cachePrefix = 'listing')
     {
-        return config('admineshop.routes.listing.cache', 0);
+        return (int)config('admineshop.routes.'.$cachePrefix.'.cache', 0);
     }
 
-    private function buildCacheKey($cacheKey, $options)
+    private function buildCacheKey($cachePrefix, $options)
     {
         $items = [
-            $cacheKey,
+            $cachePrefix,
         ];
 
         //Get filter hash
