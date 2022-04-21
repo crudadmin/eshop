@@ -273,6 +273,13 @@ trait HasProductResponses
         return $this;
     }
 
+    public function setSearchResponse()
+    {
+        $this->setListingResponse();
+
+        return $this;
+    }
+
     public function setFavouriteResponse()
     {
         return $this;
@@ -322,6 +329,11 @@ trait HasProductResponses
         $query->applyQueryFilter();
 
         $query->withProductModules();
+    }
+
+    public function scopeWithSearchResponse($query, $options = [])
+    {
+        $query->withListingResponse($options);
     }
 
     public function scopeWithProductModules($query, $prefix = null, $variants = false)

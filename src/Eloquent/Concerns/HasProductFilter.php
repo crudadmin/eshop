@@ -127,7 +127,7 @@ trait HasProductFilter
     public function scopeApplySearchFilter($query, $params)
     {
         //Filter by category
-        if ( !($searchQuery = $params['_search'] ?? null) ) {
+        if ( !($searchQuery = ($params['_search'] ?? null)) ) {
             return;
         }
 

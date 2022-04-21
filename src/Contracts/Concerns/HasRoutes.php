@@ -120,4 +120,11 @@ trait HasRoutes
             Route::get('/_store/heureka/feed', 'Store\HeurekaController@index');
         });
     }
+
+    public function routesForSearch()
+    {
+        Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
+            Route::any('/search', 'SearchController@index')->visible();
+        });
+    }
 }

@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Category;
 
 use AdminEshop\Eloquent\Concerns\HasCategoryTree;
+use AdminEshop\Eloquent\Concerns\SearchableTrait;
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
@@ -11,7 +12,8 @@ use Store;
 
 class Category extends AdminModel
 {
-    use HasCategoryTree;
+    use HasCategoryTree,
+        SearchableTrait;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -37,6 +39,8 @@ class Category extends AdminModel
     protected $sluggable = 'name';
 
     protected $withRecursiveRows = true;
+
+    protected $searchable = ['name'];
 
     protected $layouts = [
         'table-before' => 'CategoriesTree',
@@ -71,7 +75,7 @@ class Category extends AdminModel
     {
         return [
             Group::inline([
-                'name' => 'name:Názov kategórie|required|max:90'.(Store::isEnabledLocalization() ? '|locale' : ''),
+                'name' => 'name:Názov kategórie|required|max:90'.(Store::isEnabledLocalization() ? '|locale' : '|fulltext'),
                 'category' => 'name:Patri do kategórie|belongsTo:categories,name|title:Kategória je priradená do tejto nadradenej kategórie|readonly',
             ]),
             'code' => 'name:Kód kategórie|index|max:30',
@@ -154,5 +158,10 @@ class Category extends AdminModel
     public function setCategoryTreeResponse()
     {
         return $this->setVisible(['id', 'name', 'slug', 'category_id']);
+    }
+
+    public function setSearchResponse()
+    {
+        return $this->setVisible(['id', 'category_id', 'name', 'slug', 'categoriesTree'])->append(['categoriesTree']);
     }
 }
