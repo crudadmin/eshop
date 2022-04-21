@@ -296,6 +296,10 @@ class Order extends AdminModel
             $this->items->each->setClientListingResponse();
         }
 
+        if ( $this->relationLoaded('status') ) {
+            $this->status->setVisible(['id', 'name', 'color', 'default']);
+        }
+
         return $this->append([
             'number',
             'hasCompany',
