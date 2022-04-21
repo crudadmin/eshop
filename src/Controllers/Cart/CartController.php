@@ -256,7 +256,9 @@ class CartController extends Controller
         //Send email to client
         if ( config('admineshop.mail.order.created', true) == true ) {
             //Generate default invoice document
-            $proform = OrderService::makeInvoice('proform');
+            $proform = config('admineshop.mail.with_proform', true) == true
+                        ? OrderService::makeInvoice('proform')
+                        : null;
 
             OrderService::sentClientEmail($proform);
         }

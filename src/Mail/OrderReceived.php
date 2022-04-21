@@ -97,8 +97,8 @@ class OrderReceived extends Mailable
 
         //Attach order pdf
         if ( $invoice = $this->invoice ) {
-            $mail->attach($invoice->getPdf()->path, [
-                'as' => 'objednavka-'.$invoice->number.'.pdf',
+            $mail->attach($invoice->getPdf()->basepath, [
+                'as' => sprintf(_('objednavka-%s'), $invoice->number).'.pdf',
             ]);
         }
 

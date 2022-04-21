@@ -52,7 +52,7 @@ class OrderPaid extends Mailable
                 ]);
 
         if ( $this->invoice && $pdf = $this->invoice->getPdf() ) {
-            $mail->attach($pdf->path, [
+            $mail->attach($pdf->basepath, [
                  'as' => $pdf->filename
             ]);
         }

@@ -59,7 +59,7 @@ class HeurekaVerifiedCustomersJob implements ShouldQueue
             $order->log()->create([
                 'type' => 'error',
                 'code' => 'heureka-verified-customers',
-                'message' => 'Nepodarilo sa odoslať potvrdenie do služby overené zákaznikmi.',
+                'message' => _('Nepodarilo sa odoslať potvrdenie do služby overené zákaznikmi.'),
                 'log' => $e->getMessage(),
             ]);
 

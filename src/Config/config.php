@@ -274,6 +274,9 @@ return [
 
         //Show without vat product values in email template
         'show_no_vat' => false,
+
+        //Create proform invoice on new order, when invoices are enabled.
+        'with_proform' => true,
     ],
 
     'client' => [

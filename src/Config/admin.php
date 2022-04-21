@@ -44,6 +44,7 @@ return [
         __DIR__.'/../Eloquent',
         __DIR__.'/../Helpers',
         __DIR__.'/../Notifications',
+        __DIR__.'/../Mail',
         __DIR__.'/../Views',
     ],
 
