@@ -26,6 +26,16 @@ trait OrderPayments
         );
     }
 
+    public function getPaymentDataAttribute()
+    {
+        return $this->getPaymentData();
+    }
+
+    public function getPostPaymentUrlAttribute()
+    {
+        return $this->getPostPaymentUrl();
+    }
+
     public function getPaymentProvider($paymentMethodId = null)
     {
         return OrderService::getPaymentProvider($paymentMethodId);
