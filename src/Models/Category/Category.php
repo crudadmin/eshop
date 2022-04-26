@@ -155,6 +155,11 @@ class Category extends AdminModel
         return $this;
     }
 
+    public function scopeWithListingResponse($query, $options = [])
+    {
+        $query->select(['id', 'name', 'category_id', 'image', 'slug']);
+    }
+
     public function setCategoryTreeResponse()
     {
         return $this->setVisible(['id', 'name', 'slug', 'category_id']);
