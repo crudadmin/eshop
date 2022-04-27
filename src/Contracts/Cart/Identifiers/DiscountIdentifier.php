@@ -3,10 +3,10 @@
 namespace AdminEshop\Contracts\Cart\Identifiers;
 
 use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Cart\Identifiers\Identifier;
+use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use Discounts;
 
-class DiscountIdentifier extends Identifier
+class DiscountIdentifier extends DefaultIdentifier
 {
     /*
      * Retuns name of identifier

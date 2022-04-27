@@ -18,9 +18,15 @@ class DefaultIdentifier extends Identifier
     public static function getIdentifyKeys()
     {
         return [
-            'item_name' => [],
-            'item_price' => [],
-            'item_vat' => [],
+            'item_name' => [
+                'orders_items_column' => 'name',
+            ],
+            'item_price' => [
+                'orders_items_column' => 'price',
+            ],
+            'item_vat' => [
+                'orders_items_column' => 'vat',
+            ],
             'item_data' => [],
         ];
     }
@@ -147,7 +153,7 @@ class DefaultIdentifier extends Identifier
      */
     public function getProductNameParts(UsesIdentifier $item) : array
     {
-        return array_filter([ $item->item_name ?: $item->name ]);
+        return array_filter([ $item->item_name ?: ($item->name ?? null) ]);
     }
 
     /**

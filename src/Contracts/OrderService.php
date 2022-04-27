@@ -155,17 +155,21 @@ class OrderService
      *
      * @param  AdminModel|null  $order
      */
-    public function setOrder($order)
+    public function setOrder($order, $discounts = false, $items = false)
     {
         //We need register order into discounts factory
         //because we want apply discounts on this order
         //in administraiton. Order object must not be available
         //on frontend in discounts!
-        if ( Admin::isAdmin() ) {
+        if ( Admin::isAdmin() || $discounts == true ) {
             Discounts::setOrder($order);
         }
 
         $this->order = $order;
+
+        if ( $items === true ){
+            $this->setOrderCartItems($order);
+        }
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Mail;
 
+use AdminEshop\Contracts\Cart\Identifiers\DiscountIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Models\Orders\Order;
 use Cart;
@@ -45,7 +46,10 @@ class OrderReceived extends Mailable
         //Becasuse true parameter in getSummary indicates that we should sum all available items.
         $this->cartSummary = $items->getSummary(true);
 
-        $this->cartItems = $items ? Cart::addItemsFromMutators($items, 'addHiddenCartItems') : null;
+        //We does not want to show discounts in cart items
+        $this->cartItems = ($items ? Cart::addItemsFromMutators($items, 'addHiddenCartItems') : collect())->filter(function($item){
+            return ($item->getIdentifierClass() instanceof DiscountIdentifier) === false;
+        });
 
         $this->discounts = Discounts::getDiscounts();
     }
