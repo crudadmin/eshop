@@ -8,12 +8,12 @@ use AdminEshop\Commands\ImportPickupPoints;
 use AdminEshop\Commands\StockNotification;
 use AdminEshop\Jobs\CleanEmptyCartTokensJob;
 use AdminEshop\Jobs\ProductAvaiabilityChecker;
+use Admin\Providers\AdminHelperServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Kernel;
-use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+class AppServiceProvider extends AdminHelperServiceProvider
 {
     protected $providers = [
         ConfigServiceProvider::class,
@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerModels();
 
         //Boot providers after this provider boot
-        $this->bootProviders([
+        $this->registerProviders([
             ViewServiceProvider::class,
             ClientAuthServiceProvider::class,
         ]);
@@ -70,9 +70,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->bootFacades();
+        $this->registerFacades();
 
-        $this->bootProviders();
+        $this->registerProviders();
 
         $this->bootRouteMiddleware();
 
@@ -107,38 +107,6 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([__DIR__ . '/../Views' => resource_path('views/vendor/admineshop') ], 'admineshop.views');
         $this->publishes([__DIR__ . '/../Config/config.php' => config_path('admineshop.php') ], 'admineshop.config');
         $this->publishes([__DIR__ . '/../Resources/dist' => public_path('vendor/admineshop') ], 'admineshop.resources');
-    }
-
-    public function bootFacades()
-    {
-        $this->app->booting(function()
-        {
-            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-
-            foreach ($this->facades as $alias => $facade)
-            {
-                $loader->alias($alias, $facade);
-            }
-
-        });
-    }
-
-    public function bootProviders($providers = null)
-    {
-        foreach ($providers ?: $this->providers as $provider)
-        {
-            app()->register($provider);
-        }
-    }
-
-    public function bootRouteMiddleware()
-    {
-        foreach ($this->routeMiddleware as $name => $middleware)
-        {
-            $router = $this->app['router'];
-
-            $router->aliasMiddleware($name, $middleware);
-        }
     }
 
     public function registerSchedules()

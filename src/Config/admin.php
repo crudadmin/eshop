@@ -7,20 +7,17 @@ return [
     'name' => 'Eshop',
 
     /*
-     * License key
-     */
-    'license_key' => '',
-
-    /*
      * Default groups
      */
-    'groups' => [
-        'settings' => _('Nastavenia'),
-        'content' => _('Správa obsahu'),
-        'store' => [_('Obchod'), 'fa-shopping-cart'],
-        'products' => [_('Produkty'), 'fa-shopping-basket'],
-        'clients' => [_('Zákazníci'), 'fa-address-book-o'],
-    ],
+    'groups' => function(){
+        return [
+            'settings' => _('Nastavenia'),
+            'content' => _('Správa obsahu'),
+            'store' => [_('Obchod'), 'fa-shopping-cart'],
+            'products' => [_('Produkty'), 'fa-shopping-basket'],
+            'clients' => [_('Zákazníci'), 'fa-address-book-o'],
+        ];
+    },
 
     /*
      * Super password

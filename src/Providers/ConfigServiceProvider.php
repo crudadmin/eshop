@@ -2,14 +2,13 @@
 
 namespace AdminEshop\Providers;
 
-use Arr;
-use Illuminate\Support\ServiceProvider;
+use Admin\Providers\AdminHelperServiceProvider;
 
-class ConfigServiceProvider extends ServiceProvider
+class ConfigServiceProvider extends AdminHelperServiceProvider
 {
-    private $eshopConfigKey = 'admineshop';
+    private $storeConfigKey = 'admineshop';
 
-    private function getEshopConfigPath()
+    private function getStoreConfigPath()
     {
         return __DIR__.'/../Config/config.php';
     }
@@ -22,7 +21,7 @@ class ConfigServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            $this->getEshopConfigPath(), $this->eshopConfigKey
+            $this->getStoreConfigPath(), $this->storeConfigKey
         );
     }
 
@@ -34,17 +33,14 @@ class ConfigServiceProvider extends ServiceProvider
     public function boot()
     {
         //Merge crudadmin configs
-        $this->mergeConfigs(
-            'admin',
-            __DIR__.'/../Config/admin.php',
-            ['groups', 'models', 'components', 'author', 'passwords', 'gettext_source_paths', 'gettext_admin_source_paths', 'styles', 'scripts']
-        );
+        $this->mergeAdminConfigs(require __DIR__.'/../Config/admin.php');
 
         //Merge admineshop configs
         $this->mergeConfigs(
-            $this->eshopConfigKey,
-            $this->getEshopConfigPath(),
-            ['routes', 'attributes', 'stock', 'delivery', 'discounts', 'cart', 'mail', 'order', 'order.codes']
+            require $this->getStoreConfigPath(),
+            $this->storeConfigKey,
+            ['order.codes'],
+            [],
         );
 
         $this->mergeMarkdownConfigs();
@@ -63,74 +59,5 @@ class ConfigServiceProvider extends ServiceProvider
             'path' => storage_path('logs/store.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ]);
-    }
-
-    /*
-     * Merge crudadmin config with admineshop config
-     */
-    private function mergeConfigs($key, $file, $keys)
-    {
-        //test 2
-        $originalConfig = require $file;
-
-        $config = $this->app['config']->get($key, []);
-
-        $this->app['config']->set($key, array_merge($originalConfig, $config));
-
-        //Merge selected properties with two dimensional array
-        foreach ($keys as $property) {
-            if ( ! Arr::has($originalConfig, $property) || ! Arr::has($config, $property) ) {
-                continue;
-            }
-
-            $attributes = array_merge(
-                Arr::get($originalConfig, $property),
-                Arr::get($config, $property)
-            );
-
-            $this->app['config']->set($key . '.' . $property, $attributes);
-        }
-    }
-
-    /*
-     * Update markdown settings
-     */
-    private function mergeMarkdownConfigs($key = 'mail.markdown')
-    {
-        $config = $this->app['config']->get($key, []);
-
-        //Add themes from admineshop
-        $config['paths'] = array_merge($config['paths'], [
-            __DIR__ . '/../Views/mail/',
-        ]);
-
-        $this->app['config']->set($key, $config);
-    }
-
-    /*
-     * Add full components path
-     */
-    private function pushComponentsPaths($key = 'admin.components')
-    {
-        $config = $this->app['config']->get($key, []);
-
-        //Add themes from admineshop
-        $config = array_merge($config, [
-            __DIR__ . '/../Admin/Components',
-        ]);
-
-        $this->app['config']->set($key, $config);
-    }
-
-    /*
-     * For logged administrator turn of eshop/web cache
-     */
-    private function turnOfCacheForAdmin()
-    {
-        view()->composer('*', function ($view) {
-            if ( admin() ) {
-                $this->app['config']->set('admin.cache_time', 1);
-            }
-        });
     }
 }
