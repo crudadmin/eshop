@@ -15,11 +15,11 @@ return [
      * Default groups
      */
     'groups' => [
-        'settings' => 'Nastavenia',
-        'content' => 'Správa obsahu',
-        'store' => ['Obchod', 'fa-shopping-cart'],
-        'products' => ['Produkty', 'fa-shopping-basket'],
-        'clients' => ['Zákazníci', 'fa-address-book-o'],
+        'settings' => _('Nastavenia'),
+        'content' => _('Správa obsahu'),
+        'store' => [_('Obchod'), 'fa-shopping-cart'],
+        'products' => [_('Produkty'), 'fa-shopping-basket'],
+        'clients' => [_('Zákazníci'), 'fa-address-book-o'],
     ],
 
     /*
@@ -46,6 +46,12 @@ return [
         __DIR__.'/../Notifications',
         __DIR__.'/../Mail',
         __DIR__.'/../Views',
+    ],
+
+    'gettext_admin_source_paths' => [
+        __DIR__.'/../Config/admin.php',
+        __DIR__.'/../Admin',
+        __DIR__.'/../Resources/js',
     ],
 
     'styles' => [

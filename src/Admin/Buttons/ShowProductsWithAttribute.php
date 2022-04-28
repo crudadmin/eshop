@@ -39,7 +39,7 @@ class ShowProductsWithAttribute extends Button
             ]));
         }
 
-        return $this->title('Produkty s priradeným atribútom ('.count($rows).')')->message(
+        return $this->title(_('Produkty s priradeným atribútom').' ('.count($rows).')')->message(
             '<textarea class="form-control" rows="20">'.implode("\n", $rows).'</textarea>'
         );
     }
