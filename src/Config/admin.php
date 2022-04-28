@@ -49,6 +49,8 @@ return [
         __DIR__.'/../Helpers',
         __DIR__.'/../Config/admin.php',
         __DIR__.'/../Admin',
+        __DIR__.'/../Eloquent',
+        __DIR__.'/../Models',
         __DIR__.'/../Resources/js',
         __DIR__.'/../Views/components',
     ],

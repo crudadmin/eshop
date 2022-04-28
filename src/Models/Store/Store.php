@@ -67,23 +67,23 @@ class Store extends AdminModel
     public function options()
     {
         $decimalPlaces = [
-            3 => '3 desetinné miesta',
-            2 => '2 desetinné miesta',
-            1 => '1 desetinné miesto',
-            0 => 'celé čísla',
+            3 => '3 '._('desetinné miesta'),
+            2 => '2 '._('desetinné miesta'),
+            1 => '1 '._('desetinné miesto'),
+            0 => _('celé čísla'),
         ];
 
         return [
             'decimal_places' => $decimalPlaces,
             'decimal_rounding' => $decimalPlaces,
             'decimal_separator' => [
-                'dot' => '. - Bodka',
-                'comma' => ', - Čiarka',
+                'dot' => _('. - Bodka'),
+                'comma' => _(', - Čiarka'),
             ],
             'stock_type' => [
-                'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
-                'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
-                'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
+                'show' => _('Zobraziť vždy s možnosťou objednania len ak je skladom'),
+                'everytime' => _('Zobrazit a objednat vždy, bez ohľadu na sklad'),
+                'hide' => _('Zobrazit a mať možnost objednat len ak je skladom'),
             ],
         ];
     }

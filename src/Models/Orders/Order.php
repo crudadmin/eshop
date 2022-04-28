@@ -156,10 +156,10 @@ class Order extends AdminModel
         $options = [
             'country_id' => $countries,
             'delivery_status' => [
-                'new' => 'Čaká za objednanim dopravy',
-                'ok' => 'Prijatá',
-                'sent' => 'Odoslaná',
-                'error' => 'Neprijatá (chyba)',
+                'new' => _('Čaká za objednanim dopravy'),
+                'ok' => _('Prijatá'),
+                'sent' => _('Odoslaná'),
+                'error' => _('Neprijatá (chyba)'),
             ],
         ];
 
@@ -201,7 +201,7 @@ class Order extends AdminModel
         $attributes['number'] = $this->number;
         $attributes['client_name'] = $this->getClientName();
         $attributes['delivery_address'] = $this->getDeliveryAddress();
-        $attributes['created'] = $this->created_at ? $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y').' \o H:i') : '';
+        $attributes['created'] = $this->created_at ? sprintf(_('%s o %s'), $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y')), $this->created_at->format('H:i')) : '';
         $attributes['status_id'] = $this->getStatusColumn();
         $attributes['delivery_status'] = $this->getDeliveryStatusColumn();
         $attributes['is_paid'] = $this->getIsPaidStatusColumn();

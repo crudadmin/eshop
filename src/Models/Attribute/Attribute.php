@@ -34,13 +34,16 @@ class Attribute extends AdminModel
 
     protected $sluggable = 'name';
 
-    protected $options = [
-        'sortby' => [
-            'asc' => 'Vzostupne (0-9|A-Z)',
-            'desc' => 'Zostupne (Z-A|9-0)',
-            'order' => 'Vlastné radenie podľa tabuľky',
-        ],
-    ];
+    public function options()
+    {
+        return [
+            'sortby' => [
+                'asc' => _('Vzostupne (0-9|A-Z)'),
+                'desc' => _('Zostupne (Z-A|9-0)'),
+                'order' => _('Vlastné radenie podľa tabuľky'),
+            ],
+        ];
+    }
 
     public function settings()
     {
