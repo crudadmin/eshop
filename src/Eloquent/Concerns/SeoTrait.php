@@ -25,6 +25,8 @@ trait SeoTrait
             $metaImages = array_merge($metaImages, $this->meta_image);
         } else if ( $this instanceof RoutesSeo ) {
             $metaImages = array_merge($metaImages, $this->image ?: []);
+        } else if ( $this->getField('image') && $this->image ){
+            $metaImages = array_merge($metaImages, [$this->image]);
         }
 
         $attributes['meta_image'] = array_map(function($item){
@@ -32,5 +34,15 @@ trait SeoTrait
         }, $metaImages);
 
         return $attributes;
+    }
+
+    public function setMetaResponse()
+    {
+        return $this->makeVisible([
+            'meta_title',
+            'meta_keywords',
+            'meta_description',
+            'meta_image',
+        ]);
     }
 }

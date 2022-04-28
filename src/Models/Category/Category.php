@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Category;
 
 use AdminEshop\Eloquent\Concerns\HasCategoryTree;
 use AdminEshop\Eloquent\Concerns\SearchableTrait;
+use AdminEshop\Eloquent\Concerns\SeoTrait;
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
 use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
@@ -13,7 +14,8 @@ use Store;
 class Category extends AdminModel
 {
     use HasCategoryTree,
-        SearchableTrait;
+        SearchableTrait,
+        SeoTrait;
 
     /*
      * Model created date, for ordering tables in database and in user interface

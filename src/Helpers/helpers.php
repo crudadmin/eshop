@@ -67,7 +67,13 @@ if ( !function_exists('phoneValidatorRule') )
 {
     function phoneValidatorRule()
     {
-        return 'phone:'.config('admineshop.phone_countries', 'SK');
+        $validation = config('admineshop.validation.phone_countries', 'SK');
+
+        if ( $validation === false ){
+            return '';
+        }
+
+        return 'phone:'.$validation;
     }
 }
 ?>

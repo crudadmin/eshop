@@ -283,19 +283,19 @@ return [
         'guard' => 'api',
         'username_splitted' => false,
         'in_cart_response' => true,
-        'zipcode' => [
-            'validation' => true,
-        ],
         'addresses' => false,
         'favourites' => false,
         'groups' => false,
     ],
 
     /*
-     * Validation for phone numbers in order/clients,address etc...
-     * SK,CZ...
+     * Validation rules for cart
      */
-    'phone_countries' => 'SK,CZ',
+    'validation' => [
+        'phone_countries' => 'SK,CZ',
+        'zipcode' => true,
+        'company_id' => true,
+    ],
 
     /*
      * Should be products and other attributes localized?
