@@ -19,9 +19,6 @@ class SendTestingOrderStatus extends Button
      */
     public $type = 'multiple';
 
-    //Name of button on hover
-    public $name = 'Odoslať testovaci email';
-
     //Button classes
     public $class = 'btn-primary';
 
@@ -32,6 +29,8 @@ class SendTestingOrderStatus extends Button
 
     public function __construct($row)
     {
+        $this->name = _('Odoslať testovaci email');
+
         $this->active = $row->email_send == true || $row->default === true;
     }
 

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="form-group">
-            <label>Vyberte kategóriu</label>
+            <label>{{ __('Vyberte kategóriu') }}</label>
             <select class="form-control" v-model="category">
                 <option v-for="category in data.categories" :value="category.id">{{ category.name }}</option>
             </select>

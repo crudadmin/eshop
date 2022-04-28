@@ -13,7 +13,7 @@ class ShowProductsWithAttribute extends Button
     public function __construct(AdminModel $row)
     {
         //Name of button on hover
-        $this->name = 'Zobraziť priradené pridukty';
+        $this->name = _('Zobraziť priradené pridukty');
 
         $this->class = 'btn-default';
 

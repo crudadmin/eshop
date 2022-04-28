@@ -16,9 +16,6 @@ class DPDExportButton extends Button
      */
     public $type = 'action';
 
-    //Name of button on hover
-    public $name = 'DPD Export objednávok';
-
     //Button classes
     public $class = 'btn-default';
 
@@ -31,6 +28,8 @@ class DPDExportButton extends Button
      */
     public function __construct($row)
     {
+        $this->name = _('DPD Export objednávok');
+
         $this->active = true;
     }
 
@@ -42,6 +41,6 @@ class DPDExportButton extends Button
     {
         $path = OrderService::makeShippingExport(DPDShipping::class, $rows);
 
-        return $this->message('Export bol úspešne vytvorený.')->download($path);
+        return $this->message(_('Export bol úspešne vytvorený.'))->download($path);
     }
 }

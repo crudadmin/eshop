@@ -14,12 +14,12 @@ if ( !function_exists('api') ) {
 function operator_types($except = [])
 {
     $operators = [
-        '+%' => '% - Pričítať k aktualnej cene',
-        '-%' => '% - Odčítať z aktuálnej ceny',
-        '+' => '+ Pripočítať k cene',
-        '-' => '- Odčítať z ceny',
-        '*' => '* Vynásobit cenu',
-        'abs' => 'Nová hodnota',
+        '+%' => _('% - Pričítať k aktualnej cene'),
+        '-%' => _('% - Odčítať z aktuálnej ceny'),
+        '+' => _('+ Pripočítať k cene'),
+        '-' => _('- Odčítať z ceny'),
+        '*' => _('* Vynásobit cenu'),
+        'abs' => _('Nová hodnota'),
     ];
 
     return array_diff_key($operators, array_flip($except));

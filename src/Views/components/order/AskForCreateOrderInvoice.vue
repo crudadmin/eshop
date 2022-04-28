@@ -1,12 +1,12 @@
 <template>
     <div>
         <div class="form-group">
-            <label>Aký typ dokladu si prajete vygenerovať?</label>
+            <label>{{ __('Aký typ dokladu si prajete vygenerovať?') }}</label>
             <select class="form-control" v-model="invoice_type">
-                <option value="">Vyberte typ dokladu</option>
-                <option value="proform">Proforma</option>
-                <option value="invoice">Faktúra</option>
-                <option value="return">Dobropis</option>
+                <option value="">{{ __('Vyberte typ dokladu') }}</option>
+                <option value="proform">{{ __('Proforma') }}</option>
+                <option value="invoice">{{ __('Faktúra') }}</option>
+                <option value="return">{{ __('Dobropis') }}</option>
             </select>
         </div>
     </div>

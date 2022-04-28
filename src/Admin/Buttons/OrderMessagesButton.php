@@ -33,7 +33,7 @@ class OrderMessagesButton extends Button
     private function getOrderLogContent($row, $withLog = false)
     {
         $lines = [
-            '<strong>Hlásenia:</strong>'
+            '<strong>'._('Hlásenia').':</strong>'
         ];
 
         $total = $row->log->count();
@@ -50,7 +50,7 @@ class OrderMessagesButton extends Button
             //Add clone log into clipboard
             if ( $log->log && $withLog == true ) {
                 $logInfo = '
-                    <i class="fa fa-info-circle" data-toggle="tooltip" title="Nakopírovať hlásenie" onclick="var t = this.nextElementSibling; t.style.display = \'block\'; t.select();document.execCommand(\'copy\'); t.style.display = \'none\'"></i>
+                    <i class="fa fa-info-circle" data-toggle="tooltip" title="'._('Nakopírovať hlásenie').'" onclick="var t = this.nextElementSibling; t.style.display = \'block\'; t.select();document.execCommand(\'copy\'); t.style.display = \'none\'"></i>
                     <textarea id="'.$id.'" style="display: none">'.e($log->log).'</textarea>
                 ';
             }
@@ -66,7 +66,7 @@ class OrderMessagesButton extends Button
      */
     public function fire(AdminModel $row)
     {
-        return $this->title('Hlásenia ('.$row->log->count().')')->warning(
+        return $this->title(_('Hlásenia').' ('.$row->log->count().')')->warning(
             $this->getOrderLogContent($row, true)
         );
     }

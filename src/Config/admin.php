@@ -46,9 +46,11 @@ return [
     ],
 
     'gettext_admin_source_paths' => [
+        __DIR__.'/../Helpers',
         __DIR__.'/../Config/admin.php',
         __DIR__.'/../Admin',
         __DIR__.'/../Resources/js',
+        __DIR__.'/../Views/components',
     ],
 
     'styles' => [

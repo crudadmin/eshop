@@ -16,9 +16,6 @@ class SendShippmentButton extends Button
      */
     public $type = 'multiple';
 
-    //Name of button on hover
-    public $name = 'Odoslať do dopravnej služby';
-
     //Button classes
     public $class = 'btn-default';
 
@@ -31,6 +28,8 @@ class SendShippmentButton extends Button
      */
     public function __construct($row)
     {
+        $this->name = _('Odoslať do dopravnej služby');
+
         $this->active = $this->getActiveStatus($row);
     }
 

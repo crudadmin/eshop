@@ -18,7 +18,7 @@ class SetProductsCategory extends Button
     public function __construct($row)
     {
         //Name of button on hover
-        $this->name = 'Hromadné priradenie kategórie';
+        $this->name = _('Hromadné priradenie kategórie');
 
         //Button classes
         $this->class = 'btn-default';
@@ -36,7 +36,7 @@ class SetProductsCategory extends Button
      */
     public function question($row)
     {
-        return $this->title('Vyberte kategóriu pre vybrané produkty:')
+        return $this->title(_('Vyberte kategóriu pre vybrané produkty:'))
                     ->component('SetProductCategories', [
                         'categories' => $this->getCategoriesOptions(),
                     ])
@@ -58,7 +58,7 @@ class SetProductsCategory extends Button
             });
         }
 
-        return $this->success('Kategória bola pre vybrané produkty úspešne priradená.');
+        return $this->success(_('Kategória bola pre vybrané produkty úspešne priradená.'));
     }
 
     public function setProductCategory($product, $item)

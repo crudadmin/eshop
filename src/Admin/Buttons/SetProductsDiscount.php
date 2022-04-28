@@ -15,7 +15,7 @@ class SetProductsDiscount extends Button
     public function __construct($row)
     {
         //Name of button on hover
-        $this->name = 'Hromadná zľava';
+        $this->name = _('Hromadná zľava');
 
         //Button classes
         $this->class = 'btn-default';
@@ -33,9 +33,9 @@ class SetProductsDiscount extends Button
      */
     public function question($row)
     {
-        return $this->title('Vyberte zľavu pre vybrané produkty:')
+        return $this->title(_('Vyberte zľavu pre vybrané produkty:'))
                     ->component('SetProductDiscounts', [
-                        'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
+                        'discount_operator' => [ 'default' => _('Žiadna zľava') ] + operator_types(),
                     ])
                     ->type('default');
     }
