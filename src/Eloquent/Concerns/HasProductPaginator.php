@@ -46,8 +46,8 @@ trait HasProductPaginator
         $priceRanges = array_filter([
             ($totalAttributes['min_filter_price'] ?? null) ?: null,
             ($totalAttributes['max_filter_price'] ?? null) ?: null,
-            $totalAttributes['min_filter_variant_price'] ?? 0,
-            $totalAttributes['max_filter_variant_price'] ?? 0
+            $totalAttributes['min_filter_variant_price'] ?? null,
+            $totalAttributes['max_filter_variant_price'] ?? null,
         ], function($number){
             return is_numeric($number);
         });
