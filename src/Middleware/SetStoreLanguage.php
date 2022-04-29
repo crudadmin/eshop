@@ -9,6 +9,11 @@ use Localization;
 
 class SetStoreLanguage
 {
+    public static function getHeaderLocale()
+    {
+        return request()->header('app-locale');
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -21,7 +26,7 @@ class SetStoreLanguage
         AdminModel::$localizedResponseArray = false;
 
         //Update language
-        if ( $langCode = request()->header('app-locale') ){
+        if ( $langCode = self::getHeaderLocale() ){
             Localization::setLocale($langCode);
         }
 

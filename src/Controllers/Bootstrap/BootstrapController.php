@@ -15,7 +15,7 @@ class BootstrapController extends Controller
 
         //Return cached response
         if ( is_numeric($cacheMinutes) && $cacheMinutes >= 1 ) {
-            $response = json_decode(Cache::remember('store.bootstrap', $cacheMinutes * 60, function() use ($bootstrapper) {
+            $response = json_decode(Cache::remember($bootstrapper->getCacheKey(), $cacheMinutes * 60, function() use ($bootstrapper) {
                 return json_encode($bootstrapper->request());
             }), true);
         }

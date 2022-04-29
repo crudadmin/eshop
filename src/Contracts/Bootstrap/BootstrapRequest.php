@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Bootstrap;
 
 use Admin;
+use AdminEshop\Middleware\SetStoreLanguage;
 use Admin\Controllers\GettextController;
 use EditorMode;
 use Localization;
@@ -78,6 +79,11 @@ class BootstrapRequest
     public function getJsonTranslations()
     {
         return Localization::getJson();
+    }
+
+    public function getCacheKey()
+    {
+        return 'store.bootstrap.'.(SetStoreLanguage::getHeaderLocale() ?: 'default');
     }
 }
 
