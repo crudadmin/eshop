@@ -59,12 +59,16 @@ trait HasCategoryTree
         return $this->getCategoriesTree();
     }
 
-    public function getCategoriesTree()
+    public function getCategoriesTree($responsable = true)
     {
         $trees = [];
 
         foreach ( $this->categories->whereNull('category_id') as $category ) {
-            $treeLevel = array_merge([$category->setCategoryTreeResponse()], $this->buildTreeLevels($category));
+            if ( $responsable === true ){
+                $category->setCategoryTreeResponse();
+            }
+
+            $treeLevel = array_merge([$category], $this->buildTreeLevels($category));
 
             $trees[] = $treeLevel;
         }
@@ -72,11 +76,15 @@ trait HasCategoryTree
         return $trees;
     }
 
-    private function buildTreeLevels($parentCategory) {
+    private function buildTreeLevels($parentCategory, $responsable = true) {
         $levels = [];
 
         foreach ($this->categories->where('category_id', $parentCategory->getKey()) as $category) {
-            $levels[] = $category->setCategoryTreeResponse();
+            if ( $responsable === true ){
+                $category->setCategoryTreeResponse();
+            }
+
+            $levels[] = $category;
 
             $levels = array_merge($levels, $this->buildTreeLevels($category));
         }
