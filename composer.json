@@ -16,7 +16,8 @@
         "propaganistas/laravel-phone": "^4.2",
         "staudenmeir/eloquent-has-many-deep": "^1.13",
         "heureka/overeno-zakazniky": "^4.0",
-        "gopay/payments-sdk-php": "^1.4"
+        "gopay/payments-sdk-php": "^1.4",
+        "cmixin/business-day": "^1.0"
     },
     "autoload": {
         "psr-4": {

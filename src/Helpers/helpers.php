@@ -16,8 +16,10 @@ function operator_types($except = [])
     $operators = [
         '+%' => _('% - Pričítať k aktualnej cene'),
         '-%' => _('% - Odčítať z aktuálnej ceny'),
-        '+' => _('+ Pripočítať k cene'),
-        '-' => _('- Odčítať z ceny'),
+        '+V' => _('+ Pripočítať k cene (s DPH)'),
+        '-V' => _('- Odčítať z ceny (s DPH)'),
+        '+' => _('+ Pripočítať k cene (bez DPH)'),
+        '-' => _('- Odčítať z ceny (bez DPH)'),
         '*' => _('* Vynásobit cenu'),
         'abs' => _('Nová hodnota'),
     ];
@@ -27,26 +29,29 @@ function operator_types($except = [])
 
 /**
  * Modify number by operator
- * @param  [type] $number   [description]
- * @param  [type] $operator [description]
- * @param  [type] $value    [description]
- * @param  [type] $count    for basolute values, we have two options of modifing number. first ist counting, and second replacing value
- * @return [type]           [description]
+ * @param  decimal $number
+ * @param  string $operator
+ * @param  decimal $value
+ * @param  decimal|nullable $vatValue
  */
-function operator_modifier($number, $operator, $value)
+function operator_modifier($number, $operator, $operatorValue, $vatValue = null)
 {
     if ( $operator == '+%' ){
-        $number = $number * (1 + ($value / 100));
+        $number = $number * (1 + ($operatorValue / 100));
     } else if ( $operator == '-%' ){
-        return operator_modifier($number, '+%', -$value);
+        return operator_modifier($number, '+%', -$operatorValue);
     } else if ( $operator == '+' ){
-        $number += $value;
+        $number += $operatorValue;
     } else if ( $operator == '-'){
-        $number -= $value;
+        $number -= $operatorValue;
+    } else if ( $operator == '+V' ){
+        $number += Store::removeVat($operatorValue, $vatValue);
+    } else if ( $operator == '-V'){
+        $number -= Store::removeVat($operatorValue, $vatValue, false);
     } else if ( $operator == '*'){
-        $number *= $value;
+        $number *= $operatorValue;
     } else if ( $operator == 'abs' ){
-        $number = $value;
+        $number = $operatorValue;
     }
 
     return $number;

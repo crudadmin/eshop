@@ -187,7 +187,7 @@ class Store
      */
     public function roundNumber($number, $rounding = null)
     {
-        $rounding = $rounding ?: $this->getRounding();
+        $rounding = $rounding === false ? $rounding : ($rounding ?: $this->getRounding());
 
         //If we does not want rounding
         if ( $rounding === false ) {
@@ -241,6 +241,20 @@ class Store
         $price = $price * ($vat ? (1 + ($vat / 100)) : 1);
 
         return $round ? $this->roundNumber($price) : $price;
+    }
+
+    /**
+     * Remove given vat value into number
+     *
+     * @param  float  $price
+     * @param  float  $vatValue
+     */
+    public function removeVat($price, $vat, $round = null)
+    {
+        return $this->roundNumber(
+            $price / ($vat ? (1 + ($vat / 100)) : 1),
+            $round
+        );
     }
 
     /*

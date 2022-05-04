@@ -366,4 +366,9 @@ return [
         //     'class' => \AdminEshop\Contracts\Synchronizer\Excel\SheetImportWrapper::class,
         // ],
     ],
+
+    'holidays' => [
+        'country' => 'sk',
+        'additional' => [],
+    ],
 ];
