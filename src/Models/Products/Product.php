@@ -147,10 +147,10 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'name' => 'Atribúty',
                 'before' => 'code',
             ],
-            'state_filter' => [
-                'unassigned' => [ 'name' => 'Nezaradené', 'title' => 'Nezaradené do kategórii' ],
-                'active' => [ 'name' => 'Aktívne' ],
-                'inactive' => [ 'name' => 'Neaktívne' ],
+            'rows.filters.items' => [
+                'unassigned' => [ 'name' => _('Nezaradené'), 'title' => _('Nezaradené do kategórii') ],
+                'active' => [ 'name' => _('Aktívne') ],
+                'inactive' => [ 'name' => _('Neaktívne') ],
             ],
             'decimals.round_without_vat' => config('admineshop.prices.round_without_vat', false),
         ];
@@ -288,7 +288,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                 });
     }
 
-    public function scopeSetFilterProperty($query, $types = '')
+    public function scopeFilterProperty($query, $types = '')
     {
         $types = explode(',', $types);
 
