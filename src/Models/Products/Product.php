@@ -147,7 +147,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'name' => 'Atribúty',
                 'before' => 'code',
             ],
-            'rows.filters.items' => [
+            'rows.filter.items' => [
                 'unassigned' => [ 'name' => _('Nezaradené'), 'title' => _('Nezaradené do kategórii') ],
                 'active' => [ 'name' => _('Aktívne') ],
                 'inactive' => [ 'name' => _('Neaktívne') ],
