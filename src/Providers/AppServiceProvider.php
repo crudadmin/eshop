@@ -5,6 +5,7 @@ namespace AdminEshop\Providers;
 use Admin;
 use AdminEshop\Commands\CleanEmptyCartTokens;
 use AdminEshop\Commands\ImportPickupPoints;
+use AdminEshop\Commands\MigrateProductAttributesFromVersion2;
 use AdminEshop\Commands\StockNotification;
 use AdminEshop\Jobs\CleanEmptyCartTokensJob;
 use AdminEshop\Jobs\ProductAvaiabilityChecker;
@@ -58,6 +59,7 @@ class AppServiceProvider extends AdminHelperServiceProvider
             ImportPickupPoints::class,
             CleanEmptyCartTokens::class,
             StockNotification::class,
+            MigrateProductAttributesFromVersion2::class,
         ]);
 
         $this->registerSchedules();
