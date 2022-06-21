@@ -443,6 +443,8 @@ trait PriceMutator
      */
     public function getAppliedDiscountsKeysAttribute()
     {
-        return array_keys($this->appliedDiscounts);
+        return array_filter(array_map(function($item){
+            return $item['discount'] ?? null;
+        }, $this->appliedDiscounts));
     }
 }
