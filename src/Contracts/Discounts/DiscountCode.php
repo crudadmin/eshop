@@ -39,7 +39,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public function getName()
     {
-        return __('Zľavový kód');
+        return _('Zľavový kód');
     }
 
     /**
