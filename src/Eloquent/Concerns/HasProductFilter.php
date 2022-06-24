@@ -231,6 +231,19 @@ trait HasProductFilter
 
     }
 
+    public function scopeApplySaleFilter($query, $params)
+    {
+        if ( ($isSale = $this->getFilterOption('filter._sale')) != 1 ){
+            return;
+        }
+
+        $query->where(function($query) {
+            $discounts = ['-%', '-V', '-', 'abs'];
+
+            $query->whereIn($query->getQuery()->from.'.discount_operator', $discounts);
+        });
+    }
+
     public function scopeFilterProduct($query, $params)
     {
         $query->withoutGlobalScope('order');
@@ -251,6 +264,8 @@ trait HasProductFilter
         if ( $this->getFilterOption('$ignore.filter.prices', false) == false ) {
             $query->applyPriceRangeFilter($params);
         }
+
+        $query->applySaleFilter($params);
     }
 
     public function scopeFilterParentProduct($query, $filter = null)
