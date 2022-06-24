@@ -75,7 +75,8 @@ trait HasOrderInvoice
                 'quantity' => $item->quantity,
                 'vat' => $item->vat,
                 'price' => $item->price,
-                'price_vat' => $item->price_vat
+                'price_vat' => $item->price_vat,
+                'identifier' => $item->identifier,
             ]);
         }
 
@@ -87,6 +88,7 @@ trait HasOrderInvoice
                 'vat' => $this->delivery_vat,
                 'price' => $this->delivery_price,
                 'price_vat' => $this->deliveryPriceWithVat,
+                'identifier' => 'delivery',
             ]);
         }
 
@@ -98,6 +100,7 @@ trait HasOrderInvoice
                 'vat' => $this->payment_method_vat,
                 'price' => $this->payment_method_price,
                 'price_vat' => $this->paymentMethodPriceWithVat,
+                'identifier' => 'payment',
             ]);
         }
     }
