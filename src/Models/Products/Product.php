@@ -115,14 +115,14 @@ class Product extends CartEloquent implements HasAttributesSupport
         $options = [
             'vat_id' => Store::getVats(),
             'product_type' => array_merge(config('admineshop.product_types', []), [
-                'variant' => 'Varianta',
+                'variant' => _('Varianta'),
             ]),
-            'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
+            'discount_operator' => [ 'default' => _('Žiadna zľava') ] + operator_types(),
             'stock_type' => [
-                'default' => 'Preberať z globalných nastavení eshopu',
-                'show' => 'Zobraziť vždy s možnosťou objednania len ak je skladom',
-                'everytime' => 'Zobrazit a objednat vždy, bez ohľadu na sklad',
-                'hide' => 'Zobrazit a mať možnost objednat len ak je skladom',
+                'default' => _('Preberať z globalných nastavení eshopu'),
+                'show' => _('Zobraziť vždy s možnosťou objednania len ak je skladom'),
+                'everytime' => _('Zobrazit a objednat vždy, bez ohľadu na sklad'),
+                'hide' => _('Zobrazit a mať možnost objednat len ak je skladom'),
             ],
             'attributes_items' => $this->getAttributesList(),
         ];
@@ -140,7 +140,7 @@ class Product extends CartEloquent implements HasAttributesSupport
             'title.insert' => 'Nový produkt',
             'title.update' => ':name',
             'grid.default' => 'full',
-            'recursivity.name' => 'Varianty produktu',
+            'recursivity.name' => _('Varianty produktu'),
             'recursivity.max_depth' => 1,
             'columns.attributes' => [
                 'hidden' => $this->hasAttributesEnabled() ? false : true,
