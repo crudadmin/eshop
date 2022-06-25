@@ -9,6 +9,8 @@ class ProductsPaginator extends LengthAwarePaginator
 {
     protected $pushIntoArray = [];
 
+    public $onEachSide = 1;
+
     public function toArray()
     {
         $array = parent::toArray();
