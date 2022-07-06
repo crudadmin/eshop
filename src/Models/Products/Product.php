@@ -139,6 +139,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'unassigned' => [ 'name' => 'Nezaradené', 'title' => 'Nezaradené do kategórii' ],
                 'active' => [ 'name' => 'Aktívne' ],
                 'inactive' => [ 'name' => 'Neaktívne' ],
+                'discounted' => [ 'name' => 'Zľavnené' ],
             ],
             'decimals.round_without_vat' => config('admineshop.prices.round_without_vat', false),
         ];
@@ -244,6 +245,24 @@ class Product extends CartEloquent implements HasAttributesSupport
                 $query->whereNotNull('published_at');
             } else if ( $type == 'inactive' ){
                 $query->whereNull('published_at');
+            } else if ( $type == 'discounted' ){
+                $query->where(function($query){
+                    $discountKeys = array_keys(operator_types());
+
+                    $query
+                        ->where(function($query) use ($discountKeys) {
+                            $query
+                                ->nonVariantProducts()
+                                ->whereIn('discount_operator', $discountKeys);
+                        })
+                        ->orWhere(function($query) use ($discountKeys) {
+                            $query
+                                ->variantProducts()
+                                ->whereHas('variants', function($query) use ($discountKeys) {
+                                    $query->whereIn('discount_operator', $discountKeys);
+                                });
+                        });
+                });
             }
         }
     }
