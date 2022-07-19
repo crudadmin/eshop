@@ -74,6 +74,12 @@ class Product extends CartEloquent implements HasAttributesSupport
         SetProductsCategory::class,
     ];
 
+    protected $search = [
+        'deep' => [
+            Product::class,
+        ],
+    ];
+
     /**
      * Model constructor
      *
@@ -146,11 +152,6 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'hidden' => $this->hasAttributesEnabled() ? false : true,
                 'name' => 'Atribúty',
                 'before' => 'code',
-            ],
-            'rows.filter.items' => [
-                'unassigned' => [ 'name' => _('Nezaradené'), 'title' => _('Nezaradené do kategórii') ],
-                'active' => [ 'name' => _('Aktívne') ],
-                'inactive' => [ 'name' => _('Neaktívne') ],
             ],
             'decimals.round_without_vat' => config('admineshop.prices.round_without_vat', false),
         ];
@@ -288,18 +289,28 @@ class Product extends CartEloquent implements HasAttributesSupport
                 });
     }
 
-    public function scopeFilterProperty($query, $types = '')
+    public function getFilterStates()
     {
-        $types = explode(',', $types);
-
-        foreach ($types as $i => $type) {
-            if ( $type == 'unassigned' ){
-                $query->whereDoesntHave('categories');
-            } else if ( $type == 'active' ){
-                $query->whereNotNull('published_at');
-            } else if ( $type == 'inactive' ){
-                $query->whereNull('published_at');
-            }
-        }
+        return [
+            'unassigned' => [
+                'name' => _('Nezaradené'),
+                'title' => _('Nezaradené do kategórii'),
+                'query' => function($query){
+                    return $query->whereDoesntHave('categories');
+                },
+            ],
+            'active' => [
+                'name' => _('Aktívne'),
+                'query' => function($query){
+                    return $query->whereNotNull('published_at');
+                },
+            ],
+            'inactive' => [
+                'name' => _('Neaktívne'),
+                'query' => function($query){
+                    return $query->whereNull('published_at');
+                },
+            ],
+        ];
     }
 }
