@@ -76,7 +76,10 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     protected $search = [
         'deep' => [
-            Product::class,
+            [
+                'model' => Product::class,
+                'relation' => 'variants',
+            ],
         ],
     ];
 
