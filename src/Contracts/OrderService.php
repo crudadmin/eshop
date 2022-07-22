@@ -201,7 +201,11 @@ class OrderService
      */
     public function addItemsIntoOrder()
     {
-        $items = Cart::addItemsFromMutators($this->getCartItems(), 'addHiddenCartItems');
+        $items = $this->getCartItems();
+
+        foreach (['addCartItems', 'addHiddenCartItems'] as $method) {
+            $items = Cart::addItemsFromMutators($items, $method);
+        }
 
         foreach ($items as $item) {
             $identifier = $item->getIdentifierClass();

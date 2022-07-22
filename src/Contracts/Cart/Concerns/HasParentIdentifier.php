@@ -29,6 +29,8 @@ trait HasParentIdentifier
             'identifier' => $parentIdentifier->getName(),
             'data' => $parentIdentifier->getIdentifiers(),
         ];
+
+        return $this;
     }
 
     /**
