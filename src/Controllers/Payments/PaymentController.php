@@ -67,6 +67,10 @@ class PaymentController extends Controller
                 }
             }
 
+            if ( $type == 'notification' ){
+                return ['status' => 'ok'];
+            }
+
             return redirect(OrderService::onPaymentSuccess());
         }
 
@@ -76,6 +80,10 @@ class PaymentController extends Controller
                 'code' => 'payment-status-error',
                 'log' => $e->getMessage(),
             ]);
+
+            if ( $type == 'notification' ){
+                return ['status' => 'error'];
+            }
 
             return redirect(
                 OrderService::onPaymentError(PaymentErrorCodes::CODE_PAYMENT_UNVERIFIED)
@@ -90,6 +98,10 @@ class PaymentController extends Controller
                 'code' => 'payment-status-unknown-error',
                 'log' => $e->getMessage(),
             ]);
+
+            if ( $type == 'notification' ){
+                return ['status' => 'error'];
+            }
 
             return redirect(
                 OrderService::onPaymentError(PaymentErrorCodes::CODE_ERROR)
