@@ -379,7 +379,7 @@ class OrderService
      *
      * @return  void
      */
-    public function sentClientEmail(Invoice $invoice = null, $email = null, $silent = true)
+    public function sentClientEmail(Invoice $invoice = null, $silent = true)
     {
         try {
             $order = $this->getOrder();

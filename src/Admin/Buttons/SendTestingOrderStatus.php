@@ -79,12 +79,13 @@ class SendTestingOrderStatus extends Button
 
         $order->status_id = $status->getKey();
 
-        $email = $this->getStoreEmail();
+        //We need rewrite order email for testing purpose
+        $order->email = $this->getStoreEmail();
 
         if ( $status->default === true ) {
-            OrderService::setOrder($order)->setOrderCartItems($order)->sentClientEmail(null, $email, false);
+            OrderService::setOrder($order)->setOrderCartItems($order)->sentClientEmail(null, false);
         } else {
-            Mail::to($email)->send(new OrderStatus($order));
+            Mail::to($order->email)->send(new OrderStatus($order));
         }
 
         return $this->success('Email bol úspešne odoslaný na Vašu adresu.');
