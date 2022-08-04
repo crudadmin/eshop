@@ -120,8 +120,13 @@ class DiscountCode extends Discount implements Discountable
 
             //Minimum order price, can be applied also in administration
             $priceWithVat = @$this->getCartSummary()['priceWithVat'] ?: 0;
+
             if ( $code->min_order_price > 0 && $priceWithVat < $code->min_order_price ) {
                 return sprintf(_('Minimálna suma objednávky pre tento kód je %s'), Store::priceFormat($code->min_order_price));
+            }
+
+            if ( $code->discount_price > 0 && $priceWithVat < $code->discount_price ) {
+                return sprintf(_('Minimálna suma objednávky pre tento kód je %s'), Store::priceFormat($code->discount_price));
             }
         }
 
