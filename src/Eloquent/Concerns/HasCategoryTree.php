@@ -68,7 +68,7 @@ trait HasCategoryTree
                 $category->setCategoryTreeResponse();
             }
 
-            $treeLevel = array_merge([$category], $this->buildTreeLevels($category));
+            $treeLevel = array_merge([$category], $this->buildTreeLevels($category, $responsable));
 
             $trees[] = $treeLevel;
         }
