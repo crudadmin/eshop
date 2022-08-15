@@ -23,6 +23,9 @@ class SubmitOrderRequest extends AdminModelRequest
             'delivery_street',
             'delivery_zipcode', 'delivery_city',
             'delivery_country_id',
+
+            //Additional fields
+            'note',
         ];
     }
 
