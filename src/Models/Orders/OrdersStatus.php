@@ -102,6 +102,7 @@ class OrdersStatus extends AdminModel
                 'default' => false,
                 'key' => 'shipped',
                 'email_delivery' => 0,
+                'email_content' => null,
                 'return_stock' => false,
                 'color' => null]
                  + ($hasSortable ? ['_order' => $i++] : []),
@@ -111,6 +112,7 @@ class OrdersStatus extends AdminModel
                 'default' => false,
                 'key' => 'ok',
                 'email_delivery' => 0,
+                'email_content' => null,
                 'return_stock' => false,
                 'color' => '#2ecc71'
             ] + ($hasSortable ? ['_order' => $i++] : []),
@@ -120,6 +122,7 @@ class OrdersStatus extends AdminModel
                 'default' => false,
                 'key' => 'canceled',
                 'email_delivery' => 0,
+                'email_content' => null,
                 'return_stock' => true,
                 'color' => null
             ] + ($hasSortable ? ['_order' => $i++] : []),
