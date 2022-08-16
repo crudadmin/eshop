@@ -318,7 +318,8 @@ class Cart
             $items = $items->merge($addItems);
         }
 
-        return $items;
+        //We need sort parent items, because they may be added in mutators as well
+        return $items->sortByParentItemsOrder();;
     }
 
     /**
