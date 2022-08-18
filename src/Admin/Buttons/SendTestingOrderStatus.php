@@ -9,7 +9,6 @@ use Admin\Helpers\Button;
 use Illuminate\Support\Facades\Mail;
 use OrderService;
 use Store;
-use Localization;
 
 class SendTestingOrderStatus extends Button
 {
@@ -65,9 +64,6 @@ class SendTestingOrderStatus extends Button
      */
     public function fire(AdminModel $status)
     {
-        //Boot website localization for templates
-        Localization::boot();
-
         $number = request('order_number');
 
         if ( !($order = Order::where('number', $number)->first()) ){

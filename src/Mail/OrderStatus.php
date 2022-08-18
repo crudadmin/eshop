@@ -11,6 +11,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Localization;
 
 class OrderStatus extends Mailable
 {
@@ -26,6 +27,9 @@ class OrderStatus extends Mailable
     public function __construct(Order $order)
     {
         $this->order = $order;
+
+        //Boot website localization for templates, if is not booted yet.
+        Localization::boot();
     }
 
     /**
@@ -35,6 +39,7 @@ class OrderStatus extends Mailable
      */
     public function build()
     {
+
         return $this
             ->markdown('admineshop::mail.order.status', [
                 'order' => $this->order,
