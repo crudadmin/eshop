@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Payments;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentGateException;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 use AdminEshop\Contracts\Payments\PaymentHelper;
+use Exception;
 use Gopay;
 use Log;
 
