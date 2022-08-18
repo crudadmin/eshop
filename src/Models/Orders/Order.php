@@ -185,7 +185,7 @@ class Order extends AdminModel
 
     public function scopeAdminRows($query)
     {
-        $query->with(['log', 'items:id,order_id']);
+        $query->with(['log', 'items']);
     }
 
     public function setAdminAttributes($attributes)
