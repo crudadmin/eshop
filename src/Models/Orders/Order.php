@@ -297,7 +297,7 @@ class Order extends AdminModel
         }
 
         if ( $this->relationLoaded('status') ) {
-            $this->status->setVisible(['id', 'name', 'color', 'default']);
+            $this->status->setVisible(['id', 'name', 'color', 'default', 'key']);
         }
 
         return $this->append([
