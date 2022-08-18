@@ -12,6 +12,8 @@ $parcelTypes = [
         @php
             $provider = $order->getShippingProvider();
         @endphp
+
+        @continue(!$provider)
         <Order>
             <customer_name>{{ $order->username }}</customer_name>
             <customer_name2>{{ $order->username }}</customer_name2>
