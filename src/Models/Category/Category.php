@@ -2,6 +2,8 @@
 
 namespace AdminEshop\Models\Category;
 
+use AdminEshop\Contracts\Feed\Facebook\FacebookFeed;
+use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
 use AdminEshop\Eloquent\Concerns\HasCategoryTree;
 use AdminEshop\Eloquent\Concerns\SearchableTrait;
 use AdminEshop\Eloquent\Concerns\SeoTrait;
@@ -82,6 +84,21 @@ class Category extends AdminModel
             ]),
             'code' => 'name:Kód kategórie|index|max:30',
         ];
+    }
+
+    public function mutateFields($fields)
+    {
+        if ( HeurekaFeed::isEnabled() ) {
+            $fields->after('name', [
+                'heureka_name' => 'name:Heureka názov|title:Názov kategórie pre heureku',
+            ]);
+        }
+
+        if ( FacebookFeed::isEnabled() ) {
+            $fields->after('name', [
+                'google_name' => 'name:Google názov|title:Názov kategórie pre google kategórie',
+            ]);
+        }
     }
 
     public function options()

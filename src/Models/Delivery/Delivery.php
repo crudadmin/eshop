@@ -3,13 +3,14 @@
 namespace AdminEshop\Models\Delivery;
 
 use AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice;
+use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
-use OrderService;
 use Discounts;
+use OrderService;
 use Store;
 
 class Delivery extends AdminModel implements DiscountSupport
@@ -92,7 +93,7 @@ class Delivery extends AdminModel implements DiscountSupport
         }
 
         //Add payments rules
-        if ( config('admineshop.heureka.enabled') ) {
+        if ( HeurekaFeed::isEnabled() ) {
             $restrictionFields['heureka_id'] = 'name:Heureka ID dopravy|title:Ak identifikátor bude vyplnený, zašle sa doprava do heureka exportu. - https://sluzby.heureka.sk/napoveda/xml-feed/#DELIVERY';
         }
 

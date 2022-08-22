@@ -2,8 +2,9 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
-use Store;
+use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
 use Admin\Fields\Group;
+use Store;
 
 trait HasProductFields
 {
@@ -76,7 +77,7 @@ trait HasProductFields
                 'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
                 'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
             ],
-            config('admineshop.heureka.enabled')
+            HeurekaFeed::isEnabled()
                 ? ['heureka_name' => 'name:Názov pre heureku|hidden'] : [],
         ))->id('otherSettings')->icon('fa-gear')->name('Ostatné nastavenia');
     }

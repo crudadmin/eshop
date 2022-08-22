@@ -32,7 +32,7 @@ class FeedGenerator
         }
 
         if ( config('admineshop.feeds.debug', false) ){
-            $data = $feed->getData();
+            $data = $feed->data();
         } else {
             $data = $feed->getCachedData();
         }

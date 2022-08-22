@@ -10,6 +10,7 @@ use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasCategoryTree;
+use AdminEshop\Eloquent\Concerns\HasFeed;
 use AdminEshop\Eloquent\Concerns\HasHeureka;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\HasProductFields;
@@ -39,6 +40,7 @@ class Product extends CartEloquent implements HasAttributesSupport
         HasProductPaginator,
         HasProductResponses,
         HasCategoryTree,
+        HasFeed,
         HasHeureka,
         HasVariantColors,
         HasProductFields,

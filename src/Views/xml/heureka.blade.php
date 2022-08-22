@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SHOP>
-  @foreach( $feed->getItems() as $product )
+  @foreach( $items as $product )
   <SHOPITEM>
     <ITEM_ID>{{ $product['id'] }}</ITEM_ID>
     <PRODUCTNAME>{{ $product['name'] }}</PRODUCTNAME>
     <PRODUCT>{{ $product['name'] }}</PRODUCT>
     <DESCRIPTION>{{ strip_tags(($product['description'] ?? null) ?: '') }}</DESCRIPTION>
-    <URL>{{ $product['heureka_url'] }}</URL>
-    <IMGURL>{{ $product['heureka_thumbnail'] }}</IMGURL>
+    <URL>{{ $product['feed_url'] ?: $product['url'] ?? null }}</URL>
+    <IMGURL>{{ $product['feed_thumbnail'] }}</IMGURL>
     {{-- <IMGURL_ALTERNATIVE>http://obchod.sk/mobily/nokia-5800-xpressmusic/obrazok2.jpg</IMGURL_ALTERNATIVE> --}}
     <PRICE_VAT>{{ $product['priceWithVat'] }}</PRICE_VAT>
     @if ( isset($product['video_url']) )

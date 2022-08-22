@@ -377,6 +377,7 @@ return [
         'debug' => env('STORE_FEED_DEBUG', false),
         'providers' => [
             'heureka' => AdminEshop\Contracts\Feed\Heureka\HeurekaFeed::class,
+            'facebook' => AdminEshop\Contracts\Feed\Facebook\FacebookFeed::class,
         ],
     ],
 ];
