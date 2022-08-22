@@ -371,4 +371,12 @@ return [
         'country' => 'sk',
         'additional' => [],
     ],
+
+    'feeds' => [
+        'cache' => env('STORE_FEED_CACHE', 3600),
+        'debug' => env('STORE_FEED_DEBUG', false),
+        'providers' => [
+            'heureka' => AdminEshop\Contracts\Feed\Heureka\HeurekaFeed::class,
+        ],
+    ],
 ];

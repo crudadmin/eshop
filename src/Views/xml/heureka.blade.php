@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SHOP>
-  @foreach( $builder->getItems() as $product )
+  @foreach( $feed->getItems() as $product )
   <SHOPITEM>
     <ITEM_ID>{{ $product['id'] }}</ITEM_ID>
     <PRODUCTNAME>{{ $product['name'] }}</PRODUCTNAME>

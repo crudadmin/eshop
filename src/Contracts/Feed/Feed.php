@@ -1,12 +1,28 @@
 <?php
 
-namespace AdminEshop\Contracts\Heureka;
+namespace AdminEshop\Contracts\Feed;
 
 use Admin;
+use Cache;
 use Store;
 
-class HeurekaBuilder
+class Feed
 {
+    public function getContentType()
+    {
+        return $this->contentType;
+    }
+
+    public function enabled()
+    {
+        return true;
+    }
+
+    public function cacheDuration()
+    {
+        return config('admineshop.feeds.cache', 3600);
+    }
+
     public function getItems()
     {
         $items = collect();
@@ -27,5 +43,11 @@ class HeurekaBuilder
 
         return $items;
     }
+
+    public function getCachedData()
+    {
+        return Cache::remember('store.feed.'.static::class, $this->cacheDuration(), function(){
+            return $this->data();
+        });
+    }
 }
-?>

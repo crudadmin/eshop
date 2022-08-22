@@ -116,8 +116,15 @@ trait HasRoutes
 
     public function routesForHeureka()
     {
+        $this->routesForFeeds();
+    }
+
+    public function routesForFeeds()
+    {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
+            //Legaxy route
             Route::get('/_store/heureka/feed', 'Store\HeurekaController@index');
+            Route::get('/_store/feed/{feed}', 'Feed\FeedController@index');
         });
     }
 
