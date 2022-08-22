@@ -9,11 +9,6 @@ class HeurekaFeed extends Feed
 {
     public $contentType = 'application/xml';
 
-    public function enabled()
-    {
-        return config('admineshop.heureka.enabled', false);
-    }
-
     public function getProducts($query)
     {
         return $query->withHeurekaListing();

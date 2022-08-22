@@ -13,14 +13,10 @@ class Feed
         return $this->contentType;
     }
 
-    public function enabled()
-    {
-        return true;
-    }
-
+    //Check if given feed is registered
     public static function isEnabled()
     {
-        return (new self)->enabled();
+        return in_array(static::class, config('admineshop.feeds.providers'));
     }
 
     public function cacheDuration()

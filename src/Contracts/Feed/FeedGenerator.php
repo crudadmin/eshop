@@ -27,7 +27,7 @@ class FeedGenerator
 
     public function response()
     {
-        if ( !($feed = $this->getFeed($this->type)) || $feed->enabled() === false ){
+        if ( !($feed = $this->getFeed($this->type)) || $feed::isEnabled() === false ){
             abort(404);
         }
 
