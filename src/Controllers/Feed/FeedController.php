@@ -7,7 +7,7 @@ use AdminEshop\Controllers\Controller;
 
 class FeedController extends Controller
 {
-    public function index($type)
+    public function index($type = 'heureka')
     {
         return (new FeedGenerator($type))->response();
     }
