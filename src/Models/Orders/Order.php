@@ -280,6 +280,11 @@ class Order extends AdminModel
 
     }
 
+    public function getOrderUrl()
+    {
+        // return env('APP_NUXT_URL')._('/cart/success').'?id='.$this->getKey().'&hash='.$this->getHash();
+    }
+
     public function setOrderResponse()
     {
         return $this;
