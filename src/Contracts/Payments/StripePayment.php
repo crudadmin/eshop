@@ -59,6 +59,10 @@ class StripePayment extends PaymentHelper
             ],
         ];
 
+        if ( $types = $this->getOption('payment_method_types') ){
+            $data['payment_method_types'] = array_wrap($types);
+        }
+
         try {
             $session = $this->client->checkout->sessions->create($data);
 
