@@ -28,7 +28,7 @@ class ProductAvaiabilityChecker implements ShouldQueue
 
         $notifications = Admin::getModel('ProductsNotification')
                                 ->where('notified', 0)
-                                ->select('id', 'product_id', 'products_variant_id', 'email', 'notified_error')
+                                ->select('id', 'product_id', 'variant_id', 'email', 'notified_error')
                                 ->where(function($query){
                                     $query
                                         ->whereHas('product', function($query){
