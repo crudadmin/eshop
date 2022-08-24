@@ -4,7 +4,6 @@ namespace AdminEshop\Commands;
 
 use AdminEshop\Jobs\ProductAvaiabilityChecker;
 use Illuminate\Console\Command;
-use Localization;
 
 class StockNotification extends Command
 {
@@ -29,8 +28,6 @@ class StockNotification extends Command
      */
     public function handle()
     {
-        Localization::boot();
-
         dispatch(new ProductAvaiabilityChecker);
 
         return 0;

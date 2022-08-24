@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Localization;
 use Admin;
 use Log;
 
@@ -24,6 +25,8 @@ class ProductAvaiabilityChecker implements ShouldQueue
      */
     public function handle()
     {
+        Localization::boot();
+
         Admin::start();
 
         $notifications = Admin::getModel('ProductsNotification')
