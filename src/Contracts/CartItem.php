@@ -203,6 +203,16 @@ class CartItem implements UsesIdentifier
     {
         return $this->data;
     }
+
+    /**
+     * Returns identifier hash
+     *
+     * @return  string
+     */
+    public function getHash()
+    {
+        return $this->getIdentifierClass()->getIdentifierHash();
+    }
 }
 
 ?>

@@ -380,4 +380,11 @@ class CartCollection extends Collection
             }
         })->values();
     }
+
+    public function getCartKey()
+    {
+        return $this->map(function($cartItem){
+            return $cartItem->getHash();
+        })->join('_');
+    }
 }

@@ -42,9 +42,7 @@ trait HasMutators
     {
         $mutators = is_array($this->mutators) ? $this->mutators : config('admineshop.cart.mutators');
 
-        $mutatorsCacheKey = implode(';', $mutators);
-
-        $mutators = $this->cache('orderMutators.'.$mutatorsCacheKey, function() use ($mutators) {
+        $mutators = $this->cache('orderMutators.'.implode(';', $mutators), function() use ($mutators) {
             return array_map(function($item) {
                 return new $item;
             }, $mutators);
@@ -55,13 +53,16 @@ trait HasMutators
         }, $mutators);
     }
 
-    public function hasMutator($mutator)
+    public function getCachedMutators()
     {
-        $mutators = $this->cache('mutators.active', function(){
+        return $this->cache('mutators.list', function(){
             return $this->getMutators();
         });
+    }
 
-        return count(array_filter($mutators, function($class) use ($mutator) {
+    public function hasMutator($mutator)
+    {
+        return count(array_filter($this->getCachedMutators(), function($class) use ($mutator) {
             return $class instanceof $mutator;
         })) > 0;
     }
@@ -73,29 +74,33 @@ trait HasMutators
      */
     public function getActiveMutators(CartCollection $cartItems = null)
     {
-        $mutators = $this->getMutators($cartItems);
+        $cacheKey = $cartItems ? $cartItems->getCartKey() : 'default';
 
-        return array_filter(array_map(function($mutator) {
-            if ( Admin::isAdmin() ) {
-                $response = $mutator->isActiveInAdmin($this->getOrder());
-            } else {
-                $response = $mutator->isActive($this->getOrder());
-            }
+        return $this->cache('active.mutators.'.$cacheKey, function() use ($cartItems, $cacheKey) {
+            $mutators = $this->getMutators($cartItems);
 
-            //Apply all discounts on given reponse if is correct type
-            //Sometimes mutator may return Discountable admin model.
-            //So we need apply discounts to this model
-            Cart::addCartDiscountsIntoModel($response);
+            return array_filter(array_map(function($mutator) {
+                if ( Admin::isAdmin() ) {
+                    $response = $mutator->isActiveInAdmin($this->getOrder());
+                } else {
+                    $response = $mutator->isActive($this->getOrder());
+                }
 
-            //If no response has been given, skip this mutator
-            if ( ! $response ) {
-                return;
-            }
+                //Apply all discounts on given reponse if is correct type
+                //Sometimes mutator may return Discountable admin model.
+                //So we need apply discounts to this model
+                Cart::addCartDiscountsIntoModel($response);
 
-            $mutator->setActiveResponse($response);
+                //If no response has been given, skip this mutator
+                if ( ! $response ) {
+                    return;
+                }
 
-            return $mutator;
-        }, $mutators));
+                $mutator->setActiveResponse($response);
+
+                return $mutator;
+            }, $mutators));
+        });
     }
 }
 ?>
