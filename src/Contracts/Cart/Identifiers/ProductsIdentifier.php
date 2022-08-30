@@ -66,22 +66,6 @@ class ProductsIdentifier extends Identifier
         ];
     }
 
-    /**
-     * Boot identifier from given model
-     *
-     * @param  AdminModel  $model
-     * @return  ProductsIdentifier
-     */
-    public function bootFromModel($model)
-    {
-        $isVariant = $model->product_id;
-
-        return $this->bindInKeysOrder(
-            $isVariant ? $model->product_id : $model->getKey(),
-            $isVariant ? $model->getKey() : null
-        );
-    }
-
     public function cloneFromItem(object $item)
     {
         $identifier = parent::cloneFromItem($item);

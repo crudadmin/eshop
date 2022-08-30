@@ -76,7 +76,7 @@ class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
     {
         $identifierClass = $this->getModelIdentifier();
 
-        return (new $identifierClass)->bootFromModel($this);
+        return (new $identifierClass)->cloneFromItem($this);
     }
 
     /**

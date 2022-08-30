@@ -46,17 +46,18 @@ class OrderController extends Controller
 
         //Add orderItems into cart
         foreach ($order->items as $item) {
-            $cartItem = $item->getCartItem();
+            $identifier = $item->getIdentifierClass();
 
             Cart::addOrUpdate(
-                $cartItem->getIdentifierClass(),
-                $cartItem->quantity
+                $identifier,
+                $item->quantity
             );
         }
 
-        return autoAjax()->success(_('Položky z objednávky boli pridané do košíka.'))
-                        ->data([
-                            'cart' => Cart::response(),
-                        ]);
+        return autoAjax()
+                ->success(_('Položky z objednávky boli pridané do košíka.'))
+                ->data([
+                    'cart' => Cart::response(),
+                ]);
     }
 }
