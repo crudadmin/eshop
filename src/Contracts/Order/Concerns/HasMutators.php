@@ -57,7 +57,11 @@ trait HasMutators
 
     public function hasMutator($mutator)
     {
-        return count(array_filter($this->getMutators(), function($class) use ($mutator) {
+        $mutators = $this->cache('mutators.active', function(){
+            return $this->getMutators();
+        });
+
+        return count(array_filter($mutators, function($class) use ($mutator) {
             return $class instanceof $mutator;
         })) > 0;
     }
