@@ -82,6 +82,18 @@ class ProductsIdentifier extends Identifier
         );
     }
 
+    public function cloneFromItem(object $item)
+    {
+        $identifier = parent::cloneFromItem($item);
+
+        //We need reset variant_id, if is same id.
+        if ( $identifier->getIdentifier('id') == $identifier->getIdentifier('variant_id') ){
+            $identifier->setIdentifier('variant_id', null);
+        }
+
+        return $this;
+    }
+
     /**
      * Boot identifier from request data
      *
