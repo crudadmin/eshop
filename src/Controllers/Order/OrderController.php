@@ -3,6 +3,7 @@
 namespace AdminEshop\Controllers\Order;
 
 use AdminEshop\Controllers\Controller;
+use Cart;
 
 class OrderController extends Controller
 {
@@ -37,5 +38,25 @@ class OrderController extends Controller
                 return $item->setClientListingResponse();
             }),
         ]);
+    }
+
+    public function repeat($id)
+    {
+        $order = client()->orders()->where('id', $id)->with('items')->get()->first();
+
+        //Add orderItems into cart
+        foreach ($order->items as $item) {
+            $cartItem = $item->getCartItem();
+
+            Cart::addOrUpdate(
+                $cartItem->getIdentifierClass(),
+                $cartItem->quantity
+            );
+        }
+
+        return autoAjax()->success(_('Položky z objednávky boli pridané do košíka.'))
+                        ->data([
+                            'cart' => Cart::response(),
+                        ]);
     }
 }

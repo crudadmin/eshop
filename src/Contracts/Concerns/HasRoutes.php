@@ -111,6 +111,7 @@ trait HasRoutes
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){
             Route::get('/auth/orders', 'Order\OrderController@index')->visible();
             Route::get('/auth/orders/{id}', 'Order\OrderController@show')->visible();
+            Route::get('/auth/orders/{id}/repeat', 'Order\OrderController@repeat')->visible();
         });
     }
 
