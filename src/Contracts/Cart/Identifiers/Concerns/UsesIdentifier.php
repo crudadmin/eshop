@@ -38,6 +38,11 @@ interface UsesIdentifier
      * @return  string
      */
     public function getProductName();
+
+    /**
+     * Returns identifier key
+     */
+    public function getKey();
 }
 
 ?>

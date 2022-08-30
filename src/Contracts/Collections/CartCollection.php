@@ -384,7 +384,7 @@ class CartCollection extends Collection
     public function getCartKey()
     {
         return $this->map(function($cartItem){
-            return $cartItem->getHash();
+            return $cartItem->getKey();
         })->join('_');
     }
 }

@@ -209,7 +209,7 @@ class CartItem implements UsesIdentifier
      *
      * @return  string
      */
-    public function getHash()
+    public function getKey()
     {
         return $this->getIdentifierClass()->getIdentifierHash();
     }
