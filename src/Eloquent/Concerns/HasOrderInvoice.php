@@ -29,7 +29,6 @@ trait HasOrderInvoice
             'price_vat' => $this->price_vat,
             'payment_method_id' => $this->payment_method_id,
             'vs' => $this->number,
-            'payment_date' => $this->created_at->addDays(getInvoiceSettings()->payment_term),
             'country' => 'sk',
         ]);
     }
