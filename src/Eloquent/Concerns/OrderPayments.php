@@ -2,6 +2,10 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use AdminEshop\Mail\OrderPaid;
+use Exception;
+use Illuminate\Support\Facades\Mail;
+use Log;
 use OrderService;
 
 trait OrderPayments
@@ -67,6 +71,27 @@ trait OrderPayments
         return $paymentClass->getPostPaymentUrl(
             $paymentClass->getResponse()
         );
+    }
+
+    public function sendPaymentEmail($type = 'invoice', $invoice = null)
+    {
+        try {
+            //Generate invoice
+            $invoice = $invoice ?: $this->makeInvoice($type);
+
+            Mail::to($this->email)->send(
+                new OrderPaid($this, $invoice)
+            );
+
+            $invoice->setNotified();
+        } catch (Exception $e){
+            Log::channel('store')->error($e);
+
+            $this->log()->create([
+                'type' => 'error',
+                'code' => 'email-payment-done-error',
+            ]);
+        }
     }
 }
 

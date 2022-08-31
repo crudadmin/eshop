@@ -5,12 +5,9 @@ namespace AdminEshop\Contracts\Order\Concerns;
 use Admin;
 use AdminEshop\Contracts\Payments\GopayPayment;
 use AdminEshop\Events\OrderPaid as OrderPaidEvent;
-use AdminEshop\Mail\OrderPaid;
 use AdminEshop\Models\Orders\Payment;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Facades\Mail;
-use Log;
 
 trait HasPayments
 {
@@ -196,23 +193,7 @@ trait HasPayments
 
         //Send invoice email
         if ( config('admineshop.mail.order.paid_notification', true) == true ) {
-            //Generate invoice
-            $invoice = $this->makeInvoice('invoice');
-
-            try {
-                Mail::to($order->email)->send(
-                    new OrderPaid($order, $invoice)
-                );
-
-                $invoice->setNotified();
-            } catch (Exception $e){
-                Log::channel('store')->error($e);
-
-                $order->log()->create([
-                    'type' => 'error',
-                    'code' => 'email-payment-done-error',
-                ]);
-            }
+            $order->sendPaymentEmail();
         }
     }
 }

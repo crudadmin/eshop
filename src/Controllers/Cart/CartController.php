@@ -9,6 +9,7 @@ use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Controllers\Controller;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
+use Carbon\Carbon;
 use Cart;
 use OrderService;
 
@@ -256,9 +257,13 @@ class CartController extends Controller
         //Send email to client
         if ( config('admineshop.mail.order.created', true) == true ) {
             //Generate default invoice document
-            $proform = config('admineshop.mail.with_proform', true) == true
-                        ? OrderService::makeInvoice('proform')
-                        : null;
+            if ( config('admineshop.mail.with_proform', true) == true ) {
+                $proform = OrderService::makeInvoice('proform', [
+                    'notified_at' => Carbon::now(),
+                ]);
+            } else {
+                $proform = null;
+            }
 
             OrderService::sentClientEmail($proform);
         }
