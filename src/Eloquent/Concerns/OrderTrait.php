@@ -316,25 +316,35 @@ trait OrderTrait
         })->toArray();
     }
 
-    public function getOrderIndicator()
+    public function getFilterStates()
     {
-        if ( !$this->getField('status_id') ){
-            return;
-        }
-
-        $color = $this->status?->color;
-        $status = '';
-
-        if ( $this->created_at == $this->updated_at ){
-            $color = '#e3342f';
-
-            $status = 'Neupravená objednávka';
-        }
-
-        return [
-            'color' => $color,
-            'title' => $status,
+        $states = [
+            [
+                'name' => 'Neupravená objednávka',
+                'color' => '#e3342f',
+                'active' => function(){
+                    return $this->created_at == $this->updated_at;
+                },
+                'query' => function($query){
+                    return $query->whereRaw('created_at = updated_at');
+                },
+            ]
         ];
+
+        foreach (OrdersStatus::get() as $status) {
+            $states[] = [
+                'name' => $status->name,
+                'color' => $status->color,
+                'active' => function() use ($status) {
+                    return $this->status_id === $status->getKey();
+                },
+                'query' => function($query) use ($status) {
+                    return $query->where('status_id', $status->getKey());
+                },
+            ];
+        }
+
+        return $states;
     }
 
     public function onRequiredStatusIdRelation($table, $schema, $builder)

@@ -197,7 +197,6 @@ class Order extends AdminModel
 
     public function setAdminRowsAttributes($attributes)
     {
-        $attributes['$indicator'] = $this->getOrderIndicator();
         $attributes['number'] = $this->number;
         $attributes['client_name'] = $this->getClientName();
         $attributes['delivery_address'] = $this->getDeliveryAddress();
