@@ -203,6 +203,8 @@ trait HasPayments
                 Mail::to($order->email)->send(
                     new OrderPaid($order, $invoice)
                 );
+
+                $invoice->setNotified();
             } catch (Exception $e){
                 Log::channel('store')->error($e);
 

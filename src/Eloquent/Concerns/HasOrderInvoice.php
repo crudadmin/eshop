@@ -33,9 +33,9 @@ trait HasOrderInvoice
         ]);
     }
 
-    public function makeInvoice($type = null)
+    public function makeInvoice($type = null, $data = [])
     {
-        $data = $this->getInvoiceData($type);
+        $data = array_merge($this->getInvoiceData($type), $data);
 
         //If is creating invoice, and order has proform
         if (

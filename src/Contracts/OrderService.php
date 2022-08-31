@@ -364,14 +364,14 @@ class OrderService
      *
      * @return  Invoice|null
      */
-    public function makeInvoice($type = 'proform')
+    public function makeInvoice($type = 'proform', $data = [])
     {
         if ( ! $this->hasInvoices() ) {
             return;
         }
 
         //Generate proform
-        return $this->getOrder()->makeInvoice($type);
+        return $this->getOrder()->makeInvoice($type, $data);
     }
 
     /**
