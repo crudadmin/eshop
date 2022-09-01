@@ -370,8 +370,25 @@ class OrderService
             return;
         }
 
-        //Generate proform
-        return $this->getOrder()->makeInvoice($type, $data);
+        $order = $this->getOrder();
+
+        try {
+            //Generate proform
+            return $order->makeInvoice($type, $data);
+        } catch (Exception $error){
+            Log::error($error);
+
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'INVOICE_ERROR',
+                'log' => $error->getMessage()
+            ]);
+
+            //Debug
+            if ( $this->isDebug() ) {
+                throw $error;
+            }
+        }
     }
 
     /**
