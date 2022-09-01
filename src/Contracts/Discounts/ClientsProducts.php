@@ -28,6 +28,11 @@ class ClientsProducts extends Discount implements Discountable
         return __('Zľava na produkt');
     }
 
+    public function canShowInEmail()
+    {
+        return false;
+    }
+
     /*
      * Check if is discount active
      */
