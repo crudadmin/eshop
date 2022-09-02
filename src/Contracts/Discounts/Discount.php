@@ -311,7 +311,7 @@ class Discount implements Discountable, ActiveInterface
         return $this->cache('summary.'.static::class, function(){
             $exceptAcutal = Discounts::getDiscounts([ $this->getKey() ]);
 
-            return $this->getCartItems()->getSummary(null, $exceptAcutal);
+            return $this->getCartItems()->getSummary(false, $exceptAcutal, true);
         });
     }
 

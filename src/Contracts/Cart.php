@@ -184,7 +184,7 @@ class Cart
             }, Discounts::getDiscounts()),
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
-            'summary' => $items->getSummary(),
+            'summary' => $items->getSummary(false, null, false),
             'summaryTotal' => $items->getSummary($fullCartResponse),
         ];
 
