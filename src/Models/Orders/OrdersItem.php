@@ -96,7 +96,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
                 'order_item' => 'name:Patrí k položke|belongsTo:orders_items,id|inaccessible',
             ])->id('itemAdditional'),
             Group::fields([
-                'default_price' => 'name:Pôvodna cena bez DPH|invisible|type:decimal|title:Cena produktu v čase objednania.|disabled',
+                'default_price' => 'name:Pôvodna cena bez zliav DPH|invisible|type:decimal|title:Cena produktu bez zliav v čase objednania.|disabled',
                 'price' => 'name:Cena/j bez DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
                 'vat' => 'name:DPH %|type:select|default:'.Store::getDefaultVat().'|required_if:manual_price,1|disabledIf:manual_price,0',
                 'price_vat' => 'name:Cena/j s DPH|type:decimal|required_if:manual_price,1|disabledIf:manual_price,0',
@@ -223,5 +223,27 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         }
 
         return array_unique($array);
+    }
+
+    public function scopeWithExportResponse($query)
+    {
+        $query
+            ->addSelect([
+                'products.code as product_code',
+                'products.ean as product_ean',
+                'products.name as product_name',
+            ])
+            ->leftJoin('products', function($join){
+                $join->on('products.id', '=', 'orders_items.product_id');
+            });
+    }
+
+    public function setExportResponse()
+    {
+        if ( !$this->getValue('name') && $productName = $this->getValue('product_name') ){
+            $this->setAttribute('name', $productName);
+        }
+
+        return $this->setHidden(['product_name']);
     }
 }
