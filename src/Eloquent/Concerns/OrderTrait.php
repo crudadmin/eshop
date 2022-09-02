@@ -320,7 +320,7 @@ trait OrderTrait
     {
         $states = [
             [
-                'name' => 'Neupravená objednávka',
+                'name' => _('Neupravená objednávka'),
                 'color' => '#e3342f',
                 'active' => function(){
                     return $this->created_at == $this->updated_at;
