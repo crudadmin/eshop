@@ -21,7 +21,7 @@ class ClientPercentage extends Discount implements Discountable
      */
     public function getName()
     {
-        return __('Zákaznícka zľava');
+        return _('Zákaznícka zľava');
     }
 
     /*

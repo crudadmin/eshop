@@ -255,7 +255,10 @@ class Discount implements Discountable, ActiveInterface
     public function getMessages($isActiveResponse)
     {
         return [
-            [ 'name' => $this->getName(), 'value' => $this->getBaseDiscountMessage($isActiveResponse) ],
+            [
+                'name' => $this->getName(),
+                'value' => $this->getBaseDiscountMessage($isActiveResponse)
+            ],
         ];
     }
 
