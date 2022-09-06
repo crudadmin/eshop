@@ -4,6 +4,7 @@ namespace AdminEshop\Contracts\Cart\Drivers;
 
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
 use Str;
+use Admin;
 
 class BaseDriver
 {
@@ -115,5 +116,15 @@ class BaseDriver
      */
     public function getCartSession()
     {
+    }
+
+    /**
+     * Returns cart token eloquent
+     *
+     * @return AdminModel
+     */
+    public function getCartTokenModel()
+    {
+        return Admin::getModel('CartToken');
     }
 }

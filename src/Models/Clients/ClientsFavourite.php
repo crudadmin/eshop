@@ -104,7 +104,7 @@ class ClientsFavourite extends AdminModel
         return $this;
     }
 
-    public function getFavouritesIdentifiers($client = null)
+    public function getFavouritesIdentifiers($client = null, $cartToken = null)
     {
         $identifiers = [];
 
@@ -112,16 +112,16 @@ class ClientsFavourite extends AdminModel
             $identifiers['client_id'] = $client->getKey();
         }
 
-        if ( ($cartToken = Cart::getDriver()->getCartSession()) instanceof CartToken ){
+        if ( ($cartToken = ($cartToken ?: Cart::getDriver()->getCartSession())) instanceof CartToken ){
             $identifiers['cart_token_id'] = $cartToken->getKey();
         }
 
         return array_filter($identifiers);
     }
 
-    public function scopeActiveSession($query)
+    public function scopeActiveSession($query, $client = null, $cartToken = null)
     {
-        $identifiers = $this->getFavouritesIdentifiers();
+        $identifiers = $this->getFavouritesIdentifiers($client, $cartToken);
 
         //We cannot select all when identifiers are not present.
         if ( count($identifiers) == 0 ){

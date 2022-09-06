@@ -4,7 +4,6 @@ namespace AdminEshop\Contracts\Cart\Drivers;
 
 use AdminEshop\Contracts\Cart\Drivers\BaseDriver;
 use AdminEshop\Contracts\Cart\Drivers\DriverInterface;
-use AdminEshop\Models\Store\CartToken;
 use Arr;
 
 class MySqlDriver extends BaseDriver implements DriverInterface
@@ -40,10 +39,12 @@ class MySqlDriver extends BaseDriver implements DriverInterface
             return $this->cartRow;
         }
 
+        $model = $this->getCartTokenModel();
+
         if ( $cartToken = $this->getToken() ) {
             //Fetch or create new token row
-            if ( !($cartRow = CartToken::where('token', $cartToken)->first()) ){
-                $cartRow = (new CartToken)->fill([
+            if ( !($cartRow = $model->where('token', $cartToken)->first()) ){
+                $cartRow = $model->fill([
                     'token' => $cartToken,
                     'data' => $initialData ?: [],
                 ])->setClientIfEmpty();
@@ -56,7 +57,7 @@ class MySqlDriver extends BaseDriver implements DriverInterface
 
         //If token has not been sent, we create anonymous cart token
         else {
-            $cartRow = new CartToken([
+            $cartRow = $model->newInstance([
                 'data' => $initialData
             ]);
         }
