@@ -198,6 +198,12 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
             ];
         }
 
+        if ( ($notifications = $this->getNotifications()) && count($notifications) ) {
+            $services['notifications'] = [
+                'notification' => $notifications,
+            ];
+        }
+
         return $services;
     }
 
@@ -325,5 +331,53 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
     public function getTrackingUrl($trackingNumber)
     {
         return 'https://tracking.dpd.de/status/sk_SK/parcel/'.$trackingNumber;
+    }
+
+    private function getNotifications()
+    {
+        $notifications = [];
+
+        $allowedNotifications = $this->getNotificationsConfig();
+
+        $order = $this->getOrder();
+
+        $language = app()->getLocale();
+
+        if ( array_key_exists('email', $allowedNotifications) && $email = $order->email ) {
+            $notifications[] = array_merge([
+                'type' => 1,
+                'destination' => $email,
+                'rule' => 904,
+                'language' => $language,
+            ], $allowedNotifications['email']);
+        }
+
+        if ( array_key_exists('sms', $allowedNotifications) && $phone = ($order->delivery_phone ?: $order->phone) ) {
+            $notifications[] = array_merge([
+                'type' => 3,
+                'destination' => $phone,
+                'rule' => 904,
+                'language' => $language,
+            ], $allowedNotifications['sms']);
+        }
+
+        return $notifications;
+    }
+
+    private function getNotificationsConfig()
+    {
+        $providerConfig = $this->getOption('notifications', []);
+
+        $config = [];
+
+        foreach (['sms', 'email'] as $key) {
+            if ( array_key_exists($key, $providerConfig) ){
+                $config[$key] = $providerConfig[$key];
+            } else if ( in_array($key, $providerConfig) ){
+                $config[$key] = [];
+            }
+        }
+
+        return $config;
     }
 }
