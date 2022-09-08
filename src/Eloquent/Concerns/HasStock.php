@@ -205,7 +205,7 @@ trait HasStock
      * @param  string|null  $message
      * @return void
      */
-    public function commitStockChange($type, int $sub, $orderId, $message = null)
+    public function commitStockChange($type, int $sub, $orderId, $message = null, $logId = null)
     {
         //Set sub on product type
         $sub = ($type == '-' ? $sub * -1 : $sub);
@@ -225,6 +225,7 @@ trait HasStock
             'sub' => $sub,
             'stock' => $newStockQuantity,
             'message' => $message,
+            'log_id' => $logId,
         ]);
 
         //Event for added discount code

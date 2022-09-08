@@ -2,8 +2,10 @@
 
 namespace AdminEshop\Models\Products;
 
+use AdminEshop\Admin\Buttons\RevertStock;
 use AdminEshop\Eloquent\Concerns\OrderItemTrait;
 use Admin\Eloquent\AdminModel;
+use Illuminate\Support\Facades\DB;
 
 class ProductsStocksLog extends AdminModel
 {
@@ -28,6 +30,10 @@ class ProductsStocksLog extends AdminModel
 
     protected $group = 'store';
 
+    protected $buttons = [
+        RevertStock::class,
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -39,7 +45,9 @@ class ProductsStocksLog extends AdminModel
         'product' => 'name:Produkt|belongsTo:products,name|limit:40',
         'sub' => 'name:Úprava skladu|type:integer|required',
         'stock' => 'name:Nová hodnota skladu|type:integer|required',
-        'order' => 'name:Objednávka č.|belongsTo:orders,id|invisible',
+        'order' => 'name:Objednávka č.|belongsTo:orders,number|invisible',
+        'log' => 'name:Stav č.|belongsTo:products_stocks_logs,id|invisible',
+        'reverted' => 'name:Vrátene stavu|type:checkbox|default:0|hidden',
         'message' => 'name:Zmena|type:select|limit:0',
     ];
 
@@ -47,6 +55,7 @@ class ProductsStocksLog extends AdminModel
     {
         return [
             'message' => [
+                'revert' => 'Vrátenie stavu',
                 'order.new' => 'Nová objednávka',
                 'order.paid' => 'Objednávka zaplatená',
                 'order.new-backend' => 'Nová objednávka (backend)',
@@ -59,14 +68,28 @@ class ProductsStocksLog extends AdminModel
                 'item.remove' => 'Produkt zmazaný z objednávky',
             ],
             'product_id' => $this->getAvailableProducts(),
+            'order_id' => [],
         ];
     }
 
-    public function setAdminAttributes($attributes)
+    public function scopeAdminRows($query)
+    {
+        $query
+            ->selectRaw('products_stocks_logs.*, orders.number as order_number')
+            ->leftJoin('orders', function($join){
+                $join->on('orders.id', '=', 'products_stocks_logs.order_id');
+            });
+    }
+
+    public function setAdminRowsAttributes($attributes)
     {
         $attributes['created'] = $this->created_at->translatedFormat('d. M Y \o H:i');
         $attributes['sub'] = ($this->sub > 0 ? '+' : '').$this->sub.' ks';
-        $attributes['orderId'] = $this->order_id;
+        $attributes['orderId'] = $this->order_number;
+
+        if ( $this->log_id ){
+            $attributes['message'] = sprintf(_('Vrátenie stavu č. %s'), $this->log_id);
+        }
 
         return $attributes;
     }
