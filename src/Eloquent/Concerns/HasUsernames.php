@@ -96,12 +96,12 @@ trait HasUsernames
             ));
         }
 
-        return $this->attributes[$prefix.'username'] ?? '';
+        return $this->getEncryptedAttribute($prefix.'username');
     }
 
     protected function getDynamicFirstname($prefix = '')
     {
-        $value = $this->attributes[$prefix.'firstname'] ?? '';
+        $value = $this->getEncryptedAttribute($prefix.'firstname');
 
         if ( $this->hasSplitedUsernames() ){
             return $value;
@@ -114,7 +114,7 @@ trait HasUsernames
 
     protected function getDynamicLastname($prefix = '')
     {
-        $value = $this->attributes[$prefix.'lastname'] ?? '';
+        $value = $this->getEncryptedAttribute($prefix.'lastname');
 
         if ( $this->hasSplitedUsernames() ){
             return $value;
@@ -128,9 +128,9 @@ trait HasUsernames
 
     protected function setDynamicUsername($key, $value, $prefix = '')
     {
-        $this->attributes[$prefix.$key] = $value;
+        $this->setEncryptedAttribute($prefix.$key, $value);
 
-        $this->attributes[$prefix.'username'] = $this->getDynamicUsername($prefix);
+        $this->setEncryptedAttribute($prefix.'username', $this->getDynamicUsername($prefix));
     }
 
     protected function setDynamicNameParts($value, $prefix = '')
