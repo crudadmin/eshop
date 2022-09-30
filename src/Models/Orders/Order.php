@@ -327,10 +327,14 @@ class Order extends AdminModel
      *
      * @return  Admin\Core\Fields\FieldsValidator
      */
-    public function orderValidator(Request $request)
+    public function orderValidator(Request $request, $submitOrder = false)
     {
+        $orderRequest = new (config('admineshop.cart.order.validator', SubmitOrderRequest::class));
+
+        $orderRequest->setOrderSubmit($submitOrder);
+
         return $this->validator($request)->use(
-            config('admineshop.cart.order.validator', SubmitOrderRequest::class)
+            $orderRequest
         );
     }
 }

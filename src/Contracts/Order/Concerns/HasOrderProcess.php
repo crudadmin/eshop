@@ -11,7 +11,7 @@ trait HasOrderProcess
     {
         $request = $this->getPreparedOrderRequest($submitOrder, $fetchStoredClientData, $saveDataIntoSession);
 
-        $row = Admin::getModel('Order')->orderValidator($request)->validate()->getData();
+        $row = Admin::getModel('Order')->orderValidator($request, $submitOrder)->validate()->getData();
 
         //Remove uneccessary delivery and company info from order
         $this->setRequestData($row, $submitOrder, $saveDataIntoSession);

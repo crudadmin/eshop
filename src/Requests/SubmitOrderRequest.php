@@ -6,6 +6,9 @@ use Admin\Core\Requests\AdminModelRequest;
 
 class SubmitOrderRequest extends AdminModelRequest
 {
+    //Is final order submit
+    private $isFinalOrderSubmit = false;
+
     public function only()
     {
         return [
@@ -36,9 +39,25 @@ class SubmitOrderRequest extends AdminModelRequest
      */
     public function rules()
     {
-        return array_merge(
-            config('admineshop.cart.order.validator_rules', []),
-            []
-        );
+        $rules = config('admineshop.cart.order.validator_rules', []);
+
+        //We can push additional fields in submit step
+        if ( $this->isFinalOrderSubmit === true ){
+            $rules = array_merge($rules, config('admineshop.cart.order.validator_rules_submit', []));
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Determine is order is in final submit state
+     *
+     * @param  bool  $state
+     */
+    public function setOrderSubmit($state = false)
+    {
+        $this->isFinalOrderSubmit = $state;
+
+        return $this;
     }
 }
