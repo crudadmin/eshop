@@ -227,4 +227,14 @@ class Delivery extends AdminModel implements DiscountSupport
                     ->makeHidden(['created_at', 'published_at', 'deleted_at', 'updated_at'])
                     ->makeVisible('shippingProvider');
     }
+
+    /**
+     * Determine if delivery has multiple locations
+     *
+     * @return  bool
+     */
+    public function hasMultipleLocations()
+    {
+        return $this->multiple_locations;
+    }
 }
