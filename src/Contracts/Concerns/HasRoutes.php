@@ -54,6 +54,7 @@ trait HasRoutes
             Route::get('/cart/delivery-locations/{id}', 'Cart\CartController@getDeliveryLocations')->name('cart::getDeliveryLocations')->visible();
 
             Route::post('/cart/setDelivery', 'Cart\CartController@setDelivery')->name('cart::setDelivery')->visible();
+            Route::post('/cart/setDeliveryLocation', 'Cart\CartController@setDeliveryLocation')->name('cart::setDelivery')->visible();
             Route::post('/cart/setPaymentMethod', 'Cart\CartController@setPaymentMethod')->name('cart::setPaymentMethod')->visible();
             Route::post('/cart/setCountry', 'Cart\CartController@setCountry')->name('cart::setCountry')->visible();
         });

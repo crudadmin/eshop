@@ -12,6 +12,7 @@ use Admin\Fields\Group;
 use Discounts;
 use OrderService;
 use Store;
+use Admin;
 
 class Delivery extends AdminModel implements DiscountSupport
 {
@@ -204,7 +205,7 @@ class Delivery extends AdminModel implements DiscountSupport
         if (
             config('admineshop.delivery.multiple_locations.enabled') == true
             && config('admineshop.delivery.multiple_locations.autoload', false) == true
-            && config('admineshop.delivery.multiple_locations.table') == 'deliveries_locations'
+            && OrderService::getDeliveryMutator()->hasDefaultDeliveryTable()
         ) {
             $with[] = 'locations:id,delivery_id,name';
         }
@@ -225,13 +226,5 @@ class Delivery extends AdminModel implements DiscountSupport
         return $this->append('shippingProvider')
                     ->makeHidden(['created_at', 'published_at', 'deleted_at', 'updated_at'])
                     ->makeVisible('shippingProvider');
-    }
-
-    /*
-     * We can switch available locations for each delivery if neccessary
-     */
-    public function getDeliveryLocations()
-    {
-        return $this->locations();
     }
 }

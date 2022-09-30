@@ -155,7 +155,7 @@ class CartController extends Controller
         $delivery = Admin::getModel('Delivery')->findOrFail($id);
 
         return api([
-            'locations' => $delivery->getDeliveryLocations()->get(),
+            'locations' => OrderService::getDeliveryMutator()->getLocationsByDelivery($delivery)->get(),
         ]);
     }
 
@@ -170,7 +170,7 @@ class CartController extends Controller
 
             //Find by location under given delivery
             if ( $locationId ) {
-                $location = $delivery->getDeliveryLocations()->findOrFail($locationId);
+                $location = OrderService::getDeliveryMutator()->getLocationByDelivery($locationId, $delivery);
             }
         }
 
@@ -179,15 +179,30 @@ class CartController extends Controller
         );
 
         OrderService::getDeliveryMutator()->setDeliveryLocation(
-            isset($location) ? $location->getKey() : null,
+            isset($location) && $location ? $location->getKey() : null,
         );
 
-        //If no payment method is present, reset payment method to null
-        //Because payment method may be selected, but will be unavailable
-        //under this selected delivery
+        //If no payment method is unavailable for this delivery, reset payment method to null
         if ( ! OrderService::getPaymentMethodMutator()->getSelectedPaymentMethod() ) {
             OrderService::getPaymentMethodMutator()->setPaymentMethod(null);
         }
+
+        return api(
+            Cart::fullCartResponse()
+        );
+    }
+
+    public function setDeliveryLocation()
+    {
+        $delivery = OrderService::getDeliveryMutator()->getSelectedDelivery();
+
+        $location = OrderService::getDeliveryMutator()->getLocationByDelivery(
+            request('id')
+        );
+
+        OrderService::getDeliveryMutator()->setDeliveryLocation(
+            $location ? $location->getKey() : null,
+        );
 
         return api(
             Cart::fullCartResponse()

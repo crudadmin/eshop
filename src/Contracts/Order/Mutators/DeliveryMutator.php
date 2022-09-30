@@ -226,12 +226,43 @@ class DeliveryMutator extends Mutator
         $id = $this->getDriver()->get(self::DELIVERY_LOCATION_KEY);
 
         return $this->cache('selectedLocation.'.$id, function() use ($id) {
-            if ( !($delivery = $this->getSelectedDelivery()) ) {
-                return;
-            }
-
-            return $delivery->getDeliveryLocations()->where('id', $id)->first();
+            return $this->getLocationByDelivery($id);
         });
+    }
+
+    /**
+     * Returns available locations by selected delivery
+     *
+     * @param  Delivery  $delivery
+     *
+     * @return  Query|Model
+     */
+    public function getLocationsByDelivery($delivery = null)
+    {
+        if ( $this->hasDefaultDeliveryTable() ){
+            return $delivery ? $delivery->locations() : null;
+        } else {
+            return Admin::getModelByTable(
+                config('admineshop.delivery.multiple_locations.table')
+            );
+        }
+    }
+
+    /**
+     * Returns location by delivery
+     *
+     * @param  int  $locationId
+     * @param  Delivery|null  $delivery
+     *
+     * @return  AdminModel
+     */
+    public function getLocationByDelivery($locationId, $delivery = null)
+    {
+        $delivery = is_null($delivery) ? $this->getSelectedDelivery() : $delivery;
+
+        if ( $locations = $this->getLocationsByDelivery($delivery) ){
+            return $locations->find($locationId);
+        }
     }
 
     /**
@@ -262,6 +293,11 @@ class DeliveryMutator extends Mutator
         $this->getDriver()->set(self::DELIVERY_LOCATION_KEY, $locationId, $persist);
 
         return $this;
+    }
+
+    public function hasDefaultDeliveryTable()
+    {
+        return config('admineshop.delivery.multiple_locations.table') == 'deliveries_locations';
     }
 }
 
