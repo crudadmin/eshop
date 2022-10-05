@@ -261,7 +261,9 @@ class DeliveryMutator extends Mutator
         $delivery = is_null($delivery) ? $this->getSelectedDelivery() : $delivery;
 
         if ( $locations = $this->getLocationsByDelivery($delivery) ){
-            return $locations->find($locationId);
+            if ( $location = $locations->find($locationId) ){
+                return $location->setCartResponse();
+            }
         }
     }
 

@@ -60,6 +60,21 @@ class ClientDataMutator extends Mutator
     }
 
     /**
+     * Mutate base cart response
+     *
+     * @param  [type]  $response
+     * @return  [type]
+     */
+    public function mutateCartResponse($response) : array
+    {
+        if ( config('admineshop.client.in_cart_response') == true && client() ){
+            $response['client'] = client()->setClientResponse();
+        }
+
+        return $response;
+    }
+
+    /**
      * Mutation of cart response request
      *
      * @param  $response
@@ -67,15 +82,9 @@ class ClientDataMutator extends Mutator
      */
     public function mutateFullCartResponse($response) : array
     {
-        $data = [
+        return [
             'clientData' => $this->getClientData(),
         ];
-
-        if ( config('admineshop.client.in_cart_response') == true && client() ){
-            $response['client'] = client()->setClientResponse();
-        }
-
-        return array_merge($response, $data);
     }
 
     /**

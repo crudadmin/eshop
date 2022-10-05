@@ -54,4 +54,12 @@ class DeliveriesLocation extends AdminModel
             'data' => 'name:Data Pobočky|type:json|invisible',
         ];
     }
+
+    /**
+     * We can mutate cart response
+     */
+    public function setCartResponse()
+    {
+        return $this;
+    }
 }

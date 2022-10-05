@@ -188,20 +188,13 @@ class Cart
             'summaryTotal' => $items->getSummary($fullCartResponse),
         ];
 
-        //Mutate cart response
-        foreach (OrderService::getMutators() as $mutator) {
-            //Mutate basic response
-            if ( method_exists($mutator, 'mutateCartResponse') ) {
-                $response = $mutator->mutateCartResponse($response);
-            }
-
-            //Mutate response with all additional data
-            if ( $fullCartResponse == true && method_exists($mutator, 'mutateFullCartResponse') ) {
-                $response = $mutator->mutateFullCartResponse($response);
-            }
-        }
-
-        return $response;
+        return OrderService::getMutatedResponses(
+            $response,
+            array_filter([
+                'mutateCartResponse',
+                $fullCartResponse == true ? 'mutateFullCartResponse' : null
+            ])
+        );
     }
 
     /**

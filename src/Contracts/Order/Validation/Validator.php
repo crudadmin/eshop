@@ -16,6 +16,13 @@ class Validator
     private $mutator;
 
     /**
+     * Enable validator only on orders submit
+     *
+     * @var  bool
+     */
+    protected $onSubmitOnly = false;
+
+    /**
      * Set mutator
      *
      * @param  Mutator  $mutator
@@ -63,6 +70,16 @@ class Validator
     public function getMessage()
     {
         return $this->message ?: _('Veľmi sa ospravedlňujeme, no nastala u nás nečakná chyba, skúste neskôr prosím.');
+    }
+
+    /**
+     * Validate only on order submit
+     *
+     * @return  bool
+     */
+    public function isOnlyOrderSubmit()
+    {
+        return $this->onSubmitOnly === true;
     }
 }
 

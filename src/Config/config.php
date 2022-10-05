@@ -172,7 +172,7 @@ return [
         //Return full cart response with all deliveries, payment methods etc,,, in every cart request
         //add/update/delete items, manage discount codes, etc... By default those data are returned only on cart page.
         //But we can turn it on everywere
-        'default_full_response' => true,
+        'default_full_response' => false,
 
         'token' => [
             //For REST authorization

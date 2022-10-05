@@ -73,4 +73,14 @@ trait HasParentIdentifier
     {
         return !$this->parentIdentifier && $childCartItem->hasSameParentIdentifier($this->getIdentifierClass());
     }
+
+    /**
+     * Determine if item is child of existing cart item
+     *
+     * @return  bool
+     */
+    public function isChildItem()
+    {
+        return $this->parentIdentifier ? true : false;
+    }
 }

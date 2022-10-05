@@ -18,7 +18,7 @@ trait HasOrderProcess
 
         //Checks products avaiability. Some products may be sold already,
         //so we need throw an error.
-        if ( $this->passesValidation($mutators) === false ) {
+        if ( $this->passesValidation($mutators, $submitOrder) === false ) {
             return $this->errorResponse();
         }
 

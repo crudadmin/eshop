@@ -102,5 +102,20 @@ trait HasMutators
             }, $mutators));
         });
     }
+
+    public function getMutatedResponses($response, $methods = [])
+    {
+        //Mutate cart response
+        foreach ($this->getMutators() as $mutator) {
+            foreach ($methods as $method) {
+                //Mutate basic response
+                if ( method_exists($mutator, $method) ) {
+                    $response = $mutator->{$method}($response);
+                }
+            }
+        }
+
+        return $response;
+    }
 }
 ?>

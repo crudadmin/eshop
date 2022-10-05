@@ -63,10 +63,11 @@ trait HasValidation
      * Validate order
      *
      * @param  array|null mutators
+     * @param  bool $submitOrder
      *
      * @return  void
      */
-    public function validate(array $mutators = null)
+    public function validate(array $mutators = null, $submitOrder = false)
     {
         $toValidate = [
             [
@@ -90,11 +91,18 @@ trait HasValidation
         }
 
         foreach ($toValidate as $row) {
+            $isMutator = isset($row['mutator']) && $row['mutator'] instanceof Mutator;
+
             foreach ($row['validators'] as $validator) {
                 $validator = new $validator;
 
+                //Filter only submitOnly validators
+                if ( $validator->isOnlyOrderSubmit() === true && $submitOrder === false ){
+                    continue;
+                }
+
                 //Pass mutator into validator
-                if ( isset($row['mutator']) && $row['mutator'] instanceof Mutator ){
+                if ( $isMutator ){
                     $validator->setMutator($row['mutator']);
                 }
 
@@ -120,9 +128,9 @@ trait HasValidation
      *
      * @return  array|null
      */
-    public function passesValidation(array $mutators = null)
+    public function passesValidation(array $mutators = null, $submitOrder = false)
     {
-        $this->validate($mutators);
+        $this->validate($mutators, $submitOrder);
 
         return count($this->getErrorMessages()) === 0;
     }

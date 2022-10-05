@@ -333,6 +333,6 @@ class CartController extends Controller
             return OrderService::errorResponse();
         }
 
-        return autoAjax()->success();
+        return api(Cart::fullCartResponse());
     }
 }
