@@ -33,6 +33,19 @@ trait HasMutators
         return $this;
     }
 
+    private function getConfigMutators()
+    {
+        return $this->cache('config.mutators', function(){
+            $mutators = config('admineshop.cart.mutators');
+
+            $stepMutators = Cart::getCartSteps()->map(function($step){
+                return array_merge($step['mutators'] ?? [], $step['validators'] ?? []);
+            })->flatten()->unique()->toArray();
+
+            return array_values(array_unique(array_merge($mutators, $stepMutators)));
+        });
+    }
+
     /**
      * Returns all available order mutators
      *
@@ -40,7 +53,7 @@ trait HasMutators
      */
     public function getMutators(CartCollection $cartItems = null)
     {
-        $mutators = is_array($this->mutators) ? $this->mutators : config('admineshop.cart.mutators');
+        $mutators = is_array($this->mutators) ? $this->mutators : $this->getConfigMutators();
 
         $mutators = $this->cache('orderMutators.'.implode(';', $mutators), function() use ($mutators) {
             return array_map(function($item) {
@@ -103,10 +116,16 @@ trait HasMutators
         });
     }
 
-    public function getMutatedResponses($response, $methods = [])
+    public function getMutatedResponses($response, $methods = [], $mutators = null)
     {
+        $mutators = is_null($mutators) ? $this->getMutators() : $mutators;
+
         //Mutate cart response
-        foreach ($this->getMutators() as $mutator) {
+        foreach ($mutators as $mutator) {
+            if ( is_string($mutator) ){
+                $mutator = (new $mutator)->bootMutator();
+            }
+
             foreach ($methods as $method) {
                 //Mutate basic response
                 if ( method_exists($mutator, $method) ) {

@@ -62,8 +62,8 @@ class ClientDataMutator extends Mutator
     /**
      * Mutate base cart response
      *
-     * @param  [type]  $response
-     * @return  [type]
+     * @param  array  $response
+     * @return  array
      */
     public function mutateCartResponse($response) : array
     {
@@ -82,9 +82,9 @@ class ClientDataMutator extends Mutator
      */
     public function mutateFullCartResponse($response) : array
     {
-        return [
+        return array_merge($response, [
             'clientData' => $this->getClientData(),
-        ];
+        ]);
     }
 
     /**

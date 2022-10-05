@@ -64,7 +64,7 @@ trait HasMutatorsForward
     private function getMutatorNames()
     {
         return Store::cache('mutators.classmap', function(){
-            $mutators = config('admineshop.cart.mutators');
+            $mutators = $this->getConfigMutators();
 
             $classmap = [];
 

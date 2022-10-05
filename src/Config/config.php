@@ -196,7 +196,7 @@ return [
         //If we want use header_token (REST), we need turn off session
         'session' => false,
 
-        //Cart and order mutators
+        //Global cart and order mutators (if cart steps are not present)
         'mutators' => [
             AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class,
             AdminEshop\Contracts\Order\Mutators\ClientDataMutator::class,
@@ -207,13 +207,25 @@ return [
         ],
 
         //Validation steps mutators
-        'validation_steps' => [
-            // 'address' => [
-            //     AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class
+        'steps' => [
+            // [
+            //     'name' => 'address'
+            //     'mutators' => [
+            //         AdminEshop\Contracts\Order\Mutators\ClientDataMutator::class
+            //     ],
+            //     //We will apply validators in current step.
+            //     'validators' => [
+            //         AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class
+            //     ],
             // ],
-            // 'shipping' => [
-            //     AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class,
-            //     AdminEshop\Contracts\Order\Mutators\ClientDataMutator::class,
+            // [
+            //     'name' => 'shipping'
+            //     'mutators' => [
+            //         AdminEshop\Contracts\Order\Mutators\CountryMutator::class,
+            //         AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
+            //         AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
+            //         AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
+            //     ],
             // ],
         ],
 

@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts;
 use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
+use AdminEshop\Contracts\Cart\Concerns\HasCartSteps;
 use AdminEshop\Contracts\Cart\Concerns\HasStockBlockSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
@@ -21,7 +22,8 @@ class Cart
     use CartTrait,
         DataStore,
         DriverSupport,
-        HasStockBlockSupport;
+        HasStockBlockSupport,
+        HasCartSteps;
 
     /*
      * Items in cart
@@ -171,7 +173,7 @@ class Cart
      *
      * @return  array
      */
-    public function response($fullCartResponse = false)
+    public function response($fullCartResponse = false, $mutators = null)
     {
         $items = $this->allWithMutators();
 
@@ -188,13 +190,16 @@ class Cart
             'summaryTotal' => $items->getSummary($fullCartResponse),
         ];
 
-        return OrderService::getMutatedResponses(
+        $response = OrderService::getMutatedResponses(
             $response,
             array_filter([
                 'mutateCartResponse',
                 $fullCartResponse == true ? 'mutateFullCartResponse' : null
-            ])
+            ]),
+            $mutators
         );
+
+        return $response;
     }
 
     /**
@@ -204,7 +209,9 @@ class Cart
      */
     public function baseResponse()
     {
-        return $this->response(config('admineshop.cart.default_full_response', false));
+        return $this->response(
+            config('admineshop.cart.default_full_response', false)
+        );
     }
 
     /**
