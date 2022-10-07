@@ -40,8 +40,13 @@ class Feed
 
             $hasVariants = count(Store::variantsProductTypes()) > 0;
 
-            foreach ($products as $product)
+            foreach ($products as $i => $product)
             {
+                //Testing
+                // if ( $i > 100 ){
+                //     continue;
+                // }
+
                 if ( $hasVariants && $product->isType('variants') ){
                     foreach ($product->variants as $variant) {
                         $items->push(

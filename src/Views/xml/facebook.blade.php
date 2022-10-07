@@ -8,7 +8,7 @@
       <description>{{ $item['description'] }}</description>
       <availability>{{ $item['availability'] }}</availability>
       <condition>{{ $item['condition'] }}</condition>
-      <price>{{ $item['priceWithVat'] }} EUR</price>
+      <price>{{ number_format($item['priceWithVat'], 2, '.', '') }} EUR</price>
       <link>{{ $item['feed_url'] }}</link>
       <image_link>{{ $item['feed_thumbnail'] }}</image_link>
       <brand>{{ $item['brand'] ?? null }}</brand>
