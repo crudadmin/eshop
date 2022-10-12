@@ -33,7 +33,7 @@ trait HasMutators
         return $this;
     }
 
-    private function getConfigMutators()
+    public function getConfigMutators()
     {
         return $this->cache('config.mutators', function(){
             $mutators = config('admineshop.cart.mutators');

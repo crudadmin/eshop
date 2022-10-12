@@ -17,7 +17,7 @@ class DeliveryLocationValidator extends Validator
         }
 
         //If delivery does not have multiple locations
-        if ( $delivery->hasMultipleLocations() === false ) {
+        if ( $delivery->hasMultipleLocations() !== true ) {
             return true;
         }
 

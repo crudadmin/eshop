@@ -213,7 +213,7 @@ return [
             //     'mutators' => [
             //         AdminEshop\Contracts\Order\Mutators\ClientDataMutator::class
             //     ],
-            //     //We will apply validators in current step.
+            //     //We will apply additional validators in current step.
             //     'validators' => [
             //         AdminEshop\Contracts\Order\Mutators\BaseOrderMutator::class
             //     ],

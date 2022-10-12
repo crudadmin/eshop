@@ -82,7 +82,9 @@ trait HasCartSteps
     {
         $toValidate = $this->getStepValidators($stepName);
 
-        OrderService::validate($toValidate, $submitOrder);
+        if ( count($toValidate) ){
+            OrderService::validate($toValidate, $submitOrder);
+        }
 
         return count(OrderService::getErrorMessages()) === 0;
     }

@@ -235,6 +235,6 @@ class Delivery extends AdminModel implements DiscountSupport
      */
     public function hasMultipleLocations()
     {
-        return $this->multiple_locations;
+        return $this->multiple_locations ?: false;
     }
 }

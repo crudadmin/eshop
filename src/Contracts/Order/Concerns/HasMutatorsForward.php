@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Order\Concerns;
 use BadMethodCallException;
 use Store;
 use Discounts;
+use OrderService;
 
 trait HasMutatorsForward
 {
@@ -64,7 +65,7 @@ trait HasMutatorsForward
     private function getMutatorNames()
     {
         return Store::cache('mutators.classmap', function(){
-            $mutators = $this->getConfigMutators();
+            $mutators = OrderService::getConfigMutators();
 
             $classmap = [];
 
