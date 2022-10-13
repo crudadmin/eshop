@@ -19,7 +19,7 @@ trait HasFeed
         $query->whereIn($query->getQuery()->from.'.product_type', ['regular', 'variants']);
     }
 
-    public function getFeedUrl()
+    public function getFeedUrl($parentProduct = null)
     {
         //...
     }
