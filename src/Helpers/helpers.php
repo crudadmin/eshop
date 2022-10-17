@@ -36,6 +36,11 @@ function operator_types($except = [])
  */
 function operator_modifier($number, $operator, $operatorValue, $vatValue = null)
 {
+    //Convert currency conversion into price change
+    if ( in_array($operator, ['+', '-', '+V', '-V', 'abs']) ){
+        $operatorValue = Store::calculateFromDefaultCurrency($operatorValue);
+    }
+
     if ( $operator == '+%' ){
         $number = $number * (1 + ($operatorValue / 100));
     } else if ( $operator == '-%' ){

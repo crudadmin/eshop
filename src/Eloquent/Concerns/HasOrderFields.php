@@ -23,7 +23,8 @@ trait HasOrderFields
                 'number' => 'name:Č. obj.|max:20|index|hideFromForm',
                 'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
                 'client' => 'name:Klient|belongsTo:clients|inaccessible',
-                'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible'
+                'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible',
+                'currency' => 'name:Mena|belongsTo:currencies,:name :char|hidden|removeFromForm',
             ],
             config('admineshop.delivery.packeta', false)
                 ? ['packeta_point' => 'name:Packeta point|type:json|inaccessible'] : [],
@@ -143,8 +144,8 @@ trait HasOrderFields
                         'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
                         'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
                     ]),
-                    'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|hidden',
-                    'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|hidden|removeFromForm',
+                    'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|column_component:CurrencyPriceColumn|hidden',
+                    'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|column_component:CurrencyPriceColumn|hidden|removeFromForm',
                 ])->id('delivery'),
             ] : [],
             config('admineshop.payment_methods.enabled', true) ? [
@@ -154,8 +155,8 @@ trait HasOrderFields
                         'payment_method_vat' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.vat|hidden|required|type:select|default:'.Store::getDefaultVat(),
                         'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
                     ])->inline(),
-                    'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|hidden',
-                    'payment_method_price_vat' => 'name:Cena plat. metódy s DPH|type:decimal|required|hidden|removeFromForm',
+                    'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|column_component:CurrencyPriceColumn|hidden',
+                    'payment_method_price_vat' => 'name:Cena plat. metódy s DPH|type:decimal|required|column_component:CurrencyPriceColumn|hidden|removeFromForm',
                 ])->id('payment')
             ] : [],
         ))->id('shippingAndPayments')->inline()->icon('fa-truck')->name('Doprava a platba');
@@ -170,8 +171,8 @@ trait HasOrderFields
     {
         return Group::fields([
             'Cena objednávky' => Group::half([
-                'price' => 'name:Cena bez DPH|disabled|type:decimal',
-                'price_vat' => 'name:Cena s DPH|disabled|type:decimal|column_name:Suma obj.|',
+                'price' => 'name:Cena bez DPH|disabled|type:decimal|column_component:CurrencyPriceColumn',
+                'price_vat' => 'name:Cena s DPH|disabled|type:decimal|column_name:Suma obj.|column_component:CurrencyPriceColumn',
                 'paid_at' => 'name:Zaplatené dňa|type:datetime|hidden',
             ])->id('price')->inline(),
             'Zľavy' => Group::half(array_merge(

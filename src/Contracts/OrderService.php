@@ -167,6 +167,9 @@ class OrderService
 
         $this->order = $order;
 
+        //Set order currency
+        Store::setCurrency($order->currency);
+
         if ( $items === true ){
             $this->setOrderCartItems($order);
         }
@@ -270,7 +273,7 @@ class OrderService
             //TODO: support multiple operators
             foreach ($discount->getAllOperators() as $operatorParam) {
                 $operator = $operatorParam['operator'];
-                $value = $operatorParam['value'];
+                $value = Store::calculateFromDefaultCurrency($operatorParam['value']);
 
                 if ( ! $discount->hasSumPriceOperator($operator) ) {
                     continue;
@@ -324,6 +327,7 @@ class OrderService
      */
     public function buildOrder(CartCollection $items)
     {
+        $this->addCurrency();
         $this->addOrderPrices($items);
         $this->addDiscountsData($items);
 
@@ -357,6 +361,11 @@ class OrderService
         if ( !$order->status_id ) {
             $order->status_id = OrdersStatus::where('default', true)->first()?->getKey();
         }
+    }
+
+    private function addCurrency()
+    {
+        $this->getOrder()->currency_id = Store::getCurrency()?->getKey();
     }
 
     /**

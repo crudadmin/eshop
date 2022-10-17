@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts;
 
 use Admin;
+use AdminEshop\Contracts\Concerns\HasCurrencies;
 use AdminEshop\Contracts\Concerns\HasRoutes;
 use AdminEshop\Contracts\Concerns\HasStoreAttributes;
 use AdminEshop\Models\Attribute\AttributesUnit;
@@ -18,7 +19,8 @@ class Store
 {
     use DataStore,
         HasRoutes,
-        HasStoreAttributes;
+        HasStoreAttributes,
+        HasCurrencies;
 
     /*
      * Should eshop automatically show B2B prices?
@@ -125,11 +127,6 @@ class Store
         });
     }
 
-    public function getCurrency()
-    {
-        return '€';
-    }
-
     public function hasSummaryRounding()
     {
         return config('admineshop.round_summary', true);
@@ -212,7 +209,7 @@ class Store
      */
     public function priceFormat($number)
     {
-        return $this->numberFormat($number). ' '. $this->getCurrency();
+        return $this->numberFormat($number). ' '. $this->getCurrencyCode();
     }
 
     /**

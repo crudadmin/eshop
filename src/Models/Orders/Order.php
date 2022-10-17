@@ -109,8 +109,6 @@ class Order extends AdminModel
             'grid.enabled' => false,
             'grid.default' => 'full',
             'columns.price.hidden' => true,
-            'columns.price.add_after' => ' '.Store::getCurrency(),
-            'columns.price_vat.add_after' => ' '.Store::getCurrency(),
             'columns.created.name' => 'Vytvorená dňa',
             'columns.client_name' => [
                 'encode' => false,
@@ -185,11 +183,20 @@ class Order extends AdminModel
 
     public function scopeAdminRows($query)
     {
-        $query->with(['log', 'items']);
+        $query
+            ->select('orders.*')
+            ->addSelect('currencies.char as currency_char')
+            ->with([
+                'log', 'items',
+            ])
+            ->leftJoin('currencies', function($join){
+                $join->on('currencies.id', '=', 'orders.currency_id');
+            });
     }
 
     public function setAdminAttributes($attributes)
     {
+        $attributes['currency_char'] = $this->currency_char ?: Store::getCurrencyCode();
         $attributes['delivery_pickup_point'] = $this->getPickupAddressWithName();
 
         return $attributes;

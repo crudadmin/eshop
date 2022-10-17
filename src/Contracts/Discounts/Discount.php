@@ -242,7 +242,7 @@ class Discount implements Discountable, ActiveInterface
     private function getBaseDiscountMessage($isActiveResponse)
     {
         if ( in_array($this->operator, ['+', '-', '*']) ) {
-            return $this->value.' '.Store::getCurrency();
+            return $this->value.' '.Store::getCurrencyCode();
         }
 
         if ( in_array($this->operator, ['+%', '-%']) ) {

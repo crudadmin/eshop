@@ -108,8 +108,15 @@ class DiscountsCode extends AdminModel
 
         //If is only discount from order sum
         if (!is_null($this->discount_price)) {
-            $value = '-'.Store::priceFormat($this->discount_price);
-            $valueWithVat = '-'.Store::priceFormat(Store::priceWithVat($this->discount_price));
+            $value = '-'.Store::priceFormat(
+                Store::calculateFromDefaultCurrency($this->discount_price)
+            );
+
+            $valueWithVat = '-'.Store::priceFormat(
+                Store::priceWithVat(
+                    Store::calculateFromDefaultCurrency($this->discount_price)
+                )
+            );
         }
 
         //If is percentual discount

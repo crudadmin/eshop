@@ -33,7 +33,7 @@ class BootstrapRequest
         return [
             'store/setBackendEnv' => $this->getBackendEnv(),
             'store/setSettings' => Store::getSettings()->setBootstrapResponse(),
-            'store/setCurrency' => Store::getCurrency(),
+            'store/setCurrency' => Store::getCurrency()->setResponse(),
             'store/setRounding' => Store::getRounding(),
             'store/setDecimalPlaces' => Store::getDecimalPlaces(),
             'store/setVat' => Store::hasB2B() ? false : true,
