@@ -166,7 +166,7 @@ trait OrderTrait
         $clientName = str_limit(e(strip_tags($this->is_company ? $this->company_name : $this->username)), 20);
 
         if ( $this->client_id && $this->client ){
-            return '<i class="fa fa-'.($this->client->isCompany ? 'building' : 'user').' mr-1" data-toggle="tooltip" title="Klient č. '.$this->client_id.' / '.$this->client->clientName.'"></i> '.$clientName;
+            return '<i class="fa fa-'.($this->client->isCompany ? 'building' : 'user').' mr-1" data-toggle="tooltip" title="'._('Klient č.').' '.$this->client_id.' / '.$this->client->clientName.'"></i> '.$clientName;
         }
 
         return $clientName;
