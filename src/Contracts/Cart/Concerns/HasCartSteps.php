@@ -49,27 +49,45 @@ trait HasCartSteps
     {
         $steps = $this->getCartSteps();
 
-        $stepIndex = $this->getStepIndex($stepName);
+        $stepIndex = $this->getStepIndex($stepName) ?: -1;
         $mutatorsToValidate = [];
 
-        if ( is_numeric($stepIndex) ){
-            for ($i=0; $i <= $stepIndex; $i++) {
-                $step = $steps[$i];
+        for ($i=0; $i <= $stepIndex; $i++) {
+            $step = $steps[$i];
 
-                //Do not validate current step mutators. Only from previous.
-                //If current step has some validators, we may validate only them.
-                $stepValidators = $i === $stepIndex
-                                            ? ($step['validators'] ?? [])
-                                            : array_merge(
-                                                $step['validators'] ?? [],
-                                                $step['mutators'] ?? []
-                                            );
+            //Do not validate current step mutators. Only from previous.
+            //If current step has some validators, we may validate only them.
+            $stepValidators = $i === $stepIndex
+                                        ? ($step['validators'] ?? [])
+                                        : array_merge(
+                                            $step['validators'] ?? [],
+                                            $step['mutators'] ?? []
+                                        );
 
-                $mutatorsToValidate = array_merge($mutatorsToValidate, $stepValidators);
-            }
+            $mutatorsToValidate = array_merge($mutatorsToValidate, $stepValidators);
         }
 
         return array_values(array_unique($mutatorsToValidate));
+    }
+
+    public function getStepMutators($stepName)
+    {
+        $steps = $this->getCartSteps();
+
+        $stepIndex = $this->getStepIndex($stepName) ?: -1;
+        $mutators = [];
+
+
+        for ($i=0; $i <= $stepIndex; $i++) {
+            $step = $steps[$i];
+
+            $mutators = array_merge($mutators, array_merge(
+                $step['validators'] ?? [],
+                $step['mutators'] ?? []
+            ));
+        }
+
+        return array_values(array_unique($mutators));
     }
 
     /**
@@ -91,9 +109,7 @@ trait HasCartSteps
 
     public function getCartStepResponse($stepName)
     {
-        $step = $this->getCartStep($stepName);
-
-        $mutators = $step ? ($step['mutators'] ?? []) : null;
+        $mutators = $this->getStepMutators($stepName);
 
         return $this->response(true, $mutators);
     }
