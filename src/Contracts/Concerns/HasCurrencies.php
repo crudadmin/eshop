@@ -9,6 +9,12 @@ trait HasCurrencies
 {
     private $rewritedCurrency;
 
+    /*
+     * Custom price number settings
+     */
+    private $rounding = null;
+    private $decimalPlaces = null;
+
     public function getCurrencyCode()
     {
         return $this->getCurrency()?->char ?: '€';
@@ -54,5 +60,68 @@ trait HasCurrencies
         }
 
         return $price;
+    }
+
+    public function getRounding()
+    {
+        if ( $this->rounding === false ){
+            return false;
+        }
+
+        if ( $this->rounding ) {
+            return $this->rounding;
+        }
+
+        //We need cache rounding value for better performance
+        return $this->cache('store.rounding', function(){
+            return (int)$this->getCurrency()->decimal_rounding;
+        });
+    }
+
+    public function getDecimalPlaces()
+    {
+        if ( $this->decimalPlaces === false ){
+            return false;
+        }
+
+        if ( $this->decimalPlaces ) {
+            return $this->decimalPlaces;
+        }
+
+        //We need cache decimalPlaces value for better performance
+        return $this->cache('store.decimalPlaces', function(){
+            return (int)$this->getCurrency()->decimal_places;
+        });
+    }
+
+
+    /**
+     * Set custom number roundings
+     *
+     * @param  int|bool  $rounding
+     */
+    public function setRounding($rounding)
+    {
+        //If we want set default rounding set by eshop
+        if ( $rounding === true ) {
+            $rounding = null;
+        }
+
+        $this->rounding = $rounding;
+    }
+
+    /*
+     * Round number by store price settings
+     */
+    public function roundNumber($number, $rounding = null)
+    {
+        $rounding = $rounding === false ? $rounding : ($rounding ?: $this->getRounding());
+
+        //If we does not want rounding
+        if ( $rounding === false ) {
+            return $number;
+        }
+
+        return round($number, $rounding);
     }
 }

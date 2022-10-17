@@ -28,12 +28,6 @@ class Store
     private $hasB2B = false;
 
     /*
-     * Custom price number settings
-     */
-    private $rounding = null;
-    private $decimalPlaces = null;
-
-    /*
      * Return all vats
      */
     public function getVats()
@@ -132,74 +126,12 @@ class Store
         return config('admineshop.round_summary', true);
     }
 
-    public function getRounding()
-    {
-        if ( $this->rounding === false ){
-            return false;
-        }
-
-        if ( $this->rounding ) {
-            return $this->rounding;
-        }
-
-        //We need cache rounding value for better performance
-        return $this->cache('store.rounding', function(){
-            return (int)$this->getSettings()->decimal_rounding;
-        });
-    }
-
-    public function getDecimalPlaces()
-    {
-        if ( $this->decimalPlaces === false ){
-            return false;
-        }
-
-        if ( $this->decimalPlaces ) {
-            return $this->decimalPlaces;
-        }
-
-        //We need cache decimalPlaces value for better performance
-        return $this->cache('store.decimalPlaces', function(){
-            return (int)$this->getSettings()->decimal_places;
-        });
-    }
-
-    /**
-     * Set custom number roundings
-     *
-     * @param  int|bool  $rounding
-     */
-    public function setRounding($rounding)
-    {
-        //If we want set default rounding set by eshop
-        if ( $rounding === true ) {
-            $rounding = null;
-        }
-
-        $this->rounding = $rounding;
-    }
-
-    /*
-     * Round number by store price settings
-     */
-    public function roundNumber($number, $rounding = null)
-    {
-        $rounding = $rounding === false ? $rounding : ($rounding ?: $this->getRounding());
-
-        //If we does not want rounding
-        if ( $rounding === false ) {
-            return $number;
-        }
-
-        return round($number, $rounding);
-    }
-
     /*
      * Returns prices in correct number format
      */
     public function numberFormat($number)
     {
-        $separator = $this->getSettings()->decimal_separator == 'comma' ? ',' : '.';
+        $separator = $this->getCurrency()->decimal_separator == 'comma' ? ',' : '.';
 
         return number_format($this->roundNumber($number), $this->getDecimalPlaces(), $separator, ' ');
     }
