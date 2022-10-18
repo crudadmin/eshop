@@ -346,6 +346,10 @@ trait HasProductResponses
             $query->withMinAndMaxVariantPrices();
         }
 
+        if ( config('admineshop.prices.price_levels') ) {
+            $query->withPriceLevels();
+        }
+
         if (
             $variants === false
             && $this->getFilterOption($prefix.'variants.extract', false) === false
@@ -418,5 +422,22 @@ trait HasProductResponses
             ->whereNull('pv.deleted_at')
             ->addSelect(DB::raw('MIN(pv.price) as min_price, MAX(pv.price) as max_price'))
             ->groupBy('products.id');
+    }
+
+    public function scopeWithPriceLevels($query)
+    {
+        $query
+            ->leftJoin('products_prices as pl', function($join){
+                $join
+                    ->on('pl.product_id', '=', 'products.id')
+                    ->where('currency_id', Store::getCurrency()->getKey())
+                    ->whereNotNull('pl.published_at')
+                    ->whereNull('pl.deleted_at');
+            })
+            ->addSelect(DB::raw('
+                COALESCE(pl.price, products.price) as price,
+                COALESCE(pl.vat_id, products.vat_id) as vat_id,
+                pl.currency_id
+            '));
     }
 }

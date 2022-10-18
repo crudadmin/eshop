@@ -352,6 +352,9 @@ return [
      * Products settings
      */
     'prices' => [
+        //Enable price levels
+        'price_levels' => false,
+
         //Save all prices up to x decimal places
         'decimals_places' => '8,3',
         /*

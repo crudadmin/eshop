@@ -48,6 +48,8 @@ class Currency extends AdminModel
     public function settings()
     {
         return [
+            'grid.enabled' => false,
+            'grid.default' => 'full',
             'decimals.places' => Store::getDecimalPlaces(),
             'decimals.rounding' => Store::getRounding(),
         ];
@@ -76,7 +78,7 @@ class Currency extends AdminModel
                         : 'Zaokruhľovanie platí pre všetky ceny s DPH. Ceny produktov bez DPH sa nezaokruhľujú, z týchto nezaokruhlených cien je vypočítana finálna cena s DPH.'
                     ).'|required',
                 'decimal_separator' => 'name:Separator desatinných čísel|type:select|default:comma|required',
-            ])->icon('fa-money'),
+            ])->icon('fa-money')->add('hidden'),
         ];
     }
 

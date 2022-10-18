@@ -11,7 +11,7 @@ class Language extends BaseLanguage
         parent::mutateFields($fields);
 
         $fields->push([
-            'currency' => 'name:Predvolená mena pre jazykovú mutáciu|belongsTo:currencies,:name - :code',
+            'currency' => 'name:Predvolená mena pre jazykovú mutáciu|belongsTo:currencies,:name - :code|defaultByOption:default,1',
         ]);
     }
 }

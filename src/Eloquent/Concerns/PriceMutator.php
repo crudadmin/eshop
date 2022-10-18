@@ -235,7 +235,8 @@ trait PriceMutator
     public function getInitialPriceWithoutVatAttribute()
     {
         return Store::calculateFromDefaultCurrency(
-            $this->getAttribute('price')
+            $this->getAttribute('price'),
+            $this->getAttribute('currency_id'),
         );
     }
 

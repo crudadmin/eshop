@@ -50,12 +50,22 @@ trait HasCurrencies
      * Recalculate given default price into selected currency
      *
      * @param  float  $price
+     * @param  int  $currencyId
      *
      * @return  float
      */
-    public function calculateFromDefaultCurrency($price)
+    public function calculateFromDefaultCurrency($price, $currencyId = null)
     {
-        if ( ($currency = $this->getCurrency()) && ($rate = $currency->rate) !== 1.0 ){
+        if (
+            //If currency is available
+            ($currency = $this->getCurrency())
+
+            //If selected currency is not same as given currency
+            && $currencyId !== $currency->getKey()
+
+            //If rate is not flat
+            && ($rate = $currency->rate) !== 1.0
+        ){
             $price = $this->roundNumber($price * $rate);
         }
 

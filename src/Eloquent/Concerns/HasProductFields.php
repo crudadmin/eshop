@@ -5,6 +5,7 @@ namespace AdminEshop\Eloquent\Concerns;
 use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
 use Admin\Fields\Group;
 use Store;
+use Admin;
 
 trait HasProductFields
 {

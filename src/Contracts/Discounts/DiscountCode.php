@@ -156,7 +156,7 @@ class DiscountCode extends Discount implements Discountable
                 return sprintf(_('Minimálna suma objednávky pre tento kód je %s'), Store::priceFormat($code->min_order_price));
             }
 
-            if ( $code->discount_price > 0 && $priceWithVat < $code->discount_price ) {
+            if ( $code->discount_price > 0 && $priceWithVat < Store::calculateFromDefaultCurrency($code->discount_price) ) {
                 return sprintf(_('Minimálna suma objednávky pre tento kód je %s'), Store::priceFormat($code->discount_price));
             }
         }

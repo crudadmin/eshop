@@ -12,6 +12,7 @@ use AdminEshop\Contracts\Payments\Exceptions\PaymentGateException;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 use AdminEshop\Contracts\Payments\PaymentHelper;
 use Exception;
+use Store;
 use Log;
 
 class GPWebPayment extends PaymentHelper
@@ -53,6 +54,8 @@ class GPWebPayment extends PaymentHelper
 
             $payment = $this->getPayment();
 
+            $currencyCode = strtoupper(Store::getCurrency()->code);
+
             //In case of development purposes, we need create
             //range of payments for each development environment.
             $number = ((int)$this->getOption('number_prefix', 0)) + $payment->getKey();
@@ -60,7 +63,7 @@ class GPWebPayment extends PaymentHelper
             $request = new PaymentRequest(
                 $number,
                 $payment->price,
-                PaymentRequest::EUR,
+                constant('\AdminEshop\Contracts\Payments\GPWebpay\PaymentRequest::'.$currencyCode),
                 0,
                 $this->getResponseUrl('status'),
                 $order->getKey(),
