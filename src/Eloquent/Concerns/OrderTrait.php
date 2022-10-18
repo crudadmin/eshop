@@ -161,7 +161,7 @@ trait OrderTrait
         });
     }
 
-    private function getClientName()
+    protected function getClientName()
     {
         $clientName = str_limit(e(strip_tags($this->is_company ? $this->company_name : $this->username)), 20);
 
@@ -172,12 +172,12 @@ trait OrderTrait
         return $clientName;
     }
 
-    private function getPickupAddressWithName()
+    protected function getPickupAddressWithName()
     {
         return implode(' - ', array_filter([$this->deliveryPickupName, $this->deliveryPickupAddress]));
     }
 
-    private function getDeliveryAddress()
+    protected function getDeliveryAddress()
     {
         if ( $pickupAddress = $this->getPickupAddressWithName() ){
             $address = $pickupAddress;

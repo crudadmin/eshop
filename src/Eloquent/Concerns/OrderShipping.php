@@ -35,7 +35,7 @@ trait OrderShipping
             return $name;
         }
 
-        if ( $location = $this->delivery_location ) {
+        if ( $location = $this->getPickupDeliveryLocation() ) {
             return $location?->address;
         }
     }
@@ -46,9 +46,20 @@ trait OrderShipping
             return $name;
         }
 
-        if ( $location = $this->delivery_location ) {
+        if ( $location = $this->getPickupDeliveryLocation() ) {
             return $location->{config('admineshop.delivery.multiple_locations.field_name')};
         }
+    }
+
+    /**
+     * Helper pickup function
+     * We can mutate delivery location with this function.
+     *
+     * @return  DeliveryLocation
+     */
+    public function getPickupDeliveryLocation()
+    {
+        return $this->delivery_location;
     }
 }
 
