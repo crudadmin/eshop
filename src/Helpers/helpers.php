@@ -21,7 +21,8 @@ function operator_types($except = [])
         '+' => '+ Pripočítať k cene (bez DPH)',
         '-' => '- Odčítať z ceny (bez DPH)',
         '*' => '* Vynásobit cenu',
-        'abs' => 'Nová hodnota',
+        'abs' => 'Nová hodnota (bez DPH)',
+        'abs+V' => 'Nová hodnota (s DPH)',
     ];
 
     return array_diff_key($operators, array_flip($except));
@@ -52,6 +53,8 @@ function operator_modifier($number, $operator, $operatorValue, $vatValue = null)
         $number *= $operatorValue;
     } else if ( $operator == 'abs' ){
         $number = $operatorValue;
+    } else if ( $operator == 'abs+V' ){
+        $number = Store::removeVat($operatorValue, $vatValue);
     }
 
     return $number;
