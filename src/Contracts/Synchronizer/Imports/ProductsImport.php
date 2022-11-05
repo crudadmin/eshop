@@ -17,6 +17,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     public $synchronizeVariants = ['create' => true, 'update' => true, 'delete' => true];
     public $synchronizeCategories = ['create' => true, 'update' => true, 'delete' => true];
     public $synchronizeGallery = ['create' => true, 'update' => true, 'delete' => true];
+    public $synchronizePrices = ['create' => true, 'update' => true, 'delete' => true];
     public $synchronizeAttributes = ['create' => true, 'update' => true, 'delete' => true];
     public $synchronizeAttributesItems = ['create' => true, 'update' => true, 'delete' => true];
     public $synchronizeProductAttributes = ['create' => true, 'update' => true, 'delete' => true];
@@ -36,6 +37,15 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return array_filter([
             'product_id' => 'products',
             'code'
+        ]);
+    }
+
+    public function getProductsPricesIdentifier()
+    {
+        return array_filter([
+            'product_id' => 'products',
+            'currency_id',
+            'vat_id',
         ]);
     }
 
@@ -94,6 +104,15 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
                 ['product_id' => 'products', 'category_id'],
                 $this->getPreparedProductsCategories($rows),
                 $this->synchronizeCategories
+            );
+        }
+
+        if ( $this->synchronizePrices ) {
+            $this->synchronize(
+                Admin::getModel('ProductsPrice'),
+                $this->getProductsPricesIdentifier(),
+                $this->getPreparedPrices($rows),
+                $this->synchronizePrices
             );
         }
 
@@ -236,6 +255,32 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
         return $gallery;
     }
 
+    private function getPreparedPrices($rows, $levels = [], $relationIdentifier = 'getProductIdentifier')
+    {
+        foreach ($rows as $row) {
+            if ( isset($row['$variants']) && count($row['$variants']) ) {
+                $levels = $this->getPreparedPrices(
+                    $row['$variants'],
+                    $levels,
+                    'getProductsVariantIdentifier'
+                );
+            }
+
+            foreach ($row['$prices'] ?? [] as $price) {
+                $levels[] = [
+                    'product_id' => $this->getExistingRows('products')[
+                        $row[$this->{$relationIdentifier}()]
+                    ],
+                    'currency_id' => $price['currency_id'],
+                    'price' => $price['price'],
+                    'vat_id' => $this->getVatIdByValue($price['vat']),
+                ];
+            }
+        }
+
+        return $levels;
+    }
+
     private function getPreparedAttributes($rows, $attributes = [])
     {
         foreach ($rows as $row) {
@@ -322,23 +367,5 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
     public function setProductsVariantVatNumberAttribute($value, &$row)
     {
         $row['vat_id'] = $this->getVatIdByValue($value);
-    }
-
-    private function getVatIdByValue($value)
-    {
-        $value = $value ?: 0;
-
-        return $this->cache('vat.'.$value, function() use ($value){
-            if ( $vat = Store::getVats()->where('vat', $value)->first() ){
-                return $vat->getKey();
-            }
-
-            $vat = Admin::getModel('Vat')->create([
-                'name' => $value.'%',
-                'vat' => $value,
-            ]);
-
-            return $vat->getKey();
-        });
     }
 }

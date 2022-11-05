@@ -2,13 +2,17 @@
 
 namespace AdminEshop\Contracts\Synchronizer\Imports;
 
+use AdminEshop\Contracts\Synchronizer\Concerns\HasPricesTrait;
 use AdminEshop\Contracts\Synchronizer\Excel\SheetImportWrapper;
 use AdminEshop\Contracts\Synchronizer\Imports\ProductsImport;
 use AdminEshop\Contracts\Synchronizer\SynchronizerInterface;
 use Illuminate\Support\Collection;
+use Store;
 
 class ProductsSheetImport extends ProductsImport implements SynchronizerInterface
 {
+    use HasPricesTrait;
+
     public $synchronizeProducts = [ 'create' => true, 'update' => true, 'delete' => false ];
     public $synchronizeVariants = [ 'create' => true, 'update' => true, 'delete' => false ];
     public $synchronizeCategories = [ 'create' => true, 'update' => true, 'delete' => false ];
@@ -110,6 +114,8 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         $array = [
             '$attributes' => $this->prepareAttributes($item),
         ];
+
+        $array = $this->prepareProductPrices($array, $item, $variant);
 
         if ( $variant === true ){
             $array['product_type'] = 'variant';
