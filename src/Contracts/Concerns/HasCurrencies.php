@@ -51,22 +51,27 @@ trait HasCurrencies
      *
      * @param  float  $price
      * @param  int  $currencyId
+     * @param  int  $backward
      *
      * @return  float
      */
-    public function calculateFromDefaultCurrency($price, $currencyId = null)
+    public function calculateFromDefaultCurrency($price, $defaultCurrencyId = null, $backward = false)
     {
         if (
             //If currency is available
             ($currency = $this->getCurrency())
 
             //If selected currency is not same as given currency
-            && $currencyId !== $currency->getKey()
+            && $defaultCurrencyId !== $currency->getKey()
 
             //If rate is not flat
             && ($rate = $currency->rate) !== 1.0
         ){
-            $price = $this->roundNumber($price * $rate);
+            $price = $backward == true
+                        ? $price / $rate
+                        : $price * $rate;
+
+            $price = $this->roundNumber($price);
         }
 
         return $price;

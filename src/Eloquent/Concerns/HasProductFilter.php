@@ -54,6 +54,8 @@ trait HasProductFilter
 
     public function scopeApplyQueryFilter($query)
     {
+        $query->withPriceLevels();
+
         //Filter whole products
         $query->where(function($query) {
             $extractVariants = $this->getFilterOption('variants.extract', false);
@@ -204,6 +206,11 @@ trait HasProductFilter
                 foreach ($priceRanges as $priceRange) {
                     $query->orWhere(function($query) use ($priceRange){
                         $column = $query->getQuery()->from.'.price';
+
+                        if ( config('admineshop.prices.price_levels') ){
+                            $column = DB::raw('COALESCE(pl.price, '.$column.' * '.Store::getCurrency()->rate.')');
+                        }
+
                         $filterCount = count($priceRange);
 
                         if ( $filterCount == 2 ){
@@ -228,7 +235,6 @@ trait HasProductFilter
                 }
             });
         }
-
     }
 
     public function scopeApplySaleFilter($query, $params)

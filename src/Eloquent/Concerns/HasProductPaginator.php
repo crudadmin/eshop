@@ -43,14 +43,7 @@ trait HasProductPaginator
 
         $totalAttributes = $totalResult[0]->attributes;
 
-        $priceRanges = array_filter([
-            ($totalAttributes['min_filter_price'] ?? null) ?: null,
-            ($totalAttributes['max_filter_price'] ?? null) ?: null,
-            $totalAttributes['min_filter_variant_price'] ?? null,
-            $totalAttributes['max_filter_variant_price'] ?? null,
-        ], function($number){
-            return is_numeric($number);
-        });
+        $priceRanges = $this->getProductPriceRanges($totalAttributes);
 
         $total = $totalAttributes['aggregate_products'];
 
@@ -69,26 +62,110 @@ trait HasProductPaginator
         return $paginator;
     }
 
+    /**
+     * TODO: does not support prices with VAT
+     *
+     * @param  array  $attrs
+     */
+    private function getProductPriceRanges($attrs)
+    {
+        $keys = [
+            'min_filter_price',
+            'max_filter_price',
+            'min_filter_variant_price',
+            'max_filter_variant_price',
+            'min_filter_level_price',
+            'max_filter_level_price',
+            'min_filter_variant_level_price',
+            'max_filter_variant_level_price',
+        ];
+
+        $ranges = [];
+
+        foreach ($keys as $key) {
+            $isLevelPrice = strpos($key, '_level_price') !== false;
+
+            if ( isset($attrs[$key]) && is_numeric($attrs[$key]) ){
+                $value = $attrs[$key];
+
+                //If price level is available, we want reset original product price for comparison.
+                if ( $isLevelPrice == false ){
+                    $value = Store::calculateFromDefaultCurrency($value);
+                }
+
+                $ranges[$key] = (float)$value;
+            }
+        }
+
+        return array_filter($ranges, function($number){
+            return is_numeric($number);
+        });
+    }
+
     public function scopeWithMinAndMaxFilterPrices($query)
     {
-        $query->addSelect(DB::raw('MIN(products.price) as min_filter_price, MAX(products.price) as max_filter_price'));
+        $hasPriceLevels = config('admineshop.prices.price_levels');
+
+        //Load pricelevels for base products
+        if ( $hasPriceLevels ){
+            $query->withPriceLevels();
+
+            //Add maxs of default prices (only count max, when price level is available)
+            $query->addSelect(DB::raw('
+                MIN(IF(pl.price is NULL, products.price, NULL)) as min_filter_price,
+                MAX(IF(pl.price is NULL, products.price, NULL)) as max_filter_price,
+                MIN(pl.price) as min_filter_level_price,
+                MAX(pl.price) as max_filter_level_price
+            '));
+        } else {
+            $query->addSelect(DB::raw('
+                MIN(products.price) as min_filter_price,
+                MAX(products.price) as max_filter_price
+            '));
+        }
 
         if ( $this->getFilterOption('variants.extract') === false ) {
             $variants = DB::table('products')
-                            ->selectRaw('
-                                MIN(price) as min_filter_variant_price,
-                                MAX(price) as max_filter_variant_price,
-                                product_id
-                            ')
-                            ->whereNotNull('product_id')
-                            ->whereNull('deleted_at')
-                            ->groupBy('product_id');
+                            ->selectRaw('products.product_id')
+                            ->whereNotNull('products.product_id')
+                            ->whereNull('products.deleted_at')
+                            ->groupBy('products.product_id');
+
+            //Select maxs of default prices or price levels
+            if ( $hasPriceLevels ){
+                $variants->addSelect(DB::raw('
+                    MIN(IF(pl.price is NULL, products.price, NULL)) as min_filter_variant_price,
+                    MAX(IF(pl.price is NULL, products.price, NULL)) as max_filter_variant_price,
+                    MIN(pl.price) as min_filter_variant_level_price,
+                    MAX(pl.price) as max_filter_variant_level_price
+                '));
+            }
+
+            //Select only default prices
+            else {
+                $variants->addSelect(DB::raw('
+                    MIN(products.price) as min_filter_variant_price,
+                    MAX(products.price) as max_filter_variant_price
+                '));
+            }
+
+            $this->scopeWithPriceLevels($variants);
 
             $query->leftJoinSub($variants, 'pvp', function($join){
                 $join->on('products.id', '=', 'pvp.product_id');
             });
 
-            $query->addSelect(DB::raw('MIN(pvp.min_filter_variant_price) as min_filter_variant_price, MAX(pvp.max_filter_variant_price) as max_filter_variant_price'));
+            $query->addSelect(DB::raw('
+                MIN(pvp.min_filter_variant_price) as min_filter_variant_price,
+                MAX(pvp.max_filter_variant_price) as max_filter_variant_price
+            '));
+
+            if ( $hasPriceLevels ){
+                $query->addSelect(DB::raw('
+                    MAX(pvp.max_filter_variant_level_price) as max_filter_variant_level_price,
+                    MIN(pvp.min_filter_variant_level_price) as min_filter_variant_level_price
+                '));
+            }
         }
     }
 
