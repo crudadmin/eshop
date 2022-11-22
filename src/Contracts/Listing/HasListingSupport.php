@@ -3,6 +3,7 @@
 namespace AdminEshop\Contracts\Listing;
 
 use Illuminate\Support\Facades\Cache;
+use Localization;
 use Store;
 use Admin;
 
@@ -89,6 +90,7 @@ trait HasListingSupport
     {
         $items = [
             $cachePrefix,
+            Localization::get()->slug,
         ];
 
         //Get filter hash
