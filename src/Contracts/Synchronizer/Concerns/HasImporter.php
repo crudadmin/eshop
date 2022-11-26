@@ -86,6 +86,17 @@ trait HasImporter
         return $relations;
     }
 
+    private function getIdentifierKeyPosition($fieldKey, $identifier, $key)
+    {
+        $relations = $this->getFieldKeysRelationer($fieldKey);
+
+        $position = array_search($key, array_keys($relations));
+
+        $parts = explode('-', $identifier);
+
+        return $parts[$position];
+    }
+
     private function getIdentifierName($fieldKey)
     {
         return $this->isMultiKey($fieldKey) ? '_identifier' : $fieldKey;
@@ -156,7 +167,7 @@ trait HasImporter
                     return in_array($row->{$this->getIdentifierName($fieldKey)}, $allIdentifiers);
                 })->pluck($model->getKeyName())->toArray();
 
-                $this->unpublishedRowsToPublish[$model->getTable()] = array_merge($rowsToPublish, $this->getUnpublishedRowsToPublish($model));
+                $this->unpublishedRowsToPublish[$model->getTable()] = $rowsToPublish + $this->getUnpublishedRowsToPublish($model);
             }
         }
     }
@@ -361,6 +372,17 @@ trait HasImporter
         $this->message('> Inserted '.$inserted.' from '.$total.' successfully in '.Admin::end($start).'s');
     }
 
+    private function getRowsForIdentifiersChunk($rows, $fieldKey, $column, $chunkedIdentifiers)
+    {
+        $allowedRows = [];
+
+        $enabledModelIds = array_map(function($identifier) use ($fieldKey, $column) {
+            return (int)$this->getIdentifierKeyPosition($fieldKey, $identifier, $column);
+        }, array_values($chunkedIdentifiers));
+
+        return array_intersect($rows, $enabledModelIds);
+    }
+
     private function getDeletionRows(Model $model, $fieldKey, $allIdentifiers)
     {
         $selectFieldKeyColumn = $this->isMultiKey($fieldKey)
@@ -376,11 +398,17 @@ trait HasImporter
         foreach ($chunksToDelete as $chunkedIdentifiers) {
             $rows = DB::table($model->getTable())
                 ->selectRaw($model->getKeyName().', '.$selectFieldKeyColumn)
-                ->when(count($relations), function($query) use ($relations, $model) {
-                    $query->where(function($query) use ($relations, $model) {
+                ->when(count($relations), function($query) use ($relations, $model, $chunkedIdentifiers, $fieldKey) {
+                    $query->where(function($query) use ($relations, $model, $chunkedIdentifiers, $fieldKey) {
                         $i = 0;
                         foreach ($relations as $column => $table) {
-                            $existingRows = $this->getExistingRows($table);
+                            $existingRows = $this->getRowsForIdentifiersChunk(
+                                $this->getExistingRows($table),
+                                $fieldKey,
+                                $column,
+                                $chunkedIdentifiers
+                            );
+
                             $preparedRows = $this->preparedRows[$table] ?: [];
 
                             //If relation is loaded, we can check if some rows has disabled deletion of this actual relation.
@@ -427,7 +455,8 @@ trait HasImporter
                 ->pluck($this->getIdentifierName($fieldKey), $model->getKeyName())
                 ->toArray();
 
-            $toDelete = array_merge($toDelete, $rows);
+            //We need sum arrays to keep key id. So we can not use array_merge
+            $toDelete = $toDelete + $rows;
         }
 
         return $toDelete;

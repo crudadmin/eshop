@@ -69,12 +69,18 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         $products = [];
 
         foreach ($this->treeProductIdentifier as $pairingColumn => $items) {
+            $hasVariants = count($items) > 1;
+
             $item = $this->getImportProduct([
                 'name' => $items[0][$this->importer->getColumnNameByField('name')],
                 'code_pairing' => $pairingColumn,
-                'product_type' => count($items) > 1 ? 'variants' : 'regular',
+                'product_type' => $hasVariants ? 'variants' : 'regular',
                 '$categories' => $this->getCategoriesList($items),
-                '$variants' => count($items) > 1 ? $this->prepareVariants($items) : [],
+                '$variants' => $hasVariants ? $this->prepareVariants($items) : [],
+                '$attributes' => $this->prepareAttributes($items[0], function($sheetColumnName, $column) use ($hasVariants) {
+                    //Allow attributes only for parent products, or attributes defines as variant => false
+                    return $hasVariants == false || ($column['variant'] ?? true) === false;
+                }),
             ], $items, $pairingColumn);
 
             //If is regulat product type, we want add additional info
@@ -105,15 +111,18 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
     private function prepareVariants($items)
     {
         return collect($items)->map(function($variant){
-            return $this->prepareProductItem($variant, true);
+            return [
+                '$attributes' => $this->prepareAttributes($variant, function($sheetColumnName, $column){
+                    //Allow attributes only for parent products, or attributes defines as variant => false
+                    return ($column['variant'] ?? true) === true;
+                }),
+            ] + $this->prepareProductItem($variant, true);
         });
     }
 
     protected function prepareProductItem($item, $variant = false)
     {
-        $array = [
-            '$attributes' => $this->prepareAttributes($item),
-        ];
+        $array = [];
 
         $array = $this->prepareProductPrices($array, $item, $variant);
 
@@ -156,7 +165,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         return is_null($value) || $value === '';
     }
 
-    public function prepareAttributes($item)
+    public function prepareAttributes($item, callable $filter = null)
     {
         $attributes = [];
 
@@ -167,6 +176,11 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
             //If attribute is empty
             if ( !($value = $item[$sheetColumnName] ?? null) ){
+                continue;
+            }
+
+            //Custom Attributes filter
+            if ( is_callable($filter) && $filter($sheetColumnName, $column) == false ){
                 continue;
             }
 
