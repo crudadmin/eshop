@@ -4,7 +4,7 @@ namespace AdminEshop\Eloquent\Concerns;
 
 trait HasSimilarProducts
 {
-    protected $perPageSimilarProducts = 0;
+    protected $perPageSimilarProducts = 8;
 
     public function paginateSimilarProducts($query)
     {

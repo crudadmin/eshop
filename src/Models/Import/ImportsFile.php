@@ -48,7 +48,7 @@ class ImportsFile extends AdminModel
         return [
             'name' => 'name:Názov importu',
             'type' => 'name:Typ importu|type:select|option::name|default:'.($this->getImportClassNameTypes()[0] ?? '').'|required',
-            'file' => 'name:Importny súbor (.xlsx)|type:file|extensions:xlsx|required',
+            'file' => 'name:Importny súbor (.xlsx)|type:file|extensions:xlsx,csv|required',
         ];
     }
 

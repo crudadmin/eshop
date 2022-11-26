@@ -76,7 +76,9 @@ trait HasPricesTrait
 
     protected function getCurrencyVat($currency, $row)
     {
-        return (float)$row['vat_'.$currency->code];
+        if ( isset($row['vat_'.$currency->code]) ){
+            return (float)$row['vat_'.$currency->code];
+        }
     }
 
     public function castPriceNumber($number, $vat)
