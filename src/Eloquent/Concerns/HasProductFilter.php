@@ -258,13 +258,8 @@ trait HasProductFilter
             $scope($query);
         }
 
-        if (
-            $this->getFilterOption('$ignore.filter.attributes', false) == false
-            && $filter = $this->getFilterFromQuery($params)
-        ) {
-            foreach ($filter as $attributeId => $itemIds) {
-                $query->filterAttributeItems($itemIds);
-            }
+        if ( $this->getFilterOption('$ignore.filter.attributes', false) == false ) {
+            $query->applyAttributesFilter($params, config('admineshop.attributes.inParentAttributes'));
         }
 
         if ( $this->getFilterOption('$ignore.filter.prices', false) == false ) {
@@ -272,6 +267,25 @@ trait HasProductFilter
         }
 
         $query->applySaleFilter($params);
+    }
+
+    public function scopeApplyAttributesFilter($query, $params, $except = [], $only = [])
+    {
+        $filter = $this->getFilterFromQuery($params);
+
+        foreach ($filter as $attributeId => $itemIds) {
+            //Skip disabled attributes
+            if ( in_array($attributeId, $except) ){
+                continue;
+            }
+
+            //Allow only attributes
+            if ( count($only) && !in_array($attributeId, $only) ){
+                continue;
+            }
+
+            $query->filterAttributeItems($itemIds);
+        }
     }
 
     public function scopeFilterParentProduct($query, $filter = null)
@@ -284,6 +298,8 @@ trait HasProductFilter
         }
 
         $filter = $filter ?: $this->getFilterOption('filter', []);
+
+        $query->applyAttributesFilter($filter, [], config('admineshop.attributes.inParentAttributes'));
 
         $query->applyCategoryFilter($filter);
         $query->applySearchFilter($filter);
