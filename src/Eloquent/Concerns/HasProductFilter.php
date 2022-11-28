@@ -299,7 +299,9 @@ trait HasProductFilter
 
         $filter = $filter ?: $this->getFilterOption('filter', []);
 
-        $query->applyAttributesFilter($filter, [], config('admineshop.attributes.inParentAttributes'));
+        if ( $this->getFilterOption('$ignore.filter.attributes', false) == false ) {
+            $query->applyAttributesFilter($filter, [], config('admineshop.attributes.inParentAttributes'));
+        }
 
         $query->applyCategoryFilter($filter);
         $query->applySearchFilter($filter);
