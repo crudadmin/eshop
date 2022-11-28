@@ -32,9 +32,11 @@ trait HasCartSteps
     private function getStepIndex($stepName)
     {
         //Get current cart step
-        return $this->getCartSteps()->search(function($step) use ($stepName) {
+        $stepIndex = $this->getCartSteps()->search(function($step) use ($stepName) {
             return $step['name'] == $stepName;
         });
+
+        return is_numeric($stepIndex) ? $stepIndex : -1;
     }
 
     public function getCartStep($stepName)
@@ -42,14 +44,14 @@ trait HasCartSteps
         $steps = $this->getCartSteps();
         $stepIndex = $this->getStepIndex($stepName);
 
-        return is_numeric($stepIndex) ? ($steps[$stepIndex] ?? null) : null;
+        return $steps[$stepIndex] ?? null;
     }
 
     public function getStepValidators($stepName)
     {
         $steps = $this->getCartSteps();
 
-        $stepIndex = $this->getStepIndex($stepName) ?: -1;
+        $stepIndex = $this->getStepIndex($stepName);
         $mutatorsToValidate = [];
 
         for ($i=0; $i <= $stepIndex; $i++) {
@@ -74,7 +76,7 @@ trait HasCartSteps
     {
         $steps = $this->getCartSteps();
 
-        $stepIndex = $this->getStepIndex($stepName) ?: -1;
+        $stepIndex = $this->getStepIndex($stepName);
         $mutators = [];
 
 
