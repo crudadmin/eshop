@@ -18,6 +18,8 @@ class OrderProvider
      */
     protected $visibleOptionsKeys = [];
 
+    protected $identifier;
+
     protected $order;
 
     protected $paymentMethod;
@@ -29,9 +31,11 @@ class OrderProvider
      *
      * @param  mixed  $options
      */
-    public function __construct($options = null)
+    public function __construct($options = null, $identifier = null)
     {
         $this->options = $options;
+
+        $this->identifier = $identifier;
     }
 
     public function setOrder(Order $order = null)
@@ -39,6 +43,32 @@ class OrderProvider
         $this->order = $order;
 
         return $this;
+    }
+
+    public function setDelivery($delivery)
+    {
+        $this->delivery = $delivery;
+
+        return $this;
+    }
+
+    public function setPaymentMethod($paymentMethod)
+    {
+        $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    public function setOptions($options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    public function getIdentifier()
+    {
+        return $this->identifier;
     }
 
     public function getOrder()
@@ -58,13 +88,6 @@ class OrderProvider
         return array_intersect_key($options, array_flip($this->visibleOptionsKeys));
     }
 
-    public function setOptions($options)
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
     public function getOption($key, $default = null)
     {
         $options = $this->options ?: [];
@@ -82,5 +105,13 @@ class OrderProvider
     public function getDelivery()
     {
         return $this->delivery;
+    }
+
+    public function toArray()
+    {
+        return [
+            'name' => class_basename(get_class($this)),
+            'options' => $this->getVisibleOptions(),
+        ];
     }
 }

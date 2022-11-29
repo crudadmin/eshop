@@ -6,12 +6,11 @@ use AdminEshop\Contracts\Order\OrderProvider;
 use AdminEshop\Models\Delivery\Delivery;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
+use OrderService;
 use Admin;
 
 class ShippingProvider extends OrderProvider
 {
-
-
     /**
      * Admin order buttons
      *
@@ -67,6 +66,19 @@ class ShippingProvider extends OrderProvider
         return false;
     }
 
+    public function getDeliveryData()
+    {
+        //Get data from order
+        if ( $order = $this->getOrder() ){
+            return $order->delivery_data[$this->identifier] ?? null;
+        }
+
+        //Get data from cart
+        else if ( $this->identifier ){
+            return OrderService::getDeliveryMutator()->getDeliveryData($this->identifier);
+        }
+    }
+
     /**
      * On shipping send button question action
      *
@@ -76,8 +88,8 @@ class ShippingProvider extends OrderProvider
      */
     public function buttonQuestion(Button $button)
     {
-       return $button->title('Prajete si pokračovať?')
-                     ->warning('Balík bude automatický odoslaný do dopravnej služby');
+       return $button->title(_('Prajete si pokračovať?'))
+                     ->warning(_('Balík bude automatický odoslaný do dopravnej služby'));
     }
 
     /**
@@ -116,5 +128,21 @@ class ShippingProvider extends OrderProvider
     public function getPickupAddress()
     {
 
+    }
+
+    public function toArray()
+    {
+        $array = parent::toArray();
+
+        $pickupName = $this->getPickupName();
+        $pickupAddress = $this->getPickupAddress();
+        if ( $pickupName || $pickupAddress ){
+            $array['point'] = [
+                'name' => $pickupName,
+                'address' => $pickupAddress,
+            ];
+        }
+
+        return $array;
     }
 }

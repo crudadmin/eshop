@@ -163,6 +163,7 @@ class CartController extends Controller
     {
         $deliveryId = request('delivery_id');
         $locationId = request('location_id');
+        $data = request('data');
 
         //Find by delivery id
         if ( $deliveryId ) {
@@ -181,6 +182,10 @@ class CartController extends Controller
         OrderService::getDeliveryMutator()->setDeliveryLocation(
             isset($location) && $location ? $location->getKey() : null,
         );
+
+        if ( request()->has('data') ){
+            OrderService::getDeliveryMutator()->setDeliveryData($data);
+        }
 
         //If no payment method is unavailable for this delivery, reset payment method to null
         if ( ! OrderService::getPaymentMethodMutator()->getSelectedPaymentMethod() ) {

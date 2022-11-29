@@ -33,6 +33,11 @@ class DeliveryMutator extends Mutator
      */
     const DELIVERY_LOCATION_KEY = 'delivery_location';
 
+    /*
+     * additional delivery data key
+     */
+    const DELIVERY_DATA_KEY = 'delivery_data';
+
     /**
      * Returns if mutators is active
      * And sends state to other methods
@@ -45,6 +50,7 @@ class DeliveryMutator extends Mutator
             return [
                 'delivery' => $this->getSelectedDelivery(),
                 'delivery_location' => $this->getSelectedLocation(),
+                'delivery_data' => $this->getDeliveryData(),
             ];
         }
     }
@@ -65,6 +71,7 @@ class DeliveryMutator extends Mutator
             return [
                 'delivery' => $delivery,
                 'delivery_location' => $order->delivery_location_id && $order->delivery_location ? $order->delivery_location : null,
+                'delivery_data' => $order->delivery_data,
             ];
         }
     }
@@ -82,6 +89,7 @@ class DeliveryMutator extends Mutator
         if ( $this->canGenerateDelivery($order) ) {
             $delivery = $activeResponse['delivery'];
             $location = $activeResponse['delivery_location'] ?? null;
+            $deliveryData = $activeResponse['delivery_data'] ?? null;
 
             $order->fill([
                 'delivery_vat' => Store::getVatValueById($delivery->vat_id),
@@ -89,6 +97,7 @@ class DeliveryMutator extends Mutator
                 'delivery_price_vat' => $delivery->priceWithVat,
                 'delivery_id' => $delivery->getKey(),
                 'delivery_location_id' => $location ? $location->getKey() : null,
+                'delivery_data' => $deliveryData ? [ $delivery->getKey() => $deliveryData ] : null,
             ]);
         }
     }
@@ -145,6 +154,7 @@ class DeliveryMutator extends Mutator
         return array_merge($response, [
             'deliveries' => $this->getFilteredDeliveriesWithDiscounts(),
             'selectedDelivery' => $this->getSelectedDelivery(),
+            'selectedDeliveryData' => $this->getDeliveryData(),
             'selectedLocation' => $this->getSelectedLocation(),
         ]);
     }
@@ -295,6 +305,35 @@ class DeliveryMutator extends Mutator
         $this->getDriver()->set(self::DELIVERY_LOCATION_KEY, $locationId, $persist);
 
         return $this;
+    }
+
+    /**
+     * Save additional delivery data
+     *
+     * @param  [type]  $data
+     * @param  bool  $persist
+     */
+    public function setDeliveryData($data, $persist = true)
+    {
+        $id = $this->getDriver()->get(self::DELIVERY_KEY);
+
+        $this->getDriver()->set(self::DELIVERY_DATA_KEY.'.'.$id, $data, $persist);
+
+        return $this;
+    }
+
+    /**
+     * Returns delivery data
+     *
+     * @param  array  $data
+     *
+     * @return  mixed
+     */
+    public function getDeliveryData($deliveryId = null)
+    {
+        $id = $deliveryId ?: $this->getDriver()->get(self::DELIVERY_KEY);
+
+        return $this->getDriver()->get(self::DELIVERY_DATA_KEY.'.'.$id);
     }
 
     public function hasDefaultDeliveryTable()

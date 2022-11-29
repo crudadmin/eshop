@@ -97,13 +97,15 @@ class PaymentsMethod extends BasePaymentsMethod
 
     }
 
+    public function getPaymentMethodProvider()
+    {
+        return OrderService::getPaymentProvider($this->getKey());
+    }
+
     public function getPaymentProviderAttribute()
     {
-        if ( $this->exists && $provider = OrderService::getPaymentProvider($this->getKey()) ) {
-            return [
-                'name' => class_basename(get_class($provider)),
-                'options' => $provider->getVisibleOptions(),
-            ];
+        if ( $this->exists && $provider = $this->getPaymentMethodProvider() ) {
+            return $provider->toArray();
         }
     }
 

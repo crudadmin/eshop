@@ -187,13 +187,15 @@ class Delivery extends AdminModel implements DiscountSupport
 
     }
 
+    public function getShippingProvider()
+    {
+        return OrderService::getShippingProvider($this->getKey());
+    }
+
     public function getShippingProviderAttribute()
     {
-        if ( $this->exists && $provider = OrderService::getShippingProvider($this->getKey()) ) {
-            return [
-                'name' => class_basename(get_class($provider)),
-                'options' => $provider->getVisibleOptions(),
-            ];
+        if ( $this->exists && $provider = $this->getShippingProvider() ) {
+            return $provider->toArray();
         }
     }
 

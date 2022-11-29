@@ -135,6 +135,7 @@ trait HasOrderFields
                     Group::inline(array_merge(
                         [
                             'delivery' => 'name:Doprava|belongsTo:deliveries,name|required',
+                            'delivery_data' => 'name:Dáta dopravy|type:json|inaccessible',
                             'delivery_pickup_point' => 'name:Odberné miesto|imaginary|disabled|removeFromFormIf:delivery_pickup_point,NULL'
                         ],
                         config('admineshop.delivery.multiple_locations.enabled', false)
