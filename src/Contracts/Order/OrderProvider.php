@@ -11,6 +11,13 @@ class OrderProvider
 {
     protected $options = [];
 
+    /**
+     * Which options keys are visible to frontend
+     *
+     * @return  array
+     */
+    protected $visibleOptionsKeys = [];
+
     protected $order;
 
     protected $paymentMethod;
@@ -42,6 +49,13 @@ class OrderProvider
     public function getOptions()
     {
         return $this->options ?: [];
+    }
+
+    public function getVisibleOptions()
+    {
+        $options = $this->getOptions();
+
+        return array_intersect_key($options, array_flip($this->visibleOptionsKeys));
     }
 
     public function setOptions($options)

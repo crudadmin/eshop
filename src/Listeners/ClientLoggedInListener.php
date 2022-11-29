@@ -5,6 +5,7 @@ namespace AdminEshop\Listeners;
 use Admin;
 use AdminEshop\Models\Clients\Client;
 use AdminEshop\Models\Store\CartToken;
+use OrderService;
 use Cart;
 
 class ClientLoggedInListener
@@ -20,6 +21,11 @@ class ClientLoggedInListener
         //Allow only on client update
         if ( !($event->user instanceof Client) ) {
             return;
+        }
+
+        //Reset saved client data in cart, to load them from user.
+        if ( config('admineshop.cart.reset_billing_on_login') ){
+            OrderService::getClientDataMutator()->setClientData(null);
         }
 
         $client = $event->user;

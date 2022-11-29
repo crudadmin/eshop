@@ -11,11 +11,53 @@ class BaseDriver
     protected $temporaryData = [];
 
     /**
+     * Cart token
+     *
+     * @var  cart token
+     */
+    protected $token;
+
+    /**
      * Session identifier for stored key
      *
      * @var  string
      */
     const TOKEN_SESSION_KEY = 'cart_token';
+
+    /**
+     * Initialize cart driver
+     *
+     * @param  string|null  $token
+     * @param  array  $initialData
+     */
+    public function __construct($token, array $initialData = [])
+    {
+        $this->setToken($token);
+
+        $this->boot($initialData);
+    }
+
+    /**
+     * Boot driver
+     *
+     * @param  array  $initialData
+     */
+    public function boot(array $initialData = [])
+    {
+        //...
+    }
+
+    /**
+     * Set cart token
+     *
+     * @param  string  $token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+
+        return $this;
+    }
 
     /**
      * Set temporary data
@@ -83,6 +125,11 @@ class BaseDriver
      */
     public function getToken()
     {
+        //Custom token
+        if ( $this->token ){
+            return $this->token;
+        }
+
         //Return key based on session
         if ( config('admineshop.cart.session') == true ) {
             //If cart key does exists in session
@@ -97,10 +144,6 @@ class BaseDriver
             }
 
             return $key;
-        }
-
-        if ( $token = request()->header(config('admineshop.cart.token.header_name')) ) {
-            return $token;
         }
 
         //Dost not generate token automatically if header is empty

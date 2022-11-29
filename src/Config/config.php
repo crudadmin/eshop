@@ -270,6 +270,9 @@ return [
 
         //What identifier will be used by default for all cart requests
         'default_identifier' => 'ProductsIdentifier',
+
+        //When users log-in, we want reset saved cart data. To load a new.
+        'reset_billing_on_login' => true,
     ],
 
     'mail' => [

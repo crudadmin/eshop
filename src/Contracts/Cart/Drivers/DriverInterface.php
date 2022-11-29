@@ -9,7 +9,7 @@ interface DriverInterface
      *
      * @return  void
      */
-    public function __construct(array $initialData = []);
+    public function __construct($token, array $initialData = []);
 
     /**
      * Set data into cart session

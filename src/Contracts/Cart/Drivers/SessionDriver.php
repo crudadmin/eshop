@@ -17,7 +17,7 @@ class SessionDriver extends BaseDriver implements DriverInterface
      *
      * @return  void
      */
-    public function __construct(array $initialData = [])
+    public function boot(array $initialData = [])
     {
         //Boot session driver with default values
         if ( session()->has(self::SESSION_KEY) === false ){

@@ -38,6 +38,13 @@ class Cart
     private $fullCartResponse = false;
 
     /**
+     * Set custom cart token
+     *
+     * @var  null
+     */
+    protected static $cartToken = null;
+
+    /**
      * Cart constructor
      */
     public function __construct()
@@ -53,6 +60,26 @@ class Cart
                 $this->getDriver()->get('items')
             );
         }
+    }
+
+    /**
+     * Set custom cart token
+     *
+     * @param  string  $token
+     */
+    public static function setCartToken($token)
+    {
+        self::$cartToken = $token;
+    }
+
+    /**
+     * Returns cart token
+     *
+     * @return  string
+     */
+    public static function getCartToken()
+    {
+        return self::$cartToken ?: request()->header(config('admineshop.cart.token.header_name'));
     }
 
     /**

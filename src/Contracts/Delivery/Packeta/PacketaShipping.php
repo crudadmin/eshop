@@ -38,6 +38,13 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
      */
     private static $requestBuilder;
 
+    /**
+     * This keys can be passed into request.
+     *
+     * @var  array
+     */
+    protected $visibleOptionsKeys = ['API_KEY'];
+
     /*
      * Shipping name
      */

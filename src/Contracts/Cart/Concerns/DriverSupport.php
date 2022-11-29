@@ -2,10 +2,10 @@
 
 namespace AdminEshop\Contracts\Cart\Concerns;
 
-use AdminEshop\Contracts\Cart\Drivers\ProxyDriver;
-use Cart;
-use CartDriver;
 use Admin;
+use AdminEshop\Contracts\Cart;
+use AdminEshop\Contracts\Cart\Drivers\ProxyDriver;
+use CartDriver;
 
 trait DriverSupport
 {
@@ -14,7 +14,7 @@ trait DriverSupport
      *
      * @var  AdminEshop\Contracts\Cart\Drivers\ProxyDriver
      */
-    protected $driver;
+    protected $driver = [];
 
     /**
      * Flush driver data on order successfully completed
@@ -39,31 +39,28 @@ trait DriverSupport
      *
      * @return AdminEshop\Contracts\Cart\Drivers\ProxyDriver
      */
-    public function getDriver()
+    public function getDriver($token = null)
     {
-        if ( $this->driver ){
-            return $this->driver;
+        $token = $token ?: Cart::getCartToken();
+
+        //Return cached driver
+        if ( isset($this->driver[$token]) ){
+            return $this->driver[$token];
         }
 
         //Cache driver for all other classes which requires driver
-        $driver = Admin::cache('admineshop.cartDriver', function(){
+        $driver = Admin::cache('admineshop.cartDriver.'.$token, function() use ($token) {
             $driver = config('admineshop.cart.driver');
 
-            return new $driver(
-                CartDriver::getInitialData()
-            );
+            return new $driver($token, CartDriver::getInitialData());
         });
 
         //Register given class that uses driver
         CartDriver::registerDriverClass($this);
 
-        //Register all classes which accessed to proxy driver and
-        //then flush all classes with true param...
-        // dump(get_class($this));
+        $this->driver[$token] = new ProxyDriver($driver, $this->getDriverKey());
 
-        $this->driver = new ProxyDriver($driver, $this->getDriverKey());
-
-        return $this->driver;
+        return $this->driver[$token];
     }
 
     public function getDriverKey()

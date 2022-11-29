@@ -20,7 +20,7 @@ class MySqlDriver extends BaseDriver implements DriverInterface
      *
      * @return  void
      */
-    public function __construct(array $initialData = [])
+    public function boot(array $initialData = [])
     {
         //Create and save cart session with default initial data
         $this->getCartSession($initialData);
