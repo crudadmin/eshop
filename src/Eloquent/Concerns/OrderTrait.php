@@ -218,13 +218,13 @@ trait OrderTrait
 
         if ( $this->delivery_status == 'ok' ){
             $color = 'green';
-            $tooltip = 'Objednávka bola úspešne odoslaná do systému dopravnej služby.';
+            $tooltip = _('Objednávka bola úspešne odoslaná do systému dopravnej služby.');
             $message = $this->getSelectOption('delivery_status');
         }
 
         else if ( $this->delivery_status == 'error' ){
             $color = 'red';
-            $tooltip = 'Objednávka nebola odoslaná do systému dopravnej služby.';
+            $tooltip = _('Objednávka nebola odoslaná do systému dopravnej služby.');
             $message = $this->getSelectOption('delivery_status');
         }
 
@@ -235,7 +235,7 @@ trait OrderTrait
 
         if ( $trackingUrl = $this->deliveryTrackingUrl ){
             $element = 'a';
-            $icon = '<i class="fa fa-binoculars mr-2 d-inline-block"></i>';
+            $icon = '<i class="fa fa-binoculars mr-1 d-inline-block"></i>';
             $href = $trackingUrl;
         }
 

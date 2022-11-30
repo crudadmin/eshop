@@ -75,7 +75,7 @@ function client()
 
 if ( !function_exists('phoneValidatorRule') )
 {
-    function phoneValidatorRule()
+    function phoneValidatorRule($rule = true)
     {
         $validation = config('admineshop.validation.phone_countries', 'SK');
 
@@ -83,7 +83,7 @@ if ( !function_exists('phoneValidatorRule') )
             return '';
         }
 
-        return 'phone:'.$validation;
+        return ($rule == true ? 'phone:' : '').$validation;
     }
 }
 ?>

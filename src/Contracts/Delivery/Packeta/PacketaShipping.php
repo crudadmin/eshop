@@ -160,7 +160,9 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
      */
     public function buttonQuestion(Button $button)
     {
-        return $button->title('Zadajte váhu balíka')->type('success')->component('SetPacketaWeight.vue');
+        return $button->title(_('Zadajte váhu balíka'))->type('success')->component('SetDeliveryWeight', [
+            'weight' => $this->getPackageWeight()
+        ]);
     }
 
     /**
@@ -173,7 +175,7 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
         $weight = (float)str_replace(',', '.', request('weight'));
 
         if ( $weight <= 0 ){
-            return $button->error('Váha musí byť kladne číslo uvedené v kologramoch.');
+            return $button->error(_('Váha musí byť kladne číslo uvedené v kologramoch.'));
         }
 
         return [

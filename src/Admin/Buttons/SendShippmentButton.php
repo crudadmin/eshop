@@ -73,13 +73,13 @@ class SendShippmentButton extends Button
         $row->refresh();
 
         if ( $row->delivery_status == 'new' ) {
-            return $this->message('Zasielka bude za malý okamih odoslaná na do zvolenej dopravnej služby. Sledujte stav objednávky doručenia.');
+            return $this->message(_('Zasielka bude za malý okamih odoslaná na do zvolenej dopravnej služby. Sledujte stav objednávky doručenia.'));
         }
 
         if ( $row->delivery_status == 'ok' ) {
-            return $this->message('Zásielka bola úspešne odoslaná do zvolenej dopravnej služby.');
+            return $this->message(_('Zásielka bola úspešne odoslaná do zvolenej dopravnej služby.'));
         }
 
-        return $this->error('Nastala nečakná chyba. Skontrolujte hlásenia pre danu objednávku.');
+        return $this->error(_('Nastala nečakná chyba. Skontrolujte hlásenia pre danu objednávku.'));
     }
 }
