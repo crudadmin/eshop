@@ -26,6 +26,7 @@ trait HasOrderFields
                 'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible',
                 'currency' => 'name:Mena|belongsTo:currencies,:name :char|hidden|removeFromForm',
             ],
+            //Depreaced, can be removed in v4
             config('admineshop.delivery.packeta', false)
                 ? ['packeta_point' => 'name:Packeta point|type:json|inaccessible'] : [],
         ));

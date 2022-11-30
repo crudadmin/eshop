@@ -203,7 +203,6 @@ return [
             AdminEshop\Contracts\Order\Mutators\CountryMutator::class,
             AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
             AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
-            AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
         ],
 
         //Validation steps mutators
@@ -224,7 +223,6 @@ return [
             //         AdminEshop\Contracts\Order\Mutators\CountryMutator::class,
             //         AdminEshop\Contracts\Order\Mutators\DeliveryMutator::class,
             //         AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator::class,
-            //         AdminEshop\Contracts\Order\Mutators\PacketaMutator::class,
             //     ],
             // ],
         ],

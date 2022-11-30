@@ -26,6 +26,16 @@ class ShippingProvider extends OrderProvider
         return class_basename($this);
     }
 
+    /**
+     * Determine whatever shipping has pickup points
+     *
+     * @return  bool
+     */
+    public function hasPickupPoints()
+    {
+        return false;
+    }
+
     /*
      * Has shipping export?
      */
@@ -114,6 +124,14 @@ class ShippingProvider extends OrderProvider
         return $options['timeout'] ?? 2;
     }
 
+    /**
+     * Returns selected pickup point
+     */
+    public function getPickupPoint()
+    {
+
+    }
+
     /*
      * Returns selected pickup point location name
      */
@@ -136,7 +154,7 @@ class ShippingProvider extends OrderProvider
 
         $pickupName = $this->getPickupName();
         $pickupAddress = $this->getPickupAddress();
-        if ( $pickupName || $pickupAddress ){
+        if ( $this->hasPickupPoints() && ($pickupName || $pickupAddress) ){
             $array['point'] = [
                 'name' => $pickupName,
                 'address' => $pickupAddress,

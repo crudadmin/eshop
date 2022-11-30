@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Order\Mutators;
 use Admin;
 use AdminEshop\Contracts\Order\Mutators\Mutator;
 use AdminEshop\Contracts\Order\Validation\DeliveryLocationValidator;
+use AdminEshop\Contracts\Order\Validation\DeliveryPointValidator;
 use AdminEshop\Contracts\Order\Validation\DeliveryValidator;
 use AdminEshop\Events\DeliverySelected;
 use AdminEshop\Models\Orders\Order;
@@ -21,6 +22,7 @@ class DeliveryMutator extends Mutator
     protected $validators = [
         DeliveryValidator::class,
         DeliveryLocationValidator::class,
+        DeliveryPointValidator::class,
     ];
 
     /*

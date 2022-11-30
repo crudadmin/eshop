@@ -90,13 +90,6 @@ trait HasRoutes
 
     }
 
-    public function routesForPacketaShipping()
-    {
-        Route::group(['namespace' => '\AdminEshop\Controllers\Shipping'], function(){
-            Route::post('/cart/shipping/packeta/point', 'PacketaController@setPoint')->visible();
-        });
-    }
-
     public function routesForProfileAddress()
     {
         Route::group(['namespace' => '\AdminEshop\Controllers'], function(){

@@ -62,6 +62,16 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
     }
 
     /**
+     * Determine whatever shipping has pickup points
+     *
+     * @return  bool
+     */
+    public function hasPickupPoints()
+    {
+        return true;
+    }
+
+    /**
      * You can modify parcels throught callback passed in this method
      *
      * @param  callable  $callback
@@ -119,7 +129,7 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
                 'surname' => $order->lastname,
                 'email' => $order->email,
                 'phone' => $order->delivery_phone ?: $order->phone,
-                'addressId' => $order->packeta_point['id'],
+                'addressId' => $this->getPickupPoint()['id'],
                 'value' => $order->price_vat,
                 'cod' => $this->isCashDelivery() ? $order->price_vat : 0,
                 'eshop' => $options['eshop'] ?? env('PACKETA_API_ESHOP'),
@@ -175,7 +185,7 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
         $weight = (float)str_replace(',', '.', request('weight'));
 
         if ( $weight <= 0 ){
-            return $button->error(_('Váha musí byť kladne číslo uvedené v kologramoch.'));
+            return $button->error(_('Váha musí byť kladne číslo uvedené v kilogramoch.'));
         }
 
         return [
@@ -183,13 +193,25 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
         ];
     }
 
+    /**
+     * Returns selected pickup point
+     */
+    public function getPickupPoint()
+    {
+        $data = $this->getDeliveryData();
+
+        if ( $data['place'] ?? null ){
+            return $data;
+        }
+    }
+
     /*
      * Returns selected delivery location point name
      */
     public function getPickupName()
     {
-        if ( isset($this->getOrder()->packeta_point['place']) ){
-            return $this->getOrder()->packeta_point['place'];
+        if ( isset($this->getPickupPoint()['place']) ){
+            return $this->getPickupPoint()['place'];
         }
     }
 
@@ -198,8 +220,8 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
      */
     public function getPickupAddress()
     {
-        if ( isset($this->getOrder()->packeta_point['name']) ){
-            return $this->getOrder()->packeta_point['name'];
+        if ( isset($this->getPickupPoint()['name']) ){
+            return $this->getPickupPoint()['name'];
         }
     }
 }
