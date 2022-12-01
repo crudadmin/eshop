@@ -28,6 +28,9 @@ class ImportRule extends AdminRule
             Ajax::error('Nebol nájdený žiaden importný systém pre tento typ importu.');
         }
 
+        //Set limits
+        ini_set('max_execution_time', 300);
+
         try {
             $this->importer = new $importer['class']($row->file);
 
