@@ -163,4 +163,22 @@ class ShippingProvider extends OrderProvider
 
         return $array;
     }
+
+    public function getExportData($row)
+    {
+        $orders = Admin::getModel('Order')
+                        ->whereDate('created_at', '>=', $row->date_from)
+                        ->whereDate('created_at', '<=', $row->date_to)
+                        ->with([
+                            'payment_method' => function($query){
+                                $query->withTrashed();
+                            },
+                            'delivery' => function($query){
+                                $query->withTrashed();
+                            }
+                        ])
+                        ->get();
+
+        return $this->export($orders);
+    }
 }

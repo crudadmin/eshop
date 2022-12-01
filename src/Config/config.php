@@ -384,6 +384,13 @@ return [
         // ],
     ],
 
+    'exports' => [
+        // 'products' => [
+        //     'name' => 'Export produktov'
+        //     'class' => \..\ProductsExport::class,
+        // ],
+    ],
+
     'holidays' => [
         'country' => 'sk',
         'additional' => [],

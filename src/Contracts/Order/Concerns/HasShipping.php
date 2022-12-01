@@ -41,21 +41,4 @@ trait HasShipping
     {
         SendShippingJob::dispatch($this->getOrder(), $options);
     }
-
-    public function makeShippingExport($providerClass, $orders)
-    {
-        $response = $providerClass::export($orders);
-
-        $data = $response['data'];
-        $extension = $response['extension'];
-
-        $filename = 'export-'.str_random(10).'.'.$extension;
-
-        $path = (new StoreExport)->filePath('file', $filename);
-        File::makeDirs(dirname($path));
-
-        file_put_contents($path, $data);
-
-        return $path;
-    }
 }
