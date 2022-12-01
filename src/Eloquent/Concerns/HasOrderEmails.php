@@ -2,8 +2,20 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Store;
+use OrderService;
+
 trait HasOrderEmails
 {
+    public function getStoreEmailReceivers()
+    {
+        if ( !($email = Store::getSettings()->email) ) {
+            return;
+        }
+
+        return $email;
+    }
+
     public function getClientEmailMessage()
     {
         if ( $this->status && $text = $this->status->parseOrderText('email_content', $this) ) {
@@ -26,5 +38,22 @@ trait HasOrderEmails
     public function getStoreEmailSubject()
     {
         return _('Objednávka č. ') . $this->number;
+    }
+
+    public function addInvoiceToStatusMail($mail)
+    {
+        if ( OrderService::hasInvoices() == false ){
+            return;
+        }
+
+        $invoice = $this->invoices()->get()->sortByDesc(function($invoice){
+            $sortBy = ['proform', 'invoice', 'return'];
+
+            return array_search($invoice->type, $sortBy);
+        })->first();
+
+        $mail->attach($invoice->getPdf()->basepath, [
+            'as' => sprintf(_('objednavka-%s'), $invoice->number).'.pdf',
+        ]);
     }
 }

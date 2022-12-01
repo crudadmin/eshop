@@ -18,15 +18,17 @@ class OrderStatus extends Mailable
     use Queueable, SerializesModels;
 
     private $order;
+    private $status;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Order $order)
+    public function __construct(Order $order, $status = null)
     {
         $this->order = $order;
+        $this->status = $status ?: $order->status;
 
         //Boot website localization for templates, if is not booted yet.
         Localization::boot();
@@ -39,12 +41,17 @@ class OrderStatus extends Mailable
      */
     public function build()
     {
-
-        return $this
+        $mail = $this
             ->markdown('admineshop::mail.order.status', [
                 'order' => $this->order,
             ])->subject(
                 sprintf(_('Zmena stavu objednávky č. %s na %s'), $this->order->number, $this->order->status->name)
             );
+
+        if ( $this->status && $this->status->email_invoice ){
+            $this->order->addInvoiceToStatusMail($mail);
+        }
+
+        return $mail;
     }
 }

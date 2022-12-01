@@ -58,7 +58,7 @@ trait HasStock
      */
     public function getHasStockAttribute()
     {
-        return $this->stock_quantity > 0;
+          return $this->stock_quantity > 0;
     }
 
     /*
@@ -66,7 +66,7 @@ trait HasStock
      */
     public function getCanOrderEverytimeAttribute()
     {
-        return $this->stock_type == 'everytime';
+        return $this->stock_type == 'everytime' ;
     }
 
     /**

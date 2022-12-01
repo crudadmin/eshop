@@ -75,9 +75,14 @@ class OrdersStatus extends AdminModel
             'Emailové notifikácie' => Group::tab([
                 Group::inline([
                     'email_send' => 'name:Odoslať email pri zmene stavu|column_name:Email|type:checkbox|default:0',
-                    'email_delivery' => 'name:Do zmeny stavu zahrnúť informácie o doprave|type:checkbox|default:0|removeFromFormIf:email_send,0',
                 ])->add('removeFromFormIf:default,1'),
-                'email_content' => 'name:Obsah emailu|type:editor|sub_component:ShowOrderStatusVariables',
+                Group::fields([
+                    'email_content' => 'name:Obsah emailu|type:editor|sub_component:ShowOrderStatusVariables',
+                    Group::inline([
+                        'email_delivery' => 'name:Do zmeny stavu zahrnúť informácie o doprave|type:checkbox|default:0',
+                        'email_invoice' => 'name:Zahrnúť doklad v emaile|type:checkbox|default:0',
+                    ]),
+                ])->id('emailSettings')->add('removeFromFormIf:email_send,0'),
             ])->icon('fa fa-envelope')->add('hidden')->id('notification')
         ];
     }

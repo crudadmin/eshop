@@ -445,18 +445,19 @@ class OrderService
      */
     public function sentStoreEmail()
     {
-        if ( !($email = Store::getSettings()->email) ) {
+        $order = $this->getOrder();
+
+        $emails = array_unique(array_filter(array_wrap($order->getStoreEmailReceivers())));
+        if ( count($emails) == 0 ){
             return;
         }
-
-        $order = $this->getOrder();
 
         $message = $order->getStoreEmailMessage();
 
         $items = $this->getCartItems();
 
         try {
-            Mail::to($email)->send(
+            Mail::to($emails)->send(
                 (new OrderReceived($order, $items, $message))->setOwner(true)
             );
         } catch (Exception $error){
