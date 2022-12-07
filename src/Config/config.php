@@ -56,6 +56,7 @@ return [
         'attributesText' => false, //display attributesText property in products
         'attributesVariants' => false, //set which attributes can define variants
         'hideOnFiltration' => true, //When filtrating fields, we want hide items which are not present in actual filter
+        'inParentAttributes' => [], //This attributes are stored only in parent product
         'separator' => [
             'item' => ', ',
             'attribute' => ', ',

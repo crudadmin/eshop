@@ -259,7 +259,7 @@ trait HasProductFilter
         }
 
         if ( $this->getFilterOption('$ignore.filter.attributes', false) == false ) {
-            $query->applyAttributesFilter($params, config('admineshop.attributes.inParentAttributes'));
+            $query->applyAttributesFilter($params, config('admineshop.attributes.inParentAttributes', []));
         }
 
         if ( $this->getFilterOption('$ignore.filter.prices', false) == false ) {
@@ -300,7 +300,7 @@ trait HasProductFilter
         $filter = $filter ?: $this->getFilterOption('filter', []);
 
         if ( $this->getFilterOption('$ignore.filter.attributes', false) == false ) {
-            $query->applyAttributesFilter($filter, [], config('admineshop.attributes.inParentAttributes'));
+            $query->applyAttributesFilter($filter, [], config('admineshop.attributes.inParentAttributes', []));
         }
 
         $query->applyCategoryFilter($filter);
