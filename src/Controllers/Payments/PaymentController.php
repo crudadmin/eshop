@@ -5,6 +5,7 @@ namespace AdminEshop\Controllers\Payments;
 use Admin;
 use AdminEshop\Contracts\Order\Exceptions\OrderException;
 use AdminEshop\Contracts\Payments\PaymentVerifier;
+use AdminEshop\Contracts\Payments\Paypal\PaypalWebhooks;
 use AdminEshop\Contracts\Payments\Stripe\StripeWebhooks;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\Payment;
@@ -55,12 +56,17 @@ class PaymentController extends Controller
 
     public function webhooks($type)
     {
-        if ( $type == 'stripe' ) {
-            $webhooks = new StripeWebhooks;
+        $hooks = [
+            'stripe' => StripeWebhooks::class,
+            'paypal' => PaypalWebhooks::class,
+        ];
 
-            $event = $webhooks->getWebhookEvent();
+        if ( array_key_exists($type, $hooks) ){
+            $webhook = new $hooks[$type];
 
-            $webhooks->onWebhookEvent(
+            $event = $webhook->getWebhookEvent();
+
+            return $webhook->onWebhookEvent(
                 $event
             );
         }
