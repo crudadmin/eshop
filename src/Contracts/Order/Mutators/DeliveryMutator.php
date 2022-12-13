@@ -92,9 +92,11 @@ class DeliveryMutator extends Mutator
             $delivery = $activeResponse['delivery'];
             $location = $activeResponse['delivery_location'] ?? null;
             $deliveryData = $activeResponse['delivery_data'] ?? null;
+            $hasManualPrice = ($provider = $delivery->getShippingProvider()) && is_null($provider->getShippingPrice()) == false;
 
             $order->fill([
                 'delivery_vat' => Store::getVatValueById($delivery->vat_id),
+                'delivery_manual' => $hasManualPrice,
                 'delivery_price' => $delivery->priceWithoutVat,
                 'delivery_price_vat' => $delivery->priceWithVat,
                 'delivery_id' => $delivery->getKey(),

@@ -68,6 +68,13 @@ class CountryMutator extends Mutator
     {
         $id = $id ?: $this->getDriver()->get(self::COUNTRY_KEY);
 
+        if ( !$id ){
+            $clientData = $this->getClientDataMutator()->getClientData();
+
+            $id = ($clientData['delivery_country_id'] ?? null)
+                    ?: ($clientData['country_id'] ?? null);
+        }
+
         if ( ! $id ){
             return;
         }

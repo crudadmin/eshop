@@ -125,6 +125,16 @@ class ShippingProvider extends OrderProvider
     }
 
     /**
+     * Modify custom shipping price
+     *
+     * @return  float
+     */
+    public function getShippingPrice()
+    {
+
+    }
+
+    /**
      * Returns selected pickup point
      */
     public function getPickupPoint()

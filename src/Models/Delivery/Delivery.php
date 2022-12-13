@@ -41,6 +41,16 @@ class Delivery extends AdminModel implements DiscountSupport
 
     protected $appends = ['thumbnail', 'priceWithoutVat', 'priceWithVat', 'clientPrice'];
 
+    protected $settings = [
+        'grid.default' => 'medium',
+        'title.insert' => 'Nová doprava',
+        'title.update' => ':name',
+    ];
+
+    protected $layouts = [
+        'form-top' => 'DeliveryGroups',
+    ];
+
     /*
      * Automatic form and database generation
      * @name - field name
@@ -120,16 +130,6 @@ class Delivery extends AdminModel implements DiscountSupport
             );
         }
     }
-
-    protected $settings = [
-        'grid.default' => 'medium',
-        'title.insert' => 'Nová doprava',
-        'title.update' => ':name',
-    ];
-
-    protected $layouts = [
-        'form-top' => 'DeliveryGroups',
-    ];
 
     /**
      * We need allow applying discoints in administration for this model all the time
@@ -238,5 +238,23 @@ class Delivery extends AdminModel implements DiscountSupport
     public function hasMultipleLocations()
     {
         return $this->multiple_locations ?: false;
+    }
+
+    /*
+     * Return pure default product price without all discounts and without TAX
+     */
+    public function getInitialPriceWithoutVatAttribute()
+    {
+        $price = $this->getAttribute('price');
+
+        //Ability to calculate custom shipping price
+        if ( ($provider = $this->getShippingProvider()) && is_null($providerPrice = $provider->getShippingPrice()) == false ){
+            $price = $providerPrice;
+        }
+
+        return Store::calculateFromDefaultCurrency(
+            $price,
+            $this->getAttribute('currency_id'),
+        );
     }
 }

@@ -105,9 +105,21 @@ class ClientDataMutator extends Mutator
      *
      * @return  this
      */
-    public function getClientData()
+    public function getClientData($key = null, $default = null)
     {
-        return $this->getDriver()->get(self::CLIENT_KEY, null);
+        $data = $this->getDriver()->get(self::CLIENT_KEY, null);
+
+        if ( is_null($key) === false ){
+            $value = $data[$key] ?? null;
+
+            if ( is_null($value) ){
+                return $default;
+            }
+
+            return $value;
+        }
+
+        return $data;
     }
 }
 
