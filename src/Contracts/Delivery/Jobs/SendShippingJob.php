@@ -59,6 +59,10 @@ class SendShippingJob implements ShouldQueue
             $order->delivery_status = 'ok';
             $order->delivery_identifier = $package->shippingId();
 
+            if ( config('admineshop.delivery.labels') && $label = $package->getLabel() ){
+                $order->delivery_label = $this->saveLabel($order, $label);
+            }
+
             if ( $package->getMessage() ) {
                 $order->logReport('info', 'delivery-info', $package->getMessage());
             }
@@ -81,5 +85,18 @@ class SendShippingJob implements ShouldQueue
         }
 
         $order->save();
+    }
+
+    private function saveLabel($order, $label)
+    {
+        $number = $order->delivery_identifier ?: str_random(10);
+
+        $filename = 'label_'.str_random(3).'_'.$number.'.'.$label['extension'];
+
+        $path = $order->getStorageFilePath('delivery_label', $filename);
+
+        $order->getFieldStorage('delivery_label')->put($path, $label['data']);
+
+        return $filename;
     }
 }

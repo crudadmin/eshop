@@ -7,6 +7,7 @@ use AdminEshop\Models\Delivery\Delivery;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
 use OrderService;
+use Cart;
 use Admin;
 
 class ShippingProvider extends OrderProvider
@@ -53,16 +54,46 @@ class ShippingProvider extends OrderProvider
     {
         $options = $this->getOptions();
 
-        //Calculate custom order weight
-        if ( ($order = $this->getOrder()) && method_exists($order, 'getPackageWeight') ){
-            $weight = $order->getPackageWeight($this, $options);
+        $order = $this->getOrder();
 
-            if ( is_null($weight) === false ) {
-                return $weight;
-            };
+        //Calculate custom order weight
+        if ( $order ){
+            //Custom order calc
+            if ( method_exists($order, 'getPackageWeight') ) {
+                $weight = $order->getPackageWeight($this, $options);
+
+                if ( is_null($weight) === false ) {
+                    return $weight;
+                };
+            }
+
+            $itemsToWeightCalc = $order->items;
+        } else {
+            $itemsToWeightCalc = Cart::all();
         }
 
+        $cartWeight = $this->calculateWeightFromItems($itemsToWeightCalc);
+        if ( is_null($cartWeight) == false ){
+            return $cartWeight;
+        }
+
+        //Default weight
         return ($options['weight'] ?? $options['default_weight'] ?? null);
+    }
+
+    private function calculateWeightFromItems($items)
+    {
+        //Calculate weight by cart items
+        $cartItemsWithWeight = Cart::all()->filter(function($item){
+            return is_null($item->getItemModel()?->weight) == false;
+        });
+        if ( $cartItemsWithWeight->count() ){
+            $calculatedWeight = $cartItemsWithWeight->map(function($item){
+                return ($item->getItemModel()?->weight ?: 0) * $item->quantity;
+            })->sum();
+
+            return $calculatedWeight;
+        }
     }
 
     public function isCashDelivery()

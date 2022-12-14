@@ -96,6 +96,7 @@ return [
      */
     'delivery' => [
         'enabled' => true,
+        'labels' => false,
         //Multiple locations for one delivery method
         'multiple_locations' => [
             'enabled' => false,

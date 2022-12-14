@@ -10,6 +10,8 @@ class ShippingResponse
 
     protected $message;
 
+    protected $label;
+
     public function __construct($shippingId, string $message = null, $data = [])
     {
         $this->shippingId = $shippingId;
@@ -30,5 +32,18 @@ class ShippingResponse
     public function getData()
     {
         return $this->data;
+    }
+
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    public function setLabel($data, $extension = 'pdf')
+    {
+        $this->label = [
+            'data' => $data,
+            'extension' => $extension,
+        ];
     }
 }

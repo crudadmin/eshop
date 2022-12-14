@@ -118,7 +118,10 @@ trait HasOrderFields
                 , [
                     'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
                     'delivery_identifier' => 'name:Identifikačné číslo balíka|hidden',
-                ]
+                ],
+                config('admineshop.delivery.labels')
+                    ? [ 'delivery_label' => 'name:Štítok|type:file|extensions:jpg,pdf,png' ]
+                    : []
             ))->inline(),
         ])->id('additional')->name('Nastavenia objednávky');
     }
