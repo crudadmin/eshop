@@ -217,14 +217,7 @@ class Cart
             'summaryTotal' => $items->getSummary($fullCartResponse),
         ];
 
-        $response = OrderService::getMutatedResponses(
-            $response,
-            array_filter([
-                'mutateCartResponse',
-                $fullCartResponse == true ? 'mutateFullCartResponse' : null
-            ]),
-            $mutators
-        );
+        $response = OrderService::getMutatedResponses($response, $fullCartResponse, $mutators);
 
         return $response;
     }

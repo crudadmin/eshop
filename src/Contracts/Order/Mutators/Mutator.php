@@ -34,6 +34,13 @@ class Mutator implements ActiveInterface
     protected $cartItems = [];
 
     /**
+     * Force to return data in default/base cart response
+     *
+     * @var  bool
+     */
+    static $forceCartResponse = [];
+
+    /**
      * Returns if mutators is active
      * And sends state to other methods
      *
@@ -153,6 +160,14 @@ class Mutator implements ActiveInterface
         $this->setCartItems($cartItems);
 
         return $this;
+    }
+
+    /**
+     * Enable force cart response
+     */
+    public static function setForceCartResponse()
+    {
+        static::$forceCartResponse[] = static::class;
     }
 }
 

@@ -116,7 +116,7 @@ trait HasMutators
         });
     }
 
-    public function getMutatedResponses($response, $methods = [], $mutators = null)
+    public function getMutatedResponses($response, $fullCartResponse, $mutators = null)
     {
         $mutators = is_null($mutators) ? $this->getMutators() : $mutators;
 
@@ -125,6 +125,13 @@ trait HasMutators
             if ( is_string($mutator) ){
                 $mutator = (new $mutator)->bootMutator();
             }
+
+            $hasForceFullCartResponse = in_array(get_class($mutator), $mutator::$forceCartResponse);
+
+            $methods = array_filter([
+                'mutateCartResponse',
+                $fullCartResponse == true || $hasForceFullCartResponse ? 'mutateFullCartResponse' : null
+            ]);
 
             foreach ($methods as $method) {
                 //Mutate basic response
