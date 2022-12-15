@@ -213,6 +213,7 @@ trait OrderTrait
     {
         $element = 'span';
         $color = '';
+        $label = '';
         $icon = '';
         $tooltip = '';
 
@@ -239,13 +240,22 @@ trait OrderTrait
             $href = $trackingUrl;
         }
 
+        if ( $this->delivery_label ) {
+            $label = '<a href="'.$this->delivery_label->url.'" target="_blank" style="margin-right: 7px; color: inherit">
+                <i class="fa fa-file-pdf"></i>
+            </a>';
+        }
+
         if ( $message ) {
             return '
-            <'.$element.' href="'.$trackingUrl.'" style="'.($color ? ('color: '.$color) : '' ).'" target="_blank">
-                <span data-toggle="tooltip" title="'.e($tooltip).'">
-                    '.$icon.e($message).'
-                </span>
-            </'.$element.'>';
+            <div style="'.($color ? ('color: '.$color) : '' ).'">
+                '.$label.'
+                <'.$element.' href="'.$trackingUrl.'" style="color: inherit" target="_blank">
+                    <span data-toggle="tooltip" title="'.e($tooltip).'">
+                        '.$icon.e($message).'
+                    </span>
+                </'.$element.'>
+            </div>';
         }
     }
 

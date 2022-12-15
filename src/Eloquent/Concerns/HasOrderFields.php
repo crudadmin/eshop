@@ -120,7 +120,7 @@ trait HasOrderFields
                     'delivery_identifier' => 'name:Identifikačné číslo balíka|hidden',
                 ],
                 config('admineshop.delivery.labels')
-                    ? [ 'delivery_label' => 'name:Štítok|type:file|extensions:jpg,pdf,png' ]
+                    ? [ 'delivery_label' => 'name:Štítok|type:file|extensions:jpg,pdf,png|hidden' ]
                     : []
             ))->inline(),
         ])->id('additional')->name('Nastavenia objednávky');

@@ -11,6 +11,8 @@ use AdminEshop\Contracts\Delivery\ShippingResponse;
 use Carbon\Carbon;
 use Facades\AdminEshop\Contracts\Delivery\DPD\DPDApi;
 use Illuminate\Support\Collection;
+use Exception;
+use Log;
 
 /**
  * Class Api.
@@ -272,11 +274,18 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
                 throw new CreatePackageException($package['ackCode'].' - '.$message);
             }
 
-            return new ShippingResponse(
+            $shippment = new ShippingResponse(
                 $package['mpsid'],
                 $message,
                 $package
             );
+
+            //Fetch shipping label
+            if ( $label = $this->tryFetchLabel($response) ){
+                $shippment->setLabel($label);
+            }
+
+            return $shippment;
         }
 
         $message = null;
@@ -288,6 +297,19 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
         }
 
         throw new CreatePackageException($message, $response);
+    }
+
+    private function tryFetchLabel($response)
+    {
+        try {
+            if ( !($url = ($response['result']['result'][0]['label'] ?? null)) ){
+                return;
+            }
+
+            return file_get_contents($url);
+        } catch (Exception $e){
+            Log::error($e);
+        }
     }
 
     public function importLocations()
