@@ -9,8 +9,10 @@ use AdminEshop\Contracts\Delivery\ShippingProvider;
 use AdminEshop\Contracts\Delivery\ShippingResponse;
 use Admin\Helpers\Button;
 use Carbon\Carbon;
+use Exception;
 use SoapClient;
 use SoapFault;
+use Log;
 
 /**
  * Class Api.
@@ -138,7 +140,13 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
 
             $packet = $gw->createPacket($apiPassword, $data);
 
-            return new ShippingResponse($packet->id);
+            $shippment = new ShippingResponse($packet->id);
+
+            if ( $this->hasLabels() && $label = $this->tryFetchLabel($gw, $packet, $apiPassword) ){
+                $shippment->setLabel($label);
+            }
+
+            return $shippment;
         }
 
         catch(SoapFault $error) {
@@ -161,6 +169,14 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
         }
     }
 
+    private function tryFetchLabel($gw, $packet, $apiPassword)
+    {
+        try {
+            return $gw->packetLabelPdf($apiPassword, $packet->id, 'A6 on A6', 0);
+        } catch (Exception $e){
+            Log::error($e);
+        }
+    }
     /**
      * On shipping send button question action
      *

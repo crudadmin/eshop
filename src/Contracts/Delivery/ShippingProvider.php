@@ -45,6 +45,14 @@ class ShippingProvider extends OrderProvider
         return false;
     }
 
+    /*
+     * Determine if shipping has labels
+     */
+    public function hasLabels()
+    {
+        return config('admineshop.delivery.labels', false);
+    }
+
     public static function export(Collection $orders)
     {
         // return 'string';

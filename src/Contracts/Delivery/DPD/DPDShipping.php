@@ -281,7 +281,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
             );
 
             //Fetch shipping label
-            if ( $label = $this->tryFetchLabel($response) ){
+            if ( $this->hasLabels() && $label = $this->tryFetchLabel($response) ){
                 $shippment->setLabel($label);
             }
 
