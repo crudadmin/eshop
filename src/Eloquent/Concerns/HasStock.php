@@ -212,7 +212,7 @@ trait HasStock
 
         $uncastedStockQuantity = $this->attributes['stock_quantity'] ?? 0;
 
-        //Stock can be onli positive
+        //Stock can be only positive
         $newStockQuantity = max(0, $uncastedStockQuantity + $sub);
 
         $this->stock_quantity = $newStockQuantity;
@@ -220,8 +220,7 @@ trait HasStock
 
         $stockLog = ProductsStocksLog::create([
             'order_id' => $orderId,
-            //TODO: check correct variant ID is pushed here
-            'product_id' => $this instanceof Product ? $this->getKey() : $this->product_id,
+            'product_id' => $this->getKey(),
             'sub' => $sub,
             'stock' => $newStockQuantity,
             'message' => $message,
