@@ -391,73 +391,71 @@ trait HasImporter
 
         $relations = $this->getFieldKeysRelationer($fieldKey);
 
-        $chunksToDelete = array_chunk($allIdentifiers, 10000);
-
         $toDelete = [];
 
-        foreach ($chunksToDelete as $chunkedIdentifiers) {
-            $rows = DB::table($model->getTable())
-                ->selectRaw($model->getKeyName().', '.$selectFieldKeyColumn)
-                ->when(count($relations), function($query) use ($relations, $model, $chunkedIdentifiers, $fieldKey) {
-                    $query->where(function($query) use ($relations, $model, $chunkedIdentifiers, $fieldKey) {
-                        $i = 0;
-                        foreach ($relations as $column => $table) {
-                            $existingRows = $this->getRowsForIdentifiersChunk(
-                                $this->getExistingRows($table),
-                                $fieldKey,
-                                $column,
-                                $chunkedIdentifiers
-                            );
+        $chunkedIdentifiers = $allIdentifiers;
 
-                            $preparedRows = $this->preparedRows[$table] ?: [];
+        $rows = DB::table($model->getTable())
+            ->selectRaw($model->getKeyName().', '.$selectFieldKeyColumn)
+            ->when(count($relations), function($query) use ($relations, $model, $chunkedIdentifiers, $fieldKey) {
+                $query->where(function($query) use ($relations, $model, $chunkedIdentifiers, $fieldKey) {
+                    $i = 0;
+                    foreach ($relations as $column => $table) {
+                        $existingRows = $this->getRowsForIdentifiersChunk(
+                            $this->getExistingRows($table),
+                            $fieldKey,
+                            $column,
+                            $chunkedIdentifiers
+                        );
 
-                            //If relation is loaded, we can check if some rows has disabled deletion of this actual relation.
-                            if ( count($preparedRows) ) {
-                                foreach ($existingRows as $key => $row) {
-                                    //Disable globally relations deletion for given relation row
-                                    if ( ($preparedRows[$key]['$relations']['delete'] ?? null) === false ){
-                                        unset($existingRows[$key]);
-                                    }
+                        $preparedRows = $this->preparedRows[$table] ?: [];
 
-                                    //Specific table deletion
-                                    //For example we have product gallery, and you can set for products, that gallery won't be removed.
-                                    //[ '$relation' => ['products_galleries' => ['delete' => false]] ]
-                                    if ( ($preparedRows[$key]['$relations'][$model->getTable()]['delete'] ?? null) === false ){
-                                        unset($existingRows[$key]);
-                                    }
+                        //If relation is loaded, we can check if some rows has disabled deletion of this actual relation.
+                        if ( count($preparedRows) ) {
+                            foreach ($existingRows as $key => $row) {
+                                //Disable globally relations deletion for given relation row
+                                if ( ($preparedRows[$key]['$relations']['delete'] ?? null) === false ){
+                                    unset($existingRows[$key]);
+                                }
+
+                                //Specific table deletion
+                                //For example we have product gallery, and you can set for products, that gallery won't be removed.
+                                //[ '$relation' => ['products_galleries' => ['delete' => false]] ]
+                                if ( ($preparedRows[$key]['$relations'][$model->getTable()]['delete'] ?? null) === false ){
+                                    unset($existingRows[$key]);
                                 }
                             }
-
-                            $query->{ $i == 0 ? 'whereIn' : 'orWhereIn' }($column, array_values($existingRows));
-
-                            $i++;
                         }
-                    });
-                })
-                //Only not deleted rows already
-                ->when($this->hasSoftDeletes($model), function($query){
-                    $query->whereNull('deleted_at');
-                })
-                //Only published rows
-                ->when($this->isPublishable($model), function($query){
-                    $query->whereNotNull('published_at');
-                })
-                //Select only keys not present in given identifiers list. NULL values are skipped and wont be selected.
-                ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $chunkedIdentifiers) {
-                    if ( count($chunkedIdentifiers) ) {
-                        $query->whereNotIn($fieldKey, $chunkedIdentifiers);
-                    }
-                })
-                //We can use where in clause with conat support, but this is slow. Faster is to load all data...
-                ->when($this->isMultiKey($fieldKey) && count($chunkedIdentifiers), function($query) use ($fieldKey, $chunkedIdentifiers) {
-                    $query->havingRaw('_identifier not in (? '.str_repeat(', ?', count($chunkedIdentifiers) - 1).')', $chunkedIdentifiers);
-                })
-                ->pluck($this->getIdentifierName($fieldKey), $model->getKeyName())
-                ->toArray();
 
-            //We need sum arrays to keep key id. So we can not use array_merge
-            $toDelete = $toDelete + $rows;
-        }
+                        $query->{ $i == 0 ? 'whereIn' : 'orWhereIn' }($column, array_values($existingRows));
+
+                        $i++;
+                    }
+                });
+            })
+            //Only not deleted rows already
+            ->when($this->hasSoftDeletes($model), function($query){
+                $query->whereNull('deleted_at');
+            })
+            //Only published rows
+            ->when($this->isPublishable($model), function($query){
+                $query->whereNotNull('published_at');
+            })
+            //Select only keys not present in given identifiers list. NULL values are skipped and wont be selected.
+            ->when($this->isMultiKey($fieldKey) == false, function($query) use ($fieldKey, $chunkedIdentifiers) {
+                if ( count($chunkedIdentifiers) ) {
+                    $query->whereNotIn($fieldKey, $chunkedIdentifiers);
+                }
+            })
+            //We can use where in clause with conat support, but this is slow. Faster is to load all data...
+            ->when($this->isMultiKey($fieldKey) && count($chunkedIdentifiers), function($query) use ($fieldKey, $chunkedIdentifiers) {
+                $query->havingRaw('_identifier not in (? '.str_repeat(', ?', count($chunkedIdentifiers) - 1).')', $chunkedIdentifiers);
+            })
+            ->pluck($this->getIdentifierName($fieldKey), $model->getKeyName())
+            ->toArray();
+
+        //We need sum arrays to keep key id. So we can not use array_merge
+        $toDelete = $toDelete + $rows;
 
         return $toDelete;
     }

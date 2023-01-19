@@ -33,9 +33,15 @@ class FromXlsToArray
         $reader = $this->getReader();
         $reader->setReadDataOnly(true);
 
-        $spreadsheet = $reader->loadSpreadsheetFromString(
-            $this->file->get()
-        );
+        if ( method_exists($reader, 'loadSpreadsheetFromString') ) {
+            $spreadsheet = $reader->loadSpreadsheetFromString(
+                $this->file->get()
+            );
+        } else {
+            $spreadsheet = $reader->load(
+                $this->file->basepath
+            );
+        }
 
         $worksheet = $spreadsheet->getActiveSheet();
 
