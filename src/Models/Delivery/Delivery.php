@@ -247,8 +247,10 @@ class Delivery extends AdminModel implements DiscountSupport
     {
         $price = $this->getAttribute('price');
 
+        $provider = $this->getShippingProvider();
+
         //Ability to calculate custom shipping price
-        if ( ($provider = $this->getShippingProvider()) && is_null($providerPrice = $provider->getShippingPrice()) == false ){
+        if ( $provider && is_null($providerPrice = $provider->getShippingPrice()) == false ){
             $price = $providerPrice;
         }
 

@@ -65,7 +65,7 @@ class ShippingProvider extends OrderProvider
         $order = $this->getOrder();
 
         //Calculate custom order weight
-        if ( $order ){
+        if ( $order && $order->exists ){
             //Custom order calc
             if ( method_exists($order, 'getPackageWeight') ) {
                 $weight = $order->getPackageWeight($this, $options);
@@ -92,7 +92,7 @@ class ShippingProvider extends OrderProvider
     private function calculateWeightFromItems($items)
     {
         //Calculate weight by cart items
-        $cartItemsWithWeight = Cart::all()->filter(function($item){
+        $cartItemsWithWeight = $items->filter(function($item){
             return is_null($item->getItemModel()?->weight) == false;
         });
         if ( $cartItemsWithWeight->count() ){
