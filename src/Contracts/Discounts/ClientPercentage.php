@@ -59,7 +59,7 @@ class ClientPercentage extends Discount implements Discountable
         $this->value = $discount;
     }
 
-    protected function getActiveDiscount($price = null)
+    protected function getActiveDiscount()
     {
         if ( !$this->getClient() ) {
             return 0;

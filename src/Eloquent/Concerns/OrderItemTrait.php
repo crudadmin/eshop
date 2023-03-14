@@ -18,7 +18,7 @@ trait OrderItemTrait
     {
         $productModel = Admin::getModel('Product');
 
-        $products = $productModel->selectRaw('
+        $productsQuery = $productModel->selectRaw('
                 products.product_type,
                 products.id, products.name, products.price,
                 products.vat_id, products.discount_operator, products.discount,
@@ -30,13 +30,19 @@ trait OrderItemTrait
                 })->orWhere(function($query){
                     $query->nonVariantProducts();
                 });
-            })
+            });
+
+        $products = $productsQuery
             ->leftJoin('products as parentProduct', function($join){
                 $join->on('parentProduct.id', '=', 'products.product_id');
             })
-            ->with(['attributesItems' => function($query){
-                $query->withTextAttributes();
-            }])
+            ->when($productsQuery->count() < 1000, function($query){
+                $query->with([
+                    'attributesItems' => function($query){
+                        $query->withTextAttributes();
+                    }
+                ]);
+           })
             ->get();
 
         return $products->map(function($product) use ($productModel) {
