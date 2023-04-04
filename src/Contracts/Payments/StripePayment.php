@@ -8,6 +8,7 @@ use AdminEshop\Contracts\Payments\PaymentHelper;
 use Exception;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\StripeClient;
+use Store;
 
 class StripePayment extends PaymentHelper
 {
@@ -28,7 +29,7 @@ class StripePayment extends PaymentHelper
         );
     }
 
-    public function getPaymentResponse()
+    protected function getPaymentObject()
     {
         $order = $this->getOrder();
 
@@ -37,7 +38,7 @@ class StripePayment extends PaymentHelper
             'line_items' => [
                 [
                     'price_data' => [
-                        'currency' => 'eur',
+                        'currency' => Store::getCurrency()->code,
                         'unit_amount' => round($order->price_vat * 100),
                         'product_data' => [
                             'name' => 'Order n. '.$order->number,
@@ -62,6 +63,13 @@ class StripePayment extends PaymentHelper
         if ( $types = $this->getOption('payment_method_types') ){
             $data['payment_method_types'] = array_wrap($types);
         }
+
+        return $data;
+    }
+
+    public function getPaymentResponse()
+    {
+        $data = $this->getPaymentObject();
 
         try {
             $session = $this->client->checkout->sessions->create($data);
