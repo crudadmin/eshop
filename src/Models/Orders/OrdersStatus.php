@@ -4,9 +4,10 @@ namespace AdminEshop\Models\Orders;
 
 use AdminEshop\Admin\Buttons\SendTestingOrderStatus;
 use AdminEshop\Admin\Rules\SetDefaultOrderStatus;
-use AdminEshop\Models\Store\Store;
+use AdminEshop\Models\Store\Store as StoreModel;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store;
 
 class OrdersStatus extends AdminModel
 {
@@ -32,7 +33,7 @@ class OrdersStatus extends AdminModel
      * Model Parent
      * Eg. Articles::class,
      */
-    protected $belongsToModel = Store::class;
+    protected $belongsToModel = StoreModel::class;
 
     protected $publishable = false;
 
@@ -65,7 +66,7 @@ class OrdersStatus extends AdminModel
     public function fields()
     {
         return [
-            'name' => 'name:Názov|required',
+            'name' => 'name:Názov|required|'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'color' => 'name:Farba objednávky|type:color',
             Group::inline([
                 'default' => 'name:Predvolený stav|type:checkbox|default:0|title:Po vytvorení budú objednávky v tomto stave',
@@ -77,9 +78,9 @@ class OrdersStatus extends AdminModel
                     'email_send' => 'name:Odoslať email pri zmene stavu|column_name:Email|type:checkbox|default:0',
                 ])->add('removeFromFormIf:default,1'),
                 Group::fields([
-                    'email_content' => 'name:Obsah emailu|type:editor|sub_component:ShowOrderStatusVariables',
+                    'email_content' => 'name:Obsah emailu|type:editor|sub_component:ShowOrderStatusVariables|'.(Store::isEnabledLocalization() ? '|locale' : ''),
                     Group::inline([
-                        'email_delivery' => 'name:Do zmeny stavu zahrnúť informácie o doprave|type:checkbox|default:0',
+                        'email_delivery' => 'name:Do zmeny stavu zahrnúť informácie o doprave|type:checkbox|title:Informatívny text sa definuje pri konkretnej doprave.|default:0',
                         'email_invoice' => 'name:Zahrnúť doklad v emaile|type:checkbox|default:0',
                     ]),
                 ])->id('emailSettings')->add('removeFromFormIf:email_send,0'),

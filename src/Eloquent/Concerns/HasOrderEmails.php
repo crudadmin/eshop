@@ -52,8 +52,8 @@ trait HasOrderEmails
             return array_search($invoice->type, $sortBy);
         })->first();
 
-        $mail->attach($invoice->getPdf()->basepath, [
-            'as' => sprintf(_('objednavka-%s'), $invoice->number).'.pdf',
-        ]);
+        $filename = sprintf(_('objednavka-%s'), $invoice->number).'.pdf';
+
+        $mail->attachData($invoice->getPdf()->get(), $filename);
     }
 }

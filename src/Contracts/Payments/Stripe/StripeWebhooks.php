@@ -24,6 +24,10 @@ class StripeWebhooks
         $payload = @file_get_contents('php://input');
         $event = null;
 
+        if ( !$payload ){
+            abort(501, 'No payload received.');
+        }
+
         try {
             $event = \Stripe\Event::constructFrom(json_decode($payload, true));
         } catch(\UnexpectedValueException $e) {

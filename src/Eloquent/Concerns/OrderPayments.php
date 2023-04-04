@@ -3,6 +3,7 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Mail\OrderPaid;
+use AdminEshop\Models\Invoice\Invoice;
 use Exception;
 use Illuminate\Support\Facades\Mail;
 use Log;
@@ -77,13 +78,17 @@ trait OrderPayments
     {
         try {
             //Generate invoice
-            $invoice = $invoice ?: $this->makeInvoice($type);
+            $invoice = OrderService::hasInvoices()
+                            ? ($invoice ?: $this->makeInvoice($type))
+                            : null;
 
             Mail::to($this->email)->send(
                 new OrderPaid($this, $invoice)
             );
 
-            $invoice->setNotified();
+            if ( $invoice instanceof Invoice ) {
+                $invoice->setNotified();
+            }
         } catch (Exception $e){
             Log::channel('store')->error($e);
 

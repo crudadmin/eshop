@@ -16,7 +16,7 @@ class StripePayment extends PaymentHelper
     public function __construct($options = null)
     {
         parent::__construct(
-            array_merge($options ?: [], config('stripe'))
+            array_merge($options ?: [], config('stripe', []))
         );
 
         if ( !$this->getOption('api_key') ) {
@@ -38,14 +38,14 @@ class StripePayment extends PaymentHelper
                 [
                     'price_data' => [
                         'currency' => 'eur',
+                        'unit_amount' => round($order->price_vat * 100),
                         'product_data' => [
                             'name' => 'Order n. '.$order->number,
+                            'description' => $order->items->map(function($item){
+                                return $item->quantity.'x - '.$item->getProductName();
+                            })->join('... '),
                         ],
-                        'unit_amount' => round($order->price_vat * 100),
                     ],
-                    'description' => $order->items->map(function($item){
-                        return $item->quantity.'x - '.$item->getProductName();
-                    })->join('... '),
                     'quantity' => 1,
                 ],
             ],
