@@ -27,7 +27,9 @@ class ListingController extends Controller
         //TODO: return also subcategories. Only we have created support for base level of categories
         $categories = Admin::getModel('Category')
                         ->whereNull('category_id')
-                        ->withListingResponse($options)
+                        ->withListingResponse($options + [
+                            'onlyFilter' => true,
+                        ])
                         ->get()
                         ->each->setListingResponse();
 

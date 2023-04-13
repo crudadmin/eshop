@@ -35,6 +35,17 @@ trait HasProductResponses
         'cart.variants.attributes' => false,
     ];
 
+    public function scopeOnlyFiltrable($query, $callback, $prefix = null)
+    {
+        if ( $this->getFilterOption($prefix.'onlyFilter') == true ){
+            return;
+        }
+
+        $callback($query);
+
+        return $this;
+    }
+
     public function scopeSetFilterOptions($query, $options, $prefix = null)
     {
         if ( $prefix ){
@@ -338,60 +349,62 @@ trait HasProductResponses
 
     public function scopeWithProductModules($query, $prefix = null, $variants = false)
     {
-        $prefix = $prefix ? $prefix.'.' : '';
+        $query->onlyFiltrable(function($query) use ($prefix, $variants) {
+            $prefix = $prefix ? $prefix.'.' : '';
 
-        $query->withMainGalleryImage($variants ? true : false);
+            $query->withMainGalleryImage($variants ? true : false);
 
-        if ( $this->getFilterOption($prefix.'price_ranges', false) === true ) {
-            $query->withMinAndMaxVariantPrices();
-        }
+            if ( $this->getFilterOption($prefix.'price_ranges', false) === true ) {
+                $query->withMinAndMaxVariantPrices();
+            }
 
-        $query->withPriceLevelsColumns();
+            $query->withPriceLevelsColumns();
 
-        if (
-            $variants === false
-            && $this->getFilterOption($prefix.'variants.extract', false) === false
-            && $this->getFilterOption($prefix.'variants', true) === true
-            && count(Store::variantsProductTypes())
-        ){
-            $query->extendWith(['variants' => function($query) use ($prefix) {
-                $query
-                    ->select('products.*')
-                    ->cloneModelFilter($this)
-                    ->withParentProductData()
-                    ->filterVariantProduct()
-                    ->withBlockedStock();
+            if (
+                $variants === false
+                && $this->getFilterOption($prefix.'variants.extract', false) === false
+                && $this->getFilterOption($prefix.'variants', true) === true
+                && count(Store::variantsProductTypes())
+            ){
+                $query->extendWith(['variants' => function($query) use ($prefix) {
+                    $query
+                        ->select('products.*')
+                        ->cloneModelFilter($this)
+                        ->withParentProductData()
+                        ->filterVariantProduct()
+                        ->withBlockedStock();
 
-                //We can deside if filter should be applied also on selected variants
-                if ( $this->getFilterOption($prefix.'variants.filter', false) ) {
-                    $query->filterProduct(
-                        $this->getFilterOption('filter')
-                    );
-                }
-
-                $query->withProductModules($prefix.'variants', true);
-            }]);
-        }
-
-        if ( $attributesScope = $this->getFilterOption($prefix.'attributes', false) ) {
-            $query->with([
-                'attributesItems' => function($query) use ($attributesScope) {
-                    $query->withResponse($this->getFilterPrefix());
-
-                    if ( is_callable($attributesScope) ){
-                        $attributesScope($query);
+                    //We can deside if filter should be applied also on selected variants
+                    if ( $this->getFilterOption($prefix.'variants.filter', false) ) {
+                        $query->filterProduct(
+                            $this->getFilterOption('filter')
+                        );
                     }
 
-                    $query->with(['attribute' => function($query){
-                        $query->select($query->getModel()->getAttributesColumns());
-                    }]);
-                }
-            ]);
-        }
+                    $query->withProductModules($prefix.'variants', true);
+                }]);
+            }
 
-        if ( $this->getFilterOption($prefix.'gallery', false) === true ) {
-            $query->with(['gallery']);
-        }
+            if ( $attributesScope = $this->getFilterOption($prefix.'attributes', false) ) {
+                $query->with([
+                    'attributesItems' => function($query) use ($attributesScope) {
+                        $query->withResponse($this->getFilterPrefix());
+
+                        if ( is_callable($attributesScope) ){
+                            $attributesScope($query);
+                        }
+
+                        $query->with(['attribute' => function($query){
+                            $query->select($query->getModel()->getAttributesColumns());
+                        }]);
+                    }
+                ]);
+            }
+
+            if ( $this->getFilterOption($prefix.'gallery', false) === true ) {
+                $query->with(['gallery']);
+            }
+        }, $prefix);
     }
 
     public function scopeWithCartResponse($query, $variant = false)
