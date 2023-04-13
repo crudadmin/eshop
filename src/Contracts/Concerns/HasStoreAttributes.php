@@ -53,7 +53,7 @@ trait HasStoreAttributes
                                             $query->filterAttributeItems($itemIds);
                                         }
 
-                                        $this->withProductItems($query, $options);
+                                        $this->filterByItemsProduct($query, $options);
                                     });
 
                                 }
@@ -86,7 +86,7 @@ trait HasStoreAttributes
                     ->whereIn('attribute_id', $filtrableAttributes)
                     ->withListingItems()
                     ->whereHas('products', function($query) use ($options) {
-                        $this->withProductItems($query, $options);
+                        $this->filterByItemsProduct($query, $options);
                     })
                     ->get();
             }
@@ -103,7 +103,7 @@ trait HasStoreAttributes
         });
     }
 
-    private function withProductItems($query, $options)
+    private function filterByItemsProduct($query, $options)
     {
         $query->setFilterOptions(array_merge($options ?: [], [
             '$ignore.filter.attributes' => true,

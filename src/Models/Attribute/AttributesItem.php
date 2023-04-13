@@ -179,4 +179,16 @@ class AttributesItem extends AdminModel
     {
         $query->select($this->getAttributesItemsColumns());
     }
+
+    public function scopeFilterByProducts($query, $options = [])
+    {
+        $query->whereHas('products', function($query) use ($options) {
+            $query->setFilterOptions(array_merge($options ?: [], [
+                '$ignore.filter.attributes' => true,
+                'variants.extract' => true,
+            ]));
+
+            $query->applyQueryFilter();
+        });
+    }
 }
