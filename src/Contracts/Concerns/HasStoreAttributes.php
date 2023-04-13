@@ -63,17 +63,19 @@ trait HasStoreAttributes
                     ->withListingItems()
                     ->whereIn('attribute_id', array_keys($filter))
                     //Only filtrated fields
-                    ->where(function($query) use ($filter) {
+                    ->where(function($query) use ($filter, $options) {
                         foreach ($filter as $attributeId => $itemIds) {
-                            $query->orWhere(function($query) use ($filter, $attributeId) {
+                            $query->orWhere(function($query) use ($filter, $attributeId, $options) {
                                 $query
                                     ->where('attribute_id', $attributeId)
-                                    ->whereHas('products', function($query) use ($filter, $attributeId) {
+                                    ->whereHas('products', function($query) use ($filter, $attributeId, $options) {
                                         unset($filter[$attributeId]);
 
                                         foreach ($filter as $subAttributeId => $itemIds) {
                                             $query->filterAttributeItems($itemIds);
                                         }
+
+                                        $this->filterByItemsProduct($query, $options);
                                     });
                             });
                         }
