@@ -103,24 +103,6 @@ class Attribute extends AdminModel
         }
     }
 
-    public function scopeWithItemsForProducts($query, $options)
-    {
-        $query->with([
-            'items' => function($query) use ($options) {
-                $query->withListingItems($options);
-            }
-        ]);
-    }
-
-    public function loadItemsForProducts($options)
-    {
-        $this->load([
-            'items' => function($query) use ($options){
-                $query->withListingItems($options);
-            }
-        ]);
-    }
-
     /**
      * This columns will be loaded into list of attributes in category response
      *

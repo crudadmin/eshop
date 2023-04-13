@@ -17,39 +17,115 @@ trait HasStoreAttributes
 
     public function getAttributes()
     {
-        return $this->cache('store.attributes', function(){
+        $attributes = $this->cache('store.attributes', function(){
             $model = Admin::getModel('Attribute');
 
-            return $model
+             return $model
                         ->select($model->getAttributesColumns())
-                        ->when($this->attributesOptions, function($query) {
-                            $query->withItemsForProducts($this->attributesOptions);
-                        })
                         ->get()
-                        ->each(function($attribute){
-                            if ( $attribute->relationLoaded('items') == false ){
-                                $attribute->loadItemsForProducts($this->attributesOptions);
-                            }
-
-                            //Skip reordeing, already ordered from database
-                            if ( $attribute->sortby == 'order' ){
-                                return;
-                            }
-
-                            $isDescSort = in_array($attribute->sortby, ['desc']);
-
-                            $itemsSorted = $attribute->items->{ $isDescSort ? 'sortByDesc' : 'sortBy' }(function($a, $b) use ($attribute) {
-                                if ( in_array($attribute->sortby, ['asc', 'desc']) ){
-                                    return $a->name;
-                                }
-
-                                return $a->getKey();
-                            })->values();
-
-                            $attribute->setRelation('items', $itemsSorted);
-                        })
                         ->keyBy('id');
         });
+
+        return $this->addFiltratedItemsIntoAttributes($attributes);
+    }
+
+    private function addFiltratedItemsIntoAttributes($attributes)
+    {
+        return $this->cache('store.attributes.items', function() use ($attributes) {
+            $options = $this->attributesOptions;
+
+            $filter = Admin::getModel('Product')->getFilterFromQuery($options['filter'] ?? []);
+
+            $hasFilter = count($filter) >= 1;
+
+            $modelItems = Admin::getModel('AttributesItem');
+
+            if ( $hasFilter ){
+                $items = $modelItems
+                            ->withListingItems()
+                            ->where(function($query) use ($filter, $options) {
+                                foreach ($filter as $attributeId => $itemIds) {
+                                    $query->orWhereHas('products', function($query) use ($filter, $attributeId, $options) {
+                                        foreach ($filter as $subAttributeId => $itemIds) {
+                                            $query->filterAttributeItems($itemIds);
+                                        }
+
+                                        $this->withProductItems($query, $options);
+                                    });
+
+                                }
+                            })->get();
+
+                $itemsFilrated = $modelItems
+                    ->withListingItems()
+                    //Only filtrated fields
+                    ->where(function($query) use ($filter) {
+                        foreach ($filter as $attributeId => $itemIds) {
+                            $query->orWhere(function($query) use ($filter, $attributeId) {
+                                $query
+                                    ->where('attribute_id', $attributeId)
+                                    ->whereHas('products', function($query) use ($filter, $attributeId) {
+                                        unset($filter[$attributeId]);
+
+                                        foreach ($filter as $subAttributeId => $itemIds) {
+                                            $query->filterAttributeItems($itemIds);
+                                        }
+                                    });
+                            });
+                        }
+                    })
+                    ->get();
+
+                $items = $items->merge($itemsFilrated);
+            } else {
+                $items = $modelItems
+                    ->withListingItems()
+                    ->whereHas('products', function($query) use ($filter, $attributeId, $options) {
+                        $this->withProductItems($query, $options);
+                    })
+                    ->get();
+            }
+
+            $items = $items->groupBy('attribute_id');
+
+            return $attributes->each(function($attribute) use ($items) {
+                if ( $attribute->relationLoaded('items') == false ){
+                    $attribute->setRelation('items', $items[$attribute->getKey()] ?? collect());
+                }
+
+                $this->sortAttributesItems($attribute);
+            });
+        });
+    }
+
+    private function withProductItems($query, $options)
+    {
+        $query->setFilterOptions(array_merge($options ?: [], [
+            '$ignore.filter.attributes' => true,
+            'variants.extract' => true,
+        ]));
+
+        $query->applyQueryFilter();
+    }
+
+    private function sortAttributesItems($attribute)
+    {
+          //Skip reordeing, already ordered from database
+        if ( $attribute->sortby == 'order' ){
+            return;
+        }
+
+        $isDescSort = in_array($attribute->sortby, ['desc']);
+
+        $itemsSorted = $attribute->items->{ $isDescSort ? 'sortByDesc' : 'sortBy' }(function($a, $b) use ($attribute) {
+            if ( in_array($attribute->sortby, ['asc', 'desc']) ){
+                return $a->name;
+            }
+
+            return $a->getKey();
+        })->values();
+
+        $attribute->setRelation('items', $itemsSorted);
     }
 
     public function getExistingAttributesFromFilter($filter)

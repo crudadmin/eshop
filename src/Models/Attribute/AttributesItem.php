@@ -170,53 +170,9 @@ class AttributesItem extends AdminModel
             });
     }
 
-    public function scopeWithListingItems($query, $options = [])
+    public function scopeWithListingItems($query)
     {
-        $query
-            ->select($this->getAttributesItemsColumns())
-            ->filterByProducts($options);
-    }
-
-    public function scopeFilterByProducts($query, $options = [])
-    {
-        $query->whereHas('products', function($query) use ($options) {
-            $query->setFilterOptions(array_merge($options ?: [], [
-                '$ignore.filter.attributes' => true,
-                'variants.extract' => true,
-            ]));
-
-            $query->applyQueryFilter();
-        });
-
-        $query->where(function($query) use ($options) {
-            $filter = (new Product)->getFilterFromQuery($options['filter'] ?? []);
-
-            foreach ($filter as $attributeId => $itemIds) {
-                $query->orWhere(function($query) use ($filter, $attributeId) {
-                    $query
-                        //Select only available values of actually filtering attribute
-                        ->where(function($query) use ($attributeId, $filter) {
-                            unset($filter[$attributeId]);
-
-                            $query
-                                ->where('attribute_id', $attributeId)
-                                ->when($filter, function($query, $filter) {
-                                    $query->whereHas('products', function($query) use ($filter) {
-                                        foreach ($filter as $subAttributeId => $itemIds) {
-                                            $query->filterAttributeItems($itemIds);
-                                        }
-                                    });
-                                });
-                        })
-                        //Select all other attributes by selected filter
-                        ->orWhereHas('products', function($query) use ($filter, $attributeId) {
-                            foreach ($filter as $subAttributeId => $itemIds) {
-                                $query->filterAttributeItems($itemIds);
-                            }
-                        });
-                });
-            }
-        });
+        $query->select($this->getAttributesItemsColumns());
     }
 
     public function scopeWithResponse($query, $type)
