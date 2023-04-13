@@ -36,6 +36,8 @@ trait HasStoreAttributes
 
             $filter = Admin::getModel('Product')->getFilterFromQuery($options['filter'] ?? []);
 
+            $filtrableAttributes = $attributes->where('filtrable', true)->pluck('id')->toArray();
+
             $hasFilter = count($filter) >= 1;
 
             $modelItems = Admin::getModel('AttributesItem');
@@ -43,6 +45,7 @@ trait HasStoreAttributes
             if ( $hasFilter ){
                 $items = $modelItems
                             ->withListingItems()
+                            ->whereIn('attribute_id', array_values(array_diff($filtrableAttributes, array_keys($filter))))
                             ->where(function($query) use ($filter, $options) {
                                 foreach ($filter as $attributeId => $itemIds) {
                                     $query->orWhereHas('products', function($query) use ($filter, $attributeId, $options) {
@@ -58,6 +61,7 @@ trait HasStoreAttributes
 
                 $itemsFilrated = $modelItems
                     ->withListingItems()
+                    ->whereIn('attribute_id', array_keys($filter))
                     //Only filtrated fields
                     ->where(function($query) use ($filter) {
                         foreach ($filter as $attributeId => $itemIds) {
@@ -79,8 +83,9 @@ trait HasStoreAttributes
                 $items = $items->merge($itemsFilrated);
             } else {
                 $items = $modelItems
+                    ->whereIn('attribute_id', $filtrableAttributes)
                     ->withListingItems()
-                    ->whereHas('products', function($query) use ($filter, $attributeId, $options) {
+                    ->whereHas('products', function($query) use ($options) {
                         $this->withProductItems($query, $options);
                     })
                     ->get();
