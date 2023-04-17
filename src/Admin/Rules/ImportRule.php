@@ -4,13 +4,19 @@ namespace AdminEshop\Admin\Rules;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
-use Ajax;
 use Exception;
 use Log;
 
 class ImportRule extends AdminRule
 {
     protected $importer;
+
+    private function setConfigIni()
+    {
+        //Set limits
+        ini_set('max_execution_time', 1200);
+        ini_set('memory_limit', '2048M');
+    }
 
     public function creating(AdminModel $row)
     {
@@ -25,11 +31,10 @@ class ImportRule extends AdminRule
     public function bootImport($row)
     {
         if ( !($importer = $row->getImporter()) ){
-            Ajax::error('Nebol nájdený žiaden importný systém pre tento typ importu.');
+            autoAjax()->error(_('Nebol nájdený žiaden importný systém pre tento typ importu.'))->throw();
         }
 
-        //Set limits
-        ini_set('max_execution_time', 300);
+        $this->setConfigIni();
 
         try {
             $this->importer = new $importer['class']($row->file);
@@ -38,7 +43,7 @@ class ImportRule extends AdminRule
         } catch (Exception $e){
             Log::error($e);
 
-            Ajax::error($e->getMessage());
+            autoAjax()->error($e->getMessage())->throw();
         }
     }
 

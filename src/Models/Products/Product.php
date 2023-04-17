@@ -187,6 +187,11 @@ class Product extends CartEloquent implements HasAttributesSupport
         }
     }
 
+    public function scopeParentProducts($query, $table = 'products')
+    {
+        $query->whereIn($query->getQuery()->from.'.product_type', ['regular', 'variants']);
+    }
+
     public function scopeNonVariantProducts($query, $table = 'products')
     {
         $query->whereIn(implode('.', array_filter([$table, 'product_type'])), Store::nonVariantsProductTypes());

@@ -94,9 +94,9 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         return $products;
     }
 
-    public function getImportProduct($array, $items, $key)
+    public function getImportProduct($item, $items, $key)
     {
-        return $array;
+        return $item;
     }
 
     public function getCategoriesList($items)

@@ -9,7 +9,11 @@ class ProductController extends Controller
 {
     public function show($slug, $variantId = null)
     {
-        $product = Admin::getModel('Product')->withDetailResponse()->findBySlugOrFail($slug)->setDetailResponse();
+        $product = Admin::getModel('Product')
+                    ->parentProducts()
+                    ->withDetailResponse()
+                    ->findBySlugOrFail($slug)
+                    ->setDetailResponse();
 
         return api(
             $product,

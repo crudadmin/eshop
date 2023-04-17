@@ -106,7 +106,7 @@ class SheetImportWrapper
 
         if ( count($errors) ){
             throw new FormattingError(
-                'V súbore sme nenašli potrebné stĺpce:<br>'.
+                _('V súbore sme nenašli potrebné stĺpce:').'<br>'.
                 '<strong>'.implode(' | ', $errors).'</strong>'
             );
         }

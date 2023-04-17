@@ -16,7 +16,7 @@ trait HasFeed
 
     public function scopeWithFeedListing($query)
     {
-        $query->whereIn($query->getQuery()->from.'.product_type', ['regular', 'variants']);
+        $query->parentProducts();
     }
 
     public function getFeedUrl($parentProduct = null)
