@@ -109,7 +109,6 @@ trait HasStoreAttributes
     {
         $query->setFilterOptions(array_merge($options ?: [], [
             '$ignore.filter.attributes' => true,
-            'variants.extract' => true,
         ]));
 
         $query->applyQueryFilter();
