@@ -6,6 +6,14 @@ use Exception;
 
 trait SearchableTrait
 {
+    // removing symbols used by MySQL
+    protected $reservedSymbols = ['-', '+', '<', '>', '@', '(', ')', '~'];
+
+    public function getSearchableColumns()
+    {
+        return method_exists($this, 'searchable') ? $this->searchable() : ($this->searchable ?: []);
+    }
+
     /**
      * Replaces spaces with full text search wildcards
      *
@@ -14,9 +22,7 @@ trait SearchableTrait
      */
     protected function fullTextWildcards($term)
     {
-        // removing symbols used by MySQL
-        $reservedSymbols = ['-', '+', '<', '>', '@', '(', ')', '~'];
-        $term = str_replace($reservedSymbols, '', $term);
+        $term = str_replace($this->reservedSymbols, '', $term);
 
         $words = explode(' ', $term);
 
@@ -35,11 +41,6 @@ trait SearchableTrait
         return $searchTerm;
     }
 
-    public function getSearchableColumns()
-    {
-        return method_exists($this, 'searchable') ? $this->searchable() : ($this->searchable ?: []);
-    }
-
     /**
      * Scope a query that matches a full text search of term.
      *
@@ -50,6 +51,7 @@ trait SearchableTrait
     public function scopeFulltextSearch($query, $term, $where = null, $orderBy = null)
     {
         $searchable = $this->getSearchableColumns();
+
         if ( is_array($searchable) === false || count($searchable) === 0 ){
             throw new Exception('No searchable columns found.');
         }

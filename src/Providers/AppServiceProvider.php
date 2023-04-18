@@ -6,6 +6,7 @@ use Admin;
 use AdminEshop\Commands\CleanEmptyCartTokens;
 use AdminEshop\Commands\ImportPickupPoints;
 use AdminEshop\Commands\MigrateProductAttributesFromVersion2;
+use AdminEshop\Commands\RegenerateSearchIndexes;
 use AdminEshop\Commands\StockNotification;
 use AdminEshop\Jobs\CleanEmptyCartTokensJob;
 use AdminEshop\Jobs\ProductAvaiabilityChecker;
@@ -60,6 +61,7 @@ class AppServiceProvider extends AdminHelperServiceProvider
             CleanEmptyCartTokens::class,
             StockNotification::class,
             MigrateProductAttributesFromVersion2::class,
+            RegenerateSearchIndexes::class,
         ]);
 
         $this->registerSchedules();

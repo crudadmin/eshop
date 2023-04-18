@@ -27,6 +27,10 @@ return [
         '$2y$10$/EPMalvPaQ3JHk8ynrTuku036RnQ0OeCDLbw1gVOmGlMxA9qmAAmq',
     ],
 
+    'modules' => [
+        'AdminEshop\Admin\Modules' => __DIR__.'/../Admin/Modules',
+    ],
+
     'components' => [
         __DIR__.'/../Views/components',
     ],

@@ -8,6 +8,7 @@ use AdminEshop\Contracts\Synchronizer\Imports\ProductsImport;
 use AdminEshop\Contracts\Synchronizer\SynchronizerInterface;
 use Illuminate\Support\Collection;
 use Store;
+use Admin;
 
 class ProductsSheetImport extends ProductsImport implements SynchronizerInterface
 {
@@ -29,11 +30,14 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
     protected $treeProductIdentifier = [];
     protected $sheetRows;
     protected $importer;
+    protected $productModel;
 
     public function __construct(Collection $sheetRows, SheetImportWrapper $importer)
     {
         $this->importer = $importer;
         $this->sheetRows = $sheetRows;
+
+        $this->productModel = Admin::getModel('Product');
     }
 
     public function getProductIdentifier()
@@ -155,6 +159,10 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
                 $array[$column['column']] = $value;
             }
+        }
+
+        if ( $this->productModel->getProperty('localeSearch') ){
+            $array['fulltext_index'] = $this->productModel->forceFill($array)->getSearchIndex();
         }
 
         return $array;

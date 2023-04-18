@@ -2,7 +2,6 @@
 
 namespace AdminEshop\Commands;
 
-use AdminEshop\Contracts\Delivery\DeliveryLocationsImporter;
 use AdminEshop\Jobs\CleanEmptyCartTokensJob;
 use Illuminate\Console\Command;
 
