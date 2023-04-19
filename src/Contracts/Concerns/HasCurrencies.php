@@ -23,7 +23,7 @@ trait HasCurrencies
     public function getCurrency()
     {
         return $this->rewritedCurrency ?: $this->cache('orders.currency', function(){
-            if ( $languageCurrency = Localization::get()->currency ){
+            if ( Admin::isFrontend() && $languageCurrency = Localization::get()->currency ){
                 return $languageCurrency;
             }
 
