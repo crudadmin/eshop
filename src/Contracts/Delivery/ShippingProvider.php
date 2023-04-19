@@ -65,7 +65,8 @@ class ShippingProvider extends OrderProvider
         $order = $this->getOrder();
 
         //Set default weight
-        $weight = ($options['weight'] ?? null) ?: ($options['default_weight'] ?? null);
+        $defaultWeight = ($options['weight'] ?? null) ?: ($options['default_weight'] ?? null);
+        $weight = $defaultWeight;
 
         //Calculate custom order weight
         if ( $order && $order->exists ){
