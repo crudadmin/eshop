@@ -198,6 +198,7 @@ class Order extends AdminModel
     {
         $attributes['currency_char'] = $this->currency_char ?: Store::getCurrencyCode();
         $attributes['delivery_pickup_point'] = $this->getPickupAddressWithName();
+        $attributes['created'] = $this->created_at ? sprintf(_('%s o %s'), $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y')), $this->created_at->format('H:i')) : '';
 
         return $attributes;
     }
@@ -207,7 +208,6 @@ class Order extends AdminModel
         $attributes['number'] = $this->number;
         $attributes['client_name'] = $this->getClientName();
         $attributes['delivery_address'] = $this->getDeliveryAddress();
-        $attributes['created'] = $this->created_at ? sprintf(_('%s o %s'), $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y')), $this->created_at->format('H:i')) : '';
         $attributes['status_id'] = $this->getStatusColumn();
         $attributes['delivery_status'] = $this->getDeliveryStatusColumn();
         $attributes['is_paid'] = $this->getIsPaidStatusColumn();

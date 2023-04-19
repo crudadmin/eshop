@@ -3,6 +3,7 @@
 return [
     /*
      * Automaticaly boot routes
+     * (cache is defined in minutes)
      */
     'routes' => [
         'enabled' => [

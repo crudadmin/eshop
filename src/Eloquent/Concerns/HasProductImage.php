@@ -60,6 +60,11 @@ trait HasProductImage
             ]))->image;
         }
 
+        //If variants are loaded, and there are variants with uploaded image
+        if ( $this->relationLoaded('variants') && ($variantsWithImage = $this->variants->whereNotNull('image'))->count() > 0 ){
+            return $variantsWithImage->first()->image;
+        }
+
         return Store::getSettings()->default_image;
     }
 
