@@ -191,9 +191,12 @@ trait HasPayments
             $order->syncStock('-', 'order.paid');
         }
 
+        //Generate invoice
+        $invoice = $this->hasInvoices() ? $this->makeInvoice('invoice') : null;
+
         //Send invoice email
         if ( config('admineshop.mail.order.paid_notification', true) == true ) {
-            $order->sendPaymentEmail();
+            $order->sendPaymentEmail($invoice);
         }
     }
 }

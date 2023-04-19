@@ -383,7 +383,16 @@ class OrderService
 
         try {
             //Generate proform
-            return $order->makeInvoice($type, $data);
+            $invoice = $order->makeInvoice($type, $data);
+
+            //Set unpaid proform as paid
+            if ( $invoice->type == 'invoice' && $invoice->paid_at && $invoice->proform && !$invoice->proform->paid_at ){
+                $invoice->proform->update([
+                    'paid_at' => $invoice->paid_at,
+                ]);
+            }
+
+            return $invoice;
         } catch (Exception $error){
             Log::error($error);
 

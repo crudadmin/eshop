@@ -74,14 +74,9 @@ trait OrderPayments
         );
     }
 
-    public function sendPaymentEmail($type = 'invoice', $invoice = null)
+    public function sendPaymentEmail($invoice = null)
     {
         try {
-            //Generate invoice
-            $invoice = OrderService::hasInvoices()
-                            ? ($invoice ?: $this->makeInvoice($type))
-                            : null;
-
             Mail::to($this->email)->send(
                 new OrderPaid($this, $invoice)
             );
