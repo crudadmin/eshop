@@ -58,21 +58,20 @@ class ShippingProvider extends OrderProvider
         // return 'string';
     }
 
-    public function getPackageWeight()
+    public function getPackageWeight($toUnit = 'kilograms')
     {
         $options = $this->getOptions();
 
         $order = $this->getOrder();
 
+        //Set default weight
+        $weight = ($options['weight'] ?? null) ?: ($options['default_weight'] ?? null);
+
         //Calculate custom order weight
         if ( $order && $order->exists ){
             //Custom order calc
             if ( method_exists($order, 'getPackageWeight') ) {
-                $weight = $order->getPackageWeight($this, $options);
-
-                if ( is_null($weight) === false ) {
-                    return $weight;
-                };
+                $weight = $order->getPackageWeight($this, $options) ?: $weight;
             }
 
             $itemsToWeightCalc = $order->items;
@@ -80,13 +79,30 @@ class ShippingProvider extends OrderProvider
             $itemsToWeightCalc = Cart::all();
         }
 
-        $cartWeight = $this->calculateWeightFromItems($itemsToWeightCalc);
-        if ( is_null($cartWeight) == false ){
-            return $cartWeight;
+        //Get weight from cart items
+        $weight = $this->calculateWeightFromItems($itemsToWeightCalc) ?: $weight;
+
+        //If given weight is rounded to zero, then we need calculate default weight
+        return $this->toWeightUnit($weight, $toUnit) ?: $this->toWeightUnit($defaultWeight, $toUnit);
+    }
+
+    private function toWeightUnit($weight, $toUnit)
+    {
+        if ( !is_numeric($weight) ){
+            return;
         }
 
-        //Default weight
-        return ($options['weight'] ?? $options['default_weight'] ?? null);
+        $inUnit = config('admineshop.product.weight_unit');
+
+        if ( $inUnit == $toUnit ){
+            return $weight;
+        } else if ( $inUnit == 'grams' && $toUnit == 'kilograms'  ){
+            return round($weight / 1000, 1);
+        } else if ( $inUnit == 'kilograms' && $toUnit == 'grams'  ){
+            return round($weight * 1000);
+        }
+
+        return $weight;
     }
 
     private function calculateWeightFromItems($items)
@@ -95,6 +111,7 @@ class ShippingProvider extends OrderProvider
         $cartItemsWithWeight = $items->filter(function($item){
             return is_null($item->getItemModel()?->weight) == false;
         });
+
         if ( $cartItemsWithWeight->count() ){
             $calculatedWeight = $cartItemsWithWeight->map(function($item){
                 return ($item->getItemModel()?->weight ?: 0) * $item->quantity;
