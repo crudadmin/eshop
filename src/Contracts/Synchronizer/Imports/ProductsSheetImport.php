@@ -199,7 +199,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
             $attribute = [
                 'code' => $column['attribute'],
-                'name' => $this->importer->array['header'][$sheetColumnName],
+                'name' => $column['name'] ?? $this->importer->array['header'][$sheetColumnName],
                 '$items' => array_map(function($value) use ($column) {
                     return [
                         'name' => $value,
