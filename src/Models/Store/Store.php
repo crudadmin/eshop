@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Store;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store as BaseStore;
 
 class Store extends AdminModel
 {
@@ -48,7 +49,7 @@ class Store extends AdminModel
                 [
                     'Nastavenia skladu' => Group::tab([
                         'stock_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',
-                        'stock_sold' => 'name:Globálny text dostupnosti tovaru s nulovou skladovosťou|removeFromFormIfNot:stock_type,everytime'
+                        'stock_sold' => 'name:Globálny text dostupnosti tovaru s nulovou skladovosťou|removeFromFormIfNot:stock_type,everytime'.(BaseStore::isEnabledLocalization() ? '|locale' : '')
                     ])->icon('fa-bars')->add('hidden'),
                 ] : []
         ));
