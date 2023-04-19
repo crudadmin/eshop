@@ -171,8 +171,10 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
 
     private function tryFetchLabel($gw, $packet, $apiPassword)
     {
+        $label = $this->getOption('label', 'A7 on A4');
+
         try {
-            return $gw->packetLabelPdf($apiPassword, $packet->id, 'A6 on A6', 0);
+            return $gw->packetLabelPdf($apiPassword, $packet->id, $label, 0);
         } catch (Exception $e){
             Log::error($e);
         }
