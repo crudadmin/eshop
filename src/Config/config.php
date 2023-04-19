@@ -381,7 +381,7 @@ return [
             'thumbnail' => [null, 400],
             'detail' => [680, null],
         ],
-        'weight_unit' => 'kilograms', //kilograms / grams
+        'weight_unit' => 'kilograms', //kilograms / grams / false
     ],
 
     'import' => [

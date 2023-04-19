@@ -55,7 +55,7 @@ trait HasProductFields
         return Group::tab([
             Group::fields([
                 'weight' => 'name:Váha ('.(config('admineshop.product.weight_unit') == 'kilograms' ? 'kg' : 'gramov').')|type:integer',
-            ])->if(config('admineshop.product.weight', false)),
+            ])->if(config('admineshop.product.weight_unit')),
             'description' => 'name:Popis produktu|type:editor|hidden'.(Store::isEnabledLocalization() ? '|locale' : ''),
         ])->icon('fa-file-text-o')->id('description-tab')->name('Popis');
     }

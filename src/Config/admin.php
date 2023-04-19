@@ -51,7 +51,7 @@ return [
 
     'gettext_admin_source_paths' => [
         __DIR__.'/../Helpers',
-        __DIR__.'/../Config/admin.php',
+        __DIR__.'/../Config',
         __DIR__.'/../Admin',
         __DIR__.'/../Eloquent',
         __DIR__.'/../Models',
