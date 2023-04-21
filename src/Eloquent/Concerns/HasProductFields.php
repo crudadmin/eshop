@@ -44,7 +44,7 @@ trait HasProductFields
                 'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField|required_if:product_type,'.implode(',', Store::orderableProductTypes()),
             ])->id('price')->width(8),
             'Zľava' => Group::fields([
-                'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
+                'discount_operator' => 'name:Typ zľavy|type:select|hidden',
                 'discount' => 'name:Výška zľavy|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
             ])->id('discount')->width(4),
         ])->icon('fa-money')->id('price-tab')->name('Cena')->attributes('hideFromFormIf:product_type,variants')->add('removeFromFormIf:product_type,variants');
