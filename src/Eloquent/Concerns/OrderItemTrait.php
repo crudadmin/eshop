@@ -9,6 +9,8 @@ use Admin;
 
 trait OrderItemTrait
 {
+    protected $attributesLimitLoad = 3000;
+
     /**
      * Return products with needed attributes
      *
@@ -36,7 +38,10 @@ trait OrderItemTrait
             ->leftJoin('products as parentProduct', function($join){
                 $join->on('parentProduct.id', '=', 'products.product_id');
             })
-            ->when($productsQuery->count() < 1000, function($query){
+
+            //CHECK attributesLimitLoad attribute, attributes may not be available after
+            //certain limit of products
+            ->when($productsQuery->count() < $this->attributesLimitLoad, function($query){
                 $query->with([
                     'attributesItems' => function($query){
                         $query->withTextAttributes();
