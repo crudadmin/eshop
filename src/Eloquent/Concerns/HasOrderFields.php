@@ -20,7 +20,7 @@ trait HasOrderFields
     {
         return Group::fields(array_merge(
             [
-                'number' => 'name:Č. obj.|max:20|index|hideFromForm',
+                'number' => 'name:Č. obj.|max:20|index|removeFromForm',
                 'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
                 'client' => 'name:Klient|belongsTo:clients|inaccessible',
                 'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible',
