@@ -73,7 +73,7 @@ class Client extends Authenticatable
                 'city' => 'name:Mesto',
                 'zipcode' => 'name:PSČ|zipcode',
                 'country' => 'name:Krajina|belongsTo:countries,name|exists:countries,id',
-            ])->id('billing'),
+            ])->id('billing')->add('hidden'),
             'Firemné údaje' => Group::half([
                 'company_name' => 'name:Názov firmy|required_with:is_company',
                 'company_id' => 'name:IČO|company_id|required_with:is_company',
@@ -83,7 +83,7 @@ class Client extends Authenticatable
             'Zľavy' => Group::tab(array_merge(
                 Discounts::isRegistredDiscount(ClientPercentage::class)
                     ? ['percentage_discount' => 'name:Zľava na všetky produkty|type:decimal|default:0'] : []
-            ))->id('discounts')->icon('fa-percentage'),
+            ))->id('discounts')->icon('fa-percentage')->add('hidden'),
         ];
     }
 

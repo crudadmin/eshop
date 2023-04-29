@@ -7,6 +7,7 @@ use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Identifiers\DefaultIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\DiscountIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
+use AdminEshop\Contracts\Cart\Identifiers\SubscriptionIdentifier;
 use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Events\CartUpdated;
 use Admin\Eloquent\AdminModel;
@@ -40,6 +41,7 @@ trait CartTrait
         ProductsIdentifier::class,
         DefaultIdentifier::class,
         DiscountIdentifier::class,
+        SubscriptionIdentifier::class,
     ];
 
     /**
