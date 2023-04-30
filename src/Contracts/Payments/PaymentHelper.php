@@ -47,6 +47,15 @@ class PaymentHelper extends OrderProvider
         ], $data));
     }
 
+    public function setPaymentData($data = [])
+    {
+        $payment = $this->getPayment();
+
+        $payment->update([
+            'data' => array_merge($payment->data ?: [], $data)
+        ]);
+    }
+
     /**
      * Get created payment ID from provider.
      * It is more secure to set received payment id from provider, and then use this number from database.

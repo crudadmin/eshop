@@ -50,7 +50,6 @@ class StripePayment extends PaymentHelper
                     'quantity' => 1,
                 ],
             ],
-            'customer_email' => $order->email,
             'success_url' => $this->getResponseUrl('status'),
             'cancel_url' => $this->getResponseUrl('status'),
             'payment_intent_data' => [
@@ -59,6 +58,13 @@ class StripePayment extends PaymentHelper
                 ],
             ],
         ];
+
+        //If stripe customer exists, then assign payment under this customer. (Support for saved payment methods)
+        if ( client() && $stripeCustomerId = client()->stripe_customer_id ){
+            $data['customer'] = $stripeCustomerId;
+        } else {
+            $data['customer_email'] = $order->email;
+        }
 
         if ( $types = $this->getOption('payment_method_types') ){
             $data['payment_method_types'] = array_wrap($types);
