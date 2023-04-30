@@ -12,7 +12,7 @@ use Store;
 
 class StripePayment extends PaymentHelper
 {
-    protected $client;
+    public $client;
 
     public function __construct($options = null)
     {

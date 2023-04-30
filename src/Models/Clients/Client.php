@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Clients;
 
 use AdminEshop\Contracts\Discounts\ClientPercentage;
+use AdminEshop\Contracts\Payments\Stripe\HasClientStripe;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
 use Admin\Eloquent\Authenticatable;
 use Admin\Fields\Group;
@@ -11,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Client extends Authenticatable
 {
-    use HasUsernames;
+    use HasUsernames, HasClientStripe;
 
     /*
      * Model created date, for ordering tables in database and in user interface
