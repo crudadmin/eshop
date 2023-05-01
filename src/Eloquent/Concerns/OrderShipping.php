@@ -8,11 +8,9 @@ trait OrderShipping
 {
     public function getShippingProvider($deliveryId = null)
     {
-        $this->bootOrderIntoOrderService();
-
         $deliveryId = $deliveryId ?: $this->delivery_id;
 
-        return OrderService::getShippingProvider($deliveryId);
+        return OrderService::setOrder($this)->getShippingProvider($deliveryId);
     }
 
     protected function getShippingButtons()

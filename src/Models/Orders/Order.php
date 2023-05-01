@@ -15,13 +15,14 @@ use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
 use AdminEshop\Eloquent\Concerns\HasOrderLog;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
-use AdminEshop\Eloquent\Concerns\OrderPayments;
 use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
 use AdminEshop\Requests\SubmitOrderRequest;
+use AdminPayments\Contracts\Concerns\AdminModelPayments;
+use AdminPayments\Contracts\Concerns\Orderable;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Illuminate\Http\Request;
@@ -29,11 +30,11 @@ use Illuminate\Notifications\Notifiable;
 use OrderService;
 use Store;
 
-class Order extends AdminModel
+class Order extends AdminModel implements Orderable
 {
     use Notifiable,
         OrderTrait,
-        OrderPayments,
+        AdminModelPayments,
         OrderShipping,
         HasUsernames,
         HasOrderInvoice,

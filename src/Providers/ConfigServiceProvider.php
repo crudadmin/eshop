@@ -43,6 +43,12 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
             [],
         );
 
+        //Clone payment methods into admin payments config
+        config()->set(
+            'adminpayments.payment_methods',
+            config('adminpayments.payment_methods', []) + config('admineshop.payment_methods', [])
+        );
+
         $this->mergeMarkdownConfigs();
 
         $this->turnOfCacheForAdmin();

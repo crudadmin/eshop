@@ -8,7 +8,6 @@ use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutators;
 use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
-use AdminEshop\Contracts\Order\Concerns\HasPayments;
 use AdminEshop\Contracts\Order\Concerns\HasShipping;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
@@ -31,7 +30,6 @@ class OrderService
     use DataStore,
         HasProviders,
         HasRequest,
-        HasPayments,
         HasValidation,
         HasMutators,
         HasMutatorsForward,
