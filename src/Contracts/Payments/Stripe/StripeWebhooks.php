@@ -59,10 +59,17 @@ class StripeWebhooks
             Log::channel('stripe_webhooks')->info($event);
         }
 
-        if ( $event->type == 'checkout.session.completed' ) {
+        $listenForWebhooks = config('stripe.webhooks_enabled', [
+            'checkout.session.completed',
+            'customer.subscription.created',
+        ]);
+
+        if ( in_array($event->type, $listenForWebhooks) ) {
             $session = $event->data->object;
 
-            $payment = Payment::where('payment_id', $session->id)->first();
+            if ( !($payment = Payment::where('payment_id', $session->id)->first()) ) {
+                throw new Exception('Payment could not be found: '.$session->id);
+            }
 
             OrderService::isPaymentPaid($payment, $payment->order);
         }
