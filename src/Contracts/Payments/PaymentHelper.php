@@ -2,10 +2,10 @@
 
 namespace AdminEshop\Contracts\Payments;
 
-use AdminEshop\Contracts\Order\OrderProvider;
+use AdminEshop\Contracts\Order\OrderConfigProvider;
 use AdminEshop\Contracts\Payments\Exceptions\PaymentResponseException;
 
-class PaymentHelper extends OrderProvider
+class PaymentHelper extends OrderConfigProvider
 {
     private $payment;
 
