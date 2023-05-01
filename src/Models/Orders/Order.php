@@ -21,7 +21,7 @@ use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
 use AdminEshop\Requests\SubmitOrderRequest;
 use AdminPayments\Admin\Buttons\OrderMessagesButton;
-use AdminPayments\Contracts\Concerns\AdminModelPayments;
+use AdminPayments\Contracts\Concerns\HasPayments;
 use AdminPayments\Contracts\Concerns\Orderable;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
@@ -34,7 +34,7 @@ class Order extends AdminModel implements Orderable
 {
     use Notifiable,
         OrderTrait,
-        AdminModelPayments,
+        HasPayments,
         OrderShipping,
         HasUsernames,
         HasOrderInvoice,
