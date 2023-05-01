@@ -50,8 +50,6 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
         $this->pushComponentsPaths();
 
         $this->addStoreLogChannel();
-
-        $this->enablePaymentHooksCors();
     }
 
     private function addStoreLogChannel()
@@ -61,12 +59,5 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
             'path' => storage_path('logs/store.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ]);
-    }
-
-    private function enablePaymentHooksCors()
-    {
-        $paths = config('cors.paths', []);
-
-        $this->app['config']->set('cors.paths', array_values(array_unique(array_merge($paths, ['_store/*']))));
     }
 }
