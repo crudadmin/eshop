@@ -17,12 +17,14 @@ use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Events\OrderPaid;
 use AdminEshop\Models\Delivery\Delivery;
+use AdminEshop\Models\Orders\OrdersLog;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
 use AdminEshop\Requests\SubmitOrderRequest;
 use AdminPayments\Admin\Buttons\OrderMessagesButton;
 use AdminPayments\Contracts\Concerns\HasPayments;
 use AdminPayments\Contracts\Concerns\Orderable;
+use AdminPayments\Models\Payments\Payment;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Illuminate\Http\Request;
@@ -345,7 +347,7 @@ class Order extends AdminModel implements Orderable
         );
     }
 
-    public function onPaymentPaid()
+    public function onPaymentPaid(Payment $payment)
     {
         event(new OrderPaid($this));
     }
@@ -360,5 +362,10 @@ class Order extends AdminModel implements Orderable
         return $this->items->map(function($item){
             return $item->quantity.'x - '.$item->getProductName();
         })->join('... '."\n");
+    }
+
+    public function log()
+    {
+        return $this->hasMany(OrdersLog::class);
     }
 }
