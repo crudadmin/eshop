@@ -354,4 +354,11 @@ class Order extends AdminModel implements Orderable
     {
         return $this->paid_at ? true : false;
     }
+
+    public function getPaymentDescription()
+    {
+        return $this->items->map(function($item){
+            return $item->quantity.'x - '.$item->getProductName();
+        })->join('... '."\n");
+    }
 }
