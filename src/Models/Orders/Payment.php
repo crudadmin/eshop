@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Models\Orders;
 
+use AdminPayments\Contracts\Concerns\Orderable;
 use AdminPayments\Models\Payments\Payment as BasePayment;
 
 class Payment extends BasePayment
@@ -13,5 +14,10 @@ class Payment extends BasePayment
         $fields->pushBefore([
             'order' => 'name:Objednavka|belongsTo:orders,name',
         ]);
+    }
+
+    public function getOrder() : Orderable
+    {
+        return $this->order;
     }
 }

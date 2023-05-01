@@ -367,47 +367,6 @@ class OrderService
     }
 
     /**
-     * Generate invoice for order
-     *
-     * @return  Invoice|null
-     */
-    public function makeInvoice($type = 'proform', $data = [])
-    {
-        if ( ! $this->hasInvoices() ) {
-            return;
-        }
-
-        $order = $this->getOrder();
-
-        try {
-            //Generate proform
-            $invoice = $order->makeInvoice($type, $data);
-
-            //Set unpaid proform as paid
-            if ( $invoice->type == 'invoice' && $invoice->paid_at && $invoice->proform && !$invoice->proform->paid_at ){
-                $invoice->proform->update([
-                    'paid_at' => $invoice->paid_at,
-                ]);
-            }
-
-            return $invoice;
-        } catch (Exception $error){
-            Log::error($error);
-
-            $order->log()->create([
-                'type' => 'error',
-                'code' => 'INVOICE_ERROR',
-                'log' => $error->getMessage()
-            ]);
-
-            //Debug
-            if ( $this->isDebug() ) {
-                throw $error;
-            }
-        }
-    }
-
-    /**
      * Send email to client
      *
      * @return  void

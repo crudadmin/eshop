@@ -43,11 +43,7 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
             [],
         );
 
-        //Clone payment methods into admin payments config
-        config()->set(
-            'adminpayments.payment_methods',
-            config('adminpayments.payment_methods', []) + config('admineshop.payment_methods', [])
-        );
+        $this->setPaymentConfig();
 
         $this->mergeMarkdownConfigs();
 
@@ -65,5 +61,15 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
             'path' => storage_path('logs/store.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ]);
+    }
+
+    private function setPaymentConfig()
+    {
+        //Clone payment methods into admin payments config
+        config()->set('adminpayments.providers', config('adminpayments.providers', []) + config('admineshop.payment_methods.providers', []));
+        config()->set('adminpayments.payment_methods', array_merge(config('adminpayments.payment_methods', []), config('admineshop.payment_methods', [])));
+
+        config()->set('adminpayments.invoices.enabled', config('admineshop.invoices', false));
+        config()->set('adminpayments.notificaions.paid', config('admineshop.mail.order.paid_notification', true));
     }
 }

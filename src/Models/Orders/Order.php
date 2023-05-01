@@ -17,6 +17,7 @@ use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
 use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
+use AdminEshop\Events\OrderPaid;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
@@ -344,5 +345,15 @@ class Order extends AdminModel implements Orderable
         return $this->validator($request)->use(
             $orderRequest
         );
+    }
+
+    public function onPaymentPaid()
+    {
+        event(new OrderPaid($this));
+    }
+
+    public function isPaid() : bool
+    {
+        return $this->paid_at ? true : false;
     }
 }

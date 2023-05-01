@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Gogol\Invoices\Model\Invoice;
 use OrderService;
 
 trait HasOrderInvoice
@@ -33,7 +34,7 @@ trait HasOrderInvoice
         ]);
     }
 
-    public function makeInvoice($type = null, $data = [])
+    public function makeInvoice($type = null, $data = []) : Invoice
     {
         $data = array_merge($this->getInvoiceData($type), $data);
 
