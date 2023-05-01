@@ -3,7 +3,6 @@
 namespace AdminEshop\Models\Orders;
 
 use AdminEshop\Admin\Buttons\GenerateInvoice;
-use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\OnOrderStatusChange;
 use AdminEshop\Admin\Rules\OrderNumber;
@@ -12,7 +11,6 @@ use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderFields;
 use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
-use AdminEshop\Eloquent\Concerns\HasOrderLog;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
 use AdminEshop\Eloquent\Concerns\OrderShipping;
@@ -22,6 +20,7 @@ use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
 use AdminEshop\Requests\SubmitOrderRequest;
+use AdminPayments\Admin\Buttons\OrderMessagesButton;
 use AdminPayments\Contracts\Concerns\AdminModelPayments;
 use AdminPayments\Contracts\Concerns\Orderable;
 use Admin\Eloquent\AdminModel;
@@ -42,7 +41,6 @@ class Order extends AdminModel implements Orderable
         HasOrderHashes,
         HasOrderEmails,
         HasOrderNumber,
-        HasOrderLog,
         HasOrderFields;
 
     /*

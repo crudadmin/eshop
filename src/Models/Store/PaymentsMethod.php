@@ -6,7 +6,7 @@ use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Fields\Group;
 use Gogol\Invoices\Model\PaymentsMethod as BasePaymentsMethod;
 use Store;
-use OrderService;
+use PaymentService;
 
 class PaymentsMethod extends BasePaymentsMethod
 {
@@ -99,7 +99,7 @@ class PaymentsMethod extends BasePaymentsMethod
 
     public function getPaymentMethodProvider()
     {
-        return OrderService::getPaymentProvider($this->getKey());
+        return PaymentService::getPaymentProvider($this->getKey());
     }
 
     public function getPaymentProviderAttribute()

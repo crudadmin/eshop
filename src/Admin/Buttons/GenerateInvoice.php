@@ -55,10 +55,7 @@ class GenerateInvoice extends Button
         }
 
         //Generate invoice by given type
-        $row->makeInvoice($type);
-
-        //Return invoice
-        $invoice = $row->invoices()->where('type', $type)->first();
+        $invoice = $row->makeInvoice($type);
 
         return $this->downloadResponse($invoice);
     }

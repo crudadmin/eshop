@@ -71,5 +71,8 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
 
         config()->set('adminpayments.invoices.enabled', config('admineshop.invoices', false));
         config()->set('adminpayments.notificaions.paid', config('admineshop.mail.order.paid_notification', true));
+        config()->set('adminpayments.logger_models', array_merge(config('adminpayments.logger_models', []), [
+            \AdminEshop\Models\Orders\Order::class
+        ]));
     }
 }
