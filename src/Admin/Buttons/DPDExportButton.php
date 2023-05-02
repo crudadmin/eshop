@@ -7,6 +7,7 @@ use Admin\Eloquent\AdminModel;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
 use OrderService;
+use Storage;
 
 class DPDExportButton extends Button
 {
@@ -39,8 +40,13 @@ class DPDExportButton extends Button
      */
     public function fireMultiple(Collection $rows)
     {
-        $path = OrderService::makeShippingExport(DPDShipping::class, $rows);
+        $data = DPDShipping::export($rows);
 
-        return $this->message(_('Export bol úspešne vytvorený.'))->download($path);
+        $path = 'export/dpd_export.xml';
+        $storage = Storage::disk('local');
+        $file = $storage->put($path, $data['data']);
+        $basepath = $storage->path($path);
+
+        return $this->message(_('Export bol úspešne vytvorený.'))->download($basepath);
     }
 }
