@@ -345,7 +345,7 @@ class Order extends AdminModel implements Orderable
         );
     }
 
-    public function onPaymentPaid(Payment $payment)
+    public function setPaymentPaid(Payment $payment)
     {
         event(new OrderPaid($this));
     }
