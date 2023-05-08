@@ -48,12 +48,12 @@ class DPDApi
             return 'https://capi.dpdportal.sk/apix/shipment/json';
         }
 
-        return 'https://api.dpdportal.sk/shipment/json';
+        return 'https://api.dpd.sk/shipment/json';
     }
 
     public function getPickupEndpoint()
     {
-        return 'https://api.dpdportal.sk/parcelshop/json';
+        return 'https://api.dpd.sk/parcelshop/json';
     }
 
     public function setOptions(array $options = [])
