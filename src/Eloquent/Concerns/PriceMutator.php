@@ -67,6 +67,16 @@ trait PriceMutator
     ];
 
     /**
+     * Can be discounts applied on model?
+     *
+     * @return  bool
+     */
+    public function canApplyDiscounts()
+    {
+        return true;
+    }
+
+    /**
      * Add price attribute
      *
      * @param  string|array  $attribute
@@ -280,7 +290,11 @@ trait PriceMutator
      */
     public function getPriceWithoutVatAttribute()
     {
-        $price = $this->applyDiscounts($this->getAttribute('defaultPriceWithoutVat'), $this->toCartArrayDiscounts);
+        $price = $this->getAttribute('defaultPriceWithoutVat');
+
+        if ( $this->canApplyDiscounts() ){
+            $price = $this->applyDiscounts($price, $this->toCartArrayDiscounts);
+        }
 
         return config('admineshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
     }
