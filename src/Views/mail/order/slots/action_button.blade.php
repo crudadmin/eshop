@@ -15,7 +15,7 @@
 
 {{-- No action --}}
 @else
-@component('mail::button', ['url' => env('APP_NUXT_URL') ?: url('/')])
+@component('mail::button', ['url' => nuxtUrl() ?: url('/')])
 {{ _('Pokračovať na eshop') }}
 @endcomponent
 @endif

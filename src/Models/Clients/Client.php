@@ -3,6 +3,7 @@
 namespace AdminEshop\Models\Clients;
 
 use AdminEshop\Contracts\Discounts\ClientPercentage;
+use AdminEshop\Eloquent\Concerns\HasClientLocales;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
 use AdminPayments\Gateways\Stripe\HasClientStripe;
 use Admin\Eloquent\Authenticatable;
@@ -12,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Client extends Authenticatable
 {
-    use HasUsernames, HasClientStripe;
+    use HasUsernames, HasClientStripe, HasClientLocales;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -65,6 +66,7 @@ class Client extends Authenticatable
                     ])->add('hidden'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : ''))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
                     'phone' => 'name:Telefon|'.phoneValidatorRule(),
                     'password' => 'name:Heslo|type:password|min:6|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
+                    'language' => 'name:Predvolený jazyk|belongsTo:languages|inaccessible'
                 ],
                 config('admineshop.client.groups', false)
                     ? ['groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd'] : []

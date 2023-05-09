@@ -288,7 +288,7 @@ class Order extends AdminModel implements Orderable
 
     public function getOrderUrl()
     {
-        // return env('APP_NUXT_URL')._('/cart/success').'?id='.$this->getKey().'&hash='.$this->getHash();
+        // return nuxtUrl(_('/cart/success')).'?id='.$this->getKey().'&hash='.$this->getHash();
     }
 
     public function setOrderResponse()

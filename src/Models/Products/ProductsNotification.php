@@ -81,9 +81,9 @@ class ProductsNotification extends AdminModel
             $url = str_replace(':index', $this->product->getSlug(), $url);
             $url = str_replace(':variant', $this->variant->getKey(), $url);
 
-            return env('APP_NUXT_URL').$url;
+            return nuxtUrl($url);
         }
 
-        return env('APP_NUXT_URL').str_replace(':index', $this->product->getSlug(), _('/product/:index'));
+        return nuxtUrl(str_replace(':index', $this->product->getSlug(), _('/product/:index')));
     }
 }
