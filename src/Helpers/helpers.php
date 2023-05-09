@@ -6,7 +6,7 @@ function nuxtUrl($path = '')
 {
     $nuxtUrl = env('APP_NUXT_URL') ?: url();
 
-    $path = str_starts_with($path, '/') ? $path : '/'.$path;
+    $path = !str_starts_with($path, '/') && $path ? '/'.$path : $path;
 
     //We want first and not default lenguage, because that is rewrited in CMS.
     $defaultLocaleSlug = Localization::getFirstLanguage()?->slug;

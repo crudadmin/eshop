@@ -28,6 +28,20 @@ trait HasClientLocales
     }
 
     /**
+     * Set user localization
+     *
+     * @param  string  $locale
+     */
+    public function setLocale($locale = null)
+    {
+        $locale = $locale ?: $this->getLocale()?->slug;
+
+        Localization::setLocale($locale);
+
+        return $this;
+    }
+
+    /**
      * Run the callback with the given locale.
      *
      * @param  string  $locale

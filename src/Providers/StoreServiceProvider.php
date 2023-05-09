@@ -4,6 +4,7 @@ namespace AdminEshop\Providers;
 
 use Cmixin\BusinessDay;
 use Illuminate\Support\ServiceProvider;
+use PaymentService;
 
 class StoreServiceProvider extends ServiceProvider {
 
@@ -21,6 +22,13 @@ class StoreServiceProvider extends ServiceProvider {
         $this->app->bind('order.service', \AdminEshop\Contracts\OrderService::class);
 
         $this->initBusinessDates();
+    }
+
+    public function boot()
+    {
+        PaymentService::setPaymentUrl(function($path){
+            return nuxtUrl($path);
+        });
     }
 
     private function initBusinessDates()
