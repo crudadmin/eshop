@@ -8,8 +8,6 @@ use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Contracts\Order\Concerns\HasMutators;
 use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
-use AdminEshop\Contracts\Order\Concerns\HasPayments;
-use AdminEshop\Contracts\Order\Concerns\HasProviders;
 use AdminEshop\Contracts\Order\Concerns\HasShipping;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
@@ -17,6 +15,7 @@ use AdminEshop\Events\OrderCreated;
 use AdminEshop\Mail\OrderReceived;
 use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\OrdersStatus;
+use AdminPayments\Contracts\Concerns\HasProviders;
 use Admin\Core\Contracts\DataStore;
 use Cart;
 use Discounts;
@@ -31,7 +30,6 @@ class OrderService
     use DataStore,
         HasProviders,
         HasRequest,
-        HasPayments,
         HasValidation,
         HasMutators,
         HasMutatorsForward,
@@ -366,47 +364,6 @@ class OrderService
     private function addCurrency()
     {
         $this->getOrder()->currency_id = Store::getCurrency()?->getKey();
-    }
-
-    /**
-     * Generate invoice for order
-     *
-     * @return  Invoice|null
-     */
-    public function makeInvoice($type = 'proform', $data = [])
-    {
-        if ( ! $this->hasInvoices() ) {
-            return;
-        }
-
-        $order = $this->getOrder();
-
-        try {
-            //Generate proform
-            $invoice = $order->makeInvoice($type, $data);
-
-            //Set unpaid proform as paid
-            if ( $invoice->type == 'invoice' && $invoice->paid_at && $invoice->proform && !$invoice->proform->paid_at ){
-                $invoice->proform->update([
-                    'paid_at' => $invoice->paid_at,
-                ]);
-            }
-
-            return $invoice;
-        } catch (Exception $error){
-            Log::error($error);
-
-            $order->log()->create([
-                'type' => 'error',
-                'code' => 'INVOICE_ERROR',
-                'log' => $error->getMessage()
-            ]);
-
-            //Debug
-            if ( $this->isDebug() ) {
-                throw $error;
-            }
-        }
     }
 
     /**

@@ -3,25 +3,27 @@
 namespace AdminEshop\Models\Orders;
 
 use AdminEshop\Admin\Buttons\GenerateInvoice;
-use AdminEshop\Admin\Buttons\OrderMessagesButton;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\OnOrderStatusChange;
 use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderFields;
-use AdminEshop\Eloquent\Concerns\HasOrderHashes;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
-use AdminEshop\Eloquent\Concerns\HasOrderLog;
 use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
-use AdminEshop\Eloquent\Concerns\OrderPayments;
 use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
+use AdminEshop\Events\OrderPaid;
 use AdminEshop\Models\Delivery\Delivery;
+use AdminEshop\Models\Orders\OrdersLog;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\PaymentsMethod;
 use AdminEshop\Requests\SubmitOrderRequest;
+use AdminPayments\Admin\Buttons\OrderMessagesButton;
+use AdminPayments\Contracts\Concerns\HasPayments;
+use AdminPayments\Contracts\Concerns\Orderable;
+use AdminPayments\Models\Payments\Payment;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Illuminate\Http\Request;
@@ -29,18 +31,16 @@ use Illuminate\Notifications\Notifiable;
 use OrderService;
 use Store;
 
-class Order extends AdminModel
+class Order extends AdminModel implements Orderable
 {
     use Notifiable,
         OrderTrait,
-        OrderPayments,
+        HasPayments,
         OrderShipping,
         HasUsernames,
         HasOrderInvoice,
-        HasOrderHashes,
         HasOrderEmails,
         HasOrderNumber,
-        HasOrderLog,
         HasOrderFields;
 
     /*
@@ -343,5 +343,27 @@ class Order extends AdminModel
         return $this->validator($request)->use(
             $orderRequest
         );
+    }
+
+    public function setPaymentPaid(Payment $payment)
+    {
+        event(new OrderPaid($this));
+    }
+
+    public function isPaid() : bool
+    {
+        return $this->paid_at ? true : false;
+    }
+
+    public function getPaymentDescription()
+    {
+        return $this->items->map(function($item){
+            return $item->quantity.'x - '.$item->getProductName();
+        })->join('... '."\n");
+    }
+
+    public function log()
+    {
+        return $this->hasMany(OrdersLog::class);
     }
 }

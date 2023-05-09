@@ -143,7 +143,7 @@ return [
          * Available payment methods
          */
         'providers' => [
-            1 => AdminEshop\Contracts\Payments\GopayPayment::class,
+            // 1 => AdminPayments\Gateways\Gopay\GopayPayment::class,
         ],
     ],
 

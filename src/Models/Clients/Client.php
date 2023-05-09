@@ -3,8 +3,8 @@
 namespace AdminEshop\Models\Clients;
 
 use AdminEshop\Contracts\Discounts\ClientPercentage;
-use AdminEshop\Contracts\Payments\Stripe\HasClientStripe;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
+use AdminPayments\Gateways\Stripe\HasClientStripe;
 use Admin\Eloquent\Authenticatable;
 use Admin\Fields\Group;
 use Discounts;

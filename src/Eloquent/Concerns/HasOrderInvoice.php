@@ -2,7 +2,10 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Gogol\Invoices\Model\Invoice;
 use OrderService;
+Use Exception;
+use Log;
 
 trait HasOrderInvoice
 {
@@ -35,34 +38,66 @@ trait HasOrderInvoice
 
     public function makeInvoice($type = null, $data = [])
     {
-        $data = array_merge($this->getInvoiceData($type), $data);
-
-        //If is creating invoice, and order has proform
-        if (
-            $type == 'invoice'
-            && $proform = $this->invoices()->where('type', 'proform')->select(['id'])->first()
-        ) {
-            $data['proform_id'] = $proform->getKey();
+        if ( $this->hasInvoices() == false ){
+            return;
         }
 
-        //If invoice exists, regenerate it.
-        if ( $invoice = $this->invoices()->where('type', $type)->first() ){
-            //Delete invoice items for invoice regeneration
-            $invoice->items()->forceDelete();
+        try {
+            $data = array_merge($this->getInvoiceData($type), $data);
 
-            $invoice->update($data);
+            //If is creating invoice, and order has proform
+            if (
+                $type == 'invoice'
+                && $proform = $this->invoices()->where('type', 'proform')->select(['id'])->first()
+            ) {
+                $data['proform_id'] = $proform->getKey();
+            }
+
+            //If invoice exists, regenerate it.
+            if ( $invoice = $this->invoices()->where('type', $type)->first() ){
+                //Delete invoice items for invoice regeneration
+                $invoice->items()->forceDelete();
+
+                $invoice->update($data);
+            }
+
+            //If invoice does not exists
+            else {
+                $invoice = invoice()->make($type, $data);
+
+                $invoice->save();
+            }
+
+            $this->addMissingInvoiceOrderItems([], $invoice);
+
+            //Change invoice payment status
+            $this->setUnpaidInvoiceProformState($invoice);
+
+            return $invoice;
+        } catch (Exception $error){
+            Log::error($error);
+
+            $order->log()->create([
+                'type' => 'error',
+                'code' => 'INVOICE_ERROR',
+                'log' => $error->getMessage()
+            ]);
+
+            //Debug
+            if ( OrderService::isDebug() ) {
+                throw $error;
+            }
         }
+    }
 
-        //If invoice does not exists
-        else {
-            $invoice = invoice()->make($type, $data);
-
-            $invoice->save();
+    private function setUnpaidInvoiceProformState($invoice)
+    {
+        //Set unpaid proform as paid
+        if ( $invoice->type == 'invoice' && $invoice->paid_at && $invoice->proform && !$invoice->proform->paid_at ){
+            $invoice->proform->update([
+                'paid_at' => $invoice->paid_at,
+            ]);
         }
-
-        $this->addMissingInvoiceOrderItems([], $invoice);
-
-        return $invoice;
     }
 
     public function addMissingInvoiceOrderItems($items, $invoice)

@@ -43,6 +43,8 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
             [],
         );
 
+        $this->setPaymentConfig();
+
         $this->mergeMarkdownConfigs();
 
         $this->turnOfCacheForAdmin();
@@ -50,8 +52,6 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
         $this->pushComponentsPaths();
 
         $this->addStoreLogChannel();
-
-        $this->enablePaymentHooksCors();
     }
 
     private function addStoreLogChannel()
@@ -63,10 +63,16 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
         ]);
     }
 
-    private function enablePaymentHooksCors()
+    private function setPaymentConfig()
     {
-        $paths = config('cors.paths', []);
+        //Clone payment methods into admin payments config
+        config()->set('adminpayments.providers', config('adminpayments.providers', []) + config('admineshop.payment_methods.providers', []));
+        config()->set('adminpayments.payment_methods', array_merge(config('adminpayments.payment_methods', []), config('admineshop.payment_methods', [])));
 
-        $this->app['config']->set('cors.paths', array_values(array_unique(array_merge($paths, ['_store/*']))));
+        config()->set('adminpayments.invoices.enabled', config('admineshop.invoices', false));
+        config()->set('adminpayments.notificaions.paid', config('admineshop.mail.order.paid_notification', true));
+        config()->set('adminpayments.models', array_merge(config('adminpayments.models', []), [
+            \AdminEshop\Models\Orders\Order::class
+        ]));
     }
 }

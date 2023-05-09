@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Contracts\Delivery;
 
-use AdminEshop\Contracts\Order\OrderProvider;
+use AdminEshop\Contracts\Order\OrderConfigProvider;
 use AdminEshop\Models\Delivery\Delivery;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
@@ -10,7 +10,7 @@ use OrderService;
 use Cart;
 use Admin;
 
-class ShippingProvider extends OrderProvider
+class ShippingProvider extends OrderConfigProvider
 {
     /**
      * Admin order buttons

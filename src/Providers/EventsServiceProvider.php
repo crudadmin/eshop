@@ -4,10 +4,12 @@ namespace AdminEshop\Providers;
 
 use AdminEshop\Events\CartUpdated;
 use AdminEshop\Events\OrderCreated;
+use AdminEshop\Events\OrderPaid;
 use AdminEshop\Events\OrderStatusChange;
 use AdminEshop\Listeners\ClientLoggedInListener;
 use AdminEshop\Listeners\OnAdminUpdateListener;
 use AdminEshop\Listeners\OrderCreatedListener;
+use AdminEshop\Listeners\OrderPaidListener;
 use AdminEshop\Listeners\RegisterClientOnOrderCreated;
 use AdminEshop\Listeners\SendEmailOnOrderStatusChange;
 use AdminEshop\Listeners\UpdateTemporaryStockListener;
@@ -22,6 +24,9 @@ class EventsServiceProvider extends ServiceProvider
         OrderCreated::class => [
             OrderCreatedListener::class,
             RegisterClientOnOrderCreated::class,
+        ],
+        OrderPaid::class => [
+            OrderPaidListener::class,
         ],
         OrderStatusChange::class => [
             SendEmailOnOrderStatusChange::class,
