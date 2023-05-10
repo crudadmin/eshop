@@ -98,6 +98,11 @@ class ShippingProvider extends OrderConfigProvider
         if ( $inUnit == $toUnit ){
             return $weight;
         } else if ( $inUnit == 'grams' && $toUnit == 'kilograms'  ){
+            //Round easy weights
+            if ( $weight < 100 ){
+                $weight = ceil($weight / 100) * 100;
+            }
+
             return round($weight / 1000, 1);
         } else if ( $inUnit == 'kilograms' && $toUnit == 'grams'  ){
             return round($weight * 1000);
