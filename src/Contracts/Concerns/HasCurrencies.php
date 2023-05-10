@@ -65,7 +65,7 @@ trait HasCurrencies
             && $defaultCurrencyId !== $currency->getKey()
 
             //If rate is not flat
-            && ($rate = $currency->rate) !== 1.0
+            && ($rate = $currency->getAttribute('rate')) !== 1.0
         ){
             $price = $backward == true
                         ? $price / $rate

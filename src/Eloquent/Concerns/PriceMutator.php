@@ -376,8 +376,8 @@ trait PriceMutator
      */
     public function getVatValueAttribute()
     {
-        if ( $this->vat_id ) {
-            return Store::getVatValueById($this->vat_id);
+        if ( $vatId = $this->getAttribute('vat_id') ) {
+            return Store::getVatValueById($vatId);
         }
     }
 

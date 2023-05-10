@@ -51,8 +51,6 @@ trait OrderItemTrait
             ->get();
 
         return $products->map(function($product) use ($productModel) {
-            $product->name = $product->name ?: $product->parent_product_name;
-
             if ( config('admineshop.attributes.attributesVariants', false) == true ) {
                 $attributesText = $product->attributesVariantsText;
             } else if ( config('admineshop.attributes.attributesText', false) == true ) {
@@ -61,12 +59,17 @@ trait OrderItemTrait
                 $attributesText = null;
             }
 
-            //Extend name with attributes
-            $product->name .= $attributesText ? ' - '.$attributesText : '';
+            $name = ($product->getAttribute('name') ?: $product->getAttribute('parent_product_name')).$attributesText ? ' - '.$attributesText : '';
+
+            $product->setAttribute('name', $name);
 
             $product
                     ->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue', 'product_type'])
-                    ->setAppends(['priceWithVat', 'priceWithoutVat', 'vatValue']);
+                    ->setAppends([
+                        'priceWithVat',
+                        'priceWithoutVat',
+                        'vatValue'
+                    ]);
 
             return $product;
         });

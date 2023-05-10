@@ -111,7 +111,8 @@ class MySqlDriver extends BaseDriver implements DriverInterface
      */
     public function get($key = '', $default = null)
     {
-        $data = (array)($this->getCartSession()->data ?: []);
+        //Used getAttribute due to performance
+        $data = (array)($this->getCartSession()->getAttribute('data') ?: []);
 
         if ( ! $key ){
             return $data;
