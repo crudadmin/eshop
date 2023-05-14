@@ -59,7 +59,8 @@ trait OrderItemTrait
                 $attributesText = null;
             }
 
-            $name = ($product->getAttribute('name') ?: $product->getAttribute('parent_product_name')).$attributesText ? ' - '.$attributesText : '';
+            $name = ($product->getValue('name') ?: $product->getValue('parent_product_name'));
+            $name = $attributesText ? ' - '.$attributesText : '';
 
             $product->setAttribute('name', $name);
 
