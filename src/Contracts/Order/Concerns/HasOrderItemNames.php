@@ -2,6 +2,8 @@
 
 namespace AdminEshop\Contracts\Order\Concerns;
 
+use Admin;
+
 trait HasOrderItemNames
 {
     /**
@@ -57,7 +59,7 @@ trait HasOrderItemNames
 
         $name = '';
 
-        if ( $this->order_item_id ){
+        if ( Admin::isAdmin() && $this->order_item_id ){
             $name .= '<i class="fa fa-level-up-alt" style="transform: scaleX(-1); margin-left: 10px; margin-right: 10px"></i>';
         }
 
