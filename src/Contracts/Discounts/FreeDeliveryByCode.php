@@ -60,7 +60,7 @@ class FreeDeliveryByCode extends Discount implements Discountable
      */
     public function getName()
     {
-        return __('Doprava zdarma');
+        return _('Doprava zdarma');
     }
 
     /*

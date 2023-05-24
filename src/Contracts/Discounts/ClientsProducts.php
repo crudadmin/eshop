@@ -25,7 +25,7 @@ class ClientsProducts extends Discount implements Discountable
      */
     public function getName()
     {
-        return __('Zľava na produkt');
+        return _('Zľava na produkt');
     }
 
     public function canShowInEmail()
