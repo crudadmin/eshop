@@ -39,6 +39,7 @@ return [
      * Add eshop translates resources
      */
     'gettext_source_paths' => [
+        app_path('Eshop'),
         __DIR__.'/../Models',
         __DIR__.'/../Controllers',
         __DIR__.'/../Contracts',
