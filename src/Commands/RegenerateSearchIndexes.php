@@ -42,7 +42,9 @@ class RegenerateSearchIndexes extends Command
 
         $this->line('Regenerating '.$model->getTable());
 
-        $rows = $model->select($columns)->get();
+        $rows = $model->select($columns)->when($model->getProperty('publishable'), function($query){
+            $query->withUnpublished();
+        })->get();
 
         $total = $rows->count();
         $tenpercent = round($total / 10);
@@ -50,7 +52,7 @@ class RegenerateSearchIndexes extends Command
         $this->line('Rows: '.$total);
 
         foreach ($rows as $i => $row) {
-            if ( $i % $tenpercent == 0 ){
+            if ( $tenpercent && $i % $tenpercent == 0 ){
                 $this->line('Percentage: '.$i.'/'.$total);
             }
 

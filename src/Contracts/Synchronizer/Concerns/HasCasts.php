@@ -14,7 +14,7 @@ trait HasCasts
 
             if ( $isLocale ){
                 if ( is_string($value) || is_numeric($value) ) {
-                    $defaultLocaleSlug = Localization::get()->slug;
+                    $defaultLocaleSlug = Localization::getFirstLanguage()->slug;
 
                     $row[$key] = [
                         $defaultLocaleSlug => $value

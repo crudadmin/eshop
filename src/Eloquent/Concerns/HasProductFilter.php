@@ -81,7 +81,7 @@ trait HasProductFilter
                                     $query
                                         //We need clone settings from parent model
                                         ->cloneModelFilter($this)
-                                        ->filterParentProduct();
+                                        ->filterParentProduct(null, config('admineshop.attributes.inParentAttributes', []) ?: [0]);
                                 });
                         });
                     }
@@ -301,7 +301,7 @@ trait HasProductFilter
         }
     }
 
-    public function scopeFilterParentProduct($query, $filter = null)
+    public function scopeFilterParentProduct($query, $filter = null, $inParentAttributes = [])
     {
         $query->withoutGlobalScope('order');
 
@@ -313,7 +313,11 @@ trait HasProductFilter
         $filter = $filter ?: $this->getFilterOption('filter', []);
 
         if ( $this->getFilterOption('$ignore.filter.attributes', false) == false ) {
-            $query->applyAttributesFilter($filter, [], config('admineshop.attributes.inParentAttributes', []));
+            $query->applyAttributesFilter(
+                $filter,
+                [],
+                $inParentAttributes ?: config('admineshop.attributes.inParentAttributes', [])
+            );
         }
 
         $query->applyCategoryFilter($filter);
