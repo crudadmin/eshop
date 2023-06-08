@@ -43,7 +43,7 @@ class Feed
             foreach ($products as $i => $product)
             {
                 //Testing
-                // if ( $i > 100 ){
+                // if ( $i > 10 ){
                 //     continue;
                 // }
 
