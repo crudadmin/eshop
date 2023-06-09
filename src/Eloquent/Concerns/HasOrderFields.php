@@ -25,6 +25,7 @@ trait HasOrderFields
                 'client' => 'name:Klient|belongsTo:clients|inaccessible',
                 'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible',
                 'currency' => 'name:Mena|belongsTo:currencies,:name :char|hidden|removeFromForm',
+                'language' => 'name:Jazyk objednávky|belongsTo:languages|inaccessible'
             ],
             //Depreaced, can be removed in v4
             config('admineshop.delivery.packeta', false)

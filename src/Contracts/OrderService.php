@@ -17,6 +17,7 @@ use AdminEshop\Models\Orders\Order;
 use AdminEshop\Models\Orders\OrdersStatus;
 use AdminPayments\Contracts\Concerns\HasProviders;
 use Admin\Core\Contracts\DataStore;
+use Localization;
 use Cart;
 use Discounts;
 use Exception;
@@ -326,6 +327,7 @@ class OrderService
     public function buildOrder(CartCollection $items)
     {
         $this->addCurrency();
+        $this->addLanguage();
         $this->addOrderPrices($items);
         $this->addDiscountsData($items);
 
@@ -364,6 +366,13 @@ class OrderService
     private function addCurrency()
     {
         $this->getOrder()->currency_id = Store::getCurrency()?->getKey();
+    }
+
+    private function addLanguage()
+    {
+        if ( Admin::isEnabledLocalization() ) {
+            $this->getOrder()->language_id = Localization::get()->getKey();
+        }
     }
 
     /**
