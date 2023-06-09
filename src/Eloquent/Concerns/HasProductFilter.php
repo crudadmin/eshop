@@ -96,7 +96,7 @@ trait HasProductFilter
                     $query
                         ->variantsProducts()
                         ->cloneModelFilter($this)
-                        ->filterParentProduct()
+                        ->filterParentProduct(null, config('admineshop.attributes.inParentAttributes', []) ?: [0])
                         //Only when filter of parent product matches with variants
                         ->whereHas('variants', function($query) use ($filter) {
                             $query
