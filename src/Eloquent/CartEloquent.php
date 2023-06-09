@@ -7,6 +7,7 @@ use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
+use AdminEshop\Eloquent\Concerns\HasPriceLevels;
 use AdminEshop\Eloquent\Concerns\HasProductAttributes;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Eloquent\Concerns\WithExtender;
@@ -16,6 +17,7 @@ use Cart;
 class CartEloquent extends AdminModel implements CanBeInCart, DiscountSupport
 {
     use PriceMutator,
+        HasPriceLevels,
         DiscountHelper,
         WithExtender;
 

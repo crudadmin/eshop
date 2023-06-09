@@ -2,21 +2,23 @@
 
 namespace AdminEshop\Models\Delivery;
 
+use Admin;
 use AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice;
 use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
+use AdminEshop\Eloquent\Concerns\HasPriceLevels;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Discounts;
 use OrderService;
 use Store;
-use Admin;
 
 class Delivery extends AdminModel implements DiscountSupport
 {
     use PriceMutator,
+        HasPriceLevels,
         DiscountHelper;
 
     /*
@@ -203,6 +205,8 @@ class Delivery extends AdminModel implements DiscountSupport
     {
         $with = [];
 
+        $query->select(['deliveries.*']);
+
         //Autoload default delivery locations
         if (
             config('admineshop.delivery.multiple_locations.enabled') == true
@@ -221,6 +225,8 @@ class Delivery extends AdminModel implements DiscountSupport
         }
 
         $query->with($with);
+
+        $query->withPriceLevelsColumns();
     }
 
     public function setCartResponse()

@@ -128,7 +128,10 @@ class PaymentMethodMutator extends Mutator
     public function getPaymentMethods()
     {
         return $this->cache('paymentMethods', function(){
-            return Admin::getModel('PaymentsMethod')->onlyAvailable()->get();
+            return Admin::getModel('PaymentsMethod')
+                    ->withCartResponse()
+                    ->onlyAvailable()
+                    ->get();
         });
     }
 

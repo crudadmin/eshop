@@ -2,15 +2,17 @@
 
 namespace AdminEshop\Models\Store;
 
+use AdminEshop\Eloquent\Concerns\HasPriceLevels;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Fields\Group;
 use Gogol\Invoices\Model\PaymentsMethod as BasePaymentsMethod;
-use Store;
 use PaymentService;
+use Store;
 
 class PaymentsMethod extends BasePaymentsMethod
 {
-    use PriceMutator;
+    use PriceMutator,
+        HasPriceLevels;
 
     protected $group = 'store';
 
@@ -95,6 +97,13 @@ class PaymentsMethod extends BasePaymentsMethod
     public function scopeOnlyAvailable($query)
     {
 
+    }
+
+    public function scopeWithCartResponse($query)
+    {
+        $query->select(['payments_methods.*']);
+
+        $query->withPriceLevelsColumns();
     }
 
     public function getPaymentMethodProvider()

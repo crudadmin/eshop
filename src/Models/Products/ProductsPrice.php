@@ -46,24 +46,32 @@ class ProductsPrice extends AdminModel
 
     public function belongsToModel()
     {
-        return get_class(Admin::getModel('Product'));
+        return array_filter([
+            get_class(Admin::getModel('Product')),
+            config('admineshop.delivery.enabled') ? get_class(Admin::getModel('Delivery')) : null,
+            config('admineshop.payment_methods.enabled') ? get_class(Admin::getModel('PaymentsMethod')) : null,
+        ]);
     }
 
     public function fields($row = null)
     {
+        $relationColumn = collect($this->getForeignColumn())->firstWhere(function($key, $table){
+            return request()->has($key) ? $key : null;
+        });
+
         return [
             'currency' => [
                 'name' => 'Mena',
                 'belongsTo' => 'currencies,:name',
                 'defaultByOption' => 'default,1',
-                Rule::unique('products_prices')->ignore($row?->id)->where('product_id', request('product_id'))->withoutTrashed(),
+                Rule::unique('products_prices')->ignore($row?->id)->where($relationColumn, request($relationColumn))->withoutTrashed(),
             ],
             'vat' => [
                 'name' => 'Sazba DPH',
                 'belongsTo' => 'vats,:name - :vat%',
                 'defaultByOption' => 'default,1',
                 'canAdd' => true,
-                Rule::unique('products_prices')->ignore($row?->id)->where('product_id', request('product_id'))->where('currency_id', request('currency_id'))->withoutTrashed(),
+                Rule::unique('products_prices')->ignore($row?->id)->where($relationColumn, request($relationColumn))->where('currency_id', request('currency_id'))->withoutTrashed(),
             ],
             'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField',
         ];
