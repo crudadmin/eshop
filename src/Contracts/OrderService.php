@@ -365,12 +365,14 @@ class OrderService
 
     private function addCurrency()
     {
-        $this->getOrder()->currency_id = Store::getCurrency()?->getKey();
+        if ( !$this->getOrder()->currency_id ){
+            $this->getOrder()->currency_id = Store::getCurrency()?->getKey();
+        }
     }
 
     private function addLanguage()
     {
-        if ( Admin::isEnabledLocalization() ) {
+        if ( Admin::isEnabledLocalization() && !$this->getOrder()->language_id ) {
             $this->getOrder()->language_id = Localization::get()->getKey();
         }
     }
