@@ -5,6 +5,9 @@ namespace AdminEshop\Models\Products;
 use Admin;
 use AdminEshop\Admin\Rules\ProductsPriceLevelsCheck;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Models\Delivery\Delivery;
+use AdminEshop\Models\Products\Product;
+use AdminEshop\Models\Store\PaymentsMethod;
 use Admin\Eloquent\AdminModel;
 use Illuminate\Validation\Rule;
 use Store;
@@ -47,9 +50,9 @@ class ProductsPrice extends AdminModel
     public function belongsToModel()
     {
         return array_filter([
-            get_class(Admin::getModel('Product')),
-            config('admineshop.delivery.enabled') ? get_class(Admin::getModel('Delivery')) : null,
-            config('admineshop.payment_methods.enabled') ? get_class(Admin::getModel('PaymentsMethod')) : null,
+            Product::class,
+            config('admineshop.delivery.enabled') ? Delivery::class : null,
+            config('admineshop.payment_methods.enabled') ? PaymentsMethod::class : null,
         ]);
     }
 

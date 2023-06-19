@@ -17,6 +17,7 @@ use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
 use AdminEshop\Eloquent\Concerns\OrderItemTrait;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Models\Orders\Order;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
@@ -73,7 +74,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
     public function belongsToModel()
     {
-        return get_class(Admin::getModel('Order'));
+        return Order::class;
     }
 
     /*
