@@ -7,6 +7,7 @@ use AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice;
 use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
 use AdminEshop\Eloquent\Concerns\DiscountHelper;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
+use AdminEshop\Eloquent\Concerns\HasCartDeliveryFilter;
 use AdminEshop\Eloquent\Concerns\HasPriceLevels;
 use AdminEshop\Eloquent\Concerns\PriceMutator;
 use Admin\Eloquent\AdminModel;
@@ -19,7 +20,8 @@ class Delivery extends AdminModel implements DiscountSupport
 {
     use PriceMutator,
         HasPriceLevels,
-        DiscountHelper;
+        DiscountHelper,
+        HasCartDeliveryFilter;
 
     /*
      * Model created date, for ordering tables in database and in user interface

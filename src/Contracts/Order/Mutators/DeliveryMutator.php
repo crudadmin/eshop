@@ -171,38 +171,11 @@ class DeliveryMutator extends Mutator
 
     private function getFilteredDeliveriesWithDiscounts()
     {
+        $model = Admin::getModel('Delivery');
+
         $deliveries = $this->getDeliveries();
 
-        //If countries filter support is enabled,
-        //and country has been selected
-        if (
-            config('admineshop.delivery.countries') == true
-            && $selectedCountry = $this->getCountryMutator()->getSelectedCountry()
-        ) {
-            $deliveries = $deliveries->filter(function($delivery) use ($selectedCountry) {
-                $allowedCountries = $delivery->countries->pluck('id')->toArray();
-
-                //No countries has been specified, allowed is all
-                if ( count($allowedCountries) == 0 ){
-                    return true;
-                }
-
-                return in_array($selectedCountry->getKey(), $allowedCountries);
-            });
-        }
-
-        //If is price limiter available
-        if ( config('admineshop.delivery.price_limit') ) {
-            $priceWithVat = $this->getCartItems()->getSummary()['priceWithVat'] ?? 0;
-
-            $deliveries = $deliveries->filter(function($delivery) use ($priceWithVat) {
-                if ( !$delivery->price_limit ){
-                    return true;
-                }
-
-                return $priceWithVat <= $delivery->price_limit;
-            });
-        }
+        $deliveries = $model->filterCartDeliveries($deliveries, $this);
 
         return Cart::addCartDiscountsIntoModel(
             $deliveries->values()->each->setCartResponse()
