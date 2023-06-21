@@ -16,7 +16,9 @@ trait HasFeed
 
     public function scopeWithFeedListing($query)
     {
-        $query->parentProducts();
+        $query
+            ->select('products.*')
+            ->parentProducts();
     }
 
     public function getFeedUrl($parentProduct = null)
