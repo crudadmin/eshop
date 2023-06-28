@@ -260,6 +260,24 @@ class Store
     {
         return Admin::isEnabledLocalization() && config('admineshop.localization', false) === true;
     }
+
+    public function getNuxtUrl($path)
+    {
+        if ( function_exists('getNuxtUrl') ){
+            return getNuxtUrl($path);
+        }
+
+        $nuxtUrl = env('APP_NUXT_URL') ?: url('/');
+
+        $path = !str_starts_with($path, '/') && $path ? '/'.$path : $path;
+
+        //We want first and not default lenguage, because that is rewrited in CMS.
+        $defaultLocaleSlug = Localization::getFirstLanguage()?->slug;
+
+        $localeSlug = Localization::get()?->slug;
+
+        return $nuxtUrl.($localeSlug == $defaultLocaleSlug ? '' : '/'.$localeSlug).$path;
+    }
 }
 
 ?>
