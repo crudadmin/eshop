@@ -13,6 +13,7 @@ use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\Store as StoreModel;
 use AdminEshop\Models\Store\Vat;
 use Admin\Core\Contracts\DataStore;
+use Localization;
 use Cart;
 
 class Store
