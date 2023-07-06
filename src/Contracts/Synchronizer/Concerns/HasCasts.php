@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HasCasts
 {
+    public function getLocalization()
+    {
+        return $this->cache('locale', function(){
+            return Localization::getFirstLanguage();
+        });
+    }
+
+    public function getLocaleSlug()
+    {
+        return $this->getLocalization()->slug;
+    }
+
     public function castData(Model $model, $row)
     {
         foreach ($row as $key => $value) {
@@ -14,10 +26,8 @@ trait HasCasts
 
             if ( $isLocale ){
                 if ( is_string($value) || is_numeric($value) ) {
-                    $defaultLocaleSlug = Localization::getFirstLanguage()->slug;
-
                     $row[$key] = [
-                        $defaultLocaleSlug => $value
+                        $this->getLocaleSlug() => $value
                     ];
                 }
 
@@ -81,6 +91,28 @@ trait HasCasts
 
         $this->removeHelperAttributes($row);
 
+        $this->addOtherLocalesIntoUpdatedRow($model, $row, $oldRow);
+
         return $row;
+    }
+
+    private function addOtherLocalesIntoUpdatedRow($model, &$row, $oldRow)
+    {
+        foreach ($row as $key => $newValue) {
+            if ( !$this->isLocalizedField($model, $key) ){
+                continue;
+            }
+
+            $oldValue = ($oldValue = $oldRow->{$key}) ? json_decode($oldValue, true) : [];
+            $newValue = $newValue ? json_decode($newValue, true) : [];
+            $finalValue = array_merge($oldValue, $newValue);
+
+            $row[$key] = $this->encodeJsonArray($finalValue);
+        }
+    }
+
+    public function encodeJsonArray($value)
+    {
+        return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 }

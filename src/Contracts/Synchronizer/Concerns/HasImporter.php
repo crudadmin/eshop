@@ -174,20 +174,23 @@ trait HasImporter
 
     private function isLocalizedField(Model $model, $key)
     {
+        if ( $key == 'slug' ){
+            return $model->hasLocalizedSlug();
+        }
+
         return $this->cache($model->getTable().'.isLocale.'.$key, function() use ($model, $key){
             return $model instanceof AdminModel && $model->hasFieldParam($key, 'locale', true);
         });
     }
 
-    private function encodeJsonArray($value)
-    {
-        return json_encode($value, JSON_UNESCAPED_UNICODE);
-    }
-
     private function isSameValue(Model $model, $key, $value, $oldValue)
     {
         if ( $this->isLocalizedField($model, $key) ) {
-            return $value == $this->encodeJsonArray(json_decode($oldValue));
+            $locale = $this->getLocaleSlug();
+            $newValue = json_decode($value, true);
+            $oldValue = json_decode($oldValue, true);
+
+            return ($newValue[$locale] ?? null) === ($oldValue[$locale] ?? null);
         }
 
         return $value == $oldValue;
