@@ -91,6 +91,7 @@ trait HasListingSupport
         $items = [
             $cachePrefix,
             Localization::get()->slug,
+            client()?->getKey()
         ];
 
         //Get filter hash
