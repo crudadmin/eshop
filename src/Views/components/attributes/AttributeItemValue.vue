@@ -6,7 +6,7 @@
 
         <input
             :type="fieldType"
-            :name="field_key"
+            :name="name"
             :value="value"
             @keyup="onChange"
             :step="unitFormat == 'decimal' ? 'any' : ''"
@@ -19,7 +19,7 @@
 
 <script type="text/javascript">
 export default {
-    props : ['field_key', 'field', 'row', 'model', 'value'],
+    props : ['name', 'field', 'row', 'model', 'value'],
 
     data(){
         return {
