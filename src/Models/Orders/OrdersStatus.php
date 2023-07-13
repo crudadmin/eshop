@@ -74,7 +74,7 @@ class OrdersStatus extends AdminModel
                     'return_stock' => 'name:Vrátiť tovat na sklad|type:checkbox|default:0|title:Pri zvolení tohto stavu bude tovar z objednávky vráteny späť na sklad|removeFromFormIf:default,1'
                 ]),
                 Group::inline([
-                    'activness_change' => 'name:Zmeniť na iný stav po neaktívnosti|type:checkbox|default:0|title:Ak bude stav neaktívny dlhšiu dobu, prepne sa objednávka do iného stavu.',
+                    'activness_change' => 'name:Zmeniť na iný stav po neaktívnosti|type:checkbox|default:0|title:Ak bude stav bez zmeny dlhšiu dobu, prepne sa automatický do iného stavu.',
                     'activness_duration' => 'name:Prepnúť po dňoch|type:select|options:1,2,3,5,7,14|required_if:activness_change,1|visibleFieldIf:activness_change,1',
                     'activness_status' => 'name:Prepnúť na status|belongsTo:orders_statuses,name|required_if:activness_change,1|visibleFieldIf:activness_change,1',
                 ])->add('hidden'),
