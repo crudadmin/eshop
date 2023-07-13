@@ -10,6 +10,8 @@ use Ajax;
 
 class OnOrderStatusChange extends AdminRule
 {
+    public $frontend = true;
+
     /*
      * Firing callback on create row
      */
@@ -38,6 +40,12 @@ class OnOrderStatusChange extends AdminRule
         if ( !($status = $order->status) ){
             return;
         }
+
+        $order->log()->create([
+            'type' => 'info',
+            'code' => 'status',
+            'message' => $status->name,
+        ]);
 
         event(new OrderStatusChange($order, $status));
     }

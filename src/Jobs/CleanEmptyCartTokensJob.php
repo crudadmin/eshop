@@ -13,7 +13,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
-use Log;
+use Store;
 
 class CleanEmptyCartTokensJob implements ShouldQueue
 {
@@ -30,7 +30,7 @@ class CleanEmptyCartTokensJob implements ShouldQueue
         $removeEmptyAfterDays = config('admineshop.cart.token.remove_empty_after_days', 0) ?: 0;
         $removeOldStockBlocks = config('admineshop.stock.temporary_block_time', 0) ?: 0;
 
-        Log::channel('store')->info('Cart tokens remover initialized. [inactive '.$removeInactiveAfterDays.' days / empty '.$removeEmptyAfterDays.' days]');
+        Store::log()->info('Cart tokens remover initialized. [inactive '.$removeInactiveAfterDays.' days / empty '.$removeEmptyAfterDays.' days]');
 
         //Remove older stock blocks than given limit
         if ( is_numeric($removeOldStockBlocks) && $removeOldStockBlocks > 0 ) {
@@ -57,7 +57,7 @@ class CleanEmptyCartTokensJob implements ShouldQueue
         if ( ($count = $tokens->count()) > 0 ) {
             $this->removeTokens($tokens);
 
-            Log::channel('store')->info('Inactive cart tokens removed: '.$count);
+            Store::log()->info('Inactive cart tokens removed: '.$count);
         }
     }
 
@@ -77,7 +77,7 @@ class CleanEmptyCartTokensJob implements ShouldQueue
         if ( ($count = $tokens->count()) > 0 ) {
             $this->removeTokens($tokens);
 
-            Log::channel('store')->info('Empty cart tokens removed: '.$count);
+            Store::log()->info('Empty cart tokens removed: '.$count);
         }
     }
 

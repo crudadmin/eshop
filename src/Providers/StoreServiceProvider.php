@@ -2,7 +2,11 @@
 
 namespace AdminEshop\Providers;
 
+use AdminEshop\Jobs\CleanEmptyCartTokensJob;
+use AdminEshop\Jobs\ProductAvaiabilityChecker;
+use AdminEshop\Jobs\SetOrderStatusAfterInactivness;
 use Cmixin\BusinessDay;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use PaymentService;
 
@@ -29,6 +33,8 @@ class StoreServiceProvider extends ServiceProvider {
         PaymentService::setPaymentUrl(function($path){
             return nuxtUrl($path);
         });
+
+        $this->registerSchedules();
     }
 
     private function initBusinessDates()
@@ -38,5 +44,17 @@ class StoreServiceProvider extends ServiceProvider {
             config('admineshop.holidays.country', 'sk'),
             config('admineshop.holidays.additional', [])
         );
+    }
+
+    public function registerSchedules()
+    {
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->job(new CleanEmptyCartTokensJob)->dailyAt('04:00');
+            $schedule->job(new SetOrderStatusAfterInactivness)->dailyAt('05:55');
+
+            if ( $scheduleAt = config('admineshop.stock.stock_notifier_scheduler') ) {
+                $schedule->job(new ProductAvaiabilityChecker)->{$scheduleAt}();
+            }
+        });
     }
 }

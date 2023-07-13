@@ -9,11 +9,8 @@ use AdminEshop\Commands\ImportPickupPoints;
 use AdminEshop\Commands\MigrateProductAttributesFromVersion2;
 use AdminEshop\Commands\RegenerateSearchIndexes;
 use AdminEshop\Commands\StockNotification;
-use AdminEshop\Jobs\CleanEmptyCartTokensJob;
-use AdminEshop\Jobs\ProductAvaiabilityChecker;
 use Admin\Providers\AdminHelperServiceProvider;
 use Carbon\Carbon;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Kernel;
 
 class AppServiceProvider extends AdminHelperServiceProvider
@@ -65,8 +62,6 @@ class AppServiceProvider extends AdminHelperServiceProvider
             RegenerateSearchIndexes::class,
             FixProductCategoriesTree::class,
         ]);
-
-        $this->registerSchedules();
     }
 
     /**
@@ -113,16 +108,5 @@ class AppServiceProvider extends AdminHelperServiceProvider
         $this->publishes([__DIR__ . '/../Views' => resource_path('views/vendor/admineshop') ], 'admineshop.views');
         $this->publishes([__DIR__ . '/../Config/config.php' => config_path('admineshop.php') ], 'admineshop.config');
         $this->publishes([__DIR__ . '/../Resources/dist' => public_path('vendor/admineshop') ], 'admineshop.resources');
-    }
-
-    public function registerSchedules()
-    {
-        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
-            $schedule->job(new CleanEmptyCartTokensJob)->dailyAt('04:00');
-
-            if ( $scheduleAt = config('admineshop.stock.stock_notifier_scheduler') ) {
-                $schedule->job(new ProductAvaiabilityChecker)->{$scheduleAt}();
-            }
-        });
     }
 }

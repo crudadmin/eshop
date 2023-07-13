@@ -15,6 +15,7 @@ use AdminEshop\Models\Store\Vat;
 use Admin\Core\Contracts\DataStore;
 use Localization;
 use Cart;
+use Log;
 
 class Store
 {
@@ -278,6 +279,11 @@ class Store
         $localeSlug = Localization::get()?->slug;
 
         return $nuxtUrl.($localeSlug == $defaultLocaleSlug ? '' : '/'.$localeSlug).$path;
+    }
+
+    public function log()
+    {
+        return Log::channel('store');
     }
 }
 
