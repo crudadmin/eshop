@@ -9,7 +9,6 @@ use AdminEshop\Mail\OrderStatus;
 use Illuminate\Support\Facades\Mail;
 use Log;
 use Store;
-use Ajax;
 
 class SendEmailOnOrderStatusChange
 {
@@ -36,7 +35,7 @@ class SendEmailOnOrderStatusChange
 
                     $order->logReport('info', null, $message = 'Email o zmene stavu objednávky "'.$order->status->name.'" bol odoslaný.');
 
-                    Ajax::notice($message);
+                    autoAjax()->pushMessage($message);
                 } catch (Exception $e){
                     $order->logReport('error', null, 'Email o zmene stavu objednávky nebol odoslaný.', $e->getMessage());
 
