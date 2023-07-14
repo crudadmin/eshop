@@ -3,12 +3,6 @@
 namespace AdminEshop\Providers;
 
 use Admin;
-use AdminEshop\Commands\CleanEmptyCartTokens;
-use AdminEshop\Commands\FixProductCategoriesTree;
-use AdminEshop\Commands\ImportPickupPoints;
-use AdminEshop\Commands\MigrateProductAttributesFromVersion2;
-use AdminEshop\Commands\RegenerateSearchIndexes;
-use AdminEshop\Commands\StockNotification;
 use Admin\Providers\AdminHelperServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\Kernel;
@@ -55,12 +49,13 @@ class AppServiceProvider extends AdminHelperServiceProvider
         Carbon::setLocale(config('admin.locale', 'sk'));
 
         $this->commands([
-            ImportPickupPoints::class,
-            CleanEmptyCartTokens::class,
-            StockNotification::class,
-            MigrateProductAttributesFromVersion2::class,
-            RegenerateSearchIndexes::class,
-            FixProductCategoriesTree::class,
+            \AdminEshop\Commands\ImportPickupPoints::class,
+            \AdminEshop\Commands\CleanEmptyCartTokens::class,
+            \AdminEshop\Commands\StockNotification::class,
+            \AdminEshop\Commands\MigrateProductAttributesFromVersion2::class,
+            \AdminEshop\Commands\RegenerateSearchIndexes::class,
+            \AdminEshop\Commands\FixProductCategoriesTree::class,
+            \AdminEshop\Commands\CleanDeletedProducts::class,
         ]);
     }
 

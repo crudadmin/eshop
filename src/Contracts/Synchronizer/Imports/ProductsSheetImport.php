@@ -75,8 +75,8 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         foreach ($this->treeProductIdentifier as $pairingColumn => $items) {
             $hasVariants = count($items) > 1;
 
-            $item = $this->getImportProduct([
-                'name' => $items[0][$this->importer->getColumnNameByField('name')],
+            $item = $this->setParentProduct([
+                'name' => $items[0][$this->importer->getColumnNameByField('name')] ?? null,
                 'code_pairing' => $pairingColumn,
                 'product_type' => $hasVariants ? 'variants' : 'regular',
                 '$categories' => $this->getCategoriesList($items),
@@ -89,7 +89,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
 
             //If is regulat product type, we want add additional info
             if ( in_array($item['product_type'], ['regular']) ){
-                $item = $item + $this->prepareProductItem($items[0]);
+                $item = $item + $this->setProduct($items[0]);
             }
 
             $products[] = $item;
@@ -98,7 +98,7 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         return $products;
     }
 
-    public function getImportProduct($item, $items, $key)
+    public function setParentProduct($item, $items, $key)
     {
         return $item;
     }
@@ -120,11 +120,11 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
                     //Allow attributes only for parent products, or attributes defines as variant => false
                     return ($column['variant'] ?? true) === true;
                 }),
-            ] + $this->prepareProductItem($variant, true);
+            ] + $this->setProduct($variant, true);
         });
     }
 
-    protected function prepareProductItem($item, $variant = false)
+    protected function setProduct($item, $variant = false)
     {
         $array = [];
 
