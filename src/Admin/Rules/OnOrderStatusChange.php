@@ -15,9 +15,11 @@ class OnOrderStatusChange extends AdminRule
     /*
      * Firing callback on create row
      */
-    public function creating(AdminModel $row)
+    public function created(AdminModel $row)
     {
-        $this->setStatusChange($row);
+        if ( Admin::isAdmin() ) {
+            $this->setStatusChange($row);
+        }
     }
 
     /*
