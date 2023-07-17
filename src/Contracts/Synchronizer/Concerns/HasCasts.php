@@ -98,13 +98,13 @@ trait HasCasts
 
     private function addOtherLocalesIntoUpdatedRow($model, &$row, $oldRow)
     {
-        foreach ($row as $key => $newValue) {
+        foreach ($row as $key => $origNewValue) {
             if ( !$this->isLocalizedField($model, $key) ){
                 continue;
             }
 
-            $oldValue = ($oldValue = $oldRow->{$key}) ? json_decode($oldValue, true) : [];
-            $newValue = $newValue ? json_decode($newValue, true) : [];
+            $oldValue = $oldRow && ($oldValue = $oldRow->{$key} ?? null) ? json_decode($oldValue, true) : [];
+            $newValue = $origNewValue ? (json_decode($origNewValue, true) ?: []) : [];
             $finalValue = array_merge($oldValue, $newValue);
 
             $row[$key] = $this->encodeJsonArray($finalValue);

@@ -75,7 +75,7 @@ class SheetImportWrapper
         $columns = $this->getCastedColumns();
 
         if ( $columnName = (collect($columns)->where('column', $key)->keys()[0] ?? null) ){
-            return FromXlsToArray::parseHeaderString($columnName);
+            return $this->parseKey($columnName);
         }
 
         if ( array_key_exists($key, $columns) ){
@@ -122,9 +122,14 @@ class SheetImportWrapper
 
         return $this->castedColumns = array_combine(
             array_map(function($key){
-                return FromXlsToArray::parseHeaderString($key);
+                return $this->parseKey($key);
             }, array_keys($columns)),
             array_values($columns)
         );
+    }
+
+    public function parseKey($columnName)
+    {
+        return FromXlsToArray::parseHeaderString($columnName);
     }
 }
