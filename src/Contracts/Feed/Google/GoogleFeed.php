@@ -3,7 +3,6 @@
 namespace AdminEshop\Contracts\Feed\Google;
 
 use AdminEshop\Contracts\Feed\Feed;
-use Admin;
 
 class GoogleFeed extends Feed
 {
