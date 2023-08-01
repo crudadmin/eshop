@@ -45,7 +45,7 @@ class DPDApi
     public function getPackageEndpoint()
     {
         if ($this->options['testMode']) {
-            return 'https://capi.dpdportal.sk/apix/shipment/json';
+            return 'https://capi.dpd.sk/shipment/json';
         }
 
         return 'https://api.dpd.sk/shipment/json';
