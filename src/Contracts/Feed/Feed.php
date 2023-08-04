@@ -8,6 +8,13 @@ use Store;
 
 class Feed
 {
+    private $locale;
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
     public function getContentType()
     {
         return $this->contentType;
@@ -110,7 +117,7 @@ class Feed
 
     public function cacheKey($key)
     {
-        return 'store.feed.'.static::class.'.'.$key;
+        return 'store.feed.'.static::class.'.'.$key.'.'.($this->locale ?: 'default');
     }
 
     public function getCachedData()

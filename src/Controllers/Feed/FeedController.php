@@ -9,6 +9,6 @@ class FeedController extends Controller
 {
     public function index($type = 'heureka')
     {
-        return (new FeedGenerator($type))->response();
+        return (new FeedGenerator($type, request('locale')))->response();
     }
 }

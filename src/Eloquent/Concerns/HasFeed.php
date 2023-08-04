@@ -18,7 +18,13 @@ trait HasFeed
     {
         $query
             ->select('products.*')
-            ->parentProducts();
+            ->parentProducts()
+            ->WithPriceLevelsColumns()
+            ->with([
+                'variants' => function($query){
+                    $query->WithPriceLevelsColumns();
+                }
+            ]);
     }
 
     public function getFeedUrl($parentProduct = null)
