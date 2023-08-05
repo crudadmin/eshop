@@ -167,7 +167,7 @@ class ProductsIdentifier extends Identifier
     public function getProductNameParts(UsesIdentifier $item) : array
     {
         if ( $item instanceof OrdersItem ) {
-            if ( $item->product->isType('variant') ){
+            if ( $item->product?->isType('variant') ){
                 $variant = $item->product;
                 $product = $item->product->product;
             } else {
@@ -179,7 +179,9 @@ class ProductsIdentifier extends Identifier
             $variant = $item->getValue('variant');
         }
 
-        $productOrVariant = $variant ?: $product;
+        if ( !($productOrVariant = $variant ?: $product) ){
+            return [];
+        }
 
         $items = [
             $variant ? ($variant->name ?: $product?->name) : $product?->name
