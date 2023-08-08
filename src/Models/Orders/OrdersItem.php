@@ -114,6 +114,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         return [
             'vat' => Store::getVats()->map(function($item){
                 $item->vatValue = $item->vat.'%';
+
                 return $item;
             })->pluck('vatValue', 'vat'),
             'product_id' => $this->getAvailableProducts(),

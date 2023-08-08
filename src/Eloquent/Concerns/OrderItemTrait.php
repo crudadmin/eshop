@@ -4,6 +4,7 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Models\Products\Product;
+use Localization;
 use Store;
 use Admin;
 
@@ -61,6 +62,9 @@ trait OrderItemTrait
 
             $name = ($product->getValue('name') ?: $product->getValue('parent_product_name')) ?: '';
             $name .= $attributesText ? ' - '.$attributesText : '';
+            if ( $product->hasFieldParam('name', 'locale') ) {
+                $name = [Localization::getLocale() => $name];
+            }
 
             $product->setAttribute('name', $name);
 
