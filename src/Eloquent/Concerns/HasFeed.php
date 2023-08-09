@@ -19,10 +19,12 @@ trait HasFeed
         $query
             ->select('products.*')
             ->parentProducts()
-            ->WithPriceLevelsColumns()
+            ->withPriceLevelsColumns()
             ->with([
                 'variants' => function($query){
-                    $query->WithPriceLevelsColumns();
+                    $query
+                        ->select('products.*')
+                        ->withPriceLevelsColumns();
                 }
             ]);
     }
