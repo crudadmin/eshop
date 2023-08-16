@@ -56,6 +56,7 @@ class AppServiceProvider extends AdminHelperServiceProvider
             \AdminEshop\Commands\RegenerateSearchIndexes::class,
             \AdminEshop\Commands\FixProductCategoriesTree::class,
             \AdminEshop\Commands\CleanDeletedProducts::class,
+            \AdminEshop\Commands\CheckOrderInactiveStatus::class,
         ]);
     }
 
