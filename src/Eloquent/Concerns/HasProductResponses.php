@@ -35,8 +35,10 @@ trait HasProductResponses
         'cart.variants.attributes' => false,
         'gallery.columns.filter_by' => 'default',
         'gallery.columns.image_name' => 'galery_main_default_image',
+        'feed.attributes' => true,
         'feed.variants' => true,
         'feed.variants.filter' => true,
+        'feed.variants.attributes' => true,
     ];
 
     public function scopeOnlyFiltrable($query, $callback, $prefix = null)
@@ -434,6 +436,8 @@ trait HasProductResponses
     {
         //Depreaced
         $query->withFeedListing();
+
+        $query->with([ 'categories' ]);
 
         $this->setFilterOptions($options, 'feed');
 
