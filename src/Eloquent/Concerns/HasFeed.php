@@ -14,19 +14,14 @@ trait HasFeed
         return $this->product_id ? $this->product_id.'_'.$this->getKey() : $this->getKey();
     }
 
+    /**
+     * Depreacted
+     *
+     * @param  Builder  $query
+     */
     public function scopeWithFeedListing($query)
     {
-        $query
-            ->select('products.*')
-            ->parentProducts()
-            ->withPriceLevelsColumns()
-            ->with([
-                'variants' => function($query){
-                    $query
-                        ->select('products.*')
-                        ->withPriceLevelsColumns();
-                }
-            ]);
+        //..
     }
 
     public function getFeedUrl($parentProduct = null)

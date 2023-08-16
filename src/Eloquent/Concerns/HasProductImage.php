@@ -125,8 +125,11 @@ trait HasProductImage
         });
     }
 
-    public function scopeWithMainGalleryImage($query, $withMainProductInVariants = false, $finalColumn = 'galery_main_default_image', $whereColumn = 'default')
+    public function scopeWithMainGalleryImage($query, $withMainProductInVariants = false)
     {
+        $finalColumn = $this->getFilterOption('gallery.columns.image_name') ?: 'galery_main_default_image';
+        $whereColumn = $this->getFilterOption('gallery.columns.filter_by') ?: 'default';
+
         $gallerySub = DB::table('products_galleries')
                         ->selectRaw('products_galleries.image, products_galleries.product_id')
                         ->where('products_galleries.'.$whereColumn, 1)
@@ -138,6 +141,7 @@ trait HasProductImage
         $query->leftJoinSub($gallerySub, 'products_galleries', function($join) {
             $join->on('products_galleries.product_id', '=', 'products.id');
         });
+
         $query->addSelect('products_galleries.image as galery_default_image');
 
         //Select default image from parent product gallery row

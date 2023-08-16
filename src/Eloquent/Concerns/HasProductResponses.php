@@ -33,6 +33,10 @@ trait HasProductResponses
         'detail.variants.gallery' => false,
         'cart.attributes' => false,
         'cart.variants.attributes' => false,
+        'gallery.columns.filter_by' => 'default',
+        'gallery.columns.image_name' => 'galery_main_default_image',
+        'feed.variants' => true,
+        'feed.variants.filter' => true,
     ];
 
     public function scopeOnlyFiltrable($query, $callback, $prefix = null)
@@ -424,6 +428,23 @@ trait HasProductResponses
         if ( count($variantsIntoCart) == 0 ){
             $query->without('variants');
         }
+    }
+
+    public function scopeWithFeedResponse($query, $options = [])
+    {
+        //Depreaced
+        $query->withFeedListing();
+
+        $this->setFilterOptions($options, 'feed');
+
+        $query->withBlockedStock();
+
+        //We need specify select for
+        $query->addSelect('products.*');
+
+        $query->applyQueryFilter();
+
+        $query->withProductModules();
     }
 
     public function scopeWithMinAndMaxVariantPrices($query)

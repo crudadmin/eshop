@@ -42,7 +42,7 @@ class Feed
             $items = collect();
 
             $products = $this->getProducts(
-                Admin::getModel('Product')->withFeedListing()
+                Admin::getModel('Product')->withFeedResponse()
             )->get();
 
             $hasVariants = count(Store::variantsProductTypes()) > 0;
