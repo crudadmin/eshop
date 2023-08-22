@@ -24,7 +24,7 @@ class OrderPaidListener
         ]);
 
         //Countdown product stock on payment
-        if ( config('adminpayments.stock.countdown.on_order_paid', true) == true ) {
+        if ( config('admineshop.stock.countdown.on_order_paid', false) == true ) {
             $order->syncStock('-', 'order.paid');
         }
     }
