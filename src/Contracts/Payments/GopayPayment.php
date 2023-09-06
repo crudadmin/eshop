@@ -30,6 +30,10 @@ class GopayPayment extends PaymentHelper
             'isProductionMode' => $config['production'],
             'scope' => \GoPay\Definition\TokenScope::ALL,
             'language' => \GoPay\Definition\Language::SLOVAK,
+            'gatewayUrl' => $config['production']
+                                ? 'https://gate.gopay.cz/api'
+                                : 'https://gw.sandbox.gopay.com/api',
+
         ]);
     }
 
