@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Attribute;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Store;
 
 class AttributesUnit extends AdminModel
 {
@@ -59,7 +60,7 @@ class AttributesUnit extends AdminModel
     {
         return [
             'name' => 'name:Názov mernej jednotky|required',
-            'unit' => 'name:Merná jednotka',
+            'unit' => 'name:Merná jednotka|'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'format' => 'name:Formát jednotky|type:select|default:string|required',
             'space' => 'name:Medzera pred mernou jednotkou|type:checkbox|default:0',
         ];
