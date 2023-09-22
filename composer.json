@@ -14,7 +14,7 @@
         "crudadmin/crudadmin": "^4.0|^5.0|dev-master",
         "crudadmin/payments": "^1.0|dev-master",
         "marekgogol/invoices": "^4.0|dev-master",
-        "propaganistas/laravel-phone": "^4.2",
+        "propaganistas/laravel-phone": "^4.2|^5.0",
         "staudenmeir/eloquent-has-many-deep": "^1.13",
         "heureka/overeno-zakazniky": "^4.0",
         "cmixin/business-day": "^1.0"
