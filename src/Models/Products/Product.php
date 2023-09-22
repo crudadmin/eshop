@@ -71,6 +71,8 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     protected $searchable = ['name'];
 
+    protected $seo = true;
+
     protected $buttons = [
         SetProductsDiscount::class,
         SetProductsCategory::class,
