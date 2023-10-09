@@ -4,6 +4,7 @@ namespace AdminEshop\Controllers\Product;
 
 use AdminEshop\Controllers\Controller;
 use Admin;
+use Store;
 
 class ProductController extends Controller
 {
@@ -22,11 +23,12 @@ class ProductController extends Controller
                     ->findBySlugOrFail($slug)
                     ->setDetailResponse();
 
-        return api(
-            $product,
-            [
-                'similarProducts' => $product->getSimilarProducts(),
-            ]
-        );
+        $response = [];
+
+        if ( Store::hasCategories() ){
+            $response['similarProducts'] = $product->getSimilarProducts();
+        }
+
+        return api($product, $response);
     }
 }

@@ -98,7 +98,7 @@ class ProductsImport extends Synchronizer implements SynchronizerInterface
             );
         }
 
-        if ( $this->synchronizeCategories && config('admineshop.categories.enabled', false) ) {
+        if ( $this->synchronizeCategories && Store::hasCategories() ) {
             $this->synchronize(
                 new ProductsCategoriesPivot,
                 ['product_id' => 'products', 'category_id'],

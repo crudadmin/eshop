@@ -17,7 +17,9 @@ class BootstrapRequest
             [
                 'store' => $this->getStoreProperties(),
             ],
-            $this->getAdminFeatures()
+            [
+                'crudadmin' => $this->getAdminFeatures()
+            ],
         );
     }
 
@@ -73,7 +75,7 @@ class BootstrapRequest
 
     public function getLanguages()
     {
-        return Localization::getLanguages()->each->setVisible(['id', 'name', 'slug']);
+        return Localization::getLanguages()->each->setResponse();
     }
 
     public function getJsonTranslations()

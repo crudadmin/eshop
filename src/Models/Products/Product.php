@@ -141,7 +141,7 @@ class Product extends CartEloquent implements HasAttributesSupport
             'attributes_items' => $this->getAttributesList(),
         ];
 
-        if ( config('admineshop.categories.enabled') ) {
+        if ( Store::hasCategories() ) {
             $options['categories'] = $this->getCategoriesOptions();
         }
 

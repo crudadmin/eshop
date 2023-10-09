@@ -63,14 +63,16 @@ trait HasCategoryTree
     {
         $trees = [];
 
-        foreach ( $this->categories->whereNull('category_id') as $category ) {
-            if ( $responsable === true ){
-                $category->setCategoryTreeResponse();
+        if ( $categories = $this->categories ) {
+            foreach ( $categories->whereNull('category_id') as $category ) {
+                if ( $responsable === true ){
+                    $category->setCategoryTreeResponse();
+                }
+
+                $treeLevel = array_merge([$category], $this->buildTreeLevels($category, $responsable));
+
+                $trees[] = $treeLevel;
             }
-
-            $treeLevel = array_merge([$category], $this->buildTreeLevels($category, $responsable));
-
-            $trees[] = $treeLevel;
         }
 
         return $trees;
@@ -79,14 +81,16 @@ trait HasCategoryTree
     private function buildTreeLevels($parentCategory, $responsable = true) {
         $levels = [];
 
-        foreach ($this->categories->where('category_id', $parentCategory->getKey()) as $category) {
-            if ( $responsable === true ){
-                $category->setCategoryTreeResponse();
+        if ( $categories = $this->categories ) {
+            foreach ($categories->where('category_id', $parentCategory->getKey()) as $category) {
+                if ( $responsable === true ){
+                    $category->setCategoryTreeResponse();
+                }
+
+                $levels[] = $category;
+
+                $levels = array_merge($levels, $this->buildTreeLevels($category));
             }
-
-            $levels[] = $category;
-
-            $levels = array_merge($levels, $this->buildTreeLevels($category));
         }
 
         return $levels;

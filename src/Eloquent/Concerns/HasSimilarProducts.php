@@ -2,6 +2,8 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
+use Store;
+
 trait HasSimilarProducts
 {
     protected $perPageSimilarProducts = 8;
@@ -19,6 +21,10 @@ trait HasSimilarProducts
 
     public function getSimilarProducts()
     {
+        if ( Store::hasCategories() == false ){
+            return [];
+        }
+
         if ( !($lastCategory = collect($this->getCategoriesTree()[0] ?? [])->last()) )   {
             return [];
         }

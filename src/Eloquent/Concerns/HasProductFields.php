@@ -21,7 +21,7 @@ trait HasProductFields
                         'image' => 'name:Obrázok|type:file|image',
                     ])->id('images')
                 ],
-                config('admineshop.categories.enabled')
+                Store::hasCategories()
                     ? ['categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd|removeFromFormIfNot:product_id,NULL'] : [],
                 ['attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name']
             ))->id('general')->name('Základne nastavenia'),

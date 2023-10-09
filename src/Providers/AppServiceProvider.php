@@ -6,6 +6,7 @@ use Admin;
 use Admin\Providers\AdminHelperServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\Kernel;
+use Store;
 
 class AppServiceProvider extends AdminHelperServiceProvider
 {
@@ -78,7 +79,7 @@ class AppServiceProvider extends AdminHelperServiceProvider
 
     private function registerModels()
     {
-        if ( config('admineshop.categories.enabled', false) === true ) {
+        if ( Store::hasCategories() ) {
             Admin::registerAdminModels(__dir__ . '/../Models/Category/**', 'AdminEshop\Models\Category');
         }
 

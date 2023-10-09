@@ -14,4 +14,9 @@ class Language extends BaseLanguage
             'currency' => 'name:Predvolená mena pre jazykovú mutáciu|belongsTo:currencies,:name - :code|defaultByOption:default,1',
         ]);
     }
+
+    public function setResponse()
+    {
+        return $this->setVisible(['id', 'name', 'slug', 'domain']);
+    }
 }

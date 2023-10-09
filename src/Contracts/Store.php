@@ -128,6 +128,11 @@ class Store
         return config('admineshop.round_summary', true);
     }
 
+    public function hasCategories()
+    {
+        return config('admineshop.categories.enabled', false);
+    }
+
     /*
      * Returns prices in correct number format
      */
