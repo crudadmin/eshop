@@ -5,7 +5,6 @@ namespace AdminEshop\Controllers\Cart;
 use Admin;
 use AdminEshop\Contracts\Cart\Identifiers\ProductsIdentifier;
 use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
-use AdminEshop\Contracts\Order\Mutators\CountryMutator;
 use AdminEshop\Controllers\Controller;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Store\PaymentsMethod;
@@ -231,7 +230,7 @@ class CartController extends Controller
     {
         $countryId = request('country_id');
 
-        (new CountryMutator)->setCountry($countryId);
+        OrderService::getCountryMutator()->setCountry($countryId);
 
         return api(
             Cart::fullCartResponse()

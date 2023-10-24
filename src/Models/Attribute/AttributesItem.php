@@ -147,7 +147,13 @@ class AttributesItem extends AdminModel
 
     public function getAttributeItemValue($attribute)
     {
-        return $this->getValue('name');
+        $value = $this->getValue('name');
+
+        if ( $attribute->unitFormat == 'decimal' ){
+            return str_replace('.', ',', (string)$value);
+        }
+
+        return $value;
     }
 
     public function products()
