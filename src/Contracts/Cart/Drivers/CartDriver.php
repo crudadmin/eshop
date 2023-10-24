@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Cart\Drivers;
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Contracts\Collections\CartCollection;
+use Arr;
 
 class CartDriver
 {
@@ -70,7 +71,13 @@ class CartDriver
      */
     public function getInitialData()
     {
-        return $this->onCreateData;
+        $data = [];
+
+        foreach ($this->onCreateData as $key => $value) {
+            Arr::set($data, $key, $value);
+        }
+
+        return $data;
     }
 
     /*
