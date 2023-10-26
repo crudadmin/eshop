@@ -6,6 +6,7 @@ use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Contracts\Cart\Concerns\HasCartSteps;
+use AdminEshop\Contracts\Cart\Concerns\HasCartWeight;
 use AdminEshop\Contracts\Cart\Concerns\HasStockBlockSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
@@ -23,7 +24,8 @@ class Cart
         DataStore,
         DriverSupport,
         HasStockBlockSupport,
-        HasCartSteps;
+        HasCartSteps,
+        HasCartWeight;
 
     /*
      * Items in cart
@@ -229,6 +231,11 @@ class Cart
      */
     public function baseResponse()
     {
+        //Cart step is overiden if is avialable
+        if ( $cartStep = request()->header('Cart-Step') ) {
+            return $this->getCartStepResponse($cartStep);
+        }
+
         return $this->response(
             config('admineshop.cart.default_full_response', false)
         );
@@ -241,7 +248,25 @@ class Cart
      */
     public function fullCartResponse()
     {
+        //Cart step is overiden if is avialable
+        if ( $cartStep = request()->header('Cart-Step') ) {
+            return $this->getCartStepResponse($cartStep);
+        }
+
         return $this->response(true);
+    }
+
+    /**
+     * Return specific cart step response
+     *
+     * @param  string  $stepName
+     * @return  response
+     */
+    public function getCartStepResponse($stepName)
+    {
+        $mutators = $this->getStepMutators($stepName);
+
+        return $this->response(true, $mutators);
     }
 
     /**

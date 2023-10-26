@@ -108,13 +108,6 @@ trait HasCartSteps
 
         return count(OrderService::getErrorMessages()) === 0;
     }
-
-    public function getCartStepResponse($stepName)
-    {
-        $mutators = $this->getStepMutators($stepName);
-
-        return $this->response(true, $mutators);
-    }
 }
 
 ?>
