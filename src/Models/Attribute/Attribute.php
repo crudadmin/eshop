@@ -143,6 +143,8 @@ class Attribute extends AdminModel
     {
         $this->append([
             'unitFormat',
+            'hasUnitPrepend',
+            'hasUnitSpace',
         ]);
 
         $this->items->each->setListingResponse();
@@ -156,6 +158,8 @@ class Attribute extends AdminModel
 
         $this->append([
             'unitName',
+            'hasUnitPrepend',
+            'hasUnitSpace',
         ]);
 
         $this->items->each->setDetailResponse();

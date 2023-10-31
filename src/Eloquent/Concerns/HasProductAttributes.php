@@ -77,7 +77,12 @@ trait HasProductAttributes
                     return false;
                 }
 
-                return ($item ? $item->getAttributeItemValue($attribute) : '').($attribute && ($unitName = $attribute->unitName) ? (($attribute->hasUnitSpace ? ' ' : '').$unitName) : '');
+                $value = ($item ? $item->getAttributeItemValue($attribute) : '');
+                $space = !$attribute || $attribute->hasUnitSpace ? ' ' : '';
+                $prepend = $attribute && $attribute->hasUnitPrepend;
+                $unitName = $attribute ? $attribute->unitName : '';
+
+                return $prepend ? $unitName.$space.$value : $value.$space.$unitName;
             })->filter()->join(config('admineshop.attributes.separator.item', ', '));
         }
 

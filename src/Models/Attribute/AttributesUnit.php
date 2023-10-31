@@ -40,14 +40,17 @@ class AttributesUnit extends AdminModel
         ];
     }
 
-    protected $options = [
-        'format' => [
-            'string' => 'Textové pole',
-            'number' => 'Čiselná hodnota',
-            'decimal' => 'Čiselná hodnota s možnosťou desatinných miest',
-            'color' => 'Farba',
-        ],
-    ];
+    public function options()
+    {
+        return [
+            'format' => [
+                'string' => _('Textové pole'),
+                'number' => _('Čiselná hodnota'),
+                'decimal' => _('Čiselná hodnota s možnosťou desatinných miest'),
+                'color' => _('Farba'),
+            ],
+        ];
+    }
 
     /*
      * Automatic form and database generation
@@ -62,7 +65,10 @@ class AttributesUnit extends AdminModel
             'name' => 'name:Názov mernej jednotky|required',
             'unit' => 'name:Merná jednotka|'.(Store::isEnabledLocalization() ? '|locale' : ''),
             'format' => 'name:Formát jednotky|type:select|default:string|required',
-            'space' => 'name:Medzera pred mernou jednotkou|type:checkbox|default:0',
+            Group::inline([
+                'space' => 'name:Medzera pred mernou jednotkou|type:checkbox|default:0',
+                'prepend' => 'name:Vložiť pred text|type:checkbox|inAdmin:default:0|'.(Store::isEnabledLocalization() ? '|locale' : ''),
+            ]),
         ];
     }
 

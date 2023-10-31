@@ -24,6 +24,15 @@ trait HasUnit
         }
     }
 
+    public function getHasUnitPrependAttribute()
+    {
+        $unitId = $this->getAttribute('unit_id');
+
+        if ( $unitId && $unit = Store::getUnit($unitId) ) {
+            return $unit->getAttribute('prepend');
+        }
+    }
+
     public function getUnitFormatAttribute()
     {
         $unitId = $this->getAttribute('unit_id');
