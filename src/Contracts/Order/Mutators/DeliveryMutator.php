@@ -216,6 +216,10 @@ class DeliveryMutator extends Mutator
      */
     public function getSelectedLocation()
     {
+        if ( !($delivery = $this->getSelectedDelivery()) || $delivery->hasMultipleLocations() === false ){
+            return;
+        }
+
         $id = $this->getDriver()->get(self::DELIVERY_LOCATION_KEY);
 
         return $this->cache('selectedLocation.'.$id, function() use ($id) {
