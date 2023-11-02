@@ -20,6 +20,8 @@ class ReloadProductQuantity extends AdminRule
         if ( $order = $row->order ) {
             //We also need update quantity when product will be changed
             if ( $this->hasBeenChangedProduct($row) ) {
+                $row->load('product.product');
+
                 $previousModel = $this->getPreviousRowItemModel($row);
 
                 //We need subtract quantity to new item

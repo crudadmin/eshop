@@ -190,7 +190,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
      */
     public function getProduct()
     {
-        return Admin::cache('ordersItems.'.$this->getKey(), function(){
+        return Admin::cache('ordersItems.'.$this->getKey().'.'.$this->product_id, function(){
             return $this->product;
         });
     }
