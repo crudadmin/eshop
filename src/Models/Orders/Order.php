@@ -326,8 +326,14 @@ class Order extends AdminModel implements Orderable
         ]);
     }
 
-    public function setSuccessOrderFormat()
+    public function setSuccessOrderResponse()
     {
+        $this->setAddressDetailsResponse();
+
+        if ( $this->relationLoaded('items') ){
+            $this->items->each->setSuccessOrderResponse();
+        }
+
         return $this;
     }
 

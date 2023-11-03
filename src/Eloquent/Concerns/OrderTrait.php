@@ -361,6 +361,21 @@ trait OrderTrait
             ]);
         }
     }
+
+    public function setAddressDetailsResponse()
+    {
+        if ( $this->delivery_different === false ) {
+            foreach (OrderService::getOrderDeliveryFields() as $key) {
+                if ( !$this->{$key} ){
+                    $originalKey = str_replace('delivery_', '', $key);
+
+                    $this->{$key} = $this->{$originalKey};
+                }
+            }
+        }
+
+        return $this;
+    }
 }
 
 ?>

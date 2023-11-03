@@ -200,7 +200,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
         return $this;
     }
 
-    public function setSuccessOrderFormat()
+    public function setSuccessOrderResponse()
     {
         return $this;
     }

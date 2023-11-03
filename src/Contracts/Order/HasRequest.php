@@ -19,6 +19,24 @@ trait HasRequest
      */
     protected $defaultResetIfNotPresent = [];
 
+    public function getOrderDeliveryFields()
+    {
+        return array_merge(
+            [
+                'delivery_username',
+                'delivery_firstname',
+                'delivery_lastname',
+                'delivery_phone',
+                'delivery_street',
+                'delivery_city',
+                'delivery_zipcode',
+                'delivery_city',
+                'delivery_country_id'
+            ],
+            config('admineshop.cart.order.additional_delivery_fields', [])
+        );
+    }
+
     /**
      * Returns request data
      *
@@ -163,12 +181,9 @@ trait HasRequest
         ];
     }
 
-    private function getDeliveryAddressResetIfNotPresent()
+    public function getDeliveryAddressResetIfNotPresent()
     {
-        $fields = array_merge(
-            ['delivery_username', 'delivery_firstname', 'delivery_lastname', 'delivery_phone', 'delivery_street', 'delivery_city', 'delivery_zipcode', 'delivery_city', 'delivery_country_id'],
-            config('admineshop.cart.order.additional_delivery_fields', [])
-        );
+        $fields = $this->getOrderDeliveryFields();
 
         return [
             'delivery_different' => [
