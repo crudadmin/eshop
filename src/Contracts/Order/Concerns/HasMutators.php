@@ -22,6 +22,13 @@ trait HasMutators
     protected $mutators;
 
     /**
+     * Which motators are currently booting up
+     *
+     * @var  array
+     */
+    protected $bootingMutators = [];
+
+    /**
      * Set order available mutators
      *
      * @param  string|array  $namespace
@@ -100,11 +107,22 @@ trait HasMutators
             $mutators = $this->getMutators($cartItems);
 
             return array_filter(array_map(function($mutator) {
+                $className = $mutator::class;
+
+                //This mutator is already booting. This would cause infinity loop.
+                if ( isset($this->bootingMutators[$className]) ){
+                    return;
+                }
+
+                $this->bootingMutators[$className] = true;
+
                 if ( Admin::isAdmin() ) {
                     $response = $mutator->isActiveInAdmin($this->getOrder());
                 } else {
                     $response = $mutator->isActive($this->getOrder());
                 }
+
+                unset($this->bootingMutators[$className]);
 
                 //Apply all discounts on given reponse if is correct type
                 //Sometimes mutator may return Discountable admin model.
