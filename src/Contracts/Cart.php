@@ -225,8 +225,8 @@ class Cart
             }, Discounts::getDiscounts()),
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
-            'summary' => $items->getSummary(false, null, false),
-            'summaryTotal' => $baseItems->getSummary($fullCartResponse),
+            'summary' => $items->getSummary(false, null, false, $mutators),
+            'summaryTotal' => $baseItems->getSummary($fullCartResponse, null, true, $mutators),
         ];
 
         $response = OrderService::getMutatedResponses($response, $fullCartResponse, $mutators);

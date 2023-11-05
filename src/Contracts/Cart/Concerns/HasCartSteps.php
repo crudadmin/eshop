@@ -8,25 +8,13 @@ trait HasCartSteps
 {
     public static function getCartSteps()
     {
-        //Fallback config for 3.3 version
-        //Depreaced, can be removed in the future.
-        if ( ($fallbackStepMutators = config('admineshop.cart.validation_steps')) && count($fallbackStepMutators) ){
-            $steps = [];
-
-            foreach ($fallbackStepMutators as $key => $mutators) {
-                $steps[] = [
-                    'name' => $key,
-                    'mutators' => $mutators,
-                ];
-            }
-        }
-
-        //Latest version
-        else {
-            $steps = config('admineshop.cart.steps', []);
-        }
-
-        return collect($steps);
+        return collect(array_merge([
+            // Default initial step to use also global mutators
+            [
+                'name' => '_global',
+                'mutators' => config('admineshop.cart.mutators'),
+            ]
+        ], config('admineshop.cart.steps', [])));
     }
 
     private function getStepIndex($stepName)
@@ -78,7 +66,6 @@ trait HasCartSteps
 
         $stepIndex = $this->getStepIndex($stepName);
         $mutators = [];
-
 
         for ($i=0; $i <= $stepIndex; $i++) {
             $step = $steps[$i];

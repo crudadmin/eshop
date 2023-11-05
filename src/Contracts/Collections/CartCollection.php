@@ -229,9 +229,10 @@ class CartCollection extends Collection
      * @param  bool         $fullCartResponse - add payment and delivery prices into sum
      * @param  array|null   $discounts
      * @param  boolean      $withFixedDiscounts
+     * @param  array|null   $mutators
      * @return array
      */
-    public function getSummary($fullCartResponse = false, $discounts = null, $withFixedDiscounts = true)
+    public function getSummary($fullCartResponse = false, $discounts = null, $withFixedDiscounts = true, $mutators = null)
     {
         //Set discounts if are missing
         //Sometimes we may want discounts without specific discount...
@@ -250,7 +251,7 @@ class CartCollection extends Collection
 
             //Add delivery, payment method prices etc...
             if ( $fullCartResponse === true && $isVat !== null ) {
-                $sum[$key] = $this->addAdditionalPaymentsIntoSum($sum[$key], $isVat);
+                $sum[$key] = $this->addAdditionalPaymentsIntoSum($sum[$key], $isVat, $mutators);
             }
 
             //Round numbers, and make sure all numbers are positive
@@ -265,14 +266,20 @@ class CartCollection extends Collection
      *
      * @param  int/float  $price
      * @param  bool  $withVat
+     * @param  array|null  $mutators
      */
-    public function addAdditionalPaymentsIntoSum($price, bool $withVat)
+    public function addAdditionalPaymentsIntoSum($price, bool $withVat, $enabledMutators = null)
     {
         $order = OrderService::getOrder() ?: new Order;
 
         $mutators = OrderService::getActiveMutators($this);
 
         foreach ($mutators as $mutator) {
+            //If enabled mutators list, then allow only those.
+            if ( is_array($enabledMutators) && in_array($mutator::class, $enabledMutators) == false ){
+                continue;
+            }
+
             //Mutate price by anonymous price mutators
             if ( method_exists($mutator, 'mutatePrice') ) {
                 $price = $mutator->mutatePrice(
