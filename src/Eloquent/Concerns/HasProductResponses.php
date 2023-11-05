@@ -3,12 +3,14 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
+use AdminEshop\Contracts\Order\Mutators\AssignedProductMutator;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
 use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\Modules\SeoModule;
 use Arr;
 use Illuminate\Support\Facades\DB;
+use OrderService;
 use Store;
 
 trait HasProductResponses
@@ -430,6 +432,10 @@ trait HasProductResponses
         if ( count($variantsIntoCart) == 0 ){
             $query->without('variants');
         }
+
+        if ( OrderService::hasMutator(AssignedProductMutator::class) ) {
+            $query->withAssignedProduct();
+        }
     }
 
     public function scopeWithFeedResponse($query, $options = [])
@@ -458,5 +464,13 @@ trait HasProductResponses
             ->whereNull('pv.deleted_at')
             ->addSelect(DB::raw('MIN(pv.price) as min_price, MAX(pv.price) as max_price'))
             ->groupBy('products.id');
+    }
+
+
+    public function scopeWithAssignedProduct($query)
+    {
+        $query->with([
+            'assignedProduct',
+        ]);
     }
 }

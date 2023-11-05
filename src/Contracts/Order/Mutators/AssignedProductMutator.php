@@ -50,12 +50,12 @@ class AssignedProductMutator extends Mutator
                 return;
             }
 
-            if ( !($assignedProduct = $model->assignedProduct) ){
+            if ( !($assignedProduct = $model->relationLoaded('assignedProduct')) ){
                 return;
             }
 
             $cartItem = new CartItem(
-                $assignedProduct->getIdentifier(),
+                $model->assignedProduct->getIdentifier(),
                 $item->quantity
             );
 
