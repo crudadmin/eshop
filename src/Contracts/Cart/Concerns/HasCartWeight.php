@@ -24,6 +24,8 @@ trait HasCartWeight
                 return $this->toWeightUnit($calculatedWeight, $toUnit);
             }
         }
+
+        return 0;
     }
 
     public function toWeightUnit($weight, $toUnit = 'kilograms')

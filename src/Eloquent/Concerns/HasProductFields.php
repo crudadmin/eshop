@@ -2,10 +2,12 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
-use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
-use Admin\Fields\Group;
-use Store;
 use Admin;
+use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
+use AdminEshop\Contracts\Order\Mutators\AssignedProductMutator;
+use Admin\Fields\Group;
+use OrderService;
+use Store;
 
 trait HasProductFields
 {
@@ -76,13 +78,17 @@ trait HasProductFields
 
     public function getOtherSettingsFields()
     {
-        return Group::tab(array_merge(
-            [
+        return Group::tab([
+            Group::fields([
                 'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
                 'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
-            ],
-            HeurekaFeed::isEnabled()
-                ? ['heureka_name' => 'name:Názov pre heureku|hidden'] : [],
-        ))->id('otherSettings')->icon('fa-gear')->name('Ostatné nastavenia');
+            ]),
+            Group::fields([
+                'heureka_name' => 'name:Názov pre heureku|hidden'
+            ])->if(HeurekaFeed::isEnabled()),
+            Group::fields([
+                'assigned_product' => 'name:S produktom vložiť do košíka aj|belongsTo:products,name|hidden',
+            ])->if(OrderService::hasMutator(AssignedProductMutator::class)),
+        ])->id('otherSettings')->icon('fa-gear')->name('Ostatné nastavenia');
     }
 }

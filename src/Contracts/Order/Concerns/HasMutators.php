@@ -38,7 +38,9 @@ trait HasMutators
         return $this->cache('config.mutators', function(){
             $mutators = config('admineshop.cart.mutators');
 
-            $stepMutators = Cart::getCartSteps()->map(function($step){
+            //We need obtain cartSteps without firing Cart.
+            $cartSteps = \AdminEshop\Contracts\Cart::getCartSteps();
+            $stepMutators = $cartSteps->map(function($step){
                 return array_merge($step['mutators'] ?? [], $step['validators'] ?? []);
             })->flatten()->unique()->toArray();
 
@@ -75,9 +77,14 @@ trait HasMutators
 
     public function hasMutator($mutator)
     {
-        return count(array_filter($this->getCachedMutators(), function($class) use ($mutator) {
-            return $class instanceof $mutator;
-        })) > 0;
+        $mutators = is_array($this->mutators) ? $this->mutators : $this->getConfigMutators();
+        $mutators = array_map(function($mutator){
+            return class_basename(is_object($mutator) ? $mutator::class : $mutator);
+        }, $mutators);
+
+        $mutator = class_basename($mutator);
+
+        return in_array($mutator, $mutators);
     }
 
     /**

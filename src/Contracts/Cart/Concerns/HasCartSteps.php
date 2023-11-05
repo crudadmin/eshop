@@ -6,7 +6,7 @@ use OrderService;
 
 trait HasCartSteps
 {
-    public function getCartSteps()
+    public static function getCartSteps()
     {
         //Fallback config for 3.3 version
         //Depreaced, can be removed in the future.

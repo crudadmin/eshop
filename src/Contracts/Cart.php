@@ -51,6 +51,14 @@ class Cart
      */
     public function __construct()
     {
+        $this->boot();
+    }
+
+    /**
+     * Boot cart
+     */
+    public function boot()
+    {
         //We does not want fetch items from session in admin interface
         if ( Admin::isAdmin() == true ) {
             $this->items = new CartCollection;
