@@ -43,6 +43,7 @@ class Store extends AdminModel
         return array_filter(array_merge(
             [
                 'email' => 'name:Email obchodu|title:Slúži pre obdržanie kópie emailov z objednávok|email',
+                'email_logo' => 'name:Logo v emailoch|type:file|image',
                 'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
             ],
             config('admineshop.stock.store_rules', true) ?

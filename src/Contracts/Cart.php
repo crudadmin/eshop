@@ -6,7 +6,6 @@ use Admin;
 use AdminEshop\Contracts\Cart\Concerns\CartTrait;
 use AdminEshop\Contracts\Cart\Concerns\DriverSupport;
 use AdminEshop\Contracts\Cart\Concerns\HasCartSteps;
-use AdminEshop\Contracts\Cart\Concerns\HasCartWeight;
 use AdminEshop\Contracts\Cart\Concerns\HasStockBlockSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Collections\CartCollection;
@@ -24,8 +23,7 @@ class Cart
         DataStore,
         DriverSupport,
         HasStockBlockSupport,
-        HasCartSteps,
-        HasCartWeight;
+        HasCartSteps;
 
     /*
      * Items in cart
@@ -212,7 +210,11 @@ class Cart
      */
     public function response($fullCartResponse = false, $mutators = null)
     {
-        $items = $this->allWithMutators();
+        //Base items from cart
+        $baseItems = $this->all();
+
+        //Items + Additional items also from mutators
+        $items = $this->addItemsFromMutators($baseItems, 'addCartItems');
 
         $response = [
             'cartToken' => $this->getDriver()->getToken(),
@@ -224,7 +226,7 @@ class Cart
             'addedItems' => $this->addedItems,
             'updatedItems' => $this->updatedItems,
             'summary' => $items->getSummary(false, null, false),
-            'summaryTotal' => $items->getSummary($fullCartResponse),
+            'summaryTotal' => $baseItems->getSummary($fullCartResponse),
         ];
 
         $response = OrderService::getMutatedResponses($response, $fullCartResponse, $mutators);
@@ -344,31 +346,30 @@ class Cart
     }
 
     /**
-     * Return items with additional mutators items
+     * Add additional items into cart
      *
-     * @param  null|array  $discounts
-     * @param  string  $method
-     *
-     * @return  CartCollection
+     * @param  CartCollection  $items
+     * @param  string|array|bool  $methodOrArray
+     * @param  Collection  $discounts
      */
-    public function allWithMutators($discounts = null, $method = 'addCartItems')
+    public function addItemsFromMutators(CartCollection $items, $methodOrArray, $discounts = null)
     {
-        $items = $this->all();
+        //Add all assignable methods which add's additional items.
+        if ( $methodOrArray === true ){
+            $methodOrArray = ['addCartItems', 'addHiddenCartItems'];
+        }
 
-        return $this->addItemsFromMutators($items, $method, $discounts);
-    }
+        foreach (array_wrap($methodOrArray) as $method) {
+            foreach ( OrderService::getActiveMutators() as $mutator ) {
+                if ( ! method_exists($mutator, $method) ) {
+                    continue;
+                }
 
-    public function addItemsFromMutators(CartCollection $items, $method, $discounts = null)
-    {
-        foreach ( OrderService::getActiveMutators() as $mutator ) {
-            if ( ! method_exists($mutator, $method) ) {
-                continue;
+                $addItems = $mutator->{$method}($mutator->getActiveResponse())
+                                    ->toCartFormat($discounts);
+
+                $items = $items->merge($addItems);
             }
-
-            $addItems = $mutator->{$method}($mutator->getActiveResponse())
-                                ->toCartFormat($discounts);
-
-            $items = $items->merge($addItems);
         }
 
         //We need sort parent items, because they may be added in mutators as well

@@ -9,6 +9,7 @@ use AdminEshop\Contracts\Order\Concerns\HasMutators;
 use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
 use AdminEshop\Contracts\Order\Concerns\HasShipping;
+use AdminEshop\Contracts\Order\Concerns\HasWeight;
 use AdminEshop\Contracts\Order\HasRequest;
 use AdminEshop\Contracts\Order\HasValidation;
 use AdminEshop\Events\OrderCreated;
@@ -35,7 +36,8 @@ class OrderService
         HasMutators,
         HasMutatorsForward,
         HasOrderProcess,
-        HasShipping;
+        HasShipping,
+        HasWeight;
 
     /**
      * Order row
@@ -77,7 +79,7 @@ class OrderService
             clone Admin::getModelByTable('orders')
         );
 
-        //Todo:: check if here shouldn't go items with mutators, maybe price may be wrong without mutators if some are availeble
+        //Base Cart items, so only those which are added by user, and not by mutators.
         $cartItems = $this->getCartItems();
 
         //Build order with all attributes
@@ -139,13 +141,19 @@ class OrderService
      *
      * @return  CartCollection
      */
-    public function getCartItems()
+    public function getCartItems($withMutators = false)
     {
         if ( is_null($this->cartItems) ){
-            return Cart::all();
+            $items = Cart::all();
+        } else {
+            $items = $this->cartItems->toCartFormat();
         }
 
-        return $this->cartItems->toCartFormat();
+        if ( $withMutators === true ) {
+            $items = Cart::addItemsFromMutators($items, true);
+        }
+
+        return $items;
     }
 
 
@@ -203,11 +211,7 @@ class OrderService
      */
     public function addItemsIntoOrder()
     {
-        $items = $this->getCartItems();
-
-        foreach (['addCartItems', 'addHiddenCartItems'] as $method) {
-            $items = Cart::addItemsFromMutators($items, $method);
-        }
+        $items = $this->getCartItems(true);
 
         foreach ($items as $item) {
             $identifier = $item->getIdentifierClass();
@@ -311,8 +315,8 @@ class OrderService
 
         $summary = $items->getSummary(true);
 
-        $order->price = $items->count() == 0 ? 0 : ($summary['priceWithoutVat'] ?? 0);
-        $order->price_vat = $items->count() == 0 ? 0 : ($summary['priceWithVat'] ?? 0);
+        $order->price = $summary['priceWithoutVat'] ?? 0;
+        $order->price_vat = $summary['priceWithVat'] ?? 0;
 
         return $this;
     }

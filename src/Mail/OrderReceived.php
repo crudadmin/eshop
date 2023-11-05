@@ -47,7 +47,7 @@ class OrderReceived extends Mailable
         $this->cartSummary = $items->getSummary(true);
 
         //We does not want to show discounts in cart items
-        $this->cartItems = ($items ? Cart::addItemsFromMutators($items, 'addHiddenCartItems') : collect())->filter(function($item){
+        $this->cartItems = Cart::addItemsFromMutators($items, true)->filter(function($item){
             return ($item->getIdentifierClass() instanceof DiscountIdentifier) === false;
         });
 

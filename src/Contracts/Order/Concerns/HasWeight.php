@@ -1,12 +1,19 @@
 <?php
 
-namespace AdminEshop\Contracts\Cart\Concerns;
+namespace AdminEshop\Contracts\Order\Concerns;
 
-trait HasCartWeight
+trait HasWeight
 {
     public function getItemsWeight($items = null, $toUnit = 'kilograms')
     {
-        $items = $items ?: $this->all();
+        //Calculate custom order weight
+        if ( !$items ) {
+            if ( ($order = $this->getOrder()) && $order->exists ){
+                $items = $order->items;
+            } else {
+                $items = $this->getCartItems(true);
+            }
+        }
 
         //Calculate weight by cart items
         $cartItemsWithWeight = $items->filter(function($item){

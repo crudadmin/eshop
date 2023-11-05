@@ -7,7 +7,6 @@ use AdminEshop\Models\Delivery\Delivery;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
 use OrderService;
-use Cart;
 use Admin;
 
 class ShippingProvider extends OrderConfigProvider
@@ -62,29 +61,15 @@ class ShippingProvider extends OrderConfigProvider
     {
         $options = $this->getOptions();
 
-        $order = $this->getOrder();
-
         //Set default weight
         $defaultWeight = ($options['weight'] ?? null) ?: ($options['default_weight'] ?? null);
         $weight = $defaultWeight;
 
-        //Calculate custom order weight
-        if ( $order && $order->exists ){
-            //Custom order calc
-            if ( method_exists($order, 'getPackageWeight') ) {
-                $weight = $order->getPackageWeight($this, $options) ?: $weight;
-            }
-
-            $itemsToWeightCalc = $order->items;
-        } else {
-            $itemsToWeightCalc = Cart::all();
-        }
-
         //Get weight from cart items
-        $weight = Cart::getItemsWeight($itemsToWeightCalc, false) ?: $weight;
+        $weight = OrderService::getItemsWeight(null, false) ?: $weight;
 
         //If given weight is rounded to zero, then we need calculate default weight
-        return Cart::toWeightUnit($weight, $toUnit) ?: Cart::toWeightUnit($defaultWeight, $toUnit);
+        return OrderService::toWeightUnit($weight, $toUnit) ?: OrderService::toWeightUnit($defaultWeight, $toUnit);
     }
 
     public function isCashDelivery()
