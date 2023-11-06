@@ -4,9 +4,9 @@ use AdminEshop\Http\Resources\NuxtApiResponse;
 
 if ( !function_exists('nuxtUrl') )
 {
-    function nuxtUrl($path = '')
+    function nuxtUrl($path = '', $host = null)
     {
-        return Store::getNuxtUrl($path);
+        return Store::getNuxtUrl($path, $host);
     }
 }
 

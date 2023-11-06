@@ -30,8 +30,8 @@ class StoreServiceProvider extends ServiceProvider {
 
     public function boot()
     {
-        PaymentService::setPaymentUrl(function($path){
-            return nuxtUrl($path);
+        PaymentService::setPaymentUrl(function($path, $host){
+            return nuxtUrl($path, $host);
         });
 
         $this->registerSchedules();
