@@ -56,4 +56,9 @@ trait HasOrderEmails
 
         $mail->attachData($invoice->getPdf()->get(), $filename);
     }
+
+    public function onOrderReceivedBuild($mail)
+    {
+
+    }
 }
