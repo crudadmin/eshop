@@ -106,9 +106,6 @@ class OrderReceived extends Mailable
             ]);
         }
 
-        $this->order->onOrderReceivedBuild($mail);
-
         return $mail;
-
     }
 }
