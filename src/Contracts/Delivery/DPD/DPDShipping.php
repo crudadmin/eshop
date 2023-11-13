@@ -352,7 +352,7 @@ class DPDShipping extends ShippingProvider implements ShippingInterface
 
     public function getTrackingUrl($trackingNumber)
     {
-        return 'https://tracking.dpd.de/status/sk_SK/parcel/'.$trackingNumber;
+        return 'https://www.dpdgroup.com/sk/mydpd/my-parcels/search?parcelNumber='.$trackingNumber;
     }
 
     private function getNotifications()
