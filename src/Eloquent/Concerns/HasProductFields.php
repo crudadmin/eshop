@@ -64,31 +64,30 @@ trait HasProductFields
 
     public function getWarehouseFields()
     {
-        return Group::tab(array_filter(array_merge(
-            [
-                'stock_quantity' => 'name:Sklad|type:integer|default:0|hideFromFormIf:product_type,variants',
-            ],
-            config('admineshop.stock.store_rules', true)
-                ? [ Group::fields([
+        return Group::tab([
+            'stock_quantity' => 'name:Sklad|type:integer|default:0|hideFromFormIf:product_type,variants',
+            Group::fields([
                     'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
                     'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
-                ])->attributes('hideFromFormIf:product_type,variant') ] : [],
-        )))->icon('fa-bars')->id('warehouse-tab')->add('hidden')->name('Sklad');
+            ])->attributes('hideFromFormIf:product_type,variant')->if(config('admineshop.stock.store_rules', true)),
+        ])->icon('fa-bars')->id('warehouse-tab')->add('hidden')->name('Sklad');
     }
 
     public function getOtherSettingsFields()
     {
         return Group::tab([
-            Group::fields([
-                'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
-                'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
+            Group::fields([ //temporary fix for vue error
+                Group::fields([
+                    'created_at' => 'name:Vytvorené dňa|default:CURRENT_TIMESTAMP|type:datetime|disabled',
+                    'published_at' => 'name:Publikovať od|default:CURRENT_TIMESTAMP|type:datetime',
+                ]),
+                Group::fields([
+                    'heureka_name' => 'name:Názov pre heureku|hidden'
+                ])->if(HeurekaFeed::isEnabled()),
+                Group::fields([
+                    'assigned_product' => 'name:S produktom vložiť do košíka aj|belongsTo:products,name|hidden',
+                ])->if(OrderService::hasMutator(AssignedProductMutator::class)),
             ]),
-            Group::fields([
-                'heureka_name' => 'name:Názov pre heureku|hidden'
-            ])->if(HeurekaFeed::isEnabled()),
-            Group::fields([
-                'assigned_product' => 'name:S produktom vložiť do košíka aj|belongsTo:products,name|hidden',
-            ])->if(OrderService::hasMutator(AssignedProductMutator::class)),
         ])->id('otherSettings')->icon('fa-gear')->name('Ostatné nastavenia');
     }
 }
