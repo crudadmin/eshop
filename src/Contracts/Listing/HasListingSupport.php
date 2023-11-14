@@ -24,14 +24,18 @@ trait HasListingSupport
         //Set default filter, if is not set
         $options['filter'] = $options['filter'] ?? $this->getFilter();
 
-        return $this->getCachedListingResponse($options['key'] ?? 'listing', $options, function($options) {
+        $filterKey = $options['key'] ?? 'listing';
+
+        return $this->getCachedListingResponse($filterKey, $options, function($options) use ($filterKey)  {
             //We want filter out items without products
             if ( config('admineshop.attributes.hideOnFiltration', true) ){
                 Store::setAttributesScope($options);
             }
 
             //Available attributes for products set
-            $attributes = Store::getFilterAttributes()->each->setListingResponse()->values();
+            $attributes = Store::setFilterKey($filterKey)
+                                ->getFilterAttributes()
+                                ->each->setListingResponse()->values();
 
             //Paginated response
             $products = $this->getProducts($options);

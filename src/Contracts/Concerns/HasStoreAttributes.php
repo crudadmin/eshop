@@ -8,6 +8,15 @@ trait HasStoreAttributes
 {
     private $attributesOptions;
 
+    private $filterKey;
+
+    public function setFilterKey($key)
+    {
+        $this->filterKey = $key;
+
+        return $this;
+    }
+
     public function setAttributesScope($options)
     {
         $this->attributesOptions = $options;
@@ -107,9 +116,11 @@ trait HasStoreAttributes
 
     private function filterByItemsProduct($query, $options)
     {
-        $query->setFilterOptions(array_merge($options ?: [], [
+        $options = array_merge($options ?: [], [
             '$ignore.filter.attributes' => true,
-        ]));
+        ]);
+
+        $query->setFilterOptions($options, $this->filterKey);
 
         $query->applyQueryFilter();
     }
