@@ -145,15 +145,18 @@ class AttributesItem extends AdminModel
         return $this;
     }
 
-    public function getAttributeItemValue($attribute)
+    public function getAttributeItemValue($attribute, $value = null)
     {
-        $value = $this->getValue('name');
+        $value = $value ?: $this->getValue('name');
+        $space = !$attribute || $attribute->hasUnitSpace ? ' ' : '';
+        $prepend = $attribute && $attribute->hasUnitPrepend;
+        $unitName = $attribute ? $attribute->unitName : '';
 
         if ( $attribute->unitFormat == 'decimal' ){
-            return str_replace('.', ',', (string)$value);
+            $value = str_replace('.', ',', (string)$value);
         }
 
-        return $value;
+        return $prepend ? $unitName.$space.$value : $value.$space.$unitName;
     }
 
     public function products()
