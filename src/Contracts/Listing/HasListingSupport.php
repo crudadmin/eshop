@@ -51,9 +51,9 @@ trait HasListingSupport
     {
         $productsQuery = Admin::getModel('Product')->withListingResponse($options);
 
-        $products = $productsQuery->productsPaginate(
-            request('filter._limit', request('limit'))
-        );
+        $limit = $productsQuery->getModel()->getFilterOption('limit') ?: request('filter._limit', request('limit'));
+
+        $products = $productsQuery->productsPaginate($limit);
 
         $products->getCollection()->each->setListingResponse();
 
