@@ -117,7 +117,7 @@ class Feed
 
     public function cacheKey($key)
     {
-        return 'store.feed.'.static::class.'.'.$key.'.'.($this->locale ?: 'default');
+        return 'store.feed.'.static::class.'.'.$key.'.'.($this->locale ?: 'default').'.'.md5(json_encode(request()->query() ?: []));
     }
 
     public function getCachedData()
