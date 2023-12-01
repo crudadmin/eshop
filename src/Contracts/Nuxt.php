@@ -6,7 +6,11 @@ class Nuxt
 {
     public function getBundleKey()
     {
-        $clientAppPath = env('NUXT_BASEPATH').'/.nuxt/dist/client';
+        if ( !($nuxtPath = env('NUXT_BASEPATH')) ){
+            return;
+        }
+
+        $clientAppPath = $nuxtPath.'/.nuxt/dist/client';
 
         //If path does not exists (in dev mode path also does not exists)
         if ( file_exists($clientAppPath) == false ){
