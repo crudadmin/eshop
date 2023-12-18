@@ -42,9 +42,11 @@ trait HasProductFields
     {
         return Group::tab([
             'Cena' => Group::fields([
-                'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|canAdd|hidden',
-                'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField',
-            ])->id('price')->add('required_if:product_type,'.implode(',', Store::orderableProductTypes()))->width(8),
+                Group::fields([
+                    'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|canAdd|hidden',
+                    'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField',
+                ])->add('required_if:product_type,'.implode(',', Store::orderableProductTypes()))
+            ])->id('price')->width(8),
             'Zľava' => Group::fields([
                 'discount_operator' => 'name:Typ zľavy|type:select|hidden',
                 'discount' => 'name:Výška zľavy|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
