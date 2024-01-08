@@ -142,6 +142,7 @@ class Attribute extends AdminModel
     public function setListingResponse()
     {
         $this->append([
+            'unitName',
             'unitFormat',
             'hasUnitPrepend',
             'hasUnitSpace',
