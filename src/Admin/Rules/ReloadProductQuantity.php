@@ -4,7 +4,6 @@ namespace AdminEshop\Admin\Rules;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
-use Ajax;
 
 class ReloadProductQuantity extends AdminRule
 {
@@ -78,7 +77,7 @@ class ReloadProductQuantity extends AdminRule
 
         //If is no enought items on stock to subtract from product quantity
         if ( $row->product->canOrderEverytime == false && ($product->stock_quantity - $quantity) < 0 ) {
-            return Ajax::error('Pre pridanie daného produktu do objednávky <strong>nie je</strong> dostatočný počet produktov na sklade.');
+            return autoAjax()->error('Pre pridanie daného produktu do objednávky <strong>nie je</strong> dostatočný počet produktov na sklade.')->throw();
         }
 
         $product->commitStockChange('-', $quantity, $row->order_id, $message);

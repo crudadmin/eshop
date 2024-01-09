@@ -5,7 +5,6 @@ namespace AdminEshop\Admin\Rules;
 use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
 use Admin;
-use Ajax;
 use Store;
 
 class RebuildOrder extends AdminRule
@@ -43,7 +42,7 @@ class RebuildOrder extends AdminRule
         //we need notify user about this. Because sometimes bug may happend!
         //We need know about that, especially administrator to findout that something is wrong.
         if ( $priceBefore !== (float)$row->price_vat ) {
-            Ajax::warning(
+            autoAjax()->warning(
                 sprintf(
                     _('Cena objednávky bola po uložení zmenená z <strong>%s</strong> na <strong>%s</strong>.'),
                     Store::priceFormat($priceBefore),

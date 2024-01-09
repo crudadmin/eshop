@@ -4,7 +4,6 @@ namespace AdminEshop\Admin\Rules;
 
 use Admin\Eloquent\AdminRule;
 use Admin\Eloquent\AdminModel;
-use Ajax;
 
 class SetDefaultOrderStatus extends AdminRule
 {
@@ -28,7 +27,7 @@ class SetDefaultOrderStatus extends AdminRule
     public function delete(AdminModel $row)
     {
         if ( $row->default == true ) {
-            Ajax::error(_('Nie je možné vymazať predvolený záznam.'));
+            autoAjax()->error(_('Nie je možné vymazať predvolený záznam.'))->throw();
         }
     }
 }

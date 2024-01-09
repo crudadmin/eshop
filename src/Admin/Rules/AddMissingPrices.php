@@ -5,7 +5,6 @@ namespace AdminEshop\Admin\Rules;
 use Admin\Eloquent\AdminRule;
 use Admin\Eloquent\AdminModel;
 use Admin;
-use Ajax;
 use Store;
 
 class AddMissingPrices extends AdminRule
@@ -14,7 +13,7 @@ class AddMissingPrices extends AdminRule
     public function fire(AdminModel $row)
     {
         if ( ($order = $row->order) && Store::getOrdersStatus($order->status_id)?->return_stock == true ) {
-            return Ajax::error('Nie je možné upravovať produkty v už zrušenej objednávke.');
+            return autoAjax()->error('Nie je možné upravovať produkty v už zrušenej objednávke.')->throw();
         }
 
         //Set default vat

@@ -7,7 +7,6 @@ use AdminEshop\Contracts\Collections\OrderItemsCollection;
 use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Models\Orders\OrdersItem;
 use AdminEshop\Models\Orders\OrdersStatus;
-use Ajax;
 use Cart;
 use Discounts;
 use Illuminate\Support\Facades\DB;

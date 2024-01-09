@@ -6,7 +6,6 @@ use Admin;
 use AdminEshop\Events\OrderStatusChange;
 use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
-use Ajax;
 
 class OnOrderStatusChange extends AdminRule
 {
