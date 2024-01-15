@@ -145,7 +145,7 @@ trait HasOrderInvoice
             return;
         }
 
-        return ($invoice = $this->invoice->first())
+        return ($invoice = $this->invoices->first())
                 ? $invoice->getPdf()->url
                 : null;
     }
