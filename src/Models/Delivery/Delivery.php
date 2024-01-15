@@ -64,15 +64,17 @@ class Delivery extends AdminModel implements DiscountSupport
      */
     public function fields()
     {
+        $localeField = (Store::isEnabledLocalization() ? '|locale' : '');
+
         return [
-            'name' => 'name:Názov dopravy|placeholder:Zadejte názov dopravy|required|limit:40|max:90|'.(Store::isEnabledLocalization() ? '|locale' : ''),
+            'name' => 'name:Názov dopravy|placeholder:Zadejte názov dopravy|required|limit:40|max:90|'.$localeField,
             'vat' => 'name:Sadza DPH|belongsTo:vats,:name (:vat%)|required|defaultByOption:default,1|canAdd',
             'price' => 'name:Základná cena bez DPH|type:decimal|component:priceField|required',
             'image' => 'name:Ikona dopravy|type:file|image',
             'Informácie k doprave' => Group::tab([
-                'description' => 'name:Popis dopravy|hidden',
-                'description_email' => 'name:Popis k doprave v potvdzovaciom emaily objednávky|hidden|type:editor',
-                'description_email_status' => 'name:Popis pri zmene stavu objednávky|hidden|type:editor',
+                'description' => 'name:Popis dopravy|hidden'.$localeField,
+                'description_email' => 'name:Popis k doprave v potvdzovaciom emaily objednávky|hidden|type:editor'.$localeField,
+                'description_email_status' => 'name:Popis pri zmene stavu objednávky|hidden|type:editor'.$localeField,
             ])->icon('fa fa-info'),
         ];
     }
