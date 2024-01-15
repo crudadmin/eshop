@@ -11,7 +11,7 @@ class OrderController extends Controller
     {
         $orders = client()->orders()
                         ->with([
-                            'invoices:id,order_id,pdf',
+                            'invoices',
                             'status',
                         ])
                         ->withClientListingResponse()
