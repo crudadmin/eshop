@@ -266,13 +266,13 @@ trait OrderTrait
         if ( $isPaid = $this->paid_at ){
             $color = 'green';
             $icon = '<i class="fa fa-check"></i>';
-            $tooltip = 'Zaplatené '.$this->paid_at->format('d.m.Y H:i:s');
+            $tooltip = sprintf(_('Zaplatené %s'), $this->paid_at->format('d.m.Y H:i:s'));
         }
 
         else {
             $color = 'red';
             $icon = '<i class="fa fa-times"></i>';
-            $tooltip = 'Neuhradené';
+            $tooltip = _('Neuhradené');
         }
 
         // Yes/no is for sheet export
