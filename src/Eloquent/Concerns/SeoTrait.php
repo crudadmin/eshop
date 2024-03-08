@@ -18,20 +18,20 @@ trait SeoTrait
             }
         }
 
-        $metaImages = [];
+        $metaImages = collect();
 
         //Add meta images
         if ( in_array('meta_image', $arrayable) && $this->meta_image && count($this->meta_image) > 0 ) {
-            $metaImages = array_merge($metaImages, $this->meta_image);
+            $metaImages = $metaImages->merge($this->meta_image);
         } else if ( $this instanceof RoutesSeo ) {
-            $metaImages = array_merge($metaImages, $this->image ?: []);
+            $metaImages = $metaImages->merge($this->image ?: []);
         } else if ( $this->getField('image') && $this->image ){
-            $metaImages = array_merge($metaImages, [$this->image]);
+            $metaImages = $metaImages->merge([$this->image]);
         }
 
-        $attributes['meta_image'] = array_map(function($item){
+        $attributes['meta_image'] = $metaImages->map(function($item){
             return $item->resize(1200, 630)->url;
-        }, $metaImages);
+        })->toArray();
 
         return $attributes;
     }
