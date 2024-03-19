@@ -164,9 +164,9 @@ class AttributesItem extends AdminModel
         return $this->belongsToMany(get_class(Admin::getModel('Product')), 'attributes_item_product_attributes_items');
     }
 
-    public function scopeWithTextAttributes()
+    public function scopeWithTextAttributes($query)
     {
-        return $this
+        return $query
             ->with('attribute')
             ->whereHas('attribute', function($query){
                 if ( config('admineshop.attributes.attributesText', false) ) {
