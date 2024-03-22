@@ -7,7 +7,6 @@ use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Admin\Rules\OnOrderStatusChange;
 use AdminEshop\Admin\Rules\OrderNumber;
 use AdminEshop\Admin\Rules\RebuildOrder;
-use Admin\Eloquent\Concerns\HasEntryLocales;
 use AdminEshop\Eloquent\Concerns\HasOrderEmails;
 use AdminEshop\Eloquent\Concerns\HasOrderFields;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
@@ -42,8 +41,7 @@ class Order extends AdminModel implements Orderable
         HasOrderInvoice,
         HasOrderEmails,
         HasOrderNumber,
-        HasOrderFields,
-        HasEntryLocales;
+        HasOrderFields;
 
     /*
      * Model created date, for ordering tables in database and in user interface
