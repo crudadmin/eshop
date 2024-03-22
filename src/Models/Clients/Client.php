@@ -3,7 +3,7 @@
 namespace AdminEshop\Models\Clients;
 
 use AdminEshop\Contracts\Discounts\ClientPercentage;
-use AdminEshop\Eloquent\Concerns\HasClientLocales;
+use Admin\Eloquent\Concerns\HasEntryLocales;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
 use AdminPayments\Gateways\Stripe\HasClientStripe;
 use Admin\Eloquent\Authenticatable;
@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Client extends Authenticatable
 {
-    use HasUsernames, HasClientStripe, HasClientLocales;
+    use HasUsernames, HasClientStripe, HasEntryLocales;
 
     /*
      * Model created date, for ordering tables in database and in user interface

@@ -325,7 +325,7 @@ trait OrderTrait
                     return $this->created_at == $this->updated_at;
                 },
                 'query' => function($query){
-                    return $query->whereRaw('created_at = updated_at');
+                    return $query->whereRaw('orders.created_at = orders.updated_at');
                 },
             ]
         ];
