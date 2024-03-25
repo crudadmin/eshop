@@ -154,7 +154,7 @@ trait HasImporter
                 $this->getIdentifierName($fieldKey)
             )->toArray();
 
-            $this->existingRows[$model->getTable()] = array_merge($pairedKeys, $this->getExistingRows($model));
+            $this->existingRows[$model->getTable()] = $pairedKeys + $this->getExistingRows($model);
 
             if ( $this->isPublishable($model) ) {
                 $rowsToPublish = $existingRows->whereNull('published_at')->filter(function($row) use ($fieldKey, $allIdentifiers) {
