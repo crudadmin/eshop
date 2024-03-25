@@ -370,6 +370,7 @@ class Order extends AdminModel implements Orderable
 
     public function log()
     {
-        return $this->hasMany(OrdersLog::class);
+        return $this->hasMany(OrdersLog::class, 'row_id', 'id')
+                    ->where('orders_logs.table', $this->getTable());
     }
 }
