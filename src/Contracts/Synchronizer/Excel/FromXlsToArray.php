@@ -54,7 +54,7 @@ class FromXlsToArray
 
             $rowData = [];
             foreach ($cellIterator as $cell) {
-                $rowData[] = $cell->getCalculatedValue();
+                $rowData[] = $cell->getValue();
             }
 
             //We want bind header
