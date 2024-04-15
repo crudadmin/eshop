@@ -5,6 +5,7 @@ namespace AdminEshop\Contracts\Synchronizer\Excel;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use Exception;
 
 class FromXlsToArray
 {
@@ -54,7 +55,13 @@ class FromXlsToArray
 
             $rowData = [];
             foreach ($cellIterator as $cell) {
-                $rowData[] = $cell->getValue();
+                try {
+                    $value = $cell->getCalculatedValue();
+                } catch (Exception $e){
+                    $value = null;
+                }
+
+                $rowData[] = $value;
             }
 
             //We want bind header
