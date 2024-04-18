@@ -29,6 +29,7 @@ use Admin\Fields\Group;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use OrderService;
+use Admin;
 use Store;
 
 class Order extends AdminModel implements Orderable
@@ -370,7 +371,7 @@ class Order extends AdminModel implements Orderable
 
     public function log()
     {
-        return $this->hasMany(OrdersLog::class, 'row_id', 'id')
+        return $this->hasMany(get_class(Admin::getModelByTable('orders_logs')), 'row_id', 'id')
                     ->where('orders_logs.table', $this->getTable());
     }
 }
