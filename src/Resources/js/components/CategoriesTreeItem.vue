@@ -80,7 +80,6 @@
 
 
 <script type="text/javascript">
-import { mapState } from 'vuex';
 import _ from 'lodash';
 import draggable from 'vuedraggable'
 
