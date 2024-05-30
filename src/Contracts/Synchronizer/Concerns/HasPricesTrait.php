@@ -26,7 +26,8 @@ trait HasPricesTrait
                     ?: Store::getDefaultVat();
 
         $price = $row['price_'.$defaultCurrency->code] ?? $row['price'] ?? null;
-        $price = $this->castPriceNumber($price, $vat);
+
+        $price = $this->castPriceNumber($price, $vat, $row);
 
         if ( is_null($price) == false ){
             $array['price'] = $price;
@@ -55,7 +56,7 @@ trait HasPricesTrait
             if ( array_key_exists($priceCode, $row) ){
                 $vat = $this->getCurrencyVat($currency, $row);
 
-                $price = $this->castPriceNumber($row[$priceCode], $vat);
+                $price = $this->castPriceNumber($row[$priceCode], $vat, $row);
 
                 if ( !is_null($price) ){
                     $prices[] = [
@@ -81,7 +82,7 @@ trait HasPricesTrait
         }
     }
 
-    public function castPriceNumber($number, $vat)
+    public function castPriceNumber($number, $vat, $row)
     {
         if ( $number == '' || is_null($number) ){
             return;
