@@ -4,6 +4,7 @@ namespace AdminEshop\Models\Products;
 
 use AdminEshop\Admin\Buttons\SetProductsCategory;
 use AdminEshop\Admin\Buttons\SetProductsDiscount;
+use AdminEshop\Admin\Rules\ResetProductDiscount;
 use AdminEshop\Contracts\Collections\ProductsCollection;
 use AdminEshop\Eloquent\CartEloquent;
 use AdminEshop\Eloquent\Concerns\CanBeInCart;
@@ -76,6 +77,10 @@ class Product extends CartEloquent implements HasAttributesSupport
     protected $buttons = [
         SetProductsDiscount::class,
         SetProductsCategory::class,
+    ];
+
+    protected $rules = [
+        ResetProductDiscount::class,
     ];
 
     protected $search = [
