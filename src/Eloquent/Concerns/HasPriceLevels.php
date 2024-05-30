@@ -29,7 +29,14 @@ trait HasPriceLevels
                 ->where('pl.currency_id', Store::getCurrency()->getKey())
                 ->whereNotNull('pl.published_at')
                 ->whereNull('pl.deleted_at');
+
+            $this->priceLevelsJoin($join);
         });
+    }
+
+    public function priceLevelsJoin($join)
+    {
+
     }
 
     public function scopeWithPriceLevelsColumns($query)

@@ -42,6 +42,8 @@ class ProductsPrice extends AdminModel
         ProductsPriceLevelsCheck::class,
     ];
 
+    protected $uniquePriceLevels = true;
+
     public function active()
     {
         return config('admineshop.prices.price_levels');
@@ -63,19 +65,23 @@ class ProductsPrice extends AdminModel
         });
 
         return [
-            'currency' => [
+            'currency' => array_filter([
                 'name' => 'Mena',
                 'belongsTo' => 'currencies,:name',
                 'defaultByOption' => 'default,1',
-                Rule::unique('products_prices')->ignore($row?->id)->where($relationColumn, request($relationColumn))->withoutTrashed(),
-            ],
-            'vat' => [
+                $this->uniquePriceLevels
+                    ? Rule::unique('products_prices')->ignore($row?->id)->where($relationColumn, request($relationColumn))->withoutTrashed()
+                    : null,
+            ]),
+            'vat' => array_filter([
                 'name' => 'Sazba DPH',
                 'belongsTo' => 'vats,:name - :vat%',
                 'defaultByOption' => 'default,1',
                 'canAdd' => true,
-                Rule::unique('products_prices')->ignore($row?->id)->where($relationColumn, request($relationColumn))->where('currency_id', request('currency_id'))->withoutTrashed(),
-            ],
+                $this->uniquePriceLevels
+                    ? Rule::unique('products_prices')->ignore($row?->id)->where($relationColumn, request($relationColumn))->where('currency_id', request('currency_id'))->withoutTrashed()
+                    : null,
+            ]),
             'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField',
         ];
     }
