@@ -101,6 +101,7 @@ trait HasProductFilter
                         ->whereHas('variants', function($query) use ($filter) {
                             $query
                                 //We need reclone options in relationships
+                                ->withPriceLevels()
                                 ->cloneModelFilter($this)
                                 ->filterProduct($filter)
                                 ->filterVariantProduct();
