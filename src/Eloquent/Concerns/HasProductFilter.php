@@ -149,14 +149,7 @@ trait HasProductFilter
                 $query->where($query->getModel()->getTable().'.id', 0);
             })
             ->where(function($query) use ($searchQuery) {
-                $query
-                    ->where(function($query) use ($searchQuery) {
-                        $query->fulltextSearch($searchQuery);
-                    })->orWhere(function($query) use ($searchQuery) {
-                        $query->whereHas('variants', function($query) use ($searchQuery) {
-                            $query->fulltextSearch($searchQuery);
-                        });
-                    });
+                $query->fulltextSearch($searchQuery);
             });
     }
 
@@ -280,6 +273,8 @@ trait HasProductFilter
         }
 
         $query->applySaleFilter($params);
+
+        $query->applySearchFilter($params);
     }
 
     public function scopeApplyAttributesFilter($query, $params, $except = [], $only = [])
@@ -321,7 +316,6 @@ trait HasProductFilter
         }
 
         $query->applyCategoryFilter($filter);
-        $query->applySearchFilter($filter);
     }
 
     public function scopeFilterVariantProduct($query, $options = null)
