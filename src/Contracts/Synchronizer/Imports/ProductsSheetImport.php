@@ -162,7 +162,9 @@ class ProductsSheetImport extends ProductsImport implements SynchronizerInterfac
         }
 
         if ( $this->productModel->getProperty('localeSearch') ){
-            $array['fulltext_index'] = $this->productModel->forceFill($array)->getSearchIndex();
+            if ( $index = $this->productModel->forceFill($array)->getSearchIndex() ){
+                $array['fulltext_index'] = $index;
+            }
         }
 
         return $array;
