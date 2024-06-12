@@ -2,6 +2,7 @@
 
 namespace AdminEshop\Contracts\Feed;
 use Localization;
+use Store;
 
 class FeedGenerator
 {
@@ -9,11 +10,15 @@ class FeedGenerator
 
     private $locale;
 
-    public function __construct($type, $locale)
+    private $currency;
+
+    public function __construct($type, $locale, $currency)
     {
         $this->type = $type;
 
         $this->locale = $locale;
+
+        $this->currency = $currency;
 
         $this->setup();
     }
@@ -24,6 +29,12 @@ class FeedGenerator
 
         if ( $this->locale ){
             Localization::setLocale($this->locale);
+        }
+
+        if ( $this->currency ){
+            Store::setCurrency(
+                Store::getCurrencies()->firstWhere('code', $this->currency)
+            );
         }
     }
 
