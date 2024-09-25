@@ -1,14 +1,45 @@
-[data-table-rows="orders"] .td-is_paid,
-[data-table-rows="orders"] .td-items_list { text-align: center; }
+[data-table-rows='orders'] .td-is_paid,
+[data-table-rows='orders'] .td-items_list {
+    text-align: center;
+}
 
-[data-table-rows="orders"] .td-price_vat { min-width: 80px; }
+[data-table-rows='orders'] .td-price_vat {
+    min-width: 80px;
+}
 
-.tooltip-products .tooltip-inner { max-width: 400px; }
-.tooltip-products .orderItemTooltip { display: flex; justify-content: space-between; }
-.tooltip-products .orderItemTooltip .--quantity { width: 50px; margin-right: 5px; }
-.tooltip-products .orderItemTooltip .--name { width: 100%; text-align: left; }
-.tooltip-products .orderItemTooltip .--price { text-align: right; min-width: 70px; margin-left: 5px }
+.tooltip-products .tooltip-inner {
+    max-width: 400px;
+}
+.tooltip-products .orderItemTooltip {
+    display: flex;
+    justify-content: space-between;
+}
+.tooltip-products .orderItemTooltip .--quantity {
+    width: 50px;
+    margin-right: 5px;
+}
+.tooltip-products .orderItemTooltip .--name {
+    width: 100%;
+    text-align: left;
+}
+.tooltip-products .orderItemTooltip .--price {
+    text-align: right;
+    min-width: 70px;
+    margin-left: 5px;
+}
 
-.ignore-status-email { position: absolute; top: 5px; right: 15px; line-height: 100%; }
-.ignore-status-email label { margin-bottom: 0; color: #8898aa; display: flex; align-items: center; }
-.ignore-status-email input { margin-left: 5px; }
+.ignore-status-email {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    line-height: 100%;
+}
+.ignore-status-email label {
+    margin-bottom: 0;
+    color: #8898aa;
+    display: flex;
+    align-items: center;
+}
+.ignore-status-email input {
+    margin-left: 5px;
+}
