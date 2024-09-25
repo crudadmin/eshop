@@ -61,7 +61,8 @@ return [
     ],
 
     'styles' => [
-        'vendor/admineshop/css/eshop.css',
+        'vendor/admineshop/js/app.css',
+        'vendor/admineshop/js/eshop.css',
     ],
 
     'scripts' => [

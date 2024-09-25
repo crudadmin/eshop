@@ -1,32 +1,27 @@
 <template>
-<div class="sitetree__item__wrapper --addNew">
-    <div class="sitetree__item">
-        <a
-            data-toggle="tooltip"
-            @click.prevent="addNewSubcategory()"
-            :title="_('Pridať podkategóriu')"
-            href="#"
-        >
-            <i class="fa fa-plus"></i>
+    <div class="sitetree__item__wrapper --addNew">
+        <div class="sitetree__item">
+            <a data-toggle="tooltip" @click.prevent="addNewSubcategory()" :title="__('Pridať podkategóriu')" href="#">
+                <i class="fa fa-plus"></i>
 
-            {{ item ? __('Pridajte do %s').replace('%s', getLocaleFieldValue(item.name)) : __('Pridajte hlavnú kategóriu') }}
-        </a>
+                {{ item ? __('Pridajte do %s').replace('%s', useGetLocaleFieldValue(item.name)) : __('Pridajte hlavnú kategóriu') }}
+            </a>
 
-        <p>&nbsp;{{ __('alebo pretiahnite existujúcu.') }}</p>
+            <p>&nbsp;{{ __('alebo pretiahnite existujúcu.') }}</p>
+        </div>
     </div>
-</div>
 </template>
 
 <script type="text/javascript">
 export default {
-    props : ['model', 'item'],
+    props: ['model', 'item'],
     methods: {
-        addNewSubcategory(){
+        addNewSubcategory() {
             this.model.createNewEntry();
             this.model.getRow().category_id = this.item?.id;
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <style lang="scss" scoped>
