@@ -3,15 +3,15 @@
 namespace AdminEshop\Models\Clients;
 
 use AdminEshop\Contracts\Discounts\ClientPercentage;
-use Admin\Eloquent\Concerns\HasEntryLocales;
 use AdminEshop\Eloquent\Concerns\HasUsernames;
 use AdminPayments\Gateways\Stripe\HasClientStripe;
-use Admin\Eloquent\Authenticatable;
+use Admin\Eloquent\BaseAuthenticatable;
+use Admin\Eloquent\Concerns\HasEntryLocales;
 use Admin\Fields\Group;
 use Discounts;
 use Illuminate\Notifications\Notifiable;
 
-class Client extends Authenticatable
+class Client extends BaseAuthenticatable
 {
     use HasUsernames, HasClientStripe, HasEntryLocales;
 
