@@ -68,7 +68,7 @@ class Currency extends AdminModel
             'name' => 'name:Názov meny|required',
             'code' => 'name:Kód meny|placeholder:EUR,USD|required',
             'char' => 'name:Značka meny|required|max:6|placeholder:€, $, EUR, USD...',
-            'rate' => 'name:Kurz|type:decimal|title:Kurz voči predvolenej mene|required',
+            'rate' => 'name:Kurz|type:decimal|decimal_length:8,4|title:Kurz voči predvolenej mene|required',
             'default' => 'name:Predvolená mena|type:checkbox|default:0',
             'Nastavenia cien' => Group::tab([
                 'decimal_places' => 'name:Zobrazovať ceny na|type:select|default:2|required',
