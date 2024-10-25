@@ -40,7 +40,7 @@ export default {
                 return option[0] == id;
             })[0][1];
 
-            let values = _.xor(_.cloneDeep(this.field.value), [id]);
+            let values = _.xor(_.cloneDeep(this.field.value).map(r => r.id), [id]);
 
             //Add all parents categories
             if ( addedOption.tree.length > 1 ) {
@@ -54,10 +54,10 @@ export default {
 
             values.push(id);
 
-            this.model.setValue('categories', values);
+            this.model.setValue('categories', values.map(id => ({ id : id })));
         },
         removeChildCategories(id){
-            let values = _.xor(_.cloneDeep(this.field.value), [id]);
+            let values = _.xor(_.cloneDeep(this.field.value).map(r => r.id), [id]);
 
             //Add all parents categories
             let toRemove = this.field.options.filter(option => {
@@ -68,7 +68,7 @@ export default {
 
             values = _.xor(values, toRemove);
 
-            this.model.setValue('categories', values);
+            this.model.setValue('categories', values.map(id => ({ id : id })));
         }
     }
 }
