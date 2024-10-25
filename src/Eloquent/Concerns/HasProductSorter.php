@@ -10,13 +10,13 @@ trait HasProductSorter
     {
         return [
             'name-asc' => [
-                'name' => _('Cheapest'),
+                'name' => _('Name Ascending'),
                 'scope' => function($query){
                     $query->orderBy('products.name', 'ASC');
                 },
             ],
             'name-desc' => [
-                'name' => _('Cheapest'),
+                'name' => _('Name Descending'),
                 'scope' => function($query){
                     $query->orderBy('products.name', 'DESC');
                 },
@@ -46,13 +46,11 @@ trait HasProductSorter
     {
         $filterParams = $this->getFilterOption('filter');
 
-        if ( !($sortBy = $filterParams['_sort'] ?? null) ){
-            return;
-        }
+        $sortBy = $filterParams['_sort'] ?? 'default';
 
-        $sorter = $this->getAvailableSorts($query)[$sortBy];
+        $sorter = $this->getAvailableSorts($query)[$sortBy] ?? null;
 
-        if ( isset($sorter['scope']) ){
+        if ( $sorter && isset($sorter['scope']) ){
             if ( is_callable($sorter['scope']) ){
                 $sorter['scope']($query);
             }
