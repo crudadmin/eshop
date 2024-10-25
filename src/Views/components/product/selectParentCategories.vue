@@ -2,7 +2,9 @@
 export default {
     props : ['model', 'field'],
     mounted(){
-        this.$watch('field.value', (value, oldValue) => {
+        this.$watch(() => {
+            return this.model.getOption(this.field.getKey());
+        }, (value, oldValue) => {
             if ( this.toggling === true ){
                 return;
             }
@@ -11,10 +13,10 @@ export default {
 
             //Category has been added
             if ( (value||[]).length > (oldValue||[]).length ) {
-                let addedCategoryId = _.xor(oldValue, value);
+                let addedCategory = _.xor(oldValue, value);
 
-                if ( addedCategoryId.length == 1 ) {
-                    this.addParentCategories(addedCategoryId[0])
+                if ( addedCategory.length == 1 ) {
+                    this.addParentCategories(addedCategory[0].id)
                 }
             }
 
@@ -22,7 +24,9 @@ export default {
             else if ( (value||[]).length < (oldValue||[]).length ) {
                 let removedCategoryId = _.xor(value, oldValue)[0];
 
-                this.removeChildCategories(removedCategoryId)
+                if ( removedCategoryId ) {
+                    this.removeChildCategories(removedCategoryId.id)
+                }
             }
 
             setTimeout(() => {

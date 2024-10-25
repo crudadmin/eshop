@@ -58,6 +58,7 @@ class AttributesItem extends AdminModel
             'title.update' => ':item_name',
             'columns.id.hidden' => env('APP_DEBUG') == false,
             'columns.item_name.name' => 'Hodnota atribútu',
+            'columns.item_name.after' => 'id',
         ];
     }
 
