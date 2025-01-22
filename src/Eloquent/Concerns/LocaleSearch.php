@@ -4,6 +4,7 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use AdminEshop\Eloquent\Concerns\SearchableTrait;
 use DB;
+use Illuminate\Support\Collection;
 
 trait LocaleSearch
 {
@@ -93,6 +94,10 @@ trait LocaleSearch
 
         foreach ($fields as $key) {
             $value = $this->getAttribute($key);
+
+            if ( $value instanceof Collection ){
+                $value = $value->toArray();
+            }
 
             $string = is_array($value) ? implode(' ', array_map(function($item) use ($value, $totalLimit) {
                 return substr($item, 0, round($totalLimit / count($value)));
