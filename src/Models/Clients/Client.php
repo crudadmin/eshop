@@ -2,18 +2,17 @@
 
 namespace AdminEshop\Models\Clients;
 
-use AdminEshop\Contracts\Discounts\ClientPercentage;
-use AdminEshop\Eloquent\Concerns\HasUsernames;
-use AdminPayments\Gateways\Stripe\HasClientStripe;
+use Discounts;
+use Admin\Fields\Group;
 use Admin\Eloquent\BaseAuthenticatable;
 use Admin\Eloquent\Concerns\HasEntryLocales;
-use Admin\Fields\Group;
-use Discounts;
-use Illuminate\Notifications\Notifiable;
+use AdminEshop\Eloquent\Concerns\HasUsernames;
+use AdminEshop\Contracts\Discounts\ClientPercentage;
+use AdminPayments\Gateways\Stripe\HasStripeCustomer;
 
 class Client extends BaseAuthenticatable
 {
-    use HasUsernames, HasClientStripe, HasEntryLocales;
+    use HasUsernames, HasStripeCustomer, HasEntryLocales;
 
     /*
      * Model created date, for ordering tables in database and in user interface
