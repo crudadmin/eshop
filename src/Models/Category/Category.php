@@ -8,7 +8,6 @@ use AdminEshop\Eloquent\Concerns\HasCategoryTree;
 use AdminEshop\Eloquent\Concerns\SearchableTrait;
 use AdminEshop\Eloquent\Concerns\SeoTrait;
 use AdminEshop\Models\Products\Pivot\ProductsCategoriesPivot;
-use AdminEshop\Models\Products\Product;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
@@ -52,7 +51,7 @@ class Category extends AdminModel
 
     public function belongsToModel()
     {
-        if ( config('admineshop.categories.max_level', 1) > 1 ) {
+        if ( config('admin_eshop.categories.max_level', 1) > 1 ) {
             return get_class($this);
         }
     }
@@ -63,7 +62,7 @@ class Category extends AdminModel
             'buttons.create.enabled' => false,
             'title.update' => ':name',
             'recursivity.name' => 'Podkategórie',
-            'recursivity.max_depth' => config('admineshop.categories.max_level'),
+            'recursivity.max_depth' => config('admin_eshop.categories.max_level'),
             'pagination.enabled' => false,
             'table.enabled' => false,
         ];

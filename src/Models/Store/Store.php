@@ -46,7 +46,7 @@ class Store extends AdminModel
                 'email_logo' => 'name:Logo v emailoch|type:file|image',
                 'default_image' => 'name:Obrázok pri produktoch bez fotografie|type:file|image|required',
             ],
-            config('admineshop.stock.store_rules', true) ?
+            config('admin_eshop.stock.store_rules', true) ?
                 [
                     'Nastavenia skladu' => Group::tab([
                         'stock_type' => 'name:Predvolené nastavenie skladu|default:show|type:select|index',

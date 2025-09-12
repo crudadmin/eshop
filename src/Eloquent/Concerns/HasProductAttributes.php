@@ -78,10 +78,10 @@ trait HasProductAttributes
                 }
 
                 return ($item ? $item->getAttributeItemValue($attribute) : '');
-            })->filter()->join(config('admineshop.attributes.separator.item', ', '));
+            })->filter()->join(config('admin_eshop.attributes.separator.item', ', '));
         }
 
-        return implode(config('admineshop.attributes.separator.attribute', ', '), $attributes);
+        return implode(config('admin_eshop.attributes.separator.attribute', ', '), $attributes);
     }
 
     /**
@@ -98,7 +98,7 @@ trait HasProductAttributes
         $enabledClasses = Admin::cache('store.enabledAttributes', function(){
             return array_map(function($classname){
                 return class_basename($classname);
-            }, config('admineshop.attributes.eloquents', []));
+            }, config('admin_eshop.attributes.eloquents', []));
         });
 
         //Check if given class has enabled attributes support

@@ -8,7 +8,7 @@ use Admin\Helpers\File;
 
 trait HasShipping
 {
-    protected $shippingConfigKey = 'admineshop.delivery.providers';
+    protected $shippingConfigKey = 'admin_eshop.delivery.providers';
 
     public function getShippingProvider($deliveryId = null)
     {

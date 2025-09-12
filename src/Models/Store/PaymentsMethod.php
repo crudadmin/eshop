@@ -22,7 +22,7 @@ class PaymentsMethod extends BasePaymentsMethod
 
     public function active()
     {
-        return config('admineshop.payment_methods.enabled', true);
+        return config('admin_eshop.payment_methods.enabled', true);
     }
 
     public function reserved()
@@ -48,7 +48,7 @@ class PaymentsMethod extends BasePaymentsMethod
         ];
 
         //Add payments rules
-        if ( config('admineshop.payment_methods.price_limit') == true ) {
+        if ( config('admin_eshop.payment_methods.price_limit') == true ) {
             $restrictionFields['price_limit'] = 'name:Limit ceny objednávky pre platobnú metódu|type:decimal|title:S DPH - Po presiahnutí ceny objednávky bude platobná metóda odobraná z objednávkoveho košíku|hidden';
         }
 

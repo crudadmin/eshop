@@ -41,8 +41,8 @@ class StoreServiceProvider extends ServiceProvider {
     {
         BusinessDay::enable(
             'Illuminate\Support\Carbon',
-            config('admineshop.holidays.country', 'sk'),
-            config('admineshop.holidays.additional', [])
+            config('admin_eshop.holidays.country', 'sk'),
+            config('admin_eshop.holidays.additional', [])
         );
     }
 
@@ -52,7 +52,7 @@ class StoreServiceProvider extends ServiceProvider {
             $schedule->job(new CleanEmptyCartTokensJob)->dailyAt('04:00');
             $schedule->job(new SetOrderStatusAfterInactivness)->dailyAt('05:55');
 
-            if ( $scheduleAt = config('admineshop.stock.stock_notifier_scheduler') ) {
+            if ( $scheduleAt = config('admin_eshop.stock.stock_notifier_scheduler') ) {
                 $schedule->job(new ProductAvaiabilityChecker)->{$scheduleAt}();
             }
         });

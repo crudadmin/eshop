@@ -10,7 +10,7 @@ trait HasPriceLevels
 {
     public function scopeWithPriceLevels($query, $key = 'pl')
     {
-        if ( !config('admineshop.prices.price_levels') ){
+        if ( !config('admin_eshop.prices.price_levels') ){
             return;
         }
 
@@ -41,7 +41,7 @@ trait HasPriceLevels
 
     public function scopeWithPriceLevelsColumns($query)
     {
-        if ( config('admineshop.prices.price_levels') ) {
+        if ( config('admin_eshop.prices.price_levels') ) {
             $query
                 ->withPriceLevels()
                 ->addSelect(DB::raw('

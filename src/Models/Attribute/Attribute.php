@@ -56,7 +56,7 @@ class Attribute extends AdminModel
 
     public function active()
     {
-        return count(config('admineshop.attributes.eloquents', [])) > 0;
+        return count(config('admin_eshop.attributes.eloquents', [])) > 0;
     }
 
     public function reserved()
@@ -86,9 +86,9 @@ class Attribute extends AdminModel
 
     public function mutateFields($fields)
     {
-        $filtrable = config('admineshop.attributes.filtrable', true);
-        $attributesText = config('admineshop.attributes.attributesText', false);
-        $attributesVariants = config('admineshop.attributes.attributesVariants', false);
+        $filtrable = config('admin_eshop.attributes.filtrable', true);
+        $attributesText = config('admin_eshop.attributes.attributesText', false);
+        $attributesVariants = config('admin_eshop.attributes.attributesVariants', false);
 
         if ( $filtrable || $attributesText || $attributesVariants ){
             $fields->push(
@@ -112,9 +112,9 @@ class Attribute extends AdminModel
     {
         return array_filter([
             'id', 'name', 'unit_id', 'slug', 'sortby',
-            config('admineshop.attributes.filtrable', true) ? 'filtrable' : null,
-            config('admineshop.attributes.attributesText', false) ? 'product_info' : null,
-            config('admineshop.attributes.attributesVariants', false) ? 'variants' : null,
+            config('admin_eshop.attributes.filtrable', true) ? 'filtrable' : null,
+            config('admin_eshop.attributes.attributesText', false) ? 'product_info' : null,
+            config('admin_eshop.attributes.attributesVariants', false) ? 'variants' : null,
             $this->isSortable() ? '_order' : null,
         ]);
     }
@@ -127,7 +127,7 @@ class Attribute extends AdminModel
     public function displayableInTextAttributes()
     {
         //In administration variant list display all attributes when no text attributes is allowed
-        if ( config('admineshop.attributes.attributesText', false) === false ){
+        if ( config('admin_eshop.attributes.attributesText', false) === false ){
             return true;
         }
 

@@ -8,7 +8,7 @@ use OrderService;
 
 class DeliveryLocationsImporter
 {
-    private $configKey = 'admineshop.delivery.providers';
+    private $configKey = 'admin_eshop.delivery.providers';
 
     private $command;
 

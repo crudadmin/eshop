@@ -23,12 +23,12 @@ class Feed
     //Check if given feed is registered
     public static function isEnabled()
     {
-        return in_array(static::class, config('admineshop.feeds.providers'));
+        return in_array(static::class, config('admin_eshop.feeds.providers'));
     }
 
     public function cacheDuration()
     {
-        return config('admineshop.feeds.cache', 3600);
+        return config('admin_eshop.feeds.cache', 3600);
     }
 
     public function getProducts($query)
@@ -70,7 +70,7 @@ class Feed
             return $items;
         };
 
-        if ( config('admineshop.feeds.debug', false) ){
+        if ( config('admin_eshop.feeds.debug', false) ){
             return $callback();
         }
 

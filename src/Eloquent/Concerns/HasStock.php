@@ -76,7 +76,7 @@ trait HasStock
      */
     public function getOnStockTextAttribute()
     {
-        if ( $this->canOrderEverytime == false && config('admineshop.stock.status_with_quantity') === true ) {
+        if ( $this->canOrderEverytime == false && config('admin_eshop.stock.status_with_quantity') === true ) {
             return sprintf(_('Skladom %sks'), $this->stockNumber);
         }
 
@@ -135,7 +135,7 @@ trait HasStock
     {
         $stockText = $this->stock_quantity;
 
-        $roundings = config('admineshop.stock.rounding', []);
+        $roundings = config('admin_eshop.stock.rounding', []);
 
         arsort($roundings);
 
@@ -146,10 +146,10 @@ trait HasStock
             if ( $this->stock_quantity > $onStock ){
                 //If is more than sentences limiter
                 if ( ! $prevStock ){
-                    return config('admineshop.stock.rounding_more_than_char', '>').$roundings[0];
+                    return config('admin_eshop.stock.rounding_more_than_char', '>').$roundings[0];
                 }
 
-                return config('admineshop.stock.rounding_less_than_char', '<').$prevStock;
+                return config('admin_eshop.stock.rounding_less_than_char', '<').$prevStock;
             }
 
             $prevStock = $onStock;
@@ -157,7 +157,7 @@ trait HasStock
 
         //If is less then lowest limit
         if ( count($roundings) > 0 ){
-            return config('admineshop.stock.rounding_less_than_char', '<').$roundings[count($roundings) - 1];
+            return config('admin_eshop.stock.rounding_less_than_char', '<').$roundings[count($roundings) - 1];
         }
 
         return $stockText;
@@ -233,7 +233,7 @@ trait HasStock
 
     public function blockedItems()
     {
-        $blockedMinutage = config('admineshop.stock.temporary_block_time', 0);
+        $blockedMinutage = config('admin_eshop.stock.temporary_block_time', 0);
 
         return $this->hasMany(CartStockBlock::class, $this instanceof ProductsVariant ? 'variant_id' : 'product_id')
                     ->where(function($query){

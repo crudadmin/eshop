@@ -68,7 +68,7 @@ class ImportsFile extends AdminModel
 
     public function getImports()
     {
-        return collect(config('admineshop.import'));
+        return collect(config('admin_eshop.import'));
     }
 
     public function getImporter()

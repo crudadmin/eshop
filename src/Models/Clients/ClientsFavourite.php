@@ -46,7 +46,7 @@ class ClientsFavourite extends AdminModel
 
     public function active()
     {
-        return config('admineshop.client.favourites', false);
+        return config('admin_eshop.client.favourites', false);
     }
 
     /*
@@ -66,7 +66,7 @@ class ClientsFavourite extends AdminModel
     public function mutateFields($fields)
     {
         //If variants are not defined in eshop
-        if ( !config('admineshop.product_types.variants') ){
+        if ( !config('admin_eshop.product_types.variants') ){
             $fields->field('variant_id', function($field){
                 $field->invisible = true;
             });

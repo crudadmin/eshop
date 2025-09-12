@@ -50,7 +50,7 @@ class ClientsAddress extends AdminModel
 
     public function active()
     {
-        return config('admineshop.client.addresses', false);
+        return config('admin_eshop.client.addresses', false);
     }
 
     /*

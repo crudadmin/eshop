@@ -10,7 +10,7 @@ trait HasStockBlockSupport
 {
     public function isStockBlockEnabled()
     {
-        return config('admineshop.stock.temporary_block_time', 0) > 0;
+        return config('admin_eshop.stock.temporary_block_time', 0) > 0;
     }
 
     private function getItemsToBlock($cartItems)

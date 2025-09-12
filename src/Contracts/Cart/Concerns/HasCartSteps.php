@@ -12,9 +12,9 @@ trait HasCartSteps
             // Default initial step to use also global mutators
             [
                 'name' => '_global',
-                'mutators' => config('admineshop.cart.mutators'),
+                'mutators' => config('admin_eshop.cart.mutators'),
             ]
-        ], config('admineshop.cart.steps', [])));
+        ], config('admin_eshop.cart.steps', [])));
     }
 
     private function getStepIndex($stepName)

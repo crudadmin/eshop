@@ -33,7 +33,7 @@ class HeurekaVerifiedCustomersJob implements ShouldQueue
      */
     public function handle()
     {
-        if ( !($key = config('admineshop.heureka.verified_customers.key')) ){
+        if ( !($key = config('admin_eshop.heureka.verified_customers.key')) ){
             return;
         }
 

@@ -54,7 +54,7 @@ trait CartTrait
         //First we need register identifier from config, because we may want rewrite original identifiers
         $cartIdentifiers = array_merge(
             $this->cartIdentifiers,
-            config('admineshop.cart.identifiers', [])
+            config('admin_eshop.cart.identifiers', [])
         );
 
         return $this->cache('cartIdentifiers', function() use ($cartIdentifiers) {

@@ -70,7 +70,7 @@ class StoreExport extends AdminModel
 
     public function getExportTypes()
     {
-        $types = config('admineshop.exports');
+        $types = config('admin_eshop.exports');
 
         //Add buttons from shipping providers for exports
         foreach (OrderService::getShippingProviders() as $provider) {

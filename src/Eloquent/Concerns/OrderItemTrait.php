@@ -52,9 +52,9 @@ trait OrderItemTrait
             ->get();
 
         return $products->map(function($product) use ($productModel) {
-            if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+            if ( config('admin_eshop.attributes.attributesVariants', false) == true ) {
                 $attributesText = $product->attributesVariantsText;
-            } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+            } else if ( config('admin_eshop.attributes.attributesText', false) == true ) {
                 $attributesText = $product->attributesText;
             } else {
                 $attributesText = null;

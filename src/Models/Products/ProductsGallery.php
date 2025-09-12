@@ -49,7 +49,7 @@ class ProductsGallery extends AdminModel
 
     public function belongsToModel()
     {
-        return config('admineshop.gallery.eloquents', []);
+        return config('admin_eshop.gallery.eloquents', []);
     }
 
     public function setDetailResponse()

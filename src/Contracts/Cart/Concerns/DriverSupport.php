@@ -49,8 +49,8 @@ trait DriverSupport
         }
 
         //Cache driver for all other classes which requires driver
-        $driver = Admin::cache('admineshop.cartDriver.'.$token, function() use ($token) {
-            $driver = config('admineshop.cart.driver');
+        $driver = Admin::cache('admin_eshop.cartDriver.'.$token, function() use ($token) {
+            $driver = config('admin_eshop.cart.driver');
 
             return new $driver($token, CartDriver::getInitialData());
         });

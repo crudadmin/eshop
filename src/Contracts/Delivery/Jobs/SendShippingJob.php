@@ -59,7 +59,7 @@ class SendShippingJob implements ShouldQueue
             $order->delivery_status = 'ok';
             $order->delivery_identifier = $package->shippingId();
 
-            if ( config('admineshop.delivery.labels') && $label = $package->getLabel() ){
+            if ( config('admin_eshop.delivery.labels') && $label = $package->getLabel() ){
                 $order->delivery_label = $this->saveLabel($order, $label);
             }
 

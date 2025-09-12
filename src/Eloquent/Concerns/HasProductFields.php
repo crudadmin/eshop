@@ -44,12 +44,12 @@ trait HasProductFields
             'Cena' => Group::fields([
                 Group::fields([
                     'vat' => 'name:Sazba DPH|belongsTo:vats,:name (:vat%)|defaultByOption:default,1|canAdd|hidden',
-                    'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField',
+                    'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admin_eshop.prices.decimals_places').'|default:0|component:PriceField',
                 ])->add('required_if:product_type,'.implode(',', Store::orderableProductTypes()))
             ])->id('price')->width(8),
             'Zľava' => Group::fields([
                 'discount_operator' => 'name:Typ zľavy|type:select|hidden',
-                'discount' => 'name:Výška zľavy|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
+                'discount' => 'name:Výška zľavy|type:decimal|decimal_length:'.config('admin_eshop.prices.decimals_places').'|hideFieldIfIn:discount_operator,NULL,default|required_if:discount_operator,'.implode(',', array_keys(operator_types())).'|hidden',
             ])->id('discount')->width(4),
         ])->icon('fa-money')->id('price-tab')->name('Cena')->attributes('hideFromFormIf:product_type,variants')->add('removeFromFormIf:product_type,variants');
     }
@@ -58,8 +58,8 @@ trait HasProductFields
     {
         return Group::tab([
             Group::fields([
-                'weight' => 'name:Váha ('.(config('admineshop.product.weight_unit') == 'kilograms' ? 'kg' : 'gramov').')|type:decimal|hidden',
-            ])->if(config('admineshop.product.weight_unit')),
+                'weight' => 'name:Váha ('.(config('admin_eshop.product.weight_unit') == 'kilograms' ? 'kg' : 'gramov').')|type:decimal|hidden',
+            ])->if(config('admin_eshop.product.weight_unit')),
             'description' => 'name:Popis produktu|type:editor|hidden'.(Store::isEnabledLocalization() ? '|locale' : ''),
         ])->icon('fa-file-text-o')->id('description-tab')->name('Popis');
     }
@@ -71,7 +71,7 @@ trait HasProductFields
             Group::fields([
                     'stock_type' => 'name:Možnosti skladu|default:default|type:select|index',
                     'stock_sold' => 'name:Text dostupnosti tovaru s nulovou skladovosťou|hideFromFormIfNot:stock_type,everytime'
-            ])->attributes('hideFromFormIf:product_type,variant')->if(config('admineshop.stock.store_rules', true)),
+            ])->attributes('hideFromFormIf:product_type,variant')->if(config('admin_eshop.stock.store_rules', true)),
         ])->icon('fa-bars')->id('warehouse-tab')->add('hidden')->name('Sklad');
     }
 

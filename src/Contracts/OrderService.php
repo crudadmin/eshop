@@ -65,7 +65,7 @@ class OrderService
      */
     public function hasInvoices()
     {
-        return config('admineshop.invoices', false) === true;
+        return config('admin_eshop.invoices', false) === true;
     }
 
     /**
@@ -234,7 +234,7 @@ class OrderService
         $this->addDiscountableItemsIntoOrder();
 
         //Coundown stock if is allowed
-        if ( $this->stockSync == true && config('admineshop.stock.countdown.on_order_create', true) == true ) {
+        if ( $this->stockSync == true && config('admin_eshop.stock.countdown.on_order_create', true) == true ) {
             $this->order->syncStock('-', 'order.new');
         }
 
@@ -356,7 +356,7 @@ class OrderService
 
     private function addDefaultStatus()
     {
-        if ( config('admineshop.order.status') === false ){
+        if ( config('admin_eshop.order.status') === false ){
             return;
         }
 
@@ -508,7 +508,7 @@ class OrderService
 
     public function getOrderMessage($key)
     {
-        return config('admineshop.order.codes.'.$key);
+        return config('admin_eshop.order.codes.'.$key);
     }
 
     /**

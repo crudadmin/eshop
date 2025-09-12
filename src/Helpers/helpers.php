@@ -72,7 +72,7 @@ function operator_modifier($number, $operator, $operatorValue, $vatValue = null)
 
 function client()
 {
-    $guard = auth()->guard(config('admineshop.client.guard'));
+    $guard = auth()->guard(config('admin_eshop.client.guard'));
 
     if ( ! $guard->check() ) {
         return null;
@@ -85,7 +85,7 @@ if ( !function_exists('phoneValidatorRule') )
 {
     function phoneValidatorRule($rule = true)
     {
-        $validation = config('admineshop.validation.phone_countries', 'SK');
+        $validation = config('admin_eshop.validation.phone_countries', 'SK');
 
         if ( $validation === false ){
             return '';

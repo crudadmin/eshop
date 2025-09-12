@@ -21,7 +21,7 @@ class OrderCreatedListener
         //Set created order id into cart
         Cart::getDriver()->set('order_id', OrderService::getOrder()->getKey());
 
-        if ( config('admineshop.heureka.verified_customers.enabled', false) === true ) {
+        if ( config('admin_eshop.heureka.verified_customers.enabled', false) === true ) {
             dispatch(new HeurekaVerifiedCustomersJob($event->getOrder()));
         }
     }

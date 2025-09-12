@@ -20,7 +20,7 @@ trait HasOrderNumber
      */
     public function getOrderNumberResetPrefix()
     {
-        $prefix = config('admineshop.cart.order.number.prefix', '');
+        $prefix = config('admin_eshop.cart.order.number.prefix', '');
 
         $date = $this->created_at ? $this->created_at : Carbon::now();
 
@@ -49,7 +49,7 @@ trait HasOrderNumber
             return $this;
         }
 
-        $pad = config('admineshop.cart.order.number.length', 6);
+        $pad = config('admin_eshop.cart.order.number.length', 6);
 
         $lastOrder = $this->newQuery()->getLastOrderNumber()->first();
 

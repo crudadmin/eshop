@@ -79,13 +79,13 @@ class AttributesItem extends AdminModel
 
     public function mutateFields($fields)
     {
-        if ( config('admineshop.attributes.types.colors', false) === true ){
+        if ( config('admin_eshop.attributes.types.colors', false) === true ){
             $fields->push([
                 'color' => 'name:Farba|type:color',
             ]);
         }
 
-        if ( config('admineshop.attributes.types.images', false) === true ){
+        if ( config('admin_eshop.attributes.types.images', false) === true ){
             $fields->push([
                 'image' => 'name:Obrázok|type:file|image|required_if:attribute_id,'.env('ATTR_IMAGES_ID').'|inaccessibleIfNotIn:attribute_id,'.env('ATTR_IMAGES_ID'),
             ]);
@@ -125,7 +125,7 @@ class AttributesItem extends AdminModel
             'attributes_items.slug',
         ];
 
-        if ( config('admineshop.attributes.types.colors', false) === true ){
+        if ( config('admin_eshop.attributes.types.colors', false) === true ){
             $columns[] = 'attributes_items.color';
         }
 
@@ -170,11 +170,11 @@ class AttributesItem extends AdminModel
         return $query
             ->with('attribute')
             ->whereHas('attribute', function($query){
-                if ( config('admineshop.attributes.attributesText', false) ) {
+                if ( config('admin_eshop.attributes.attributesText', false) ) {
                     $query->orWhere('product_info', 1);
                 }
 
-                if ( config('admineshop.attributes.attributesVariants', false) ) {
+                if ( config('admin_eshop.attributes.attributesVariants', false) ) {
                     $query->orWhere('variants', 1);
                 }
             });

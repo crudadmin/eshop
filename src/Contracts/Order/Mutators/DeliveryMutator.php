@@ -240,7 +240,7 @@ class DeliveryMutator extends Mutator
             return $delivery ? $delivery->locations() : null;
         } else {
             return Admin::getModelByTable(
-                config('admineshop.delivery.multiple_locations.table')
+                config('admin_eshop.delivery.multiple_locations.table')
             );
         }
     }
@@ -325,7 +325,7 @@ class DeliveryMutator extends Mutator
 
     public function hasDefaultDeliveryTable()
     {
-        return config('admineshop.delivery.multiple_locations.table') == 'deliveries_locations';
+        return config('admin_eshop.delivery.multiple_locations.table') == 'deliveries_locations';
     }
 }
 

@@ -14,7 +14,7 @@ class OrderNumber extends AdminRule
      */
     public function creating(AdminModel $row)
     {
-        if ( config('admineshop.cart.order.number.custom', false) === true ) {
+        if ( config('admin_eshop.cart.order.number.custom', false) === true ) {
             $row->setOrderNumber();
         }
     }

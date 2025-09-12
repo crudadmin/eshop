@@ -24,7 +24,7 @@ class ClientLoggedInListener
         }
 
         //Reset saved client data in cart, to load them from user.
-        if ( config('admineshop.cart.reset_billing_on_login') ){
+        if ( config('admin_eshop.cart.reset_billing_on_login') ){
             OrderService::getClientDataMutator()->setClientData(null);
         }
 

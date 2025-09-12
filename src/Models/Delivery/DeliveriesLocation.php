@@ -35,8 +35,8 @@ class DeliveriesLocation extends AdminModel
     public function active()
     {
         //If delivery default delivery locations model is enabled
-        return config('admineshop.delivery.multiple_locations.enabled') === true
-                && $this->getTable() == config('admineshop.delivery.multiple_locations.table');
+        return config('admin_eshop.delivery.multiple_locations.enabled') === true
+                && $this->getTable() == config('admin_eshop.delivery.multiple_locations.table');
     }
 
     /*

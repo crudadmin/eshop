@@ -133,7 +133,7 @@ class Product extends CartEloquent implements HasAttributesSupport
     {
         $options = [
             'vat_id' => Store::getVats(),
-            'product_type' => array_merge(config('admineshop.product_types', []), [
+            'product_type' => array_merge(config('admin_eshop.product_types', []), [
                 'variant' => _('Varianta'),
             ]),
             'discount_operator' => [ 'default' => _('Žiadna zľava') ] + operator_types(),
@@ -166,7 +166,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'name' => 'Atribúty',
                 'before' => 'code',
             ],
-            'decimals.round_without_vat' => config('admineshop.prices.round_without_vat', false),
+            'decimals.round_without_vat' => config('admin_eshop.prices.round_without_vat', false),
         ];
     }
 
@@ -177,7 +177,7 @@ class Product extends CartEloquent implements HasAttributesSupport
             'stock_quantity',
         ];
 
-        if ( config('admineshop.stock.store_rules', true) ) {
+        if ( config('admin_eshop.stock.store_rules', true) ) {
             $columns = array_merge($columns, ['stock_type', 'stock_sold']);
         }
 
@@ -254,9 +254,9 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     public function setAdminRowsAttributes($attributes)
     {
-        if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+        if ( config('admin_eshop.attributes.attributesVariants', false) == true ) {
             $attributes['attributes'] = $this->attributesVariantsText;
-        } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+        } else if ( config('admin_eshop.attributes.attributesText', false) == true ) {
             $attributes['attributes'] = $this->attributesText;
         }
 
@@ -281,7 +281,7 @@ class Product extends CartEloquent implements HasAttributesSupport
     {
         $selectColumns = array_merge($selectColumns, ['main_product.image as main_image']);
 
-        if ( config('admineshop.stock.store_rules', true) ) {
+        if ( config('admin_eshop.stock.store_rules', true) ) {
             $selectColumns = array_merge($selectColumns, [
                 'main_product.stock_type as main_stock_type', 'main_product.stock_sold as main_stock_sold',
             ]);

@@ -26,9 +26,9 @@ class CleanEmptyCartTokensJob implements ShouldQueue
      */
     public function handle()
     {
-        $removeInactiveAfterDays = config('admineshop.cart.token.remove_inactive_after_days', 0) ?: 0;
-        $removeEmptyAfterDays = config('admineshop.cart.token.remove_empty_after_days', 0) ?: 0;
-        $removeOldStockBlocks = config('admineshop.stock.temporary_block_time', 0) ?: 0;
+        $removeInactiveAfterDays = config('admin_eshop.cart.token.remove_inactive_after_days', 0) ?: 0;
+        $removeEmptyAfterDays = config('admin_eshop.cart.token.remove_empty_after_days', 0) ?: 0;
+        $removeOldStockBlocks = config('admin_eshop.stock.temporary_block_time', 0) ?: 0;
 
         Store::log()->info('Cart tokens remover initialized. [inactive '.$removeInactiveAfterDays.' days / empty '.$removeEmptyAfterDays.' days]');
 

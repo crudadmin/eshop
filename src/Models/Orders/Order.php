@@ -138,7 +138,7 @@ class Order extends AdminModel implements Orderable
             ],
         ];
 
-        if ( config('admineshop.order.status', true) ){
+        if ( config('admin_eshop.order.status', true) ){
             $settings['columns.status_id'] = [
                 'after' => 'is_paid',
                 'encode' => false,
@@ -163,7 +163,7 @@ class Order extends AdminModel implements Orderable
         ];
 
         //Add delivery feature options
-        if ( config('admineshop.delivery.enabled', true) === true ) {
+        if ( config('admin_eshop.delivery.enabled', true) === true ) {
             $options = array_merge($options, [
                 'delivery_country_id' => $countries,
                 'delivery_id' => $this->getDeliveries(),
@@ -172,7 +172,7 @@ class Order extends AdminModel implements Orderable
         }
 
         //Add payment method feature options
-        if ( config('admineshop.payment_methods.enabled', true) === true ) {
+        if ( config('admin_eshop.payment_methods.enabled', true) === true ) {
             $options = array_merge($options, [
                 'payment_method_vat' => $this->getVatOptions(),
                 'payment_method_id' => $this->getPaymentMethods(),
@@ -226,12 +226,12 @@ class Order extends AdminModel implements Orderable
     {
         //We need return value from attributes, because this property may be appended also when field does exists.
         //If we would use $value from parameter, this parameter may be null
-        if ( config('admineshop.cart.order.number.custom', false) === true ) {
+        if ( config('admin_eshop.cart.order.number.custom', false) === true ) {
             return $this->attributes['number'] ?? null;
         }
 
         //Generate order number automatically by order ID
-        return str_pad($this->getKey(), config('admineshop.cart.order.number.length', 6), '0', STR_PAD_LEFT);
+        return str_pad($this->getKey(), config('admin_eshop.cart.order.number.length', 6), '0', STR_PAD_LEFT);
     }
 
     public function getPaymentMethodPriceWithVatAttribute()
@@ -343,7 +343,7 @@ class Order extends AdminModel implements Orderable
      */
     public function orderValidator(Request $request, $submitOrder = false)
     {
-        $orderRequest = new (config('admineshop.cart.order.validator', SubmitOrderRequest::class));
+        $orderRequest = new (config('admin_eshop.cart.order.validator', SubmitOrderRequest::class));
 
         $orderRequest->setOrderSubmit($submitOrder);
 

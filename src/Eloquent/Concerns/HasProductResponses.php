@@ -140,7 +140,7 @@ trait HasProductResponses
     {
         $columns = ['stock_quantity', 'stockText', 'stockNumber', 'hasStock'];
 
-        if ( config('admineshop.stock.store_rules', true) ) {
+        if ( config('admin_eshop.stock.store_rules', true) ) {
             $columns[] = 'canOrderEverytime';
         }
 
@@ -157,11 +157,11 @@ trait HasProductResponses
     {
         $columns = ['id', 'slug', 'name', 'thumbnail'];
 
-        if ( config('admineshop.stock.store_rules', true) ) {
+        if ( config('admin_eshop.stock.store_rules', true) ) {
             $columns[] = 'stock_type';
         }
 
-        if ( config('admineshop.attributes.attributesText', false) == true ) {
+        if ( config('admin_eshop.attributes.attributesText', false) == true ) {
             $columns[] = 'attributesText';
         }
 
@@ -259,7 +259,7 @@ trait HasProductResponses
             'detailThumbnail',
         ]);
 
-        if ( config('admineshop.attributes.attributesText', false) == true ) {
+        if ( config('admin_eshop.attributes.attributesText', false) == true ) {
             $this->append(['attributesText']);
         }
 
@@ -426,7 +426,7 @@ trait HasProductResponses
 
         //If variants are not enabled in cart response, we need throw away relation
         $variantsIntoCart = array_filter(Store::variantsProductTypes(), function($key){
-            return config('admineshop.product_types.'.$key.'.loadInCart', false) == true;
+            return config('admin_eshop.product_types.'.$key.'.loadInCart', false) == true;
         });
 
         if ( count($variantsIntoCart) == 0 ){

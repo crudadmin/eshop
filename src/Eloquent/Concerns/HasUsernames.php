@@ -13,7 +13,7 @@ trait HasUsernames
 {
     private function hasSplitedUsernames()
     {
-        return config('admineshop.client.username_splitted', false) ? true : false;
+        return config('admin_eshop.client.username_splitted', false) ? true : false;
     }
 
     /**

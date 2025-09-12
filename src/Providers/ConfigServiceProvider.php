@@ -6,7 +6,7 @@ use Admin\Providers\AdminHelperServiceProvider;
 
 class ConfigServiceProvider extends AdminHelperServiceProvider
 {
-    private $storeConfigKey = 'admineshop';
+    private $storeConfigKey = 'admin_eshop';
 
     private function getStoreConfigPath()
     {
@@ -66,10 +66,10 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
     private function setPaymentConfig()
     {
         //Clone payment methods into admin payments config
-        config()->set('admin_payments.providers', config('admin_payments.providers', []) + config('admineshop.payment_methods.providers', []));
-        config()->set('admin_payments.payment_methods', array_merge(config('admin_payments.payment_methods', []), config('admineshop.payment_methods', [])));
+        config()->set('admin_payments.providers', config('admin_payments.providers', []) + config('admin_eshop.payment_methods.providers', []));
+        config()->set('admin_payments.payment_methods', array_merge(config('admin_payments.payment_methods', []), config('admin_eshop.payment_methods', [])));
 
-        config()->set('admin_payments.invoices.enabled', config('admineshop.invoices', false));
-        config()->set('admin_payments.notifications.paid', config('admineshop.mail.order.paid_notification', true));
+        config()->set('admin_payments.invoices.enabled', config('admin_eshop.invoices', false));
+        config()->set('admin_payments.notifications.paid', config('admin_eshop.mail.order.paid_notification', true));
     }
 }

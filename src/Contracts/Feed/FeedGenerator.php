@@ -40,7 +40,7 @@ class FeedGenerator
 
     public function getFeed()
     {
-        $feeds = config('admineshop.feeds.providers', []);
+        $feeds = config('admin_eshop.feeds.providers', []);
 
         if ( $feed = $feeds[$this->type] ?? null ){
             return new $feed;
@@ -55,7 +55,7 @@ class FeedGenerator
 
         $feed->setLocale($this->locale);
 
-        if ( config('admineshop.feeds.debug', false) ){
+        if ( config('admin_eshop.feeds.debug', false) ){
             $data = $feed->data();
         } else {
             $data = $feed->getCachedData();

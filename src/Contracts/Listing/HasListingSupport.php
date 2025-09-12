@@ -28,7 +28,7 @@ trait HasListingSupport
 
         return $this->getCachedListingResponse($filterKey, $options, function($options) use ($filterKey)  {
             //We want filter out items without products
-            if ( config('admineshop.attributes.hideOnFiltration', true) ){
+            if ( config('admin_eshop.attributes.hideOnFiltration', true) ){
                 Store::setAttributesScope($options);
             }
 
@@ -87,7 +87,7 @@ trait HasListingSupport
 
     private function getCacheMinutage($cachePrefix = 'listing')
     {
-        return (int)config('admineshop.routes.'.$cachePrefix.'.cache', 0);
+        return (int)config('admin_eshop.routes.'.$cachePrefix.'.cache', 0);
     }
 
     private function buildCacheKey($cachePrefix, $options)

@@ -45,7 +45,7 @@ trait OrderShipping
         }
 
         if ( $location = $this->getPickupDeliveryLocation() ) {
-            return $location->{config('admineshop.delivery.multiple_locations.field_name')};
+            return $location->{config('admin_eshop.delivery.multiple_locations.field_name')};
         }
     }
 

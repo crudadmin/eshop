@@ -27,7 +27,7 @@ class CartController extends Controller
         if ( $identifierName = $request['identifier'] ?? null ) {
             $classname = Cart::getIdentifierByName($identifierName);
         } else {
-            $classname = Cart::getIdentifierByClassName(config('admineshop.cart.default_identifier'));
+            $classname = Cart::getIdentifierByClassName(config('admin_eshop.cart.default_identifier'));
         }
 
         $identifier = new $classname;
@@ -274,9 +274,9 @@ class CartController extends Controller
         OrderService::store();
 
         //Send email to client
-        if ( config('admineshop.mail.order.created', true) == true ) {
+        if ( config('admin_eshop.mail.order.created', true) == true ) {
             //Generate default invoice document
-            if ( config('admineshop.mail.with_proform', true) == true ) {
+            if ( config('admin_eshop.mail.with_proform', true) == true ) {
                 $proform = OrderService::getOrder()->makeInvoice('proform', [
                     'notified_at' => Carbon::now(),
                 ]);
@@ -288,7 +288,7 @@ class CartController extends Controller
         }
 
         //Sent store email
-        if ( config('admineshop.mail.order.store_copy', true) == true ) {
+        if ( config('admin_eshop.mail.order.store_copy', true) == true ) {
             OrderService::sentStoreEmail();
         }
 

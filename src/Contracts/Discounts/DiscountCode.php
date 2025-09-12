@@ -272,7 +272,7 @@ class DiscountCode extends Discount implements Discountable
     {
         $codes = array_filter(array_wrap($code));
 
-        if ( config('admineshop.discounts.codes.multiple', false) === true ) {
+        if ( config('admin_eshop.discounts.codes.multiple', false) === true ) {
             $codes = $merge === true ? array_merge($this->getCodes(), $codes) : $codes;
         }
 
@@ -290,7 +290,7 @@ class DiscountCode extends Discount implements Discountable
      */
     public function removeDiscountCode(string $code = null, $persist = true)
     {
-        if ( config('admineshop.discounts.codes.multiple', false) === false ) {
+        if ( config('admin_eshop.discounts.codes.multiple', false) === false ) {
             $this->getDriver()->forget(self::DISCOUNT_CODE_KEY);
         }
 

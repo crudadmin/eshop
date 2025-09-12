@@ -18,7 +18,7 @@ trait HasProductImage
      */
     public function getThumbnailSize()
     {
-        return config('admineshop.product.images.thumbnail', [null, 300]);
+        return config('admin_eshop.product.images.thumbnail', [null, 300]);
     }
 
     /**
@@ -28,7 +28,7 @@ trait HasProductImage
      */
     public function getDetailThumbnailSize()
     {
-        return config('admineshop.product.images.detail', [null, 500]);
+        return config('admin_eshop.product.images.detail', [null, 500]);
     }
 
     public function getImageOrDefaultAttribute()
@@ -108,7 +108,7 @@ trait HasProductImage
         $enabledClasses = Store::cache('store.enabledGallery', function(){
             return array_map(function($classname){
                 return class_basename($classname);
-            }, config('admineshop.gallery.eloquents', []));
+            }, config('admin_eshop.gallery.eloquents', []));
         });
 
         //Check if given class has enabled attributes support

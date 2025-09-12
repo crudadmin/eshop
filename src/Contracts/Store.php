@@ -125,12 +125,12 @@ class Store
 
     public function hasSummaryRounding()
     {
-        return config('admineshop.round_summary', true);
+        return config('admin_eshop.round_summary', true);
     }
 
     public function hasCategories()
     {
-        return config('admineshop.categories.enabled', false);
+        return config('admin_eshop.categories.enabled', false);
     }
 
     /*
@@ -224,7 +224,7 @@ class Store
     {
         $arr = [];
 
-        foreach (config('admineshop.product_types') as $key => $item) {
+        foreach (config('admin_eshop.product_types') as $key => $item) {
             if ( @$item[$configKey] === $value ) {
                 $arr[] = $key;
             }
@@ -265,7 +265,7 @@ class Store
 
     public function isEnabledLocalization()
     {
-        return Admin::isEnabledLocalization() && config('admineshop.localization', false) === true;
+        return Admin::isEnabledLocalization() && config('admin_eshop.localization', false) === true;
     }
 
     public function getNuxtUrl($path, $host = null)

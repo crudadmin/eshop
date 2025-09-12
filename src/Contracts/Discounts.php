@@ -15,7 +15,7 @@ class Discounts
     use DataStore;
 
     /**
-     * @see config admineshop.php in admineshop.discounts.classes
+     * @see config admin_eshop.php in admin_eshop.discounts.classes
      *
      * All registered discounts applied on cart items and whole store...
      */
@@ -57,7 +57,7 @@ class Discounts
     public function __construct()
     {
         //Register discount classes from config
-        foreach (config('admineshop.discounts.classes', []) as $discountClass) {
+        foreach (config('admin_eshop.discounts.classes', []) as $discountClass) {
             if ( class_exists($discountClass) ) {
                 $this->discounts[] = $discountClass;
             }

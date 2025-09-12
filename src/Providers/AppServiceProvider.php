@@ -83,14 +83,14 @@ class AppServiceProvider extends AdminHelperServiceProvider
             Admin::registerAdminModels(__dir__ . '/../Models/Category/**', 'AdminEshop\Models\Category');
         }
 
-        if ( count(config('admineshop.import', [])) > 0 ) {
+        if ( count(config('admin_eshop.import', [])) > 0 ) {
             Admin::registerAdminModels(__dir__ . '/../Models/Import/**', 'AdminEshop\Models\Import');
         }
 
         Admin::registerAdminModels(__dir__ . '/../Models/Attribute/**', 'AdminEshop\Models\Attribute');
         Admin::registerAdminModels(__dir__ . '/../Models/Clients/**', 'AdminEshop\Models\Clients');
 
-        if ( config('admineshop.delivery.enabled', true) ) {
+        if ( config('admin_eshop.delivery.enabled', true) ) {
             Admin::registerAdminModels(__dir__ . '/../Models/Delivery/**', 'AdminEshop\Models\Delivery');
         }
 
@@ -102,8 +102,8 @@ class AppServiceProvider extends AdminHelperServiceProvider
 
     private function addPublishes()
     {
-        $this->publishes([__DIR__ . '/../Views' => resource_path('views/vendor/admineshop') ], 'admineshop.views');
-        $this->publishes([__DIR__ . '/../Config/config.php' => config_path('admineshop.php') ], 'admineshop.config');
-        $this->publishes([__DIR__ . '/../Resources/dist' => public_path('vendor/admineshop') ], 'admineshop.resources');
+        $this->publishes([__DIR__ . '/../Views' => resource_path('views/vendor/admineshop') ], 'admin_eshop.views');
+        $this->publishes([__DIR__ . '/../Config/config.php' => config_path('admin_eshop.php') ], 'admin_eshop.config');
+        $this->publishes([__DIR__ . '/../Resources/dist' => public_path('vendor/admineshop') ], 'admin_eshop.resources');
     }
 }

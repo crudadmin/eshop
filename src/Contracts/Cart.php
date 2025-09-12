@@ -87,7 +87,7 @@ class Cart
      */
     public static function getCartToken()
     {
-        return self::$cartToken ?: request()->header(config('admineshop.cart.token.header_name'));
+        return self::$cartToken ?: request()->header(config('admin_eshop.cart.token.header_name'));
     }
 
     /**
@@ -247,7 +247,7 @@ class Cart
         }
 
         return $this->response(
-            config('admineshop.cart.default_full_response', false)
+            config('admin_eshop.cart.default_full_response', false)
         );
     }
 

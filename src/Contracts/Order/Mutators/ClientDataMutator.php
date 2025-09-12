@@ -67,7 +67,7 @@ class ClientDataMutator extends Mutator
      */
     public function mutateCartResponse($response) : array
     {
-        if ( config('admineshop.client.in_cart_response') == true && client() ){
+        if ( config('admin_eshop.client.in_cart_response') == true && client() ){
             $response['client'] = client()->saveLocale()->setClientResponse();
         }
 

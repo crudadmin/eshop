@@ -81,7 +81,7 @@ trait HasProductFilter
                                     $query
                                         //We need clone settings from parent model
                                         ->cloneModelFilter($this)
-                                        ->filterParentProduct(null, config('admineshop.attributes.inParentAttributes', []) ?: [0]);
+                                        ->filterParentProduct(null, config('admin_eshop.attributes.inParentAttributes', []) ?: [0]);
                                 });
                         });
                     }
@@ -96,7 +96,7 @@ trait HasProductFilter
                     $query
                         ->variantsProducts()
                         ->cloneModelFilter($this)
-                        ->filterParentProduct(null, config('admineshop.attributes.inParentAttributes', []) ?: [0])
+                        ->filterParentProduct(null, config('admin_eshop.attributes.inParentAttributes', []) ?: [0])
                         //Only when filter of parent product matches with variants
                         ->whereHas('variants', function($query) use ($filter) {
                             $query
@@ -214,7 +214,7 @@ trait HasProductFilter
                     $query->orWhere(function($query) use ($priceRange){
                         $column = $query->getQuery()->from.'.price';
 
-                        if ( config('admineshop.prices.price_levels') ){
+                        if ( config('admin_eshop.prices.price_levels') ){
                             $column = DB::raw('COALESCE(pl.price, '.$column.' * '.Store::getCurrency()->rate.')');
                         }
 
@@ -266,7 +266,7 @@ trait HasProductFilter
         }
 
         if ( $this->getFilterOption('$ignore.filter.attributes', false) == false ) {
-            $query->applyAttributesFilter($params, config('admineshop.attributes.inParentAttributes', []));
+            $query->applyAttributesFilter($params, config('admin_eshop.attributes.inParentAttributes', []));
         }
 
         if ( $this->getFilterOption('$ignore.filter.prices', false) == false ) {
@@ -312,7 +312,7 @@ trait HasProductFilter
             $query->applyAttributesFilter(
                 $filter,
                 [],
-                $inParentAttributes ?: config('admineshop.attributes.inParentAttributes', [])
+                $inParentAttributes ?: config('admin_eshop.attributes.inParentAttributes', [])
             );
         }
 

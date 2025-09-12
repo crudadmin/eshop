@@ -47,7 +47,7 @@ trait HasWeight
             $toUnit = 'kilograms';
         }
 
-        $inUnit = config('admineshop.product.weight_unit');
+        $inUnit = config('admin_eshop.product.weight_unit');
 
         if ( $inUnit == $toUnit ){
             return $weight;

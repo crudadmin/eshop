@@ -6,7 +6,7 @@ class CountryValidator extends Validator
 {
     public function isActive()
     {
-        return config('admineshop.delivery.countries') === true;
+        return config('admin_eshop.delivery.countries') === true;
     }
 
     /*

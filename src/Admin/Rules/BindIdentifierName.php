@@ -19,7 +19,7 @@ class BindIdentifierName extends AdminRule
                 $identifier = $row->getProduct()->getModelIdentifier();
             }
 
-            $identifier = $identifier ?: config('admineshop.default_identifier', DefaultIdentifier::class);
+            $identifier = $identifier ?: config('admin_eshop.default_identifier', DefaultIdentifier::class);
 
             $row->identifier = (new $identifier)->getName();
         }

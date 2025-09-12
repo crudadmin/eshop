@@ -46,15 +46,15 @@ class ProductsPrice extends AdminModel
 
     public function active()
     {
-        return config('admineshop.prices.price_levels');
+        return config('admin_eshop.prices.price_levels');
     }
 
     public function belongsToModel()
     {
         return array_filter([
             Product::class,
-            config('admineshop.delivery.enabled') ? Delivery::class : null,
-            config('admineshop.payment_methods.enabled') ? PaymentsMethod::class : null,
+            config('admin_eshop.delivery.enabled') ? Delivery::class : null,
+            config('admin_eshop.payment_methods.enabled') ? PaymentsMethod::class : null,
         ]);
     }
 
@@ -82,7 +82,7 @@ class ProductsPrice extends AdminModel
                     ? Rule::unique('products_prices')->ignore($row?->id)->where($relationColumn, request($relationColumn))->where('currency_id', request('currency_id'))->withoutTrashed()
                     : null,
             ]),
-            'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|default:0|component:PriceField',
+            'price' => 'name:Cena bez DPH|type:decimal|decimal_length:'.config('admin_eshop.prices.decimals_places').'|default:0|component:PriceField',
         ];
     }
 

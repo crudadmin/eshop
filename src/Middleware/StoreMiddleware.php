@@ -15,9 +15,9 @@ class StoreMiddleware
      */
     public function handle($request, Closure $next, $type = null)
     {
-        $tokenName = config('admineshop.cart.token.header_name');
+        $tokenName = config('admin_eshop.cart.token.header_name');
 
-        if ( config('admineshop.cart.session') === false && empty($request->header($tokenName)) ){
+        if ( config('admin_eshop.cart.session') === false && empty($request->header($tokenName)) ){
             return abort(401, $tokenName.' header has not been set.');
         }
 

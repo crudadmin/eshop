@@ -104,7 +104,7 @@ trait HasProductPaginator
 
     public function scopeWithMinAndMaxFilterPrices($query)
     {
-        $hasPriceLevels = config('admineshop.prices.price_levels');
+        $hasPriceLevels = config('admin_eshop.prices.price_levels');
 
         //Load pricelevels for base products
         if ( $hasPriceLevels ){

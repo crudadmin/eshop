@@ -90,22 +90,22 @@ class Delivery extends AdminModel implements DiscountSupport
         $restrictionFields = [];
 
         //Add multiple locations model
-        if ( config('admineshop.delivery.multiple_locations.enabled') == true ) {
+        if ( config('admin_eshop.delivery.multiple_locations.enabled') == true ) {
             $restrictionFields['multiple_locations'] = 'name:Viacero doručovacích adries/predajní|type:checkbox|default:0';
         }
 
         //Add payments rules
-        if ( config('admineshop.delivery.payments') == true ) {
+        if ( config('admin_eshop.delivery.payments') == true ) {
             $restrictionFields['payments'] = 'name:Dostupné platobné metódy|belongsToMany:payments_methods,name|title:Pri žiadnej vybranej platia všetký|canAdd';
         }
 
         //Add payments rules
-        if ( config('admineshop.delivery.countries') == true ) {
+        if ( config('admin_eshop.delivery.countries') == true ) {
             $restrictionFields['countries'] = 'name:Dostupné krajiny|belongsToMany:countries,name|title:Pri žiadnej vybranej platia všetký|canAdd';
         }
 
         //Add payments rules
-        if ( config('admineshop.delivery.price_limit') == true ) {
+        if ( config('admin_eshop.delivery.price_limit') == true ) {
             $restrictionFields['price_limit'] = 'name:Limit ceny objednávky pre dopravu|type:decimal|title:S DPH - Po presiahnutí ceny objednávky bude doprava odobraná z objednávkoveho košíku|hidden';
         }
 
@@ -213,18 +213,18 @@ class Delivery extends AdminModel implements DiscountSupport
 
         //Autoload default delivery locations
         if (
-            config('admineshop.delivery.multiple_locations.enabled') == true
-            && config('admineshop.delivery.multiple_locations.autoload', false) == true
+            config('admin_eshop.delivery.multiple_locations.enabled') == true
+            && config('admin_eshop.delivery.multiple_locations.autoload', false) == true
             && OrderService::getDeliveryMutator()->hasDefaultDeliveryTable()
         ) {
             $with[] = 'locations:id,delivery_id,name';
         }
 
-        if ( config('admineshop.delivery.countries') == true ) {
+        if ( config('admin_eshop.delivery.countries') == true ) {
             $with[] = 'countries';
         }
 
-        if ( config('admineshop.delivery.payments') == true ) {
+        if ( config('admin_eshop.delivery.payments') == true ) {
             $with[] = 'payments';
         }
 

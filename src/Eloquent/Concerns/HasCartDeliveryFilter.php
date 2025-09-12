@@ -9,14 +9,14 @@ trait HasCartDeliveryFilter
         //If countries filter support is enabled,
         //and country has been selected
         if (
-            config('admineshop.delivery.countries') == true
+            config('admin_eshop.delivery.countries') == true
             && $selectedCountry = $deliveryMutator->getCountryMutator()->getSelectedCountry()
         ) {
             $deliveries = $this->filterDeliveriesByCountries($deliveries, $selectedCountry);
         }
 
         //If is price limiter available
-        if ( config('admineshop.delivery.price_limit') ) {
+        if ( config('admin_eshop.delivery.price_limit') ) {
             $deliveries = $this->filterDeliveriesByPriceLimit($deliveries, $deliveryMutator->getCartItems());
         }
 

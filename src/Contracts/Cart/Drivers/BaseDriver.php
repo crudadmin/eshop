@@ -117,7 +117,7 @@ class BaseDriver
      */
     public function regenerateKey()
     {
-        return Str::random(config('admineshop.cart.token.length', 12));
+        return Str::random(config('admin_eshop.cart.token.length', 12));
     }
 
     /*
@@ -131,7 +131,7 @@ class BaseDriver
         }
 
         //Return key based on session
-        if ( config('admineshop.cart.session') == true ) {
+        if ( config('admin_eshop.cart.session') == true ) {
             //If cart key does exists in session
             if ( session()->has(self::TOKEN_SESSION_KEY) === true ) {
                 $key = session()->get(self::TOKEN_SESSION_KEY);
@@ -147,7 +147,7 @@ class BaseDriver
         }
 
         //Dost not generate token automatically if header is empty
-        if ( request()->header(config('admineshop.cart.token.header_initializator')) ) {
+        if ( request()->header(config('admin_eshop.cart.token.header_initializator')) ) {
             return $this->regenerateKey();
         }
     }

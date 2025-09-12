@@ -97,10 +97,10 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
                 'order_item' => 'name:Patrí k položke|belongsTo:orders_items,id|inaccessible',
             ])->id('itemAdditional'),
             Group::fields([
-                'default_price' => 'name:Pôvodna cena bez zliav DPH|invisible|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|title:Cena produktu bez zliav v čase objednania.|disabled',
-                'price' => 'name:Cena/j bez DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|required_if:manual_price,1|disabledIf:manual_price,0|column_component:CurrencyPriceColumn',
+                'default_price' => 'name:Pôvodna cena bez zliav DPH|invisible|type:decimal|decimal_length:'.config('admin_eshop.prices.decimals_places').'|title:Cena produktu bez zliav v čase objednania.|disabled',
+                'price' => 'name:Cena/j bez DPH|type:decimal|decimal_length:'.config('admin_eshop.prices.decimals_places').'|required_if:manual_price,1|disabledIf:manual_price,0|column_component:CurrencyPriceColumn',
                 'vat' => 'name:DPH %|type:select|default:'.Store::getDefaultVat().'|required_if:manual_price,1|disabledIf:manual_price,0',
-                'price_vat' => 'name:Cena/j s DPH|type:decimal|decimal_length:'.config('admineshop.prices.decimals_places').'|required_if:manual_price,1|disabledIf:manual_price,0|column_component:CurrencyPriceColumn',
+                'price_vat' => 'name:Cena/j s DPH|type:decimal|decimal_length:'.config('admin_eshop.prices.decimals_places').'|required_if:manual_price,1|disabledIf:manual_price,0|column_component:CurrencyPriceColumn',
                 'price_total' => 'name:Cena spolu bez DPH|type:decimal|imaginary|column_visible|removeFromForm|column_component:CurrencyPriceColumn',
                 'price_total_vat' => 'name:Cena spolu s DPH|type:decimal|imaginary|column_visible|removeFromForm|column_component:CurrencyPriceColumn',
                 'manual_price' => 'name:Manuálna cena|default:0|hidden|tooltip:Ak je manuálna cena zapnutá, nebude na cenu pôsobiť žiadna automatická zľava.|type:checkbox',

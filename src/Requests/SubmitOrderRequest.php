@@ -39,11 +39,11 @@ class SubmitOrderRequest extends AdminModelRequest
      */
     public function rules()
     {
-        $rules = config('admineshop.cart.order.validator_rules', []);
+        $rules = config('admin_eshop.cart.order.validator_rules', []);
 
         //We can push additional fields in submit step
         if ( $this->isFinalOrderSubmit === true ){
-            $rules = array_merge($rules, config('admineshop.cart.order.validator_rules_submit', []));
+            $rules = array_merge($rules, config('admin_eshop.cart.order.validator_rules_submit', []));
         }
 
         return $rules;

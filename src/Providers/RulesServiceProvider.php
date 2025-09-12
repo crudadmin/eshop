@@ -53,7 +53,7 @@ class RulesServiceProvider extends ServiceProvider
         }, trans('validation.required'));
 
         Validator::extend('zipcode', function ($attribute, $value, $parameters, $validator) {
-            if ( config('admineshop.validation.zipcode', true) === false ){
+            if ( config('admin_eshop.validation.zipcode', true) === false ){
                 return true;
             }
 
@@ -73,7 +73,7 @@ class RulesServiceProvider extends ServiceProvider
         }, _('Zadali ste nesprávny tvar hodnoty atribútu.'));
 
         Validator::extend('company_id', function ($attribute, $number, $parameters, $validator) {
-            if ( config('admineshop.validation.company_id', true) === false ){
+            if ( config('admin_eshop.validation.company_id', true) === false ){
                 return true;
             }
 

@@ -18,7 +18,7 @@ class OnAdminUpdateListener
     public function handle($event)
     {
         //Set created order id into cart
-        Artisan::call('vendor:publish', [ '--tag' => 'admineshop.resources', '--force' => true ]);
+        Artisan::call('vendor:publish', [ '--tag' => 'admin_eshop.resources', '--force' => true ]);
 
         Admin::addGitignoreFiles([
             public_path('vendor/admineshop')

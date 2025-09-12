@@ -49,7 +49,7 @@ class ShippingProvider extends OrderConfigProvider
      */
     public function hasLabels()
     {
-        return config('admineshop.delivery.labels', false);
+        return config('admin_eshop.delivery.labels', false);
     }
 
     public static function export(Collection $orders)

@@ -43,7 +43,7 @@ trait HasMutators
     public function getConfigMutators()
     {
         return $this->cache('config.mutators', function(){
-            $mutators = config('admineshop.cart.mutators');
+            $mutators = config('admin_eshop.cart.mutators');
 
             //We need obtain cartSteps without firing Cart.
             $cartSteps = \AdminEshop\Contracts\Cart::getCartSteps();

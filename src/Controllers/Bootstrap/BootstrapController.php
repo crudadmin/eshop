@@ -10,8 +10,8 @@ class BootstrapController extends Controller
 {
     public function index()
     {
-        $cacheMinutes = config('admineshop.routes.bootstrap.cache');
-        $bootstrapper = new (config('admineshop.routes.bootstrap.class'));
+        $cacheMinutes = config('admin_eshop.routes.bootstrap.cache');
+        $bootstrapper = new (config('admin_eshop.routes.bootstrap.class'));
 
         //Return cached response
         if ( is_numeric($cacheMinutes) && $cacheMinutes >= 1 ) {

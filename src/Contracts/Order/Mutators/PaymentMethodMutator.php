@@ -176,7 +176,7 @@ class PaymentMethodMutator extends Mutator
         $delivery = $this->getSelectedDelivery();
 
         //If delivery is selected and payments rules are enabled, we can receive filter
-        $allowedPaymentMethods = $delivery && config('admineshop.delivery.payments') == true
+        $allowedPaymentMethods = $delivery && config('admin_eshop.delivery.payments') == true
                                         ? $delivery->payments->pluck('id')->toArray()
                                         : [];
 
@@ -192,7 +192,7 @@ class PaymentMethodMutator extends Mutator
         });
 
         //If is price limiter available
-        if ( config('admineshop.payment_methods.price_limit') ) {
+        if ( config('admin_eshop.payment_methods.price_limit') ) {
             $priceWithVat = $this->getCartItems()->getSummary()['priceWithVat'] ?? 0;
 
             $paymentMethods = $paymentMethods->filter(function($paymentMethod) use ($priceWithVat) {

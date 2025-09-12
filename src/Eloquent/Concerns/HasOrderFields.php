@@ -28,7 +28,7 @@ trait HasOrderFields
                 'language' => 'name:Jazyk objednávky|belongsTo:languages|inaccessible'
             ],
             //Depreaced, can be removed in v4
-            config('admineshop.delivery.packeta', false)
+            config('admin_eshop.delivery.packeta', false)
                 ? ['packeta_point' => 'name:Packeta point|type:json|inaccessible'] : [],
         ));
     }
@@ -43,11 +43,11 @@ trait HasOrderFields
         $requiredRule = $this->getRequiredRuleForBilling();
 
         return Group::fields([
-            'username' => 'name:Meno a priezvisko|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule),
+            'username' => 'name:Meno a priezvisko|inaccessible_column'.(config('admin_eshop.client.username_splitted') ? '|removeFromForm' : $requiredRule),
             Group::inline([
                 'firstname' => 'name:Meno',
                 'lastname' => 'name:Priezvisko',
-            ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
+            ])->add('hidden|inaccessible_column'.(!config('admin_eshop.client.username_splitted') ? '|removeFromForm' : $requiredRule))->attributes(!config('admin_eshop.client.username_splitted') ? 'hideFromForm' : ''),
             'email' => 'name:Email|required|email|hidden',
             'phone' => 'name:Telefón|'.phoneValidatorRule().'|hidden',
             'street' => 'name:Ulica a č.p.|column_name:Ulica'.$requiredRule.'|hidden',
@@ -69,11 +69,11 @@ trait HasOrderFields
         return Group::fields([
             'delivery_different' => 'name:Doručiť na inú ako fakturačnú adresu|column_name:Ina doruč. adr.|type:checkbox|default:0',
             Group::fields([
-                'delivery_username' => 'name:Meno a priezvisko / Firma|inaccessible_column'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule),
+                'delivery_username' => 'name:Meno a priezvisko / Firma|inaccessible_column'.(config('admin_eshop.client.username_splitted') ? '|removeFromForm' : $requiredRule),
                 Group::inline([
                     'delivery_firstname' => 'name:Meno',
                     'delivery_lastname' => 'name:Priezvisko',
-                ])->add('hidden|inaccessible_column'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : $requiredRule))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
+                ])->add('hidden|inaccessible_column'.(!config('admin_eshop.client.username_splitted') ? '|removeFromForm' : $requiredRule))->attributes(!config('admin_eshop.client.username_splitted') ? 'hideFromForm' : ''),
                 'delivery_phone' => 'name:Telefón|'.phoneValidatorRule(),
                 'delivery_street' => 'name:Ulica a č.p.'.$requiredRule,
                 'delivery_city' => 'name:Mesto'.$requiredRule,
@@ -114,13 +114,13 @@ trait HasOrderFields
                 'internal_note' => 'name:Interná poznámka|type:text|hidden',
             ])->inline(),
             Group::fields(array_merge(
-                config('admineshop.order.status', true)
+                config('admin_eshop.order.status', true)
                     ? [ 'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|defaultByOption:default,1|title:Pri zmene stavu sa môže odosielať email zákazníkovy|sub_component:IgnoreStatusEmail|required' ] : []
                 , [
                     'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
                     'delivery_identifier' => 'name:Identifikačné číslo balíka|hidden',
                 ],
-                config('admineshop.delivery.labels')
+                config('admin_eshop.delivery.labels')
                     ? [ 'delivery_label' => 'name:Štítok|type:file|extensions:jpg,pdf,png|hidden' ]
                     : []
             ))->inline(),
@@ -135,7 +135,7 @@ trait HasOrderFields
     protected function getShippingAndPaymentFields()
     {
         return Group::tab(array_merge(
-            config('admineshop.delivery.enabled', true) ? [
+            config('admin_eshop.delivery.enabled', true) ? [
                 'Doprava' => Group::fields([
                     Group::inline(array_merge(
                         [
@@ -143,8 +143,8 @@ trait HasOrderFields
                             'delivery_data' => 'name:Dáta dopravy|type:json|inaccessible',
                             'delivery_pickup_point' => 'name:Odberné miesto|imaginary|disabled|removeFromFormIf:delivery_pickup_point,NULL'
                         ],
-                        config('admineshop.delivery.multiple_locations.enabled', false)
-                            ? ['delivery_location' => 'name:Predajňa|hidden|canView|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:'.config('admineshop.delivery.multiple_locations.table').','.config('admineshop.delivery.multiple_locations.field_name')] : []
+                        config('admin_eshop.delivery.multiple_locations.enabled', false)
+                            ? ['delivery_location' => 'name:Predajňa|hidden|canView|hideFromFormIfNot:delivery_id.multiple_locations,TRUE|belongsTo:'.config('admin_eshop.delivery.multiple_locations.table').','.config('admin_eshop.delivery.multiple_locations.field_name')] : []
                     )),
                     Group::inline([
                         'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
@@ -154,7 +154,7 @@ trait HasOrderFields
                     'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|column_component:CurrencyPriceColumn|hidden|removeFromForm',
                 ])->id('delivery'),
             ] : [],
-            config('admineshop.payment_methods.enabled', true) ? [
+            config('admin_eshop.payment_methods.enabled', true) ? [
                 'Platobná metóda' => Group::fields([
                     Group::fields([
                         'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',

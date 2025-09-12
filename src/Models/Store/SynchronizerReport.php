@@ -31,7 +31,7 @@ class SynchronizerReport extends AdminModel
 
     public function active()
     {
-        return config('admineshop.synchronizer.enabled', false) == true;
+        return config('admin_eshop.synchronizer.enabled', false) == true;
     }
 
     /*

@@ -33,7 +33,7 @@ trait HasRequest
                 'delivery_city',
                 'delivery_country_id'
             ],
-            config('admineshop.cart.order.additional_delivery_fields', [])
+            config('admin_eshop.cart.order.additional_delivery_fields', [])
         );
     }
 
@@ -114,7 +114,7 @@ trait HasRequest
      */
     private function cleanNotPresent(&$row, $submitOrder = false, $cleanedData = false)
     {
-        $resetFields = config('admineshop.cart.order.'.($submitOrder ? 'fields_reset_submit' : 'fields_reset_process'));
+        $resetFields = config('admin_eshop.cart.order.'.($submitOrder ? 'fields_reset_submit' : 'fields_reset_process'));
         $resetFields = is_array($resetFields) ? $resetFields : $this->getDefaultResetIfNotPresent();
 
         foreach ($resetFields as $presenceKeyName => $data) {
@@ -169,7 +169,7 @@ trait HasRequest
 
     public function isDeliveryAddressPrimary()
     {
-        return config('admineshop.cart.order.delivery_address_primary', false);
+        return config('admin_eshop.cart.order.delivery_address_primary', false);
     }
 
     private function getCompanyResetIfNotPresent()

@@ -25,7 +25,7 @@ class ClientsGroup extends AdminModel
 
     public function active()
     {
-        return config('admineshop.client.groups', false);
+        return config('admin_eshop.client.groups', false);
     }
 
     /*

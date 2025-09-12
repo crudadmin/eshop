@@ -188,7 +188,7 @@ class ProductsIdentifier extends Identifier
         ];
 
         //If text attributes are not loaded
-        if ( config('admineshop.attributes.attributesVariants', false) || config('admineshop.attributes.attributesText', false) ) {
+        if ( config('admin_eshop.attributes.attributesVariants', false) || config('admin_eshop.attributes.attributesText', false) ) {
             if ( $productOrVariant->relationLoaded('attributesItems') == false ){
                 $productOrVariant->load(['attributesItems' => function($query){
                     $query->withTextAttributes();
@@ -196,11 +196,11 @@ class ProductsIdentifier extends Identifier
             }
         }
 
-        if ( config('admineshop.attributes.attributesVariants', false) == true ) {
+        if ( config('admin_eshop.attributes.attributesVariants', false) == true ) {
             $this->loadAttributes($productOrVariant);
 
             $items[] = $productOrVariant->attributesVariantsText;
-        } else if ( config('admineshop.attributes.attributesText', false) == true ) {
+        } else if ( config('admin_eshop.attributes.attributesText', false) == true ) {
             $this->loadAttributes($productOrVariant);
 
             $items[] = $productOrVariant->attributesText;

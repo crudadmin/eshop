@@ -53,7 +53,7 @@ class OrdersStatus extends AdminModel
 
     public function active()
     {
-        return config('admineshop.order.status', true);
+        return config('admin_eshop.order.status', true);
     }
 
     /*

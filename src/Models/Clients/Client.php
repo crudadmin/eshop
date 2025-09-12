@@ -58,16 +58,16 @@ class Client extends BaseAuthenticatable
                         'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
                         'photo' => 'name:Fotografia|type:file|image',
                     ])->inline(),
-                    'username' => 'name:Meno a priezvisko'.(config('admineshop.client.username_splitted') ? '|removeFromForm' : ''),
+                    'username' => 'name:Meno a priezvisko'.(config('admin_eshop.client.username_splitted') ? '|removeFromForm' : ''),
                     Group::inline([
                         'firstname' => 'name:Meno',
                         'lastname' => 'name:Priezvisko',
-                    ])->add('hidden'.(!config('admineshop.client.username_splitted') ? '|removeFromForm' : ''))->attributes(!config('admineshop.client.username_splitted') ? 'hideFromForm' : ''),
+                    ])->add('hidden'.(!config('admin_eshop.client.username_splitted') ? '|removeFromForm' : ''))->attributes(!config('admin_eshop.client.username_splitted') ? 'hideFromForm' : ''),
                     'phone' => 'name:Telefon|'.phoneValidatorRule(),
                     'password' => 'name:Heslo|type:password|min:6|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                     'language' => 'name:Predvolený jazyk|belongsTo:languages|inaccessible'
                 ],
-                config('admineshop.client.groups', false)
+                config('admin_eshop.client.groups', false)
                     ? ['groups' => 'name:Skupina klienta|belongsToMany:clients_groups,name|canAdd'] : []
             ))->id('personal'),
             'Fakturačné údaje' => Group::half([

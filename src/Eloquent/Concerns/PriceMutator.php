@@ -274,7 +274,7 @@ trait PriceMutator
             $this->getRewritedVatValue()
         );
 
-        return config('admineshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
+        return config('admin_eshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
     }
 
     /*
@@ -296,7 +296,7 @@ trait PriceMutator
             $price = $this->applyDiscounts($price, $this->toCartArrayDiscounts);
         }
 
-        return config('admineshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
+        return config('admin_eshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
     }
 
     /*
