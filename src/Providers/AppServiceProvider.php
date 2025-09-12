@@ -104,6 +104,6 @@ class AppServiceProvider extends AdminHelperServiceProvider
     {
         $this->publishes([__DIR__ . '/../Views' => resource_path('views/vendor/admineshop') ], 'admin_eshop.views');
         $this->publishes([__DIR__ . '/../Config/config.php' => config_path('admin_eshop.php') ], 'admin_eshop.config');
-        $this->publishes([__DIR__ . '/../Resources/dist' => public_path('vendor/admineshop') ], 'admin_eshop.resources');
+        $this->publishes([__DIR__ . '/../Resources/dist/assets' => public_path('vendor/admineshop/js') ], 'admin_eshop.resources');
     }
 }
