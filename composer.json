@@ -2,11 +2,18 @@
     "name": "crudadmin/eshop",
     "type": "library",
     "description": "Laravel Eshop package for administration based on crudadmin system",
-    "keywords": ["eshop", "admin", "laravel"],
+    "keywords": [
+        "eshop",
+        "admin",
+        "laravel"
+    ],
     "homepage": "https://www.marekgogol.sk",
     "license": "MIT",
     "authors": [
-        { "name": "Marek Gogoľ", "email": "info@marekgogol.sk" }
+        {
+            "name": "Marek Gogoľ",
+            "email": "info@marekgogol.sk"
+        }
     ],
     "require": {
         "php": ">=8.0",
@@ -14,7 +21,7 @@
         "crudadmin/crudadmin": "^4.0|^5.0|dev-master|dev-5.0-dev",
         "crudadmin/payments": "^1.0|dev-master",
         "marekgogol/invoices": "^4.0|dev-master",
-        "propaganistas/laravel-phone": "^4.2|^5.0",
+        "propaganistas/laravel-phone": "^4.2|^5.0|^6.0",
         "staudenmeir/eloquent-has-many-deep": "^1.13",
         "heureka/overeno-zakazniky": "^4.0",
         "cmixin/business-day": "^1.0"
