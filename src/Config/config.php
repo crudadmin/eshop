@@ -359,6 +359,7 @@ return [
 
         //Save all prices up to x decimal places
         'decimals_places' => '8,3',
+
         /*
             When we round no-vat prices, then all final vat prices may not be correct when store
             uses more decimal places than defined in settings. Here is example for 2 places:
