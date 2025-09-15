@@ -3,7 +3,6 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
-use AdminEshop\Models\Attribute\AttributesItem;
 use AdminEshop\Models\Products\Pivot\ProductsAttributesItem;
 use AdminEshop\Models\Products\Product;
 

@@ -5,7 +5,6 @@ namespace AdminEshop\Providers;
 use Admin;
 use Admin\Providers\AdminHelperServiceProvider;
 use Carbon\Carbon;
-use Illuminate\Foundation\Http\Kernel;
 use Store;
 
 class AppServiceProvider extends AdminHelperServiceProvider
@@ -87,7 +86,7 @@ class AppServiceProvider extends AdminHelperServiceProvider
             Admin::registerAdminModels(__dir__ . '/../Models/Import/**', 'AdminEshop\Models\Import');
         }
 
-        if ( config('admin_eshop.attributes.enabled', true) ) {
+        if ( Store::hasAttributes() ) {
             Admin::registerAdminModels(__dir__ . '/../Models/Attribute/**', 'AdminEshop\Models\Attribute');
         }
 

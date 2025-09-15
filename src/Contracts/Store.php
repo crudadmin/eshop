@@ -7,8 +7,6 @@ use AdminEshop\Contracts\Concerns\HasCurrencies;
 use AdminEshop\Contracts\Concerns\HasRoutes;
 use AdminEshop\Contracts\Concerns\HasStoreAttributes;
 use AdminEshop\Models\Attribute\AttributesUnit;
-use AdminEshop\Models\Orders\OrdersProduct;
-use AdminEshop\Models\Products\Product;
 use AdminEshop\Models\Store\Country;
 use AdminEshop\Models\Store\Store as StoreModel;
 use AdminEshop\Models\Store\Vat;
@@ -131,6 +129,11 @@ class Store
     public function hasCategories()
     {
         return config('admin_eshop.categories.enabled', false);
+    }
+
+    public function hasAttributes()
+    {
+        return config('admin_eshop.attributes.enabled', false);
     }
 
     /*

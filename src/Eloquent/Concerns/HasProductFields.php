@@ -25,7 +25,8 @@ trait HasProductFields
                 ],
                 Store::hasCategories()
                     ? ['categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd|removeFromFormIfNot:product_id,NULL'] : [],
-                ['attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name']
+                Store::hasAttributes()
+                    ? ['attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name'] : []
             ))->id('general')->name('Základne nastavenia'),
             Group::fields([
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|hideFromFormIf:product_type,variant|sub_component:setProductType|required',
