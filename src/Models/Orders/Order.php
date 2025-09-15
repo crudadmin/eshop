@@ -189,6 +189,7 @@ class Order extends AdminModel implements Orderable
 
     public function setAdminAttributes($attributes)
     {
+        $attributes['currency_char'] = Store::getCurrencies()->firstWhere('id', $this->currency_id)?->char;
         $attributes['delivery_pickup_point'] = $this->getPickupAddressWithName();
         $attributes['created'] = $this->created_at ? sprintf(_('%s o %s'), $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y')), $this->created_at->format('H:i')) : '';
 
