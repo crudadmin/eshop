@@ -67,7 +67,9 @@ class ProductsStocksLog extends AdminModel
                 'item.changed.old' => _('Tento produkt v objednávke bol nahradený iným tovarom'),
                 'item.remove' => _('Produkt zmazaný z objednávky'),
             ],
-            'product_id' => $this->getAvailableProducts(),
+
+            // TODO: fix this
+            // 'product_id' => $this->getAvailableProducts(),
             'order_id' => [],
         ];
     }

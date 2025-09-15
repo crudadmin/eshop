@@ -72,7 +72,8 @@ class ClientsProductsDiscount extends AdminModel
     {
         return [
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
-            'product_id' => $this->getAvailableProducts(),
+            // TODO: fix this
+            // 'product_id' => $this->getAvailableProducts(),
         ];
     }
 }

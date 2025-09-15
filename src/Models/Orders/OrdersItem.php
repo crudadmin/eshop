@@ -117,7 +117,9 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
                 return $item;
             })->pluck('vatValue', 'vat'),
-            'product_id' => $this->getAvailableProducts(),
+
+            // TODO: fix this
+            // 'product_id' => $this->getAvailableProducts(),
         ];
     }
 
