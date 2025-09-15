@@ -134,8 +134,15 @@ trait HasOrderFields
      */
     protected function getShippingAndPaymentFields()
     {
+        $hasDelivery = config('admin_eshop.delivery.enabled', true);
+        $hasPaymentMethods = config('admin_eshop.payment_methods.enabled', true);
+
+        if ( !$hasDelivery && !$hasPaymentMethods ){
+            return [];
+        }
+
         return Group::tab(array_merge(
-            config('admin_eshop.delivery.enabled', true) ? [
+            $hasDelivery ? [
                 'Doprava' => Group::fields([
                     Group::inline(array_merge(
                         [
@@ -154,7 +161,7 @@ trait HasOrderFields
                     'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|column_component:CurrencyPriceColumn|hidden|removeFromForm|keepInRequest',
                 ])->id('delivery'),
             ] : [],
-            config('admin_eshop.payment_methods.enabled', true) ? [
+            $hasPaymentMethods ? [
                 'Platobná metóda' => Group::fields([
                     Group::fields([
                         'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
