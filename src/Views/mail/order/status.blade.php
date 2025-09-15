@@ -4,7 +4,7 @@
 @include('admineshop::mail.order.slots.status.slot_before')
 
 @if ( $order->status->email_content )
-{!! $order->status->email_content !!}
+{!! $order->status->parseOrderText('email_content', $order) !!}
 @endif
 
 {{-- Delivery info --}}

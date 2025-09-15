@@ -2,13 +2,8 @@
 
 namespace AdminEshop\Mail;
 
-use AdminEshop\Contracts\Collections\CartCollection;
 use AdminEshop\Models\Orders\Order;
-use Cart;
-use Discounts;
-use Gogol\Invoices\Model\Invoice;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Localization;
