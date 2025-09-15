@@ -115,11 +115,11 @@ trait HasOrderFields
             ])->inline(),
             Group::fields(array_merge(
                 config('admin_eshop.order.status', true)
-                    ? [ 'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|defaultByOption:default,1|title:Pri zmene stavu sa môže odosielať email zákazníkovy|sub_component:IgnoreStatusEmail|required' ] : []
-                , [
+                    ? [ 'status' => 'name:Stav objednávky|column_name:Stav|belongsTo:orders_statuses,name|defaultByOption:default,1|title:Pri zmene stavu sa môže odosielať email zákazníkovy|sub_component:IgnoreStatusEmail|required' ] : [],
+                config('admin_eshop.delivery.enabled', true) ? [
                     'delivery_status' => 'name:Status dopravnej služby|type:select|default:new|hidden',
                     'delivery_identifier' => 'name:Identifikačné číslo balíka|hidden',
-                ],
+                ] : [],
                 config('admin_eshop.delivery.labels')
                     ? [ 'delivery_label' => 'name:Štítok|type:file|extensions:jpg,pdf,png|hidden' ]
                     : []

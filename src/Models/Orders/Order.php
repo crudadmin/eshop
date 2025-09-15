@@ -121,6 +121,7 @@ class Order extends AdminModel implements Orderable
                 'encode' => false,
                 'name' => 'Status dopravy',
                 'before' => 'delivery_id',
+                'hidden' => !config('admin_eshop.delivery.enabled', true),
             ],
             'columns.is_paid' => [
                 'encode' => false,
