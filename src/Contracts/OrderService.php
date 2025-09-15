@@ -65,7 +65,7 @@ class OrderService
      */
     public function hasInvoices()
     {
-        return config('admin_eshop.invoices', false) === true;
+        return config('admin_eshop.invoices.enabled', false) === true;
     }
 
     /**

@@ -15,10 +15,6 @@ use AdminEshop\Eloquent\Concerns\HasUsernames;
 use AdminEshop\Eloquent\Concerns\OrderShipping;
 use AdminEshop\Eloquent\Concerns\OrderTrait;
 use AdminEshop\Events\OrderPaid;
-use AdminEshop\Models\Delivery\Delivery;
-use AdminEshop\Models\Orders\OrdersLog;
-use AdminEshop\Models\Store\Country;
-use AdminEshop\Models\Store\PaymentsMethod;
 use AdminEshop\Requests\SubmitOrderRequest;
 use AdminPayments\Admin\Buttons\OrderMessagesButton;
 use AdminPayments\Contracts\Concerns\HasPayments;
@@ -28,7 +24,6 @@ use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
-use OrderService;
 use Admin;
 use Store;
 

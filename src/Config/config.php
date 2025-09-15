@@ -51,6 +51,7 @@ return [
      * Enable attributes
      */
     'attributes' => [
+        'enabled' => true,
         //Allowed models with attributes
         'eloquents' => [
             AdminEshop\Models\Products\Product::class,
@@ -299,6 +300,7 @@ return [
     ],
 
     'client' => [
+        'enabled' => true,
         'guard' => 'api',
         'username_splitted' => false,
         'in_cart_response' => true,

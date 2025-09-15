@@ -87,14 +87,22 @@ class AppServiceProvider extends AdminHelperServiceProvider
             Admin::registerAdminModels(__dir__ . '/../Models/Import/**', 'AdminEshop\Models\Import');
         }
 
-        Admin::registerAdminModels(__dir__ . '/../Models/Attribute/**', 'AdminEshop\Models\Attribute');
-        Admin::registerAdminModels(__dir__ . '/../Models/Clients/**', 'AdminEshop\Models\Clients');
+        if ( config('admin_eshop.attributes.enabled', true) ) {
+            Admin::registerAdminModels(__dir__ . '/../Models/Attribute/**', 'AdminEshop\Models\Attribute');
+        }
+
+        if ( config('admin_eshop.client.enabled', true) ) {
+            Admin::registerAdminModels(__dir__ . '/../Models/Clients/**', 'AdminEshop\Models\Clients');
+        }
 
         if ( config('admin_eshop.delivery.enabled', true) ) {
             Admin::registerAdminModels(__dir__ . '/../Models/Delivery/**', 'AdminEshop\Models\Delivery');
         }
 
-        Admin::registerAdminModels(__dir__ . '/../Models/Invoice/**', 'AdminEshop\Models\Invoice');
+        if ( config('admin_eshop.invoices.enabled', false) ) {
+            Admin::registerAdminModels(__dir__ . '/../Models/Invoice/**', 'AdminEshop\Models\Invoice');
+        }
+
         Admin::registerAdminModels(__dir__ . '/../Models/Orders/**', 'AdminEshop\Models\Orders');
         Admin::registerAdminModels(__dir__ . '/../Models/Products/**', 'AdminEshop\Models\Products');
         Admin::registerAdminModels(__dir__ . '/../Models/Store/**', 'AdminEshop\Models\Store');

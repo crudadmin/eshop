@@ -69,7 +69,7 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
         config()->set('admin_payments.providers', config('admin_payments.providers', []) + config('admin_eshop.payment_methods.providers', []));
         config()->set('admin_payments.payment_methods', array_merge(config('admin_payments.payment_methods', []), config('admin_eshop.payment_methods', [])));
 
-        config()->set('admin_payments.invoices.enabled', config('admin_eshop.invoices', false));
+        config()->set('admin_payments.invoices.enabled', config('admin_eshop.invoices.enabled', false));
         config()->set('admin_payments.notifications.paid', config('admin_eshop.mail.order.paid_notification', true));
     }
 }
