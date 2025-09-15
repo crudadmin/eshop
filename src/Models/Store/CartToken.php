@@ -33,7 +33,7 @@ class CartToken extends AdminModel
     {
         return [
             'token' => 'name:Customer token|max:255|index',
-            'client_id' => 'name:Client id|belongsTo:clients,id',
+            'client_id' => 'name:Client id|belongsTo:'.config('admin_eshop.client.table', 'clients').',id',
             'data' => 'name:Data|type:json',
         ];
     }

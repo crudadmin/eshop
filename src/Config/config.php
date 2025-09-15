@@ -301,6 +301,7 @@ return [
 
     'client' => [
         'enabled' => true,
+        'table' => 'clients',
         'guard' => 'api',
         'username_splitted' => false,
         'in_cart_response' => true,

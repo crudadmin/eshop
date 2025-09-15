@@ -22,7 +22,7 @@ trait HasOrderFields
             [
                 'number' => 'name:Č. obj.|max:20|index|removeFromForm',
                 'number_prefix' => 'name:Number prefix|type:string|max:10|inaccessible',
-                'client' => 'name:Klient|belongsTo:clients|inaccessible',
+                'client' => 'name:Klient|belongsTo:'.config('admin_eshop.client.table', 'clients').'|inaccessible',
                 'discount_data' => 'name:Uložené serializované zľavy pri vytvárani objednávky|type:json|inaccessible',
                 'currency' => 'name:Mena|belongsTo:currencies,:name :char|hidden|removeFromForm',
                 'language' => 'name:Jazyk objednávky|belongsTo:languages|inaccessible'
