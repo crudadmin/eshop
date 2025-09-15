@@ -182,16 +182,18 @@ trait HasOrderFields
      */
     public function getPriceFields()
     {
-        return Group::fields([
-            'Cena objednávky' => Group::half([
+        $discounts = array_merge(
+            Discounts::isRegistredDiscount(DiscountCode::class)
+                ? ['discount_codes' => 'name:Zľavové kódy|belongsToMany:discounts_codes,code|hidden|canAdd'] : []
+        );
+
+        return Group::inline([
+            'Cena objednávky' => Group::fields([
                 'price' => 'name:Cena bez DPH|disabled|type:decimal|column_component:CurrencyPriceColumn',
                 'price_vat' => 'name:Cena s DPH|disabled|type:decimal|column_name:Suma obj.|column_component:CurrencyPriceColumn',
                 'paid_at' => 'name:Zaplatené dňa|type:datetime|hidden',
             ])->id('price')->inline(),
-            'Zľavy' => Group::half(array_merge(
-                Discounts::isRegistredDiscount(DiscountCode::class)
-                    ? ['discount_codes' => 'name:Zľavové kódy|belongsToMany:discounts_codes,code|hidden|canAdd'] : []
-            ))->id('discounts')->inline(),
+            'Zľavy' => Group::fields($discounts)->id('discounts')->inline()->if(count($discounts) > 0),
         ])->id('orderPrices');
     }
 
