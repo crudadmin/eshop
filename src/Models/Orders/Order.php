@@ -22,6 +22,7 @@ use AdminPayments\Contracts\Concerns\Orderable;
 use AdminPayments\Models\Payments\Payment;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Admin;
@@ -181,18 +182,13 @@ class Order extends AdminModel implements Orderable
     {
         $query
             ->select('orders.*')
-            ->addSelect('currencies.char as currency_char')
             ->with([
                 'log', 'items',
-            ])
-            ->leftJoin('currencies', function($join){
-                $join->on('currencies.id', '=', 'orders.currency_id');
-            });
+            ]);
     }
 
     public function setAdminAttributes($attributes)
     {
-        $attributes['currency_char'] = $this->currency_char ?: Store::getCurrencyCode();
         $attributes['delivery_pickup_point'] = $this->getPickupAddressWithName();
         $attributes['created'] = $this->created_at ? sprintf(_('%s o %s'), $this->created_at->translatedFormat('d.m'.($this->created_at->year == date('Y') ? '' : '.Y')), $this->created_at->format('H:i')) : '';
 
