@@ -376,6 +376,7 @@ return [
      * Product thumbnail sizes
      */
     'product' => [
+        'async' => false,
         'images' => [
             'thumbnail' => [null, 400],
             'detail' => [680, null],

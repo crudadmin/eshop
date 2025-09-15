@@ -1,12 +1,12 @@
 <template>
 <div @mouseenter="loadProducts" ref="element" data-template='<div class="tooltip tooltip-products" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>' data-toggle="tooltip" data-html="true" :title="products" :key="loaded ? 1 : 0">
-    {{ mutatedValue }}
+    {{ valueMutated }}
 </div>
 </template>
 
 <script type="text/javascript">
 export default {
-    props : ['mutatedValue', 'value', 'field', 'row', 'model'],
+    props : ['valueMutated', 'value', 'field', 'row', 'model'],
 
     data(){
         return {
