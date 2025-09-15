@@ -5,11 +5,8 @@ namespace AdminEshop\Models\Products;
 use AdminEshop\Admin\Buttons\SetProductsCategory;
 use AdminEshop\Admin\Buttons\SetProductsDiscount;
 use AdminEshop\Admin\Rules\ResetProductDiscount;
-use AdminEshop\Contracts\Collections\ProductsCollection;
 use AdminEshop\Eloquent\CartEloquent;
-use AdminEshop\Eloquent\Concerns\CanBeInCart;
 use AdminEshop\Eloquent\Concerns\HasAttributesSupport;
-use AdminEshop\Eloquent\Concerns\HasCart;
 use AdminEshop\Eloquent\Concerns\HasCategoryTree;
 use AdminEshop\Eloquent\Concerns\HasFeed;
 use AdminEshop\Eloquent\Concerns\HasHeureka;
@@ -23,11 +20,9 @@ use AdminEshop\Eloquent\Concerns\HasProductSorter;
 use AdminEshop\Eloquent\Concerns\HasSimilarProducts;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\HasVariantColors;
-use AdminEshop\Eloquent\Concerns\PriceMutator;
 use AdminEshop\Eloquent\Concerns\SearchableTrait;
 use AdminEshop\Models\Attribute\Attribute;
 use AdminEshop\Models\Attribute\AttributesItem;
-use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
 use Store;
 
@@ -293,6 +288,10 @@ class Product extends CartEloquent implements HasAttributesSupport
 
     private function getAttributesList()
     {
+        if ( !Store::hasAttributes() ){
+            return collect();
+        }
+
         $attribute = new Attribute;
 
         return AttributesItem::select('attributes_items.id', 'attributes_items.name', 'attributes.name as attribute_name')

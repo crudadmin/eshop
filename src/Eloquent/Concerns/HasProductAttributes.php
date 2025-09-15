@@ -5,6 +5,7 @@ namespace AdminEshop\Eloquent\Concerns;
 use Admin;
 use AdminEshop\Models\Products\Pivot\ProductsAttributesItem;
 use AdminEshop\Models\Products\Product;
+use Store;
 
 trait HasProductAttributes
 {
@@ -92,6 +93,10 @@ trait HasProductAttributes
      */
     public function hasAttributesEnabled(string $classname = null)
     {
+        if ( !Store::hasAttributes() ){
+            return false;
+        }
+
         $classname = $classname ?: get_class($this);
 
         $enabledClasses = Admin::cache('store.enabledAttributes', function(){
