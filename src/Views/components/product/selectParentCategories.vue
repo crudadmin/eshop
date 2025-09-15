@@ -11,6 +11,7 @@ export default {
 
             this.toggling = true;
 
+
             //Category has been added
             if ( (value||[]).length > (oldValue||[]).length ) {
                 let addedCategory = _.xor(oldValue, value);
@@ -40,7 +41,7 @@ export default {
                 return option[0] == id;
             })[0][1];
 
-            let values = _.xor(_.cloneDeep(this.field.value).map(r => r.id), [id]);
+            let values = _.xor(_.cloneDeep(this.field.value).map(r => r.id), [id]).filter(id => id);
 
             //Add all parents categories
             if ( addedOption.tree.length > 1 ) {
@@ -52,7 +53,9 @@ export default {
 
             }
 
-            values.push(id);
+            if ( !values.includes(id) ) {
+                values.push(id);
+            }
 
             this.model.setValue('categories', values.map(id => ({ id : id })));
         },
