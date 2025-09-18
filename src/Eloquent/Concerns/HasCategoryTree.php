@@ -10,7 +10,7 @@ use Admin;
  */
 trait HasCategoryTree
 {
-    protected function getCategoriesOptions()
+    public function getCategoriesOptions()
     {
         return Admin::cache('store.categories.tree', function(){
             $model = Admin::getModel('Category');
