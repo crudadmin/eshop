@@ -62,6 +62,8 @@ trait HasStoreAttributes
                                             $query->filterAttributeItems($itemIds);
                                         }
 
+                                        $options['variants.extract'] = true;
+
                                         $this->filterByItemsProduct($query, $options);
                                     });
 
