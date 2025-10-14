@@ -188,7 +188,7 @@ trait PriceMutator
                     if ( $operator && is_numeric($value) ) {
                         $originalPrice = $price;
 
-                        $price = operator_modifier($price, $operator, $value, $this->getRewritedVatValue());
+                        $price = operator_modifier($price, $operator, $value, $this->getRewritedVatValue(), false);
 
                         //Save all discounts applied on given model
                         $this->appliedDiscounts[] = [
