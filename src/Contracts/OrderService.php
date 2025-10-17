@@ -276,6 +276,12 @@ class OrderService
             //TODO: support multiple operators
             foreach ($discount->getAllOperators() as $operatorParam) {
                 $operator = $operatorParam['operator'];
+
+                // If value is callable, we need skip this discount. TODO: Fix?
+                if ( is_callable($operatorParam['value']) ) {
+                    continue;
+                }
+
                 $value = Store::calculateFromDefaultCurrency($operatorParam['value']);
 
                 if ( ! $discount->hasSumPriceOperator($operator) ) {

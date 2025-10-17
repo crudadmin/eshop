@@ -41,11 +41,12 @@ function operator_types($except = [])
  * @param  string $operator
  * @param  decimal $value
  * @param  decimal|nullable $vatValue
+ * @param  bool $applyCurrency
  */
-function operator_modifier($number, $operator, $operatorValue, $vatValue = null)
+function operator_modifier($number, $operator, $operatorValue, $vatValue = null, $applyCurrency = true)
 {
     //Convert currency conversion into price change
-    if ( in_array($operator, ['+', '-', '+V', '-V', 'abs']) ){
+    if ( in_array($operator, ['+', '-', '+V', '-V', 'abs']) && $applyCurrency ){
         $operatorValue = Store::calculateFromDefaultCurrency($operatorValue);
     }
 
