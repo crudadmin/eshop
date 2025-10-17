@@ -79,7 +79,7 @@ class DeliveryMutator extends Mutator
             return [
                 'delivery' => $order->delivery,
                 'delivery_location' => $order->delivery_location_id && $order->delivery_location ? $order->delivery_location : null,
-                'delivery_data' => $order->delivery_data,
+                'delivery_data' => $order->delivery_data[$order->delivery_id] ?? null,
             ];
         }
     }
