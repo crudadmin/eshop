@@ -167,6 +167,10 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
                     : null
             );
         }
+
+        catch(Exception $error) {
+            throw new CreatePackageException($error->getMessage());
+        }
     }
 
     private function tryFetchLabel($gw, $packet, $apiPassword)
