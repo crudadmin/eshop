@@ -24,6 +24,8 @@ class NotifierController extends Controller
             $row['product_id'] = $product->product_id;
         } else {
             $product = Admin::getModel('Product')->findOrFail($data['product_id']);
+
+            $row['product_id'] = $product->id;
         }
 
         //If email is not registred yet
