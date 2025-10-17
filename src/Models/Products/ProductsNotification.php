@@ -2,16 +2,15 @@
 
 namespace AdminEshop\Models\Products;
 
-use Admin;
-use AdminEshop\Models\Products\Product;
-use AdminEshop\Notifications\ProductAvailableNotification;
 use Admin\Eloquent\AdminModel;
-use Admin\Fields\Group;
+use AdminEshop\Models\Products\Product;
 use Illuminate\Notifications\Notifiable;
+use Admin\Eloquent\Concerns\HasEntryLocales;
+use AdminEshop\Notifications\ProductAvailableNotification;
 
 class ProductsNotification extends AdminModel
 {
-    use Notifiable;
+    use Notifiable, HasEntryLocales;
 
     /*
      * Model created date, for ordering tables in database and in user interface
@@ -57,6 +56,7 @@ class ProductsNotification extends AdminModel
             'email' => 'name:E-mail|required|email|max:90',
             'notified' => 'name:Upozornený emailom|type:checkbox|default:0',
             'notified_error' => 'name:Chyba pri upozornení|type:checkbox|default:0|inaccessible',
+            'language' => 'name:Jazyk objednávky|belongsTo:languages|inaccessible',
         ];
     }
 

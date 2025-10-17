@@ -3,24 +3,27 @@
 namespace AdminEshop\Controllers\Product;
 
 use AdminEshop\Controllers\Controller;
+use Localization;
 use Admin;
 
 class NotifierController extends Controller
 {
     public function notifyOnStock()
     {
-        $validator = Admin::getModel('ProductsNotification')->getNotifierValidator()->validate();
+        $notificationsModel = Admin::getModel('ProductsNotification');
+        $validator = $notificationsModel->getNotifierValidator()->validate();
 
         $data = $validator->getData();
 
         $row = [
-            'email' => $data['email']
+            'email' => $data['email'],
+            'language_id' => Localization::get()?->getKey(),
         ];
 
         if ( isset($data['variant_id']) ) {
-            //TODO: fix variants
             $product = Admin::getModel('ProductsVariant')->findOrFail($data['variant_id']);
 
+            $row['variant_id'] = $data['variant_id'];
             $row['product_id'] = $product->product_id;
         } else {
             $product = Admin::getModel('Product')->findOrFail($data['product_id']);
@@ -29,8 +32,8 @@ class NotifierController extends Controller
         }
 
         //If email is not registred yet
-        if ( $product->notifications()->where('email', $data['email'])->where('notified', 0)->count() == 0 ) {
-            $product->notifications()->create($row);
+        if ( $notificationsModel->where($row)->where('notified', 0)->count() == 0 ) {
+            $notificationsModel->create($row);
         }
 
         return autoAjax()->save(_('Ďakujeme! Hneď ako produkt naskladníme Vás budeme informovať.'));

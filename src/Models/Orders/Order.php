@@ -21,8 +21,6 @@ use AdminPayments\Contracts\Concerns\HasPayments;
 use AdminPayments\Contracts\Concerns\Orderable;
 use AdminPayments\Models\Payments\Payment;
 use Admin\Eloquent\AdminModel;
-use Admin\Fields\Group;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Admin;

@@ -2,13 +2,10 @@
 
 namespace AdminEshop\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Exception;
 use AdminEshop\Mail\OrderStatus;
 use Illuminate\Support\Facades\Mail;
 use Log;
-use Store;
 
 class SendEmailOnOrderStatusChange
 {

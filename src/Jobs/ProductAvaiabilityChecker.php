@@ -52,7 +52,9 @@ class ProductAvaiabilityChecker implements ShouldQueue
             try {
                 $notification->update([ 'notified' => 1 ]);
 
-                $notification->sendNotification();
+                $notification->withLocale(function() use ($notification) {
+                    $notification->sendNotification();
+                });
             } catch (Exception $e){
                 $errored++;
 
