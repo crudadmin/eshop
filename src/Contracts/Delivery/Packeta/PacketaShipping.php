@@ -60,7 +60,7 @@ class PacketaShipping extends ShippingProvider implements ShippingInterface
      */
     public function isActive()
     {
-        return env('SHIPPMENT_PACKETA_ENABLED') === true;
+        return env('SHIPPMENT_PACKETA_ENABLED', true) === true;
     }
 
     /**
