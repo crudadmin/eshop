@@ -166,7 +166,9 @@ return [
     /*
      * Enable invoices support
      */
-    'invoices' => false,
+    'invoices' => [
+        'enabled' => false,
+    ],
 
     /*
      * Does not round decimals for vat price in products. For multiple quantity total price may be different

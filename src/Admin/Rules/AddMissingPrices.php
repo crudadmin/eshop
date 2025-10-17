@@ -4,7 +4,6 @@ namespace AdminEshop\Admin\Rules;
 
 use Admin\Eloquent\AdminRule;
 use Admin\Eloquent\AdminModel;
-use Admin;
 use Store;
 
 class AddMissingPrices extends AdminRule
