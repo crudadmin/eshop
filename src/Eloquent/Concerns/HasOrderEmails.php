@@ -32,12 +32,12 @@ trait HasOrderEmails
 
     public function getClientEmailSubject()
     {
-        return _('Objednávka č. ') . $this->number;
+        return sprintf(_('Objednávka č. %s'), $this->number);
     }
 
     public function getStoreEmailSubject()
     {
-        return _('Objednávka č. ') . $this->number;
+        return sprintf(_('Objednávka č. %s'), $this->number);
     }
 
     public function addInvoiceToStatusMail($mail)
