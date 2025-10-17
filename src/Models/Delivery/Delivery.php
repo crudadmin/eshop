@@ -3,18 +3,19 @@
 namespace AdminEshop\Models\Delivery;
 
 use Admin;
-use AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice;
-use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
-use AdminEshop\Eloquent\Concerns\DiscountHelper;
-use AdminEshop\Eloquent\Concerns\DiscountSupport;
-use AdminEshop\Eloquent\Concerns\HasCartDeliveryFilter;
-use AdminEshop\Eloquent\Concerns\HasPriceLevels;
-use AdminEshop\Eloquent\Concerns\PriceMutator;
-use Admin\Eloquent\AdminModel;
-use Admin\Fields\Group;
+use Store;
 use Discounts;
 use OrderService;
-use Store;
+use Admin\Fields\Group;
+use Admin\Eloquent\AdminModel;
+use Admin\Core\Casts\LocalizedJsonCast;
+use AdminEshop\Eloquent\Concerns\PriceMutator;
+use AdminEshop\Eloquent\Concerns\DiscountHelper;
+use AdminEshop\Eloquent\Concerns\HasPriceLevels;
+use AdminEshop\Eloquent\Concerns\DiscountSupport;
+use AdminEshop\Contracts\Feed\Heureka\HeurekaFeed;
+use AdminEshop\Eloquent\Concerns\HasCartDeliveryFilter;
+use AdminEshop\Contracts\Discounts\FreeDeliveryFromPrice;
 
 class Delivery extends AdminModel implements DiscountSupport
 {
@@ -169,6 +170,10 @@ class Delivery extends AdminModel implements DiscountSupport
         $string = trim($string);
         $string = str_replace("\n", '</br>', $string);
         $string = preg_replace("/<\/br><\/br>/", '</br>', $string);
+
+        if ( $this->hasFieldParam('description_email', 'locale') ) {
+            return LocalizedJsonCast::castUsing([])->get($this, 'description_email', $string, $this->attributes);
+        }
 
         return $string;
     }
