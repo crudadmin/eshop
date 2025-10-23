@@ -1,10 +1,10 @@
 <template>
-    <div style="white-space: nowrap;">{{ value }} {{ currency }}</div>
+    <div style="white-space: nowrap;">{{ valueMutated }} {{ currency }}</div>
 </template>
 
 <script type="text/javascript">
 export default {
-    props : ['row', 'value'],
+    props : ['row', 'valueMutated'],
     computed: {
         currency(){
             if ( this.row.currency_char ){

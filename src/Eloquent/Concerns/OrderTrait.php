@@ -4,11 +4,8 @@ namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
 use AdminEshop\Contracts\Collections\OrderItemsCollection;
-use AdminEshop\Contracts\Discounts\DiscountCode;
 use AdminEshop\Models\Orders\OrdersItem;
 use AdminEshop\Models\Orders\OrdersStatus;
-use Cart;
-use Discounts;
 use Illuminate\Support\Facades\DB;
 use OrderService;
 use Store;
