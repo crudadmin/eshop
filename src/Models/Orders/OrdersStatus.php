@@ -151,6 +151,7 @@ class OrdersStatus extends AdminModel
 
     public function parseOrderText($key, $order)
     {
+        // In admin, return raw text without localization array
         $this->setLocalizedResponse(false);
 
         $text = $this->getAttribute($key) ?: '';
