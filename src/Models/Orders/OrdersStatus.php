@@ -151,7 +151,9 @@ class OrdersStatus extends AdminModel
 
     public function parseOrderText($key, $order)
     {
-        $text = $this->{$key} ?? '';
+        $this->setLocalizedResponse(false);
+
+        $text = $this->getAttribute($key) ?: '';
 
         foreach ($order->append(['firstname', 'lastname'])->toArray() as $key => $value) {
             if ( is_string($value) || is_numeric($value) ) {
