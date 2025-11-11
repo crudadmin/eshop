@@ -2,7 +2,7 @@
 
 namespace AdminEshop\Contracts\Cart\Concerns;
 
-trait HasPriceSupport
+trait HasCartItemPriceSupport
 {
     public function getPrice($priceKey = 'priceWithVat')
     {

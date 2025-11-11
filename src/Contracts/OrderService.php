@@ -125,11 +125,20 @@ class OrderService
      */
     public function setOrderCartItems(Order $order)
     {
-        $cartItems = (new CartCollection(
-            $order->items->map(function($item){
-                return $item->getCartItem();
-            })
-        ))->renderCartItems();
+        $orderItems = $order->items->map(function($item){
+            return $item->getCartItem();
+        });
+
+        $cartItems = (new CartCollection($orderItems))
+            ->renderCartItems()
+            ->map(function($item){
+                // Restore original order item prices
+                if ( $model = $item->getItemModel() ) {
+                    $item->getOriginalObject()->restorePricesIntoItemModel($model);
+                }
+
+                return $item;
+            });
 
         $this->setCartItems($cartItems);
 

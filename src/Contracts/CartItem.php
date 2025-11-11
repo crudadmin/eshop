@@ -4,12 +4,11 @@ namespace AdminEshop\Contracts;
 
 use AdminEshop\Contracts\Cart\Concerns\HasOptionableDiscounts;
 use AdminEshop\Contracts\Cart\Concerns\HasParentIdentifier;
-use AdminEshop\Contracts\Cart\Concerns\HasPriceSupport;
+use AdminEshop\Contracts\Cart\Concerns\HasCartItemPriceSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\IdentifierSupport;
 use AdminEshop\Contracts\Cart\Identifiers\Concerns\UsesIdentifier;
 use AdminEshop\Contracts\Cart\Identifiers\Identifier;
 use AdminEshop\Contracts\Order\Concerns\HasOrderItemNames;
-use AdminEshop\Eloquent\Concerns\HasStock;
 use Cart;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,7 +18,7 @@ class CartItem implements UsesIdentifier
         HasOptionableDiscounts,
         HasOrderItemNames,
         HasParentIdentifier,
-        HasPriceSupport;
+        HasCartItemPriceSupport;
 
     /**
      * Cart item identififer
