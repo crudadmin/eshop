@@ -35,11 +35,13 @@ trait OrderItemTrait
             ->leftJoin('products as parentProduct', function($join){
                 $join->on('parentProduct.id', '=', 'products.product_id');
             })
-            ->with([
-                'attributesItems' => function($query){
-                    $query->withTextAttributes();
-                }
-            ]);
+            ->when(Store::hasAttributes(), function($query){
+                $query->with([
+                    'attributesItems' => function($query){
+                        $query->withTextAttributes();
+                    }
+                ]);
+            });
     }
 
     public function setProductIdOption($option)
