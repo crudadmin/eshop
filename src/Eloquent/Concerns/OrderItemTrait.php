@@ -2,82 +2,71 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
-use AdminEshop\Contracts\CartItem;
-use AdminEshop\Models\Products\Product;
-use Localization;
-use Store;
 use Admin;
+use Store;
+use Localization;
+use AdminEshop\Contracts\CartItem;
+use Illuminate\Support\Facades\DB;
+use AdminEshop\Models\Products\Product;
 
 trait OrderItemTrait
 {
-    protected $attributesLimitLoad = 3000;
-
     /**
      * Return products with needed attributes
      *
      * @return  Collection
      */
-    public function getAvailableProducts()
+    public function scopeProductIdOption($query)
     {
-        $productModel = Admin::getModel('Product');
-
-        $productsQuery = $productModel->selectRaw('
+        $query
+            ->addSelect(DB::raw('
                 products.product_type,
                 products.id, products.name, products.price,
                 products.vat_id, products.discount_operator, products.discount,
                 parentProduct.name as parent_product_name
-            ')
+            '))
             ->where(function($query){
                 $query->where(function($query){
                     $query->variantProducts();
                 })->orWhere(function($query){
                     $query->nonVariantProducts();
                 });
-            });
-
-        $products = $productsQuery
+            })
             ->leftJoin('products as parentProduct', function($join){
                 $join->on('parentProduct.id', '=', 'products.product_id');
             })
+            ->with([
+                'attributesItems' => function($query){
+                    $query->withTextAttributes();
+                }
+            ]);
+    }
 
-            //CHECK attributesLimitLoad attribute, attributes may not be available after
-            //certain limit of products
-            ->when($productsQuery->count() < $this->attributesLimitLoad, function($query){
-                $query->with([
-                    'attributesItems' => function($query){
-                        $query->withTextAttributes();
-                    }
-                ]);
-           })
-            ->get();
+    public function setProductIdOption($option)
+    {
+        $option = $option
+            ->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue', 'product_type'])
+            ->setAppends([
+                'priceWithVat',
+                'priceWithoutVat',
+                'vatValue'
+            ]);
 
-        return $products->map(function($product) use ($productModel) {
-            if ( config('admin_eshop.attributes.attributesVariants', false) == true ) {
-                $attributesText = $product->attributesVariantsText;
-            } else if ( config('admin_eshop.attributes.attributesText', false) == true ) {
-                $attributesText = $product->attributesText;
-            } else {
-                $attributesText = null;
-            }
 
-            $name = ($product->getValue('name') ?: $product->getValue('parent_product_name')) ?: '';
-            $name .= $attributesText ? ' - '.$attributesText : '';
-            if ( $product->hasFieldParam('name', 'locale') ) {
-                $name = [Localization::getLocale() => $name];
-            }
+        if ( config('admin_eshop.attributes.attributesVariants', false) == true ) {
+            $attributesText = $option->attributesVariantsText;
+        } else if ( config('admin_eshop.attributes.attributesText', false) == true ) {
+            $attributesText = $option->attributesText;
+        } else {
+            $attributesText = null;
+        }
 
-            $product->setAttribute('name', $name);
+        $name = ($option->getValue('name') ?: $option->getValue('parent_product_name')) ?: '';
+        $name .= $attributesText ? ' - '.$attributesText : '';
 
-            $product
-                    ->setVisible(['id', 'name', 'priceWithVat', 'priceWithoutVat', 'vatValue', 'product_type'])
-                    ->setAppends([
-                        'priceWithVat',
-                        'priceWithoutVat',
-                        'vatValue'
-                    ]);
-
-            return $product;
-        });
+        return [
+            'name' => $name,
+        ] + $option->toArray();
     }
 
     /**

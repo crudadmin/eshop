@@ -59,7 +59,7 @@ class ClientsProductsDiscount extends AdminModel
     {
         return [
             'Produkt' => Group::fields([
-                'product' => 'name:Produkt|belongsTo:products,name',
+                'product' => 'name:Produkt|belongsTo:products,name|'.(config('admin_eshop.product.async') ? 'async' : ''),
             ]),
             'Zľava' => Group::fields([
                 'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',
@@ -72,8 +72,6 @@ class ClientsProductsDiscount extends AdminModel
     {
         return [
             'discount_operator' => [ 'default' => 'Žiadna zľava' ] + operator_types(),
-            // TODO: fix this
-            // 'product_id' => $this->getAvailableProducts(),
         ];
     }
 }
