@@ -221,7 +221,7 @@ class OrdersItem extends AdminModel implements UsesIdentifier, DiscountSupport
 
         //Add additional order item description
         if ( $name = $this->getValue('name') ) {
-            $array[] = $this->getValue('name');
+            $array[] = $name;
         }
 
         return array_unique($array);
