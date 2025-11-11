@@ -2,30 +2,31 @@
 
 namespace AdminEshop\Contracts;
 
-use Admin;
-use AdminEshop\Contracts\CartItem;
-use AdminEshop\Contracts\Collections\CartCollection;
-use AdminEshop\Contracts\Order\Concerns\HasMutators;
-use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
-use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
-use AdminEshop\Contracts\Order\Concerns\HasShipping;
-use AdminEshop\Contracts\Order\Concerns\HasWeight;
-use AdminEshop\Contracts\Order\HasRequest;
-use AdminEshop\Contracts\Order\HasValidation;
-use AdminEshop\Events\OrderCreated;
-use AdminEshop\Mail\OrderReceived;
-use AdminEshop\Models\Orders\Order;
-use AdminEshop\Models\Orders\OrdersStatus;
-use AdminPayments\Contracts\Concerns\HasProviders;
-use Admin\Core\Contracts\DataStore;
-use Localization;
+use Log;
 use Cart;
+use Mail;
+use Admin;
+use Store;
 use Discounts;
 use Exception;
+use Localization;
 use Gogol\Invoices\Model\Invoice;
-use Log;
-use Mail;
-use Store;
+use AdminEshop\Contracts\CartItem;
+use AdminEshop\Mail\OrderReceived;
+use Admin\Core\Contracts\DataStore;
+use AdminEshop\Events\OrderCreated;
+use AdminEshop\Models\Orders\Order;
+use AdminEshop\Models\Orders\OrdersItem;
+use AdminEshop\Contracts\Order\HasRequest;
+use AdminEshop\Models\Orders\OrdersStatus;
+use AdminEshop\Contracts\Order\HasValidation;
+use AdminEshop\Contracts\Order\Concerns\HasWeight;
+use AdminPayments\Contracts\Concerns\HasProviders;
+use AdminEshop\Contracts\Collections\CartCollection;
+use AdminEshop\Contracts\Order\Concerns\HasMutators;
+use AdminEshop\Contracts\Order\Concerns\HasShipping;
+use AdminEshop\Contracts\Order\Concerns\HasOrderProcess;
+use AdminEshop\Contracts\Order\Concerns\HasMutatorsForward;
 
 class OrderService
 {
@@ -133,8 +134,8 @@ class OrderService
             ->renderCartItems()
             ->map(function($item){
                 // Restore original order item prices
-                if ( $model = $item->getItemModel() ) {
-                    $item->getOriginalObject()->restorePricesIntoItemModel($model);
+                if ( ($model = $item->getItemModel()) && ($orderItem = $item->getOriginalObject()) instanceof OrdersItem ) {
+                    $orderItem->restorePricesIntoItemModel($model);
                 }
 
                 return $item;
