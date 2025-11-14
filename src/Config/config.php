@@ -371,7 +371,7 @@ return [
             TRUE => 1.625 => 1.63 when rounded no-vat, and then 1.63*1.2=>1.96
             FALSE => 1.625*1.2=>1.95
          */
-        'round_without_vat' => false,
+        'round_without_vat' => true,
     ],
 
     /*

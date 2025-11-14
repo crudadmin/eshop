@@ -3,10 +3,7 @@
 namespace AdminEshop\Eloquent\Concerns;
 
 use Admin;
-use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Eloquent\Concerns\DiscountSupport;
-use AdminEshop\Models\Delivery\Delivery;
-use AdminEshop\Models\Store\PaymentsMethod;
 use Discounts;
 use Store;
 
@@ -274,7 +271,7 @@ trait PriceMutator
             $this->getRewritedVatValue()
         );
 
-        return config('admin_eshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
+        return Store::roundNumberWithoutVat($price);
     }
 
     /*
@@ -296,7 +293,7 @@ trait PriceMutator
             $price = $this->applyDiscounts($price, $this->toCartArrayDiscounts);
         }
 
-        return config('admin_eshop.prices.round_without_vat', false) ? Store::roundNumber($price) : $price;
+        return Store::roundNumberWithoutVat($price);
     }
 
     /*

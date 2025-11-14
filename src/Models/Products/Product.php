@@ -161,7 +161,7 @@ class Product extends CartEloquent implements HasAttributesSupport
                 'name' => 'Atribúty',
                 'before' => 'code',
             ],
-            'decimals.round_without_vat' => config('admin_eshop.prices.round_without_vat', false),
+            'decimals.round_without_vat' => Store::hasNoVatRounding(),
         ];
     }
 

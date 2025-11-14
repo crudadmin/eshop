@@ -73,7 +73,7 @@ class Currency extends AdminModel
             'Nastavenia cien' => Group::tab([
                 'decimal_places' => 'name:Zobrazovať ceny na|type:select|default:2|required',
                 'decimal_rounding' => 'name:Zaokrúhľovanie cien na|type:select|default:2|title:'.(
-                    config('admin_eshop.prices.round_without_vat', false)
+                    Store::hasNoVatRounding()
                         ? 'Zaokruhľovanie platí pre ceny bez DPH a taktiež pre ceny s DPH. Ak je cena bez DPH 1.625, výsledna cena s DPH bude 1.96'
                         : 'Zaokruhľovanie platí pre všetky ceny s DPH. Ceny produktov bez DPH sa nezaokruhľujú, z týchto nezaokruhlených cien je vypočítana finálna cena s DPH.'
                     ).'|required',
