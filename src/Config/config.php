@@ -170,13 +170,6 @@ return [
         'enabled' => false,
     ],
 
-    /*
-     * Does not round decimals for vat price in products. For multiple quantity total price may be different
-     * true => (1.11*1.2 => 1.332)*6=>7.99 in total
-     * false => (1.11*1.2 => 1.33)*6=>7.98 in total
-     */
-    'round_summary' => true,
-
     'cart' => [
         //Return full cart response with all deliveries, payment methods etc,,, in every cart request
         //add/update/delete items, manage discount codes, etc... By default those data are returned only on cart page.
@@ -366,12 +359,22 @@ return [
         'decimals_places' => '8,3',
 
         /*
+        * Does not round decimals for vat price in products. For multiple quantity total price may be different
+        * true => (1.11*1.2 => 1.332)*6=>7.99 in total
+        * false => (1.11*1.2 => 1.33)*6=>7.98 in total
+        */
+        'round_summary' => true,
+
+        /*
             When we round no-vat prices, then all final vat prices may not be correct when store
             uses more decimal places than defined in settings. Here is example for 2 places:
             TRUE => 1.625 => 1.63 when rounded no-vat, and then 1.63*1.2=>1.96
             FALSE => 1.625*1.2=>1.95
          */
         'round_without_vat' => true,
+
+        // First will be calculated price with VAT, and from this price we will calculate price without VAT
+        'vat_priority' => true,
     ],
 
     /*

@@ -4,7 +4,6 @@ namespace AdminEshop\Contracts\Collections;
 
 use AdminEshop\Contracts\CartItem;
 use AdminEshop\Models\Orders\Order;
-use Admin\Eloquent\AdminModel;
 use Cart;
 use Discounts;
 use Illuminate\Support\Collection;
@@ -193,11 +192,28 @@ class CartCollection extends Collection
             $array = $item->getPricesArray($discounts);
 
             foreach ($array as $key => $value) {
+                // Meta keys
+                if ( in_array($key, ['vat']) ) {
+                    continue;
+                }
+
                 if ( !array_key_exists($key, $sum) ) {
                     $sum[$key] = 0;
                 }
 
                 $sum[$key] += ($item->quantity * $array[$key]);
+            }
+
+            // Recalculate/fix no vat prices to fix no vat prices from vat prices after big quantity
+            if ( Store::hasVatPriority() && array_key_exists('vat', $array) ) {
+                foreach ($sum as $key => $value) {
+                    $samePriceVatKey = str_replace('WithoutVat', 'WithVat', $key);
+
+                    // Recalculate final price after quantity applied
+                    if ( strpos($key, 'WithoutVat') !== false && array_key_exists($samePriceVatKey, $sum) ) {
+                        $sum[$key] = Store::removeVat($sum[$samePriceVatKey], $array['vat']);
+                    }
+                }
             }
         }
 

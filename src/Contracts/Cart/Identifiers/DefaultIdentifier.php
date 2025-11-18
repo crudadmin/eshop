@@ -115,6 +115,7 @@ class DefaultIdentifier extends Identifier
             $priceWithVat = Store::priceWithVat($price, $vat);
 
             return [
+                'vat' => $vat,
                 'price' => $price,
                 'initialPriceWithVat' => $priceWithVat,
                 'initialPriceWithoutVat' => $price,

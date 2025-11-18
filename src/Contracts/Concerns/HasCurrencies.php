@@ -140,16 +140,6 @@ trait HasCurrencies
         return round($number, $rounding);
     }
 
-    /**
-     * All NO VAT prices should be rounded for correct VAT calculation.
-     *
-     * @return void
-     */
-    public function hasNoVatRounding()
-    {
-        return config('admin_eshop.prices.round_without_vat', false);
-    }
-
     public function roundNumberWithoutVat($number, $rounding = null)
     {
         if ( $this->hasNoVatRounding() ) {

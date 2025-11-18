@@ -71,5 +71,10 @@ class ConfigServiceProvider extends AdminHelperServiceProvider
 
         config()->set('admin_payments.invoices.enabled', config('admin_eshop.invoices.enabled', false));
         config()->set('admin_payments.notifications.paid', config('admin_eshop.mail.order.paid_notification', true));
+
+        // Set vat priority for invoices according to store settings
+        if ( \OrderService::hasInvoices() && \Store::hasVatPriority() ) {
+            config()->set('invoices.prices.vat_priority', true);
+        }
     }
 }
