@@ -373,7 +373,10 @@ return [
          */
         'round_without_vat' => true,
 
-        // First will be calculated price with VAT, and from this price we will calculate price without VAT
+        /*
+         * First will be calculated final VAT price with all quantity (item VAT PRICE * QUANTITY), and from this price we will calculate final no VAT price
+         * This fixes big differences in final price with many (10+) quantities of the same product, when base no vat price is rounded.
+         */
         'vat_priority' => true,
     ],
 
