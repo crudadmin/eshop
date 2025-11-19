@@ -2,18 +2,24 @@
 
 namespace AdminEshop\Eloquent\Concerns;
 
-use AdminEshop\Events\StockChanged;
-use AdminEshop\Models\Products\Product;
-use AdminEshop\Models\Products\ProductsStocksLog;
-use AdminEshop\Models\Store\CartStockBlock;
-use Store;
-use Cart;
+use Admin\Fields\Group;
 
 trait HasUsernames
 {
     private function hasSplitedUsernames()
     {
         return config('admin_eshop.client.username_splitted', false) ? true : false;
+    }
+
+    public function getUsernameFields()
+    {
+        return [
+            'username' => 'name:Meno a priezvisko'.(config('admin_eshop.client.username_splitted') ? '|removeFromForm' : ''),
+            Group::inline([
+                'firstname' => 'name:Meno',
+                'lastname' => 'name:Priezvisko',
+            ])->add('hidden'.(!config('admin_eshop.client.username_splitted') ? '|removeFromForm' : ''))->attributes(!config('admin_eshop.client.username_splitted') ? 'hideFromForm' : '')
+        ];
     }
 
     /**

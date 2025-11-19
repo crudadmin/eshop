@@ -58,11 +58,7 @@ class Client extends BaseAuthenticatable
                         'email' => 'name:Email|email|required|unique:clients,email,'.(isset($row) ? $row->getKey() : 'NULL').',id,deleted_at,NULL',
                         'photo' => 'name:Fotografia|type:file|image',
                     ])->inline(),
-                    'username' => 'name:Meno a priezvisko'.(config('admin_eshop.client.username_splitted') ? '|removeFromForm' : ''),
-                    Group::inline([
-                        'firstname' => 'name:Meno',
-                        'lastname' => 'name:Priezvisko',
-                    ])->add('hidden'.(!config('admin_eshop.client.username_splitted') ? '|removeFromForm' : ''))->attributes(!config('admin_eshop.client.username_splitted') ? 'hideFromForm' : ''),
+                    ...$this->getUsernameFields(),
                     'phone' => 'name:Telefon|'.phoneValidatorRule(),
                     'password' => 'name:Heslo|type:password|min:6|confirmed|max:40'.( ! isset($row) ? '|required' : '' ),
                     'language' => 'name:Predvolený jazyk|belongsTo:languages|inaccessible'
