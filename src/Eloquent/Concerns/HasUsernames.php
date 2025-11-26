@@ -96,10 +96,15 @@ trait HasUsernames
     protected function getDynamicUsername($prefix = '', $force = false)
     {
         if ( $this->hasSplitedUsernames() || $force === true ) {
-            return implode(' ', array_filter([
+            $parts = array_filter([
                 $this->{$prefix.'firstname'},
-                $this->{$prefix.'lastname'}]
-            ));
+                $this->{$prefix.'lastname'}
+            ]);
+
+            // Attributes must be loaded
+            if ( count($parts) > 0 ) {
+                return implode(' ', $parts);
+            }
         }
 
         return $this->getEncryptedAttribute($prefix.'username');
