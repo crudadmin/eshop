@@ -95,4 +95,9 @@ if ( !function_exists('phoneValidatorRule') )
         return ($rule == true ? 'phone:' : '').$validation;
     }
 }
+
+function productAsyncRule($rule = '')
+{
+    return ($asyncCount = config('admin_eshop.product.async')) ? 'async:'.(is_numeric($asyncCount) ? (int)$asyncCount : 1000).'|'.$rule : '';
+}
 ?>

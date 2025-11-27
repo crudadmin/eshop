@@ -59,7 +59,7 @@ class ClientsProductsDiscount extends AdminModel
     {
         return [
             'Produkt' => Group::fields([
-                'product' => 'name:Produkt|belongsTo:products,name|'.(config('admin_eshop.product.async') ? 'async' : ''),
+                'product' => 'name:Produkt|belongsTo:products,name|'.productAsyncRule(),
             ]),
             'Zľava' => Group::fields([
                 'discount_operator' => 'name:Typ zľavy|type:select|required_with:discount|hidden',

@@ -67,10 +67,10 @@ trait HasProductAttributes
 
         $grouppedAttributes = $this->attributesItems->sortBy(function($item){
             return $item->attribute?->getAttribute('_order');
-        })->groupBy('products_attribute_id');
+        })->groupBy('attribute_id');
 
         foreach ($grouppedAttributes as $attributeItems) {
-            $attributes[] = $attributeItems->map(function($item) use ($filter) {
+            $value = $attributeItems->map(function($item) use ($filter) {
                 $attribute = $item->attribute;
 
                 if ( $filter($item, $attribute) === false ){
@@ -79,6 +79,12 @@ trait HasProductAttributes
 
                 return ($item ? $item->getAttributeItemValue($attribute) : '');
             })->filter()->join(config('admin_eshop.attributes.separator.item', ', '));
+
+            if ( is_null($value) || $value === '' ) {
+                continue;
+            }
+
+            $attributes[] = $value;
         }
 
         return implode(config('admin_eshop.attributes.separator.attribute', ', '), $attributes);
