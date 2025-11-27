@@ -384,7 +384,7 @@ return [
      * Product thumbnail sizes
      */
     'product' => [
-        'async' => false,
+        'async' => 5000, // From 5+k products they will be async in orderItems etc
         'images' => [
             'thumbnail' => [null, 400],
             'detail' => [680, null],
