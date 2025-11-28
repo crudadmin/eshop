@@ -100,6 +100,8 @@ class AppServiceProvider extends AdminHelperServiceProvider
 
         if ( config('admin_eshop.invoices.enabled', false) ) {
             Admin::registerAdminModels(__dir__ . '/../Models/Invoice/**', 'AdminEshop\Models\Invoice');
+        } else {
+            config()->set('invoices.enabled', false);
         }
 
         Admin::registerAdminModels(__dir__ . '/../Models/Orders/**', 'AdminEshop\Models\Orders');
