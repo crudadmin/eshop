@@ -355,12 +355,12 @@ trait HasProductResponses
         $query->withListingResponse($options);
     }
 
-    public function scopeWithProductModules($query, $prefix = null, $variants = false)
+    public function scopeWithProductModules($query, $prefix = null, $inVariants = false)
     {
-        $query->onlyFiltrable(function($query) use ($prefix, $variants) {
+        $query->onlyFiltrable(function($query) use ($prefix, $inVariants) {
             $prefix = $prefix ? $prefix.'.' : '';
 
-            $query->withMainGalleryImage($variants ? true : false);
+            $query->withMainGalleryImage($inVariants ? true : false);
 
             // Add price ranges columns
             if ( $this->getFilterOption($prefix.'price_ranges', false) === true ) {
@@ -374,7 +374,7 @@ trait HasProductResponses
 
             // Add variants
             if (
-                $variants === false
+                $inVariants === false
                 && $this->getFilterOption($prefix.'variants.extract', false) === false
                 && $this->getFilterOption($prefix.'variants', true) === true
                 && count(Store::variantsProductTypes())
