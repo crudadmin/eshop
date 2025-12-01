@@ -41,14 +41,18 @@ trait HasPriceLevels
 
     public function scopeWithPriceLevelsColumns($query)
     {
-        if ( config('admin_eshop.prices.price_levels') ) {
-            $query
-                ->withPriceLevels()
-                ->addSelect(DB::raw('
-                    COALESCE(pl.price, '.$this->qualifyColumn('price').') as price,
-                    COALESCE(pl.vat_id, '.$this->qualifyColumn('vat_id').') as vat_id,
-                    pl.currency_id
-                '));
+        if ( !config('admin_eshop.prices.price_levels') ) {
+            return;
         }
+
+        $priceLevelsOnly = $this->getFilterOption('price_levels_only', false);
+
+        $query
+            ->withPriceLevels()
+            ->addSelect(DB::raw('
+                COALESCE(pl.price, '.($priceLevelsOnly ? 0 : $this->qualifyColumn('price')).') as price,
+                COALESCE(pl.vat_id, '.($priceLevelsOnly ? 0 : $this->qualifyColumn('vat_id')).') as vat_id,
+                pl.currency_id
+            '));
     }
 }

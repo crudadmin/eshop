@@ -362,12 +362,17 @@ trait HasProductResponses
 
             $query->withMainGalleryImage($variants ? true : false);
 
+            // Add price ranges columns
             if ( $this->getFilterOption($prefix.'price_ranges', false) === true ) {
                 $query->withMinAndMaxVariantPrices();
             }
 
-            $query->withPriceLevelsColumns();
+            // Add price levels columns
+            if ( $this->getFilterOption($prefix.'price_levels', true) === true ) {
+                $query->withPriceLevelsColumns();
+            }
 
+            // Add variants
             if (
                 $variants === false
                 && $this->getFilterOption($prefix.'variants.extract', false) === false
@@ -393,6 +398,7 @@ trait HasProductResponses
                 }]);
             }
 
+            // Add attributes
             if ( $attributesScope = $this->getFilterOption($prefix.'attributes', false) ) {
                 $query->with([
                     'attributesItems' => function($query) use ($attributesScope) {
@@ -409,6 +415,7 @@ trait HasProductResponses
                 ]);
             }
 
+            // Add gallery
             if ( $this->getFilterOption($prefix.'gallery', false) === true ) {
                 $query->with(['gallery']);
             }
