@@ -45,7 +45,11 @@ trait HasPriceLevels
             return;
         }
 
-        $priceLevelsOnly = $this->getFilterOption('price_levels_only', false);
+        if ( method_exists($this, 'getFilterOption') ) {
+            $priceLevelsOnly = $this->getFilterOption('price_levels_only', false);
+        } else {
+            $priceLevelsOnly = false;
+        }
 
         $query
             ->withPriceLevels()
