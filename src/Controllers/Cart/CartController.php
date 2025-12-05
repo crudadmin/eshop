@@ -278,7 +278,9 @@ class CartController extends Controller
             //Generate default invoice document
             if ( config('admin_eshop.mail.with_proform', true) == true ) {
                 $proform = OrderService::getOrder()->makeInvoice('proform', [
-                    'notified_at' => Carbon::now(),
+                    'notified_at' => [
+                        'notification' => now()->format('Y-m-d H:i:s'),
+                    ],
                 ]);
             } else {
                 $proform = null;
