@@ -115,10 +115,16 @@ trait HasUsernames
         $value = $this->getEncryptedAttribute($prefix.'firstname');
 
         if ( $this->hasSplitedUsernames() ){
-            return $value;
+            if ( $value ) {
+                return $value;
+            } else {
+                $username = $this->getEncryptedAttribute($prefix.'username');
+            }
+        } else {
+            $username = $this->{$prefix.'username'};
         }
 
-        $names = explode(' ', $this->{$prefix.'username'});
+        $names = explode(' ', $username);
 
         return $names[0] ?? null;
     }
@@ -128,10 +134,16 @@ trait HasUsernames
         $value = $this->getEncryptedAttribute($prefix.'lastname');
 
         if ( $this->hasSplitedUsernames() ){
-            return $value;
+            if ( $value ) {
+                return $value;
+            } else {
+                $username = $this->getEncryptedAttribute($prefix.'username');
+            }
+        } else {
+            $username = $this->{$prefix.'username'};
         }
 
-        $names = explode(' ', $this->{$prefix.'username'});
+        $names = explode(' ', $username);
         if ( count($names) >= 2 ) {
             return end($names);
         }
