@@ -252,6 +252,8 @@ trait PriceMutator
      */
     public function getInitialPriceWithVatAttribute($value)
     {
+        // WARNING: Default price can not be rounded.
+        // Because from that prices is calculated all other prices. So that price must be exact.
         return $this->calculateVatPrice($this->getAttribute('initialPriceWithoutVat'));
     }
 
@@ -271,7 +273,7 @@ trait PriceMutator
             $this->getRewritedVatValue()
         );
 
-        // WARNING: Price without VAT can not be rounded. Because from those prices is calculated final price with VAT.
+        // WARNING: Price without VAT can not be rounded. Because from those prices is calculated final price with VAT. So that price must be exact.
         return $price;
     }
 
@@ -294,7 +296,8 @@ trait PriceMutator
             $price = $this->applyDiscounts($price, $this->toCartArrayDiscounts);
         }
 
-        // WARNING: Price without VAT can not be rounded. Because from those prices is calculated final price with VAT.
+        // WARNING: Price without VAT can not be rounded.
+        // Because from those prices is calculated final price with VAT. So that price must be exact.
         return $price;
     }
 
