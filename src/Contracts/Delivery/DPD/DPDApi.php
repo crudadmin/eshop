@@ -72,7 +72,7 @@ class DPDApi
      *
      * @return array
      */
-    public function sendRequest(string $endpoint, string $method, array $data): array
+    public function sendRequest(string $endpoint, string $method, array $data)
     {
         $data['DPDSecurity'] = [
             'SecurityToken' => [
