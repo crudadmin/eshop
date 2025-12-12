@@ -11,8 +11,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use OrderService;
 use Exception;
+use Throwable;
 
 class SendShippingJob implements ShouldQueue
 {
@@ -78,7 +78,7 @@ class SendShippingJob implements ShouldQueue
             $order->logReport('error', 'delivery-error', $error->getMessage(), $error->getResponse());
         }
 
-        catch (Exception $error){
+        catch (Exception|Throwable $error){
             $order->delivery_status = 'error';
 
             $order->logReport('error', 'delivery-error', implode(' ', array_wrap($error->getMessage())));
