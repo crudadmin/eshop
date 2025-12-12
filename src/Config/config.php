@@ -355,8 +355,10 @@ return [
         //Enable price levels
         'price_levels' => false,
 
-        //Save all prices up to x decimal places
-        'decimals_places' => '8,3',
+        // Save all NO VAT prices up to x decimal places
+        // When are displaying prices up to 2 decimal places, we need to add additional 2 more places for correct rounding.
+        // Eg: 11.9/1.23=>9.6747. If we would save only 3 steps, we would have 9.675, and when we do that to 2 places, we will have 9.68 what is wrong.
+        'decimals_places' => '8,4',
 
         /*
         * Does not round decimals for vat price in products. For multiple quantity total price may be different
