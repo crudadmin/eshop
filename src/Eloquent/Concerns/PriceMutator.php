@@ -271,7 +271,8 @@ trait PriceMutator
             $this->getRewritedVatValue()
         );
 
-        return Store::roundNumberWithoutVat($price);
+        // WARNING: Price without VAT can not be rounded. Because from those prices is calculated final price with VAT.
+        return $price;
     }
 
     /*
@@ -293,7 +294,8 @@ trait PriceMutator
             $price = $this->applyDiscounts($price, $this->toCartArrayDiscounts);
         }
 
-        return Store::roundNumberWithoutVat($price);
+        // WARNING: Price without VAT can not be rounded. Because from those prices is calculated final price with VAT.
+        return $price;
     }
 
     /*

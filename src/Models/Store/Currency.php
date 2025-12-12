@@ -72,11 +72,7 @@ class Currency extends AdminModel
             'default' => 'name:Predvolená mena|type:checkbox|default:0',
             'Nastavenia cien' => Group::tab([
                 'decimal_places' => 'name:Zobrazovať ceny na|type:select|default:2|required',
-                'decimal_rounding' => 'name:Zaokrúhľovanie cien na|type:select|default:2|title:'.(
-                    Store::hasNoVatRounding()
-                        ? 'Zaokruhľovanie platí pre ceny bez DPH a taktiež pre ceny s DPH. Ak je cena bez DPH 1.625, výsledna cena s DPH bude 1.96'
-                        : 'Zaokruhľovanie platí pre všetky ceny s DPH. Ceny produktov bez DPH sa nezaokruhľujú, z týchto nezaokruhlených cien je vypočítana finálna cena s DPH.'
-                    ).'|required',
+                'decimal_rounding' => 'name:Zaokrúhľovanie cien na|type:select|default:2|title:Zaokruhľovanie platí pre všetky ceny s DPH. Ceny produktov bez DPH sa nezaokruhľujú, z týchto nezaokruhlených cien je vypočítana finálna cena s DPH|required',
                 'decimal_separator' => 'name:Separator desatinných čísel|type:select|default:comma|required',
             ])->icon('fa-money')->add('hidden'),
         ];

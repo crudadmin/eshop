@@ -139,13 +139,4 @@ trait HasCurrencies
 
         return round($number, $rounding);
     }
-
-    public function roundNumberWithoutVat($number, $rounding = null)
-    {
-        if ( $this->hasNoVatRounding() ) {
-            return $this->roundNumber($number, $rounding);
-        }
-
-        return $number;
-    }
 }

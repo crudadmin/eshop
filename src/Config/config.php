@@ -366,14 +366,6 @@ return [
         'round_summary' => true,
 
         /*
-            When we round no-vat prices, then all final vat prices may not be correct when store
-            uses more decimal places than defined in settings. Here is example for 2 places:
-            TRUE => 1.625 => 1.63 when rounded no-vat, and then 1.63*1.2=>1.96
-            FALSE => 1.625*1.2=>1.95
-         */
-        'round_without_vat' => true,
-
-        /*
          * First will be calculated final VAT price with all quantity (item VAT PRICE * QUANTITY), and from this price we will calculate final no VAT price
          * This fixes big differences in final price with many (10+) quantities of the same product, when base no vat price is rounded.
          */

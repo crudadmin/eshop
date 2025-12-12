@@ -126,14 +126,6 @@ class Store
         return config('admin_eshop.prices.round_summary', true);
     }
 
-    /**
-     * All NO VAT prices should be rounded for correct VAT calculation.
-     */
-    public function hasNoVatRounding()
-    {
-        return config('admin_eshop.prices.round_without_vat', false);
-    }
-
     public function hasVatPriority()
     {
         return config('admin_eshop.prices.vat_priority', true);
