@@ -2,29 +2,30 @@
 
 namespace AdminEshop\Models\Orders;
 
-use AdminEshop\Admin\Buttons\GenerateInvoice;
-use AdminEshop\Admin\Buttons\SendShippmentButton;
-use AdminEshop\Admin\Rules\OnOrderStatusChange;
-use AdminEshop\Admin\Rules\OrderNumber;
-use AdminEshop\Admin\Rules\RebuildOrder;
-use AdminEshop\Eloquent\Concerns\HasOrderEmails;
-use AdminEshop\Eloquent\Concerns\HasOrderFields;
-use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
-use AdminEshop\Eloquent\Concerns\HasOrderNumber;
-use AdminEshop\Eloquent\Concerns\HasUsernames;
-use AdminEshop\Eloquent\Concerns\OrderShipping;
-use AdminEshop\Eloquent\Concerns\OrderTrait;
-use AdminEshop\Events\OrderPaid;
-use AdminEshop\Requests\SubmitOrderRequest;
-use AdminPayments\Admin\Buttons\OrderMessagesButton;
-use AdminPayments\Contracts\Concerns\HasPayments;
-use AdminPayments\Contracts\Concerns\Orderable;
-use AdminPayments\Models\Payments\Payment;
-use Admin\Eloquent\AdminModel;
-use Illuminate\Http\Request;
-use Illuminate\Notifications\Notifiable;
 use Admin;
 use Store;
+use Illuminate\Http\Request;
+use Admin\Eloquent\AdminModel;
+use AdminEshop\Events\OrderPaid;
+use AdminEshop\Admin\Rules\OrderNumber;
+use AdminEshop\Admin\Rules\RebuildOrder;
+use Illuminate\Notifications\Notifiable;
+use AdminPayments\Models\Payments\Payment;
+use AdminEshop\Requests\SubmitOrderRequest;
+use AdminEshop\Eloquent\Concerns\OrderTrait;
+use AdminEshop\Admin\Buttons\GenerateInvoice;
+use AdminEshop\Eloquent\Concerns\HasUsernames;
+use AdminEshop\Admin\Rules\OnOrderStatusChange;
+use AdminEshop\Eloquent\Concerns\OrderShipping;
+use AdminPayments\Contracts\Concerns\Orderable;
+use AdminEshop\Eloquent\Concerns\HasOrderEmails;
+use AdminEshop\Eloquent\Concerns\HasOrderFields;
+use AdminEshop\Eloquent\Concerns\HasOrderNumber;
+use AdminEshop\Admin\Buttons\SendShippmentButton;
+use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
+use AdminPayments\Contracts\Concerns\HasPayments;
+use AdminEshop\Admin\Buttons\SetOrderStatusButton;
+use AdminPayments\Admin\Buttons\OrderMessagesButton;
 
 class Order extends AdminModel implements Orderable
 {
@@ -70,6 +71,7 @@ class Order extends AdminModel implements Orderable
             GenerateInvoice::class,
             SendShippmentButton::class,
             OrderMessagesButton::class,
+            SetOrderStatusButton::class,
         ], $this->getShippingButtons());
     }
 
@@ -103,6 +105,7 @@ class Order extends AdminModel implements Orderable
             'title.update' => 'Objednávka č. :number - :created',
             'grid.enabled' => false,
             'grid.default' => 'full',
+            'form.actions' => true,
             'columns.price.hidden' => true,
             'columns.created.name' => 'Vytvorená dňa',
             'columns.client_name' => [
