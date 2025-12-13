@@ -36,8 +36,10 @@ class GenerateInvoice extends Button
             return $this->error(_('Objednávka neobsahuje žiadne položky k vygenerovaniu dokladu.'));
         }
 
-        return $this->title(_('Naozaj si prajete vygenerovať faktúru?'))
-                    ->component('AskForCreateOrderInvoice')
+        return $this->title(_('Aký typ dokladu si prajete vygenerovať?'))
+                    ->component('GenerateOrderInvoice', [
+                        'invoice_types' => config('invoices.invoice_types', []),
+                    ])
                     ->type('default');
     }
 
@@ -50,7 +52,9 @@ class GenerateInvoice extends Button
             return $this->message(_('Táto objednávka bola zrušená, nie je možné jej vygenerovať doklad.'));
         }
 
-        if ( !in_array($type = request('invoice_type'), ['proform', 'invoice', 'return']) ) {
+        $type = request('invoice_type');
+
+        if ( array_key_exists($type, config('invoices.invoice_types', [])) === false ) {
             return $this->error(_('Nevybrali ste typ dokladu.'));
         }
 
