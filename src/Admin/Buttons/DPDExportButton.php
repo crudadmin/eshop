@@ -3,10 +3,8 @@
 namespace AdminEshop\Admin\Buttons;
 
 use AdminEshop\Contracts\Delivery\DPD\DPDShipping;
-use Admin\Eloquent\AdminModel;
 use Admin\Helpers\Button;
 use Illuminate\Support\Collection;
-use OrderService;
 use Storage;
 
 class DPDExportButton extends Button
@@ -29,9 +27,14 @@ class DPDExportButton extends Button
      */
     public function __construct($row)
     {
-        $this->name = _('DPD Export objednávok');
+        $this->name = _('DPD Export');
 
         $this->active = true;
+    }
+
+    public function fire($row)
+    {
+        return $this->fireMultiple(collect([$row]));
     }
 
     /**
