@@ -24,6 +24,7 @@ use AdminEshop\Eloquent\Concerns\HasOrderNumber;
 use AdminEshop\Admin\Buttons\SendShippmentButton;
 use AdminEshop\Eloquent\Concerns\HasOrderInvoice;
 use AdminPayments\Contracts\Concerns\HasPayments;
+use AdminEshop\Admin\Buttons\SetOrderDeliveryStatusButton;
 use AdminEshop\Admin\Buttons\SetOrderStatusButton;
 use AdminPayments\Admin\Buttons\OrderMessagesButton;
 
@@ -72,6 +73,7 @@ class Order extends AdminModel implements Orderable
             SendShippmentButton::class,
             OrderMessagesButton::class,
             SetOrderStatusButton::class,
+            SetOrderDeliveryStatusButton::class,
         ], $this->getShippingButtons());
     }
 
@@ -152,12 +154,7 @@ class Order extends AdminModel implements Orderable
 
         $options = [
             'country_id' => $countries,
-            'delivery_status' => [
-                'new' => _('Čaká za objednanim dopravy'),
-                'ok' => _('Prijatá'),
-                'sent' => _('Odoslaná'),
-                'error' => _('Neprijatá (chyba)'),
-            ],
+            'delivery_status' => getDeliveryStates(),
         ];
 
         //Add delivery feature options

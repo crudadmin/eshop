@@ -100,4 +100,14 @@ function productAsyncRule($rule = '')
 {
     return ($asyncCount = config('admin_eshop.product.async')) ? 'async:'.(is_numeric($asyncCount) ? (int)$asyncCount : 1000).'|'.$rule : '';
 }
+
+function getDeliveryStates()
+{
+    return [
+        'new' => _('Čaká za objednanim dopravy'),
+        'ok' => _('Prijatá'),
+        'sent' => _('Odoslaná'),
+        'error' => _('Neprijatá (chyba)'),
+    ];
+}
 ?>

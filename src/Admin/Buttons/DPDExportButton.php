@@ -19,7 +19,7 @@ class DPDExportButton extends Button
     public $class = 'btn-default';
 
     //Button Icon
-    public $icon = 'fa-truck';
+    public $icon = 'fa-file-export';
 
     /**
      * Here you can set your custom properties for each row
