@@ -77,7 +77,7 @@ trait HasOrderInvoice
         } catch (Exception $error){
             Log::error($error);
 
-            $order->log()->create([
+            $this->log()->create([
                 'type' => 'error',
                 'code' => 'INVOICE_ERROR',
                 'log' => $error->getMessage()
