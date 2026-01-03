@@ -7,6 +7,7 @@ use AdminEshop\Admin\Rules\SetDefaultOrderStatus;
 use AdminEshop\Models\Store\Store as StoreModel;
 use Admin\Eloquent\AdminModel;
 use Admin\Fields\Group;
+use Admin;
 use Store;
 
 class OrdersStatus extends AdminModel
@@ -99,7 +100,7 @@ class OrdersStatus extends AdminModel
     {
         $hasSortable = $this->isSortable();
 
-        $storeId = Store::first()->getKey();
+        $storeId = Admin::getModel('Store')->first()->getKey();
 
         $i = 1;
 
