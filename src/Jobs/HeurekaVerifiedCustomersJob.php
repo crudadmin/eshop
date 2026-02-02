@@ -6,14 +6,11 @@ use AdminEshop\Models\Orders\Order;
 use Exception;
 use Heureka\ShopCertification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Collection;
 use Log;
-use Throwable;
 
 class HeurekaVerifiedCustomersJob implements ShouldQueue
 {
