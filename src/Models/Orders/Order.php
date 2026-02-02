@@ -74,7 +74,12 @@ class Order extends AdminModel implements Orderable
             OrderMessagesButton::class,
             SetOrderStatusButton::class,
             SetOrderDeliveryStatusButton::class,
-        ], $this->getShippingButtons());
+        ]);
+    }
+
+    public function exports()
+    {
+        return $this->getShippingButtons();
     }
 
     /*

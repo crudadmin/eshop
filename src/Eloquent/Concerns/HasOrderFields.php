@@ -30,7 +30,7 @@ trait HasOrderFields
             //Depreaced, can be removed in v4
             config('admin_eshop.delivery.packeta', false)
                 ? ['packeta_point' => 'name:Packeta point|type:json|inaccessible'] : [],
-        ));
+        ))->id('general');
     }
 
     /**
