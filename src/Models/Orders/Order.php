@@ -69,7 +69,6 @@ class Order extends AdminModel implements Orderable
     public function buttons()
     {
         return array_merge([
-            GenerateInvoice::class,
             SendShippmentButton::class,
             OrderMessagesButton::class,
             SetOrderStatusButton::class,
@@ -79,7 +78,9 @@ class Order extends AdminModel implements Orderable
 
     public function exports()
     {
-        return $this->getShippingButtons();
+        return [
+            GenerateInvoice::class,
+        ] + $this->getShippingButtons();
     }
 
     /*
