@@ -13,7 +13,7 @@ class GenerateInvoice extends AdminButtonExport
     public function __construct($row = null)
     {
         //Name of button on hover
-        $this->name = _('Vystaviť doklad');
+        $this->name = _('Vystavenie dokladov');
 
         //Button classes
         $this->class = 'btn-default';
