@@ -261,9 +261,7 @@ trait HasProductFilter
     {
         $query->withoutGlobalScope('order');
 
-        if ( $scope = $this->getFilterOption('scope.product') ){
-            $scope($query);
-        }
+        $query->applyFilterScope();
 
         if ( $this->getFilterOption('$ignore.filter.attributes', false) == false ) {
             $query->applyAttributesFilter($params, config('admin_eshop.attributes.inParentAttributes', []));
@@ -356,5 +354,12 @@ trait HasProductFilter
     public function getExtractorAttributes()
     {
         // return env('ATTR_COLOR_ID');
+    }
+
+    public function scopeApplyFilterScope($query)
+    {
+        if ( $scope = $this->getFilterOption('scope.product') ){
+            $scope($query);
+        }
     }
 }
