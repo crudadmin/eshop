@@ -42,8 +42,13 @@ trait HasOrderInvoice
             return;
         }
 
+
         try {
             $data = array_merge($this->getInvoiceData($type), $data);
+
+            if ( config('invoices.multi_subjects', false) && ($currency = $this->currency) ) {
+                $data['subject_id'] = $currency->subject_id;
+            }
 
             //If is creating invoice, and order has proform
             if (

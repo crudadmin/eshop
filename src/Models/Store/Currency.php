@@ -75,6 +75,9 @@ class Currency extends AdminModel
                 'decimal_rounding' => 'name:Zaokrúhľovanie cien na|type:select|default:2|title:Zaokruhľovanie platí pre všetky ceny s DPH. Ceny produktov bez DPH sa nezaokruhľujú, z týchto nezaokruhlených cien je vypočítana finálna cena s DPH|required',
                 'decimal_separator' => 'name:Separator desatinných čísel|type:select|default:comma|required',
             ])->icon('fa-money')->add('hidden'),
+            'Fakturácia' => Group::tab([
+                'subject' => 'name:Fakturovať na|belongsTo:invoices_settings,:name - :company_id',
+            ])->if(config('invoices.multi_subjects', false))->icon('fa-file-invoice')->id('billing'),
         ];
     }
 
