@@ -386,7 +386,10 @@ class OrderService
     private function addCurrency()
     {
         if ( !$this->getOrder()->currency_id ){
-            $this->getOrder()->currency_id = Store::getCurrency()?->getKey();
+            $currency = Store::getCurrency();
+
+            $this->getOrder()->currency_id = $currency?->getKey();
+            $this->getOrder()->setRelation('currency', $currency);
         }
     }
 
