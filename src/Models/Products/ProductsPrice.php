@@ -34,6 +34,8 @@ class ProductsPrice extends AdminModel
         'search.enabled' => false,
         'grid.enabled' => false,
         'grid.default' => 'halt',
+        'title.create' => 'Nová cena',
+        'title.update' => 'Upravujete cenu č. :id',
         'buttons.create' => 'Nová cena',
         'columns.price_vat.name' => 'Cena s DPH',
     ];
