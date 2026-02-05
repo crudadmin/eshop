@@ -42,13 +42,9 @@ class FreeDeliveryByCode extends Discount implements Discountable
      */
     public function getCacheKey()
     {
-        if ( Admin::isAdmin() ) {
-            $identifier = ($order = $this->getOrder()) ? $order->discount_codes->pluck('code')->join(';') : '-';
-        } else {
-            $identifier = implode(';', OrderService::getDiscountCodeDiscount()->getCodes());
-        }
+        $key = OrderService::getDiscountCodeDiscount()->getCacheKey();
 
-        return $this->getKey().':'.($identifier?:'');
+        return str_replace('DiscountCode', $this->getKey(), $key);
     }
 
     /**
