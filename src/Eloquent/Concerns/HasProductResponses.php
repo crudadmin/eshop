@@ -336,6 +336,10 @@ trait HasProductResponses
 
         $query->withProductModules();
 
+        // Add detail scope filter
+        if ( $scope = $this->getFilterOption('scope.product') ){
+            $scope($query);
+        }
     }
 
     public function scopeWithFavouriteResponse($query, $options = [])
