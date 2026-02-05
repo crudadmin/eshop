@@ -48,7 +48,9 @@ class GenerateInvoice extends AdminButtonExport
      */
     public function generate($row)
     {
-        if ( array_key_exists(request('invoice_type'), config('invoices.invoice_types', [])) === false ) {
+        $invoiceType = request('invoice_type');
+
+        if ( array_key_exists($invoiceType, config('invoices.invoice_types', [])) === false ) {
             return $this->error(_('Nevybrali ste typ dokladu.'));
         }
 
@@ -56,7 +58,7 @@ class GenerateInvoice extends AdminButtonExport
             return $this->error(sprintf(_('Objednávka č. %s neobsahuje žiadne položky k vygenerovaniu dokladu.'), $row->number));
         }
 
-        $invoice = $row->makeInvoice('invoice');
+        $invoice = $row->makeInvoice($invoiceType);
 
         //Generate PDF
         if ( !($pdf = $invoice->getPdf()) ){
