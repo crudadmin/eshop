@@ -42,7 +42,6 @@ trait HasOrderInvoice
             return;
         }
 
-
         try {
             $data = array_merge($this->getInvoiceData($type), $data);
 
