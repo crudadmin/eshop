@@ -78,7 +78,7 @@ class FreeDeliveryFromPrice extends Discount implements Discountable
 
             $summaryWithVat = @$this->getCartSummary()['priceWithVat'] ?: 0;
 
-            return $summaryWithVat >= $item->free_from ? 0 : null;
+            return $summaryWithVat >= $item->free_from ? ($item->free_from_price ?: 0) : null;
         };
     }
 }

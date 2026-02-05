@@ -128,12 +128,15 @@ class Delivery extends AdminModel implements DiscountSupport
 
         //Add multiple locations model
         if ( Discounts::isRegistredDiscount(FreeDeliveryFromPrice::class) ) {
-            $discountFields['free_from'] = 'name:Zdarma od (€)|title:Platí od sumy s DPH|type:decimal';
+            $discountFields[] = Group::inline([
+                'free_from' => 'name:Po prekročení sumy objednávky (€)|title:Platí od sumy s DPH|type:decimal',
+                'free_from_price' => 'name:Nová cena dopravy (€)|type:decimal|default:0|title:bez DPH',
+            ]);
         }
 
         if ( count($discountFields) > 0 ) {
             $fields->push(
-                Group::tab($discountFields)->name('Zľavy dopravy')->icon('fa-percentage')->add('hidden')
+                Group::tab($discountFields)->name('Zľavy dopravy')->icon('fa-percentage')->add('hidden')->id('discounts')
             );
         }
     }
