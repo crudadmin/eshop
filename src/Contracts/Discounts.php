@@ -213,7 +213,7 @@ class Discounts
                 //If response is negative, we can cache discount
                 //Or If discount data are not present in saved order
                 if (
-                    !array_key_exists($discount->getKey(), $orderDiscountData)
+                    array_key_exists($discount->getKey(), $orderDiscountData) === false
                     || !(
                         $response = $discount->unserializeResponse(
                             $orderDiscountData[$discount->getKey()]

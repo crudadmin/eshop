@@ -8,7 +8,6 @@ use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
 use Admin;
 use OrderService;
-use Store;
 
 class FreeDeliveryByCode extends Discount implements Discountable
 {
@@ -26,7 +25,12 @@ class FreeDeliveryByCode extends Discount implements Discountable
      *
      * @var  bool
      */
-    public $canApplyOutsideCart = false;
+    public $canApplyOutsideCart = true;
+
+    /*
+     * We does not want cache discount codes, because they may be changed in order
+     */
+    public $cachableResponse = false;
 
     /**
      * Returns cache key for given discount
@@ -39,10 +43,12 @@ class FreeDeliveryByCode extends Discount implements Discountable
     public function getCacheKey()
     {
         if ( Admin::isAdmin() ) {
-            return false;
+            $identifier = ($order = $this->getOrder()) ? $order->discount_codes->pluck('code')->join(';') : '-';
         } else {
-            return $this->getKey().OrderService::getDiscountCodeDiscount()->getCacheKey();
+            $identifier = implode(';', OrderService::getDiscountCodeDiscount()->getCodes());
         }
+
+        return $this->getKey().':'.($identifier?:'');
     }
 
     /**
@@ -86,7 +92,7 @@ class FreeDeliveryByCode extends Discount implements Discountable
     {
         //Get discount code in order, if exists..
         foreach ($order->discountCodes as $code) {
-            if ( $hasDiscount = $this->hasCodeFreeDelivery($order->discountCode) ){
+            if ( $hasDiscount = $this->hasCodeFreeDelivery($code) ){
                 return $hasDiscount;
             }
         }
