@@ -21,9 +21,8 @@ use AdminEshop\Eloquent\Concerns\HasSimilarProducts;
 use AdminEshop\Eloquent\Concerns\HasStock;
 use AdminEshop\Eloquent\Concerns\HasVariantColors;
 use AdminEshop\Eloquent\Concerns\SearchableTrait;
-use AdminEshop\Models\Attribute\Attribute;
-use AdminEshop\Models\Attribute\AttributesItem;
 use Admin\Fields\Group;
+use Admin;
 use Store;
 
 class Product extends CartEloquent implements HasAttributesSupport
@@ -291,9 +290,9 @@ class Product extends CartEloquent implements HasAttributesSupport
             return collect();
         }
 
-        $attribute = new Attribute;
+        $attribute = Admin::getModel('Attribute');
 
-        return AttributesItem::select('attributes_items.id', 'attributes_items.name', 'attributes.name as attribute_name')
+        $items = Admin::getModel('AttributesItem')->select('attributes_items.id', 'attributes_items.name', 'attributes.name as attribute_name')
                 ->leftJoin('attributes', 'attributes_items.attribute_id', '=', 'attributes.id')
                 ->orderBy('attributes.id', 'ASC')
                 ->get()
@@ -303,6 +302,8 @@ class Product extends CartEloquent implements HasAttributesSupport
 
                     return $item;
                 });
+
+        return $items;
     }
 
     public function getFilterStates()
