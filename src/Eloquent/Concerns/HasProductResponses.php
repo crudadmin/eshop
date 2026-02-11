@@ -335,8 +335,6 @@ trait HasProductResponses
         $query->addSelect('products.*');
 
         $query->withProductModules();
-
-        $query->applyFilterScope();
     }
 
     public function scopeWithFavouriteResponse($query, $options = [])
