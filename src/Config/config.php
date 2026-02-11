@@ -6,6 +6,8 @@ return [
      * (cache is defined in minutes)
      */
     'routes' => [
+        // Return absolute routes in bootstrap response
+        'absolute' => false,
         'enabled' => [
             'products' => false,
             'discounts' => false,

@@ -4,7 +4,6 @@ namespace AdminEshop\Contracts\Bootstrap;
 
 use Admin;
 use AdminEshop\Middleware\SetStoreLanguage;
-use Admin\Controllers\GettextController;
 use EditorMode;
 use Localization;
 use Store;
@@ -49,7 +48,7 @@ class BootstrapRequest
     {
         return [
             'seo_routes' => $this->getSeoRoutes(),
-            'routes' => EditorMode::getVisibleRoutes(),
+            'routes' => EditorMode::getVisibleRoutes(config('admin_eshop.routes.absolute', false)),
             'translates' => $this->getJsonTranslations(),
             'languages' => $this->getLanguages(),
         ];
