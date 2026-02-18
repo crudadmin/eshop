@@ -115,7 +115,10 @@ class Order extends AdminModel implements Orderable
             'grid.default' => 'full',
             'form.actions' => true,
             'columns.price.hidden' => true,
-            'columns.created.name' => 'Vytvorená dňa',
+            'columns.created' => [
+                'name' => 'Vytvorená dňa',
+                'sortBy' => 'created_at',
+            ],
             'columns.client_name' => [
                 'encode' => false,
                 'after' => 'number',
