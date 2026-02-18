@@ -26,7 +26,9 @@ trait HasProductFields
                 Store::hasCategories()
                     ? ['categories' => 'name:Kategória|belongsToMany:categories,name|component:selectParentCategories|canAdd|removeFromFormIfNot:product_id,NULL'] : [],
                 Store::hasAttributes()
-                    ? ['attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name'] : []
+                    ? ['attributes_items' => 'name:Atribúty|belongsToMany:attributes_items,:attribute_name - :name'] : [],
+                config('admin_eshop.product.weight_unit')
+                    ? ['weight' => 'name:Váha ('.(config('admin_eshop.product.weight_unit') == 'kilograms' ? 'kg' : 'gramov').')|type:decimal|hidden'] : [],
             ))->id('general')->name('Základne nastavenia'),
             Group::fields([
                 'product_type' => 'name:Typ produktu|type:select|option:name|index|default:regular|hideFromFormIf:product_type,variant|sub_component:setProductType|required',
@@ -58,9 +60,6 @@ trait HasProductFields
     public function getDescriptionFields()
     {
         return Group::tab([
-            Group::fields([
-                'weight' => 'name:Váha ('.(config('admin_eshop.product.weight_unit') == 'kilograms' ? 'kg' : 'gramov').')|type:decimal|hidden',
-            ])->if(config('admin_eshop.product.weight_unit')),
             'description' => 'name:Popis produktu|type:editor|hidden'.(Store::isEnabledLocalization() ? '|locale' : ''),
         ])->icon('fa-file-text-o')->id('description-tab')->name('Popis');
     }
