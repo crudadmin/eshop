@@ -155,7 +155,7 @@ class Store
         $model = (Admin::getModel('Store') ?: new StoreModel);
 
         return $this->cache('storeSettings', function() use ($model) {
-            return $model->first() ?: $model;
+            return $model->runCached('storeSettings', fn() => $model->first()) ?: $model;
         });
     }
 

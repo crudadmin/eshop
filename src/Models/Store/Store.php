@@ -31,6 +31,8 @@ class Store extends AdminModel
     protected $publishable = false;
     protected $sortable = false;
 
+    protected $flushableCacheKeys = ['storeSettings'];
+
     /*
      * Automatic form and database generation
      * @name - field name
