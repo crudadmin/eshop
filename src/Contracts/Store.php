@@ -64,7 +64,7 @@ class Store
         $model = Admin::getModel('Vat') ?: new Vat;
 
         return $this->cache('vats', function() use ($model) {
-            return $model->get();
+            return $model->getCached('vats');
         });
     }
 
