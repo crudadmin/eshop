@@ -141,6 +141,8 @@ trait HasOrderFields
             return [];
         }
 
+        $defaultVat = Store::getDefaultVat();
+
         return Group::tab(array_merge(
             $hasDelivery ? [
                 'Doprava' => Group::fields([
@@ -155,7 +157,7 @@ trait HasOrderFields
                     )),
                     Group::inline([
                         'delivery_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na cenu dopravy pôsobiť žiadna automatická zľava.',
-                        'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.Store::getDefaultVat(),
+                        'delivery_vat' => 'name:DPH dopravy %|readonlyIf:delivery_manual,0|fillBy:delivery.vat|required|hidden|type:select|default:'.$defaultVat,
                     ]),
                     'delivery_price' => 'name:Cena za dopravu|readonlyIf:delivery_manual,0|required|fillBy:delivery.price|type:decimal|component:PriceField|column_component:CurrencyPriceColumn|hidden',
                     'delivery_price_vat' => 'name:Cena za dopravu s DPH|required|column_component:CurrencyPriceColumn|hidden|removeFromForm|keepInRequest',
@@ -165,7 +167,7 @@ trait HasOrderFields
                 'Platobná metóda' => Group::fields([
                     Group::fields([
                         'payment_method' => 'name:Platobná metóda|column_name:Platba|required|belongsTo:payments_methods,name',
-                        'payment_method_vat' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.vat|hidden|required|type:select|default:'.Store::getDefaultVat(),
+                        'payment_method_vat' => 'name:DPH plat. metody %|readonlyIf:delivery_manual,0|fillBy:payment_method.vat|hidden|required|type:select|default:'.$defaultVat,
                         'payment_method_manual' => 'name:Manuálna cena|hidden|type:checkbox|default:0|tooltip:Ak je manuálna cena zapnutá, nebude na poplatok za platobnú metódu pôsobiť žiadna automatická zľava.',
                     ])->inline(),
                     'payment_method_price' => 'name:Cena plat. metódy|readonlyIf:payment_method_manual,0|type:decimal|required|fillBy:payment_method.price|component:PriceField|column_component:CurrencyPriceColumn|hidden',
