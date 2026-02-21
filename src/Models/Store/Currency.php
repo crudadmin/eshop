@@ -41,6 +41,8 @@ class Currency extends AdminModel
         'columns.id.hidden' => true,
     ];
 
+    protected $flushableCacheKeys = ['currencies'];
+
     protected $rules = [
         SetDefault::class,
     ];

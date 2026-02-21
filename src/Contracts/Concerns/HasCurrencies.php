@@ -42,7 +42,7 @@ trait HasCurrencies
     public function getCurrencies()
     {
         return $this->cache('orders.currencies', function(){
-            return Admin::getModel('Currency')->get();
+            return Admin::getModel('Currency')->getCached('currencies');
         });
     }
 

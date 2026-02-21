@@ -9,6 +9,8 @@ class Country extends BaseCountry
 {
     protected $group = 'store';
 
+    protected $flushableCacheKeys = ['countries'];
+
     public function mutateFields($fields)
     {
         parent::mutateFields($fields);

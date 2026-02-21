@@ -88,7 +88,7 @@ class Store
         $model = (Admin::getModel('Country') ?: new Country);
 
         return $this->cache('countries', function() use ($model) {
-            return $model->get();
+            return $model->getCached('countries');
         });
     }
 
