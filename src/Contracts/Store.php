@@ -27,13 +27,44 @@ class Store
      */
     private $hasB2B = false;
 
+    /**
+     * Is ecommerce app booted?
+     */
+    private $booted = false;
+
+    /**
+     * Boot ecommerce app
+     */
+    public function boot()
+    {
+        $this->booted = true;
+
+        return $this;
+    }
+
+    /**
+     * Is ecommerce app booted?
+     */
+    public function isBooted()
+    {
+        return $this->booted;
+    }
+
     /*
      * Return all vats
      */
     public function getVats()
     {
-        return $this->cache('vats', function(){
-            return (Admin::getModel('Vat') ?: new Vat)->get();
+        // When store app is not fully booted, return empty collection
+        if ( $this->isBooted() === false ) {
+            return collect([]);
+        }
+
+        // Eloquent must be outside cache, because it may occur recursive call
+        $model = Admin::getModel('Vat') ?: new Vat;
+
+        return $this->cache('vats', function() use ($model) {
+            return $model->get();
         });
     }
 
@@ -42,9 +73,9 @@ class Store
      */
     public function getUnits()
     {
-        return $this->cache('units', function(){
-            $units = (Admin::getModel('AttributesUnit') ?: new AttributesUnit)->get();
+        $units = (Admin::getModel('AttributesUnit') ?: new AttributesUnit)->get();
 
+        return $this->cache('units', function() use ($units) {
             return $units->each->setLocalizedResponse();
         });
     }
@@ -54,8 +85,10 @@ class Store
      */
     public function getCountries()
     {
-        return $this->cache('countries', function(){
-            return (Admin::getModel('Country') ?: new Country)->get();
+        $model = (Admin::getModel('Country') ?: new Country);
+
+        return $this->cache('countries', function() use ($model) {
+            return $model->get();
         });
     }
 
@@ -64,8 +97,10 @@ class Store
      */
     public function getOrdersStatuses()
     {
-        return $this->cache('orders.statuses', function(){
-            return Admin::getModel('OrdersStatus')->get();
+        $statuses = Admin::getModel('OrdersStatus');
+
+        return $this->cache('orders.statuses', function() use ($statuses) {
+            return $statuses->get();
         });
     }
 
@@ -74,7 +109,8 @@ class Store
      */
     public function getDefaultVat()
     {
-        if ( app()->runningInconsole() === true ) {
+        // TODO: console should have default vat value? Because in queus this will trigger
+        if ( app()->runningInconsole() === true || $this->isBooted() === false ) {
             return 0;
         }
 
@@ -116,8 +152,10 @@ class Store
 
     public function getSettings()
     {
-        return $this->cache('storeSettings', function(){
-            return (Admin::getModel('Store') ?: new StoreModel)->first() ?: new StoreModel;
+        $model = (Admin::getModel('Store') ?: new StoreModel);
+
+        return $this->cache('storeSettings', function() use ($model) {
+            return $model->first() ?: $model;
         });
     }
 

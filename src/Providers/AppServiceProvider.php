@@ -59,6 +59,8 @@ class AppServiceProvider extends AdminHelperServiceProvider
             \AdminEshop\Commands\CheckOrderInactiveStatus::class,
             \AdminEshop\Commands\FixProductsNoVatPrices::class,
         ]);
+
+        Store::boot();
     }
 
     /**
