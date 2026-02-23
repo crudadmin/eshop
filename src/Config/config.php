@@ -189,7 +189,7 @@ return [
             'length' => 12,
 
             //Remove inactive tokens after X days
-            'remove_inactive_after_days' => false,
+            'remove_inactive_after_days' => 60,
             'remove_empty_after_days' => 3,
         ],
 
