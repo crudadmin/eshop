@@ -1,5 +1,5 @@
 <template>
-<div @mouseenter="loadProducts" ref="element" data-bs-template='<div class="tooltip tooltip-products" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>' data-toggle="tooltip" data-bs-html="true" data-bs-delay="5000" :title="products" :key="loaded ? 1 : 0">
+<div @mouseenter="loadProducts" ref="element" data-bs-template='<div class="tooltip tooltip-products" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>' data-toggle="tooltip" data-bs-html="true" data-bs-delay="5000" :title="products" :key="loaded ? 1 : 0">
     {{ valueMutated }}
 </div>
 </template>
