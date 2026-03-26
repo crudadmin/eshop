@@ -122,7 +122,7 @@ class SynchronizerReport extends AdminModel
         if ( $removeOlderReportsFrom ) {
             $this->where('id', '<', $removeOlderReportsFrom->getKey())
                  ->where('name', $name)
-                 ->delete();
+                 ->forceDelete();
         }
     }
 }
