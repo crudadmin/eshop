@@ -23,8 +23,10 @@ trait HasProductResponses
             'id', 'slug', 'name', 'stock_type',
         ];
 
+        $type = $this->getAttribute('product_type');
+
         //In main product we does not need this properties, because they are present in each variant
-        if ( in_array($this->getAttribute('product_type'), Store::variantsProductTypes()) === false ){
+        if ( !in_array($type, Store::variantsProductTypes()) || in_array($type, Store::orderableProductTypes()) ){
             $columns = array_merge($columns, ['initialPriceWithVat', 'defaultPriceWithVat', 'priceWithVat', 'priceWithoutVat']);
             $columns = array_merge($columns, ['stock_quantity', 'stockText', 'stockNumber', 'hasStock', 'canOrderEverytime']);
         }
