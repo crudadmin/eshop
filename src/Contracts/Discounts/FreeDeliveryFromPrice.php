@@ -6,7 +6,7 @@ use AdminEshop\Contracts\Discounts\Discount;
 use AdminEshop\Contracts\Discounts\Discountable;
 use AdminEshop\Models\Delivery\Delivery;
 use AdminEshop\Models\Orders\Order;
-use Store;
+use OrderService;
 
 class FreeDeliveryFromPrice extends Discount implements Discountable
 {
@@ -49,7 +49,11 @@ class FreeDeliveryFromPrice extends Discount implements Discountable
      */
     public function isActive()
     {
-        return true;
+        if ( !($delivery = OrderService::getDeliveryMutator()->getSelectedDelivery()) ) {
+            return false;
+        }
+
+        return $this->getDeliveryDiscounts($delivery);
     }
 
     /*
@@ -57,7 +61,20 @@ class FreeDeliveryFromPrice extends Discount implements Discountable
      */
     public function isActiveInAdmin(Order $order)
     {
-        return true;
+        if ( !($delivery = $order->delivery) ) {
+            return false;
+        }
+
+        return $this->getDeliveryDiscounts($delivery);
+    }
+
+    public function getDeliveryDiscounts($delivery = null)
+    {
+        if ( !$delivery || !$delivery->free_from || $delivery->free_from <= 0 ) {
+            return false;
+        }
+
+        return $delivery->only('id', 'free_from', 'free_from_price');
     }
 
     /**
@@ -66,19 +83,27 @@ class FreeDeliveryFromPrice extends Discount implements Discountable
      * @param  mixed  $code
      * @return void
      */
-    public function boot($code)
+    public function boot($discountData)
     {
         $this->operator = 'abs';
 
-        $this->value = function($item){
+        $this->value = function($item) use ($discountData) {
+            // Other discounts should use fresh data.
+            if ( ($discountData['id'] ?? null) !== $item->id ) {
+                $discountData = $item->only('id', 'free_from', 'free_from_price');
+            }
+
+            $freeFrom = $discountData['free_from'] ?? null;
+            $freeFromPrice = $discountData['free_from_price'] ?? null;
+
             //If free delivery from price is not defined
-            if ( !$item->free_from ) {
+            if ( !$freeFrom ) {
                 return;
             }
 
             $summaryWithVat = @$this->getCartSummary()['priceWithVat'] ?: 0;
 
-            return $summaryWithVat >= $item->free_from ? ($item->free_from_price ?: 0) : null;
+            return $summaryWithVat >= $freeFrom ? $freeFromPrice : null;
         };
     }
 }
