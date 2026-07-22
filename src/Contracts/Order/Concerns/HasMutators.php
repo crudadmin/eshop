@@ -4,10 +4,6 @@ namespace AdminEshop\Contracts\Order\Concerns;
 
 use Admin;
 use AdminEshop\Contracts\Collections\CartCollection;
-use AdminEshop\Contracts\Order\Mutators\ClientDataMutator;
-use AdminEshop\Contracts\Order\Mutators\CountryMutator;
-use AdminEshop\Contracts\Order\Mutators\DeliveryMutator;
-use AdminEshop\Contracts\Order\Mutators\PaymentMethodMutator;
 use Cart;
 
 trait HasMutators

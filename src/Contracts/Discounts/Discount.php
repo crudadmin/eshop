@@ -308,7 +308,13 @@ class Discount implements Discountable, ActiveInterface
      */
     public function getCartSummary()
     {
-        return $this->cache('summary.'.static::class, function(){
+        //Cache key must be scoped by order, otherwise a bulk admin action processing
+        //multiple orders in one request would reuse the first order's cart summary
+        //for every other order in that same request.
+        $order = $this->getOrder();
+        $orderKey = $order ? $order->getKey() : 'cart';
+
+        return $this->cache('summary.'.static::class.'.'.$orderKey, function(){
             $exceptAcutal = Discounts::getDiscounts([ $this->getKey() ]);
 
             return $this->getCartItems()->getSummary(false, $exceptAcutal, true);
