@@ -62,8 +62,8 @@ class Order extends AdminModel implements Orderable
 
     protected $rules = [
         OrderNumber::class,
-        OnOrderStatusChange::class,
         RebuildOrder::class,
+        OnOrderStatusChange::class,
     ];
 
     public function buttons()

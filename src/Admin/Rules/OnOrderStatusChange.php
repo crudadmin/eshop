@@ -24,7 +24,7 @@ class OnOrderStatusChange extends AdminRule
     /*
      * Firing callback on update row
      */
-    public function updating(AdminModel $row)
+    public function updated(AdminModel $row)
     {
         $this->setStatusChange($row);
     }
