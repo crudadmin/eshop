@@ -34,7 +34,7 @@ class RebuildOrder extends AdminRule
 
         // Recalculate order on save if priceable fields have been changed
         if ( $this->hasChangedPriceableFields($row) ) {
-            $this->tryRecalculateOrder($row);
+            $this->checkPriceRecalculation($row);
         }
     }
 
@@ -72,7 +72,7 @@ class RebuildOrder extends AdminRule
      * @param  mixed $row
      * @return void
      */
-    private function tryRecalculateOrder(AdminModel $row)
+    private function checkPriceRecalculation(AdminModel $row)
     {
         $priceBefore = (float)$row->getOriginal('price_vat');
 
