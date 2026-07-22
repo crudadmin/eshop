@@ -113,6 +113,21 @@ class Discounts
     }
 
     /**
+     * Scope the whole DataStore cache bucket of this class by the current order.
+     * Without this, a bulk admin action processing multiple orders in one request
+     * would reuse the first order's cached discount state for every other order
+     * in that same request.
+     *
+     * @return  string
+     */
+    protected function getStoreKey()
+    {
+        $order = $this->getOrder();
+
+        return get_class($this).($order ? '.'.$order->getKey() : '');
+    }
+
+    /**
      * Get all registered discounts in cart
      *
      * @param  array|string  $exceps
@@ -139,12 +154,7 @@ class Discounts
                 $discount->setOrder($order);
             }
 
-            //Cache key must be scoped by order, otherwise a bulk admin action processing
-            //multiple orders in one request would reuse the first order's booted discount
-            //state for every other order in that same request.
-            $orderKey = $order ? $order->getKey() : 'cart';
-
-            return $this->cache('discounts.'.$discount->getCacheKey().'.'.$orderKey, function() use ($discount) {
+            return $this->cache('discounts.'.$discount->getCacheKey(), function() use ($discount) {
                 //This discount is now under "boot" state. We need save this state
                 //because in isActive method may be needed cartSummary. In this case
                 //summary with all discounts except booting one will be retrieved. But if other discount

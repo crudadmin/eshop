@@ -308,13 +308,7 @@ class Discount implements Discountable, ActiveInterface
      */
     public function getCartSummary()
     {
-        //Cache key must be scoped by order, otherwise a bulk admin action processing
-        //multiple orders in one request would reuse the first order's cart summary
-        //for every other order in that same request.
-        $order = $this->getOrder();
-        $orderKey = $order ? $order->getKey() : 'cart';
-
-        return $this->cache('summary.'.static::class.'.'.$orderKey, function(){
+        return $this->cache('summary.'.static::class, function(){
             $exceptAcutal = Discounts::getDiscounts([ $this->getKey() ]);
 
             return $this->getCartItems()->getSummary(false, $exceptAcutal, true);
@@ -362,6 +356,21 @@ class Discount implements Discountable, ActiveInterface
     public function getOrder()
     {
         return $this->order;
+    }
+
+    /**
+     * Scope the whole DataStore cache bucket of this class by the current order.
+     * Without this, a bulk admin action processing multiple orders in one request
+     * would reuse the first order's cached cart summary for every other order
+     * in that same request.
+     *
+     * @return  string
+     */
+    protected function getStoreKey()
+    {
+        $order = $this->getOrder();
+
+        return get_class($this).($order ? '.'.$order->getKey() : '');
     }
 
     /**

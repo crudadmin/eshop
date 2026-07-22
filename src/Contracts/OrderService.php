@@ -204,6 +204,21 @@ class OrderService
         return $this->order;
     }
 
+    /**
+     * Scope the whole DataStore cache bucket of this class by the current order.
+     * Without this, a bulk admin action processing multiple orders in one request
+     * would reuse the first order's cached active mutators (delivery, payment
+     * method, ...) for every other order in that same request.
+     *
+     * @return  string
+     */
+    protected function getStoreKey()
+    {
+        $order = $this->getOrder();
+
+        return get_class($this).($order ? '.'.$order->getKey() : '');
+    }
+
     private function saveOrCreateOrder(CartCollection $items)
     {
         $this->getOrder()->save();

@@ -41,6 +41,21 @@ class Mutator implements ActiveInterface
     static $forceCartResponse = [];
 
     /**
+     * Scope the whole DataStore cache bucket of this class by the current order.
+     * Without this, a bulk admin action processing multiple orders in one request
+     * would reuse the first order's cached selected delivery/payment method/...
+     * for every other order in that same request.
+     *
+     * @return  string
+     */
+    protected function getStoreKey()
+    {
+        $order = OrderService::getOrder();
+
+        return get_class($this).($order ? '.'.$order->getKey() : '');
+    }
+
+    /**
      * Returns if mutators is active
      * And sends state to other methods
      *
