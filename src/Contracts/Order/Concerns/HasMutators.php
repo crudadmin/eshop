@@ -97,7 +97,14 @@ trait HasMutators
      */
     public function getActiveMutators(CartCollection $cartItems = null)
     {
-        $cacheKey = $cartItems ? $cartItems->getCartKey() : 'default';
+        //Cache key must be scoped by order, otherwise a bulk admin action processing
+        //multiple orders in one request would reuse the first order's booted mutators
+        //(and their activeResponse, eg. selected delivery/payment method) for every
+        //other order in that same request.
+        $order = $this->getOrder();
+        $orderKey = $order ? $order->getKey() : 'cart';
+
+        $cacheKey = ($cartItems ? $cartItems->getCartKey() : 'default').'.'.$orderKey;
 
         return $this->cache('active.mutators.'.$cacheKey, function() use ($cartItems, $cacheKey) {
             $mutators = $this->getMutators($cartItems);
