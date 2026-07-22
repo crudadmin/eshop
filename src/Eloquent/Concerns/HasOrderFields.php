@@ -212,4 +212,33 @@ trait HasOrderFields
                 ? '|required'
                 : '|required_if_checked:delivery_different';
     }
+
+    /**
+     * Order priceable fields, field which may affect order price
+     *
+     * @return void
+     */
+    public function getPriceableFields()
+    {
+        return [
+            // Delivery fields
+            'delivery_id',
+            'delivery_vat',
+            'delivery_price',
+            'delivery_price_vat',
+
+            // Payment method fields
+            'payment_method_id',
+            'payment_method_vat',
+            'payment_method_price',
+            'payment_method_price_vat',
+
+            // Order fields
+            'price',
+            'price_vat',
+
+            // Discount fields
+            'discount_codes',
+        ];
+    }
 }

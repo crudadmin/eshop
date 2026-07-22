@@ -4,7 +4,6 @@ namespace AdminEshop\Admin\Rules;
 
 use Admin\Eloquent\AdminModel;
 use Admin\Eloquent\AdminRule;
-use Admin;
 use Store;
 
 class RebuildOrder extends AdminRule
@@ -33,6 +32,48 @@ class RebuildOrder extends AdminRule
             $row->syncStock('+', 'order.canceled');
         }
 
+        // Recalculate order on save if priceable fields have been changed
+        if ( $this->hasChangedPriceableFields($row) ) {
+            $this->tryRecalculateOrder($row);
+        }
+    }
+
+    /*
+     * On delete product from admin, add goods back to stock
+     */
+    public function deleted($row)
+    {
+        //If order has been uncounted from stock yet
+        if ( Store::getOrdersStatus($row->status_id)?->return_stock !== true ) {
+            $row->syncStock('+', 'order.deleted');
+        }
+    }
+
+    /**
+     * Check if order has changed priceable fields
+     *
+     * @param  mixed $row
+     * @return void
+     */
+    private function hasChangedPriceableFields(AdminModel $row)
+    {
+        $priceableFields = $row->getPriceableFields();
+
+        $isModelDirty = $row->isDirty($priceableFields);
+
+        $isAdminDirty = $this->isFieldDirty($priceableFields);
+
+        return $isModelDirty || $isAdminDirty;
+    }
+
+    /**
+     * Recalculate final order price if any of field has been changed
+     *
+     * @param  mixed $row
+     * @return void
+     */
+    private function tryRecalculateOrder(AdminModel $row)
+    {
         $priceBefore = (float)$row->getOriginal('price_vat');
 
         //Change delivery prices etc..
@@ -49,17 +90,6 @@ class RebuildOrder extends AdminRule
                     Store::priceFormat($row->price_vat),
                 )
             );
-        }
-    }
-
-    /*
-     * On delete product from admin, add goods back to stock
-     */
-    public function deleted($row)
-    {
-        //If order has been uncounted from stock yet
-        if ( Store::getOrdersStatus($row->status_id)?->return_stock !== true ) {
-            $row->syncStock('+', 'order.deleted');
         }
     }
 }
