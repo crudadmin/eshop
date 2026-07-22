@@ -327,7 +327,15 @@ class OrderService
                     $orderItem = $discount->createDiscountableItem($orderItem, $operatorParam);
                 }
 
-                $order->items()->create($orderItem);
+                //These discount items are created as part of an order price recalculation.
+                //Firing their model rules (eg. RebuildOrderOnItemChange) would recalculate
+                //the order prices again - which, since we are already inside a recalculation,
+                //would loop endlessly. Their prices are already up to date here, so we silence
+                //the created/updated rules for this item.
+                $order->items()
+                      ->make($orderItem)
+                      ->silentRules(['created', 'updated'])
+                      ->save();
             }
         }
 
