@@ -37,9 +37,8 @@ trait OrderTrait
         //We want sync discounts in every other items in order
         $this->syncOrderItemsWithCartDiscounts($items, $mutatingItem);
 
-        //Remove and add again all discounts
-        $this->items()->where('identifier', 'discount')->delete();
-
+        //Refresh discount items - only touches the database when they actually changed
+        //(see addDiscountableItemsIntoOrder), to avoid needless delete/recreate churn.
         OrderService::addDiscountableItemsIntoOrder();
     }
 

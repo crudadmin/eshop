@@ -293,11 +293,49 @@ class OrderService
 
     public function addDiscountableItemsIntoOrder()
     {
-        $discounts = Discounts::getDiscounts();
-
         $order = $this->getOrder();
 
-        foreach ($discounts as $discount) {
+        $newItems = $this->buildDiscountableItems();
+
+        //One extra select is cheaper than deleting and recreating these rows on every
+        //recalculation. If the discount items we would create already match what is
+        //persisted, we leave the database untouched. This also avoids re-firing their
+        //model rules (eg. RebuildOrderOnItemChange), which recalculate the order again.
+        $existingItems = $order->items()
+                               ->where('identifier', 'discount')
+                               ->get(['id', 'name', 'quantity', 'price', 'price_vat']);
+
+        if ( $this->discountItemsAreSame($existingItems, $newItems) ) {
+            return $this;
+        }
+
+        //Discount items changed - replace them all.
+        $order->items()->where('identifier', 'discount')->delete();
+
+        foreach ($newItems as $orderItem) {
+            //We are already inside a recalculation here, so we silence the created/updated
+            //rules of the new item to prevent RebuildOrderOnItemChange from looping back
+            //into calculatePrices.
+            $order->items()
+                  ->make($orderItem)
+                  ->silentRules(['created', 'updated'])
+                  ->save();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Build the discount order items which should be present on the order,
+     * without touching the database.
+     *
+     * @return  array
+     */
+    private function buildDiscountableItems()
+    {
+        $items = [];
+
+        foreach (Discounts::getDiscounts() as $discount) {
             //TODO: support multiple operators
             foreach ($discount->getAllOperators() as $operatorParam) {
                 $operator = $operatorParam['operator'];
@@ -327,19 +365,53 @@ class OrderService
                     $orderItem = $discount->createDiscountableItem($orderItem, $operatorParam);
                 }
 
-                //These discount items are created as part of an order price recalculation.
-                //Firing their model rules (eg. RebuildOrderOnItemChange) would recalculate
-                //the order prices again - which, since we are already inside a recalculation,
-                //would loop endlessly. Their prices are already up to date here, so we silence
-                //the created/updated rules for this item.
-                $order->items()
-                      ->make($orderItem)
-                      ->silentRules(['created', 'updated'])
-                      ->save();
+                $items[] = $orderItem;
             }
         }
 
-        return $this;
+        return $items;
+    }
+
+    /**
+     * Compare already persisted discount items with the freshly built ones,
+     * so we can skip pointless delete/recreate when nothing changed.
+     *
+     * @param  \Illuminate\Support\Collection  $existingItems
+     * @param  array  $newItems
+     * @return  bool
+     */
+    private function discountItemsAreSame($existingItems, array $newItems)
+    {
+        if ( count($existingItems) !== count($newItems) ) {
+            return false;
+        }
+
+        //Compact, order-insensitive signature of the money-relevant fields.
+        //Normalize numbers to avoid false mismatches from float noise or negative zero
+        //(eg. 0 * -1 = -0.0, which stringifies differently than 0.0).
+        $number = function($value) {
+            $rounded = round((float) $value, 4);
+
+            return $rounded == 0.0 ? '0' : (string) $rounded;
+        };
+
+        $signature = function($name, $quantity, $price, $priceVat) use ($number) {
+            return $name.'|'.(int)$quantity.'|'.$number($price).'|'.$number($priceVat);
+        };
+
+        $existing = $existingItems
+                        ->map(function($item) use ($signature) {
+                            return $signature($item->name, $item->quantity, $item->price, $item->price_vat);
+                        })
+                        ->sort()->values()->all();
+
+        $new = collect($newItems)
+                        ->map(function($item) use ($signature) {
+                            return $signature($item['name'] ?? '', $item['quantity'] ?? 0, $item['price'] ?? 0, $item['price_vat'] ?? 0);
+                        })
+                        ->sort()->values()->all();
+
+        return $existing === $new;
     }
 
     /**
