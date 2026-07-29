@@ -88,11 +88,12 @@ class FreeDeliveryFromPrice extends Discount implements Discountable
         $this->operator = 'abs';
 
         $this->value = function($item) use ($discountData) {
-            // Other discounts should use fresh data.
+            // When cache is not available or is not used for that item. Use fresh item discounts data.
             if ( ($discountData['id'] ?? null) !== $item->id ) {
                 $discountData = $item->only('id', 'free_from', 'free_from_price');
             }
 
+            // Parse discount data.
             $freeFrom = $discountData['free_from'] ?? null;
             $freeFromPrice = $discountData['free_from_price'] ?? null;
 
