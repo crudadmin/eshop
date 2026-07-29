@@ -50,7 +50,7 @@ class FreeDeliveryFromPrice extends Discount implements Discountable
     public function isActive()
     {
         if ( !($delivery = OrderService::getDeliveryMutator()->getSelectedDelivery()) ) {
-            return false;
+            return true;
         }
 
         return $this->getDeliveryDiscounts($delivery);
